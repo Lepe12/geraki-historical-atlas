@@ -71,6 +71,53 @@ test('overview story hides counts behind Πορεία έρευνας', async () 
   assert.match(html, /Το ερώτημά σας/);
   assert.ok(html.indexOf('έδρασε στη θάλασσα') < html.indexOf('Πορεία έρευνας'));
   assert.ok(html.indexOf('Πηγές') < html.indexOf('Πορεία έρευνας'));
+  // «Τι δεν βρέθηκε» lives only inside the closed Πορεία έρευνας.
+  const pathStart = html.indexOf('<details class="overview-details research-path">');
+  assert.ok(pathStart > 0);
+  assert.ok(html.indexOf('Τι δεν βρέθηκε') > pathStart);
+  assert.match(html, /Δεν βρέθηκε τόπος ταφής/);
+  assert.doesNotMatch(html, /<details[^>]*open/);
+  // Legacy dashboard tallies are gone from the panel.
+  assert.doesNotMatch(html, /Ιστορικοί ισχυρισμοί/);
+  assert.doesNotMatch(html, /Καταγεγραμμένες αντιφάσεις/);
+  assert.doesNotMatch(html, /Εμπόδια πρόσβασης/);
+  assert.doesNotMatch(html, /overview-counts/);
+  assert.doesNotMatch(html, /Αφήγηση έρευνας/);
+  assert.match(html, /<h2>ΠΑΡΑΔΕΙΓΜΑ προσώπου<\/h2>/);
+});
+
+test('closed surface is only article + Πηγές + map; not-found never sits beside sources', async () => {
+  const { renderStoryHtml, renderResearchPath } = await viewPromise;
+  const narrative = {
+    status: 'NARRATIVE_PENDING_HUMAN_REVIEW',
+    title_el: 'Πέτρος Λάντζας (Pietro / Pedro Lanza, 1530–1613)',
+    paragraphs: [{ text_el: 'Στις 9 Ιανουαρίου 1573 έγινε κυβερνήτης της Πάργας *(Λάσκαρις 1956)*' }],
+    sources: [{ label_el: 'Λάσκαρις 1956' }],
+    map_places: [{ label: 'Πάργα', status: 'RESOLVED', lon: 20.4, lat: 39.3 }],
+    research_path: { found: 12, passed: 3, cut: 9, groups: [{ label_el: 'Συνονόματοι', count: 9 }] },
+    not_found: [{ note_el: 'Δεν βρέθηκε τόπος ταφής.' }],
+  };
+  const story = renderStoryHtml(narrative, { heading: true });
+  assert.match(story, /<h3>Πέτρος Λάντζας \(Pietro \/ Pedro Lanza, 1530–1613\)<\/h3>/);
+  assert.match(story, /Πηγές/);
+  assert.match(story, /τόπους του άρθρου: Πάργα/);
+  assert.doesNotMatch(story, /Τι δεν βρέθηκε/);
+  assert.doesNotMatch(story, /Πορεία έρευνας/);
+  const path = renderResearchPath(narrative);
+  assert.match(path, /^<details class="overview-details research-path"><summary>Πορεία έρευνας<\/summary>/);
+  assert.match(path, /Βρέθηκαν 12 τεκμήρια· Πέρασαν 3· Κόπηκαν 9/);
+  assert.match(path, /Συνονόματοι: 9/);
+  assert.match(path, /Τι δεν βρέθηκε/);
+});
+
+test('heading never falls back to «Αφήγηση έρευνας»', async () => {
+  const { renderStoryHtml, articleTitle } = await viewPromise;
+  const base = { status: 'NARRATIVE_PENDING_HUMAN_REVIEW', paragraphs: [{ text_el: 'Γεγονός *(Α)*' }] };
+  assert.equal(articleTitle({ ...base, title_el: 'Αφήγηση έρευνας' }, 'Πέτρος Λάντζας'), 'Πέτρος Λάντζας');
+  const html = renderStoryHtml({ ...base, title_el: '' }, { heading: true, fallbackTitle: 'Πέτρος Λάντζας' });
+  assert.match(html, /<h3>Πέτρος Λάντζας<\/h3>/);
+  assert.doesNotMatch(renderStoryHtml(base, { heading: true }), /Αφήγηση έρευνας/);
+  assert.doesNotMatch(renderStoryHtml(base, { heading: false }), /Αφήγηση/);
 });
 
 test('territory mode is a place note and keeps the map note', async () => {

@@ -11,6 +11,7 @@ async function renderAnswer(payload) {
     URL,
     isNarrativeReady: view.isNarrativeReady,
     renderStoryHtml: view.renderStoryHtml,
+    renderResearchPath: view.renderResearchPath,
   })(payload);
 }
 test('source dossier renders exact quotes, citations, uncertainty and safe links without claiming model synthesis', async () => {
@@ -66,10 +67,12 @@ test('greek narrative is the default answer surface with raw English under detai
       not_found: [{ note_el: 'Δεν βρέθηκε ακριβής ημερομηνία σύλληψης στις εξετασθείσες πηγές.', reason: 'NOT_FOUND_IN_CONSULTED_SOURCES' }],
     },
   });
-  assert.match(html, /Δείγμα προσώπου|Αφήγηση/);
+  assert.match(html, /<h3>Δείγμα προσώπου<\/h3>/);
+  assert.doesNotMatch(html, /Αφήγηση έρευνας/);
   assert.match(html, /κράτησε τη Μήλο/);
   assert.match(html, /Book, σελ\. 42/);
   assert.match(html, /Τι δεν βρέθηκε/);
+  assert.ok(html.indexOf('Τι δεν βρέθηκε') > html.indexOf('<summary>Πορεία έρευνας</summary>'));
   assert.match(html, /Λεπτομέρειες πηγών/);
   assert.match(html, /Held Melos/);
   assert.match(html, /<cite>/);

@@ -4,7 +4,8 @@ import {
   escapeHtml,
   isNarrativeReady,
   renderStoryHtml,
-  renderCountsDetails,
+  renderResearchPath,
+  articleTitle,
 } from "./research-narrative-view.js";
 
 const PANEL_ID = "narrativeStoryPanel";
@@ -18,10 +19,10 @@ function ensurePanel() {
   panel.id = PANEL_ID;
   panel.className = "narrative-story-panel hidden";
   panel.hidden = true;
-  panel.setAttribute("aria-label", "Αφήγηση έρευνας");
+  panel.setAttribute("aria-label", "Ιστορικό άρθρο");
   panel.innerHTML =
-    '<div class="nsp-head"><p class="nsp-kicker" id="nspKicker">Αφήγηση</p><h2 id="nspTitle"></h2>' +
-    '<button type="button" class="nsp-close" id="nspClose" aria-label="Κλείσιμο αφήγησης">×</button></div>' +
+    '<div class="nsp-head"><p class="nsp-kicker" id="nspKicker"></p><h2 id="nspTitle"></h2>' +
+    '<button type="button" class="nsp-close" id="nspClose" aria-label="Κλείσιμο άρθρου">×</button></div>' +
     '<div class="nsp-body" id="nspBody"></div>';
   const host =
     document.getElementById("stage") ||
@@ -34,10 +35,10 @@ function ensurePanel() {
 
 function modeMeta(which) {
   if (which === "territory")
-    return { kicker: "ΕΔΑΦΗ", titleFallback: "Τόποι στην αφήγηση", storyMode: "territory" };
+    return { kicker: "ΕΔΑΦΗ", titleFallback: "Τόποι του άρθρου", storyMode: "territory" };
   if (which === "people")
-    return { kicker: "ΠΡΟΣΩΠΑ", titleFallback: "Πρόσωπο στην αφήγηση", storyMode: "people" };
-  return { kicker: "ΙΣΤΟΡΙΑ", titleFallback: "Χρονολογική αφήγηση", storyMode: "history" };
+    return { kicker: "ΠΡΟΣΩΠΑ", titleFallback: "Πρόσωπο του άρθρου", storyMode: "people" };
+  return { kicker: "ΙΣΤΟΡΙΑ", titleFallback: "Ιστορικό άρθρο", storyMode: "history" };
 }
 
 function emptyHtml(message) {
@@ -64,28 +65,11 @@ function render() {
     );
     return;
   }
-  titleEl.textContent = narrative.title_el || snapshot.mission?.target || meta.titleFallback;
-  const discoveries = Array.isArray(snapshot.discoveries) ? snapshot.discoveries : [];
-  const related = discoveries.filter((d) =>
-    ["TARGET_MATCH", "POSSIBLE_TARGET"].includes(d.topical_match?.category),
-  ).length;
-  const claims = Array.isArray(snapshot.claims) ? snapshot.claims.length : 0;
-  const blockers = Array.isArray(snapshot.blockers) ? snapshot.blockers.length : 0;
-  const contradictions = Array.isArray(snapshot.contradictions?.records)
-    ? snapshot.contradictions.records.length
-    : 0;
+  titleEl.textContent = articleTitle(narrative, snapshot.mission?.target || meta.titleFallback);
+  // Closed surface = article + Πηγές + map; found/passed/cut and «Τι δεν βρέθηκε» stay in Πορεία έρευνας.
   body.innerHTML =
     renderStoryHtml(narrative, { mode: meta.storyMode, heading: false }) +
-    renderCountsDetails(
-      [
-        [related, "Σχετικές αναφορές"],
-        [claims, "Ιστορικοί ισχυρισμοί"],
-        [contradictions, "Καταγεγραμμένες αντιφάσεις"],
-        [blockers, "Εμπόδια πρόσβασης"],
-      ],
-      "",
-      narrative,
-    );
+    renderResearchPath(narrative);
   if (window.NABOU_FACT_PINS) window.NABOU_FACT_PINS.fromSnapshot(snapshot);
 }
 

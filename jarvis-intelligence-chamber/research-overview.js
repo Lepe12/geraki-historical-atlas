@@ -47,7 +47,12 @@ export function overview(snapshot) {
     ? (narrative.paragraphs || []).map((p) => p.text_el).filter(Boolean).slice(0, 2).join(" ")
     : "";
   return {
-    title: (narrativeReady && narrative.title_el) || title,
+    title:
+      (narrativeReady &&
+        narrative.title_el &&
+        !["αφήγηση έρευνας", "αφήγηση"].includes(String(narrative.title_el).trim().toLocaleLowerCase("el")) &&
+        narrative.title_el) ||
+      title,
     related: provisional ? '—' : related,
     claims: provisional ? '—' : claims,
     blockers: provisional ? '—' : blockers,
@@ -64,7 +69,7 @@ export function overview(snapshot) {
               ? "Δεν έχουν καταγραφεί σχετικές αναφορές ή ιστορικοί ισχυρισμοί. Αυτό δεν αποδεικνύει ότι δεν υπάρχουν ιστορικές πηγές."
               : "Δεν έχουν καταγραφεί ακόμη αποτελέσματα για αυτή την έρευνα.",
     next: narrativeReady
-      ? "Διαβάστε την αφήγηση και τον χάρτη· τα πλήθη και οι λόγοι απόρριψης είναι στην Πορεία έρευνας."
+      ? "Διαβάστε το άρθρο, τις πηγές και τον χάρτη· όσα βρέθηκαν, πέρασαν και κόπηκαν, και γιατί, είναι στην Πορεία έρευνας."
       : hasEvidence
         ? "Ανοίξτε τις πηγές παρακάτω και ελέγξτε το αρχικό κείμενο και τη σελίδα."
         : blockers

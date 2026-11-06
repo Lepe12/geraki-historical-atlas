@@ -1,5 +1,5 @@
 import { statusLabel } from './research-overview.js';
-import { isNarrativeReady, renderStoryHtml, renderCountsDetails } from './research-narrative-view.js';
+import { isNarrativeReady, renderStoryHtml, renderResearchPath } from './research-narrative-view.js';
 const escape = (value) =>
   String(value ?? "").replace(
     /[&<>"']/g,
@@ -140,7 +140,11 @@ export function dossierMarkup(snapshot) {
       ["TARGET_MATCH", "POSSIBLE_TARGET"].includes(d.topical_match?.category),
     ).length + (snapshot.claims || []).length;
   const storyLead = narrativeReady
-    ? renderStoryHtml(narrative, { mode: "default", heading: true })
+    ? renderStoryHtml(narrative, {
+        mode: "default",
+        heading: true,
+        fallbackTitle: snapshot.mission?.target || snapshot.mission?.purpose || "",
+      })
     : "<p>" +
       (leads
         ? "Οι αναφορές και οι ισχυρισμοί χρειάζονται έλεγχο του πρωτοτύπου, της σελίδας και της ανεξαρτησίας των πηγών."
@@ -165,17 +169,9 @@ export function dossierMarkup(snapshot) {
         : "<p>Δεν έχουν καταγραφεί εμπόδια πρόσβασης. Αυτό δεν επιβεβαιώνει ότι εξετάστηκαν όλες οι πηγές.</p>");
   const pending =
     storyLead +
-    (narrativeReady
-      ? renderCountsDetails(
-          [
-            [leads, "Σχετικές αναφορές / ισχυρισμοί"],
-            [contradictions.length, "Καταγεγραμμένες αντιφάσεις"],
-            [blockers.length, "Εμπόδια πρόσβασης"],
-          ],
-          pendingExtras,
-          narrative,
-        )
-      : pendingExtras);
+    // With a ready article the closed Πορεία έρευνας carries only found/passed/cut
+    // and «Τι δεν βρέθηκε»; legacy contradiction/blocker tallies stay in the results filters.
+    (narrativeReady ? renderResearchPath(narrative) : pendingExtras);
   const events = Array.isArray(snapshot.events) ? snapshot.events : [];
   const updates = [...events]
     .reverse()
