@@ -1,0 +1,43 @@
+name: N7 Library HTTP 405 diagnosis
+on:
+  pull_request:
+    paths:
+      - .github/workflows/n7-library-http-diagnose.yml
+      - ops_ftps_requests/n7-library-http-diagnose.json
+  push:
+    branches: [main]
+    paths:
+      - ops_ftps_requests/n7-library-http-diagnose.json
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: ops_ftps_requests
+      - name: Inspect live HTTP method handling, no credentials or source content
+        run: |
+          python3 - <<'PY'
+          import json,urllib.request,urllib.error
+          from pathlib import Path
+          assert json.loads(Path('ops_ftps_requests/n7-library-http-diagnose.json').read_text())=={"mode":"READ_ONLY","path":"/pct-api/live/n7/library/search"}
+          url='https://pct-live.piratecartography.com/pct-api/live/n7/library/search'
+          for method in ('OPTIONS','GET','POST'):
+              for origin in ('https://bot.piratecartography.com', ''):
+                  headers={'X-Nabou-Agent-Room':'1','Content-Type':'application/json'}
+                  if origin:headers['Origin']=origin
+                  req=urllib.request.Request(url,data=b'{"query":"Lanza"}' if method=='POST' else None,headers=headers,method=method)
+                  try:
+                      with urllib.request.urlopen(req,timeout=12) as response:
+                          status=response.status;h=response.headers
+                          body=response.read(600).decode('utf-8','replace')
+                  except urllib.error.HTTPError as exc:
+                      status=exc.code;h=exc.headers;body=exc.read(600).decode('utf-8','replace')
+                  except Exception as exc:
+                      print(json.dumps({'method':method,'origin':bool(origin),'error_type':type(exc).__name__}));continue
+                  print(json.dumps({'method':method,'origin':bool(origin),'status':status,'content_type':h.get('Content-Type',''),'allow':h.get('Allow',''),'location':h.get('Location',''),'cors_origin':h.get('Access-Control-Allow-Origin',''),'body_start':body[:200]}))
+          PY
