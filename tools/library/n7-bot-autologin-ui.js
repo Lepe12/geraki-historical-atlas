@@ -8,7 +8,7 @@ async function n7LibrarySearch(query) {
   if(response.status===401)throw new Error("Χρειάζεται σύνδεση στο N7 για την ιστορική βιβλιοθήκη.");
   if(!response.ok)throw new Error("Αποτυχία βιβλιοθήκης: HTTP "+response.status);
   const result=await response.json();
-  return Array.isArray(result.matches)?result.matches.slice(0,8):[];
+  return {matches:Array.isArray(result.matches)?result.matches.slice(0,8):[],source_count:result.source_count,page_count:result.page_count};
 }
 window.N7Library={search:n7LibrarySearch};
 
@@ -36,8 +36,9 @@ document.addEventListener("DOMContentLoaded",()=>{
     e.preventDefault();results.replaceChildren();status.textContent="Αναζήτηση στη μόνιμη βιβλιοθήκη...";
     submit.disabled=true;
     try {
-      const matches=await n7LibrarySearch(query.value.trim());
-      status.textContent=matches.length?matches.length+" αποσπάσματα — μη επαληθευμένο κείμενο πηγών":"Δεν βρέθηκαν αποσπάσματα στη μόνιμη βιβλιοθήκη.";
+      const found=await n7LibrarySearch(query.value.trim());
+      const matches=found.matches;
+      status.textContent=matches.length?matches.length+" αποσπάσματα — μη επαληθευμένο κείμενο πηγών":found.source_count===0?"Η μόνιμη βιβλιοθήκη είναι κενή: δεν έχει εισαχθεί ακόμη καμία πηγή.":found.page_count===0?"Έχουν καταχωριστεί πηγές, αλλά δεν υπάρχουν ακόμη αναζητήσιμες σελίδες.":typeof found.page_count==="number"?"Δεν βρέθηκε η φράση σε "+found.page_count+" καταχωρισμένες σελίδες ("+found.source_count+" πηγές).":"Δεν βρέθηκαν αποσπάσματα. Δεν έχει επιβεβαιωθεί ο αριθμός καταχωρισμένων πηγών.";
       for(const hit of matches){
         const section=document.createElement("article");section.style.cssText="padding:12px;margin:12px 0;border:1px solid #386478;border-radius:6px";
         const heading=document.createElement("strong");
