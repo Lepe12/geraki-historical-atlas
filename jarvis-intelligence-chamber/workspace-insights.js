@@ -1,6 +1,7 @@
 import { connectResearchFeed } from "./live-bridge.js";
 import { overview, historyEntry, mergeHistory, statusLabel } from "./research-overview.js";
 import { dossierMarkup } from "./research-dossier.js?v=v2-phase2-1";
+import { renderOverviewStory } from "./research-narrative-view.js";
 const $ = (id) => document.getElementById(id);
 const summary = $("researchOverview"),
   list = $("historyList"),
@@ -164,50 +165,8 @@ connectResearchFeed({
     link.href = "?run=" + encodeURIComponent(snapshot.run_id);
     link.hidden = false;
     document.title = "NABOU//X · " + data.title;
-    const narrative = data.narrative || snapshot.research_answer?.greek_narrative;
-    const story =
-      narrative && Array.isArray(narrative.paragraphs)
-        ? narrative.paragraphs
-            .map((row) => "<p class=\"narrative-paragraph\">" + escape(row.text_el || "") + "</p>")
-            .join("")
-        : "";
-    const notFound =
-      narrative && Array.isArray(narrative.not_found) && narrative.not_found.length
-        ? '<section class="narrative-not-found"><h3>Τι δεν βρέθηκε</h3><ul>' +
-          narrative.not_found.map((row) => "<li>" + escape(row.note_el || "") + "</li>").join("") +
-          "</ul><small>«Δεν βρέθηκε στις εξετασθείσες πηγές» δεν σημαίνει «δεν συνέβη».</small></section>"
-        : "";
-    summary.innerHTML =
-      '<div class="overview-heading"><h2>' +
-      escape(data.title) +
-      "</h2><span>" +
-      escape(data.status) +
-      '</span></div><dl class="dossier-question"><div><dt>Το ερώτημά σας</dt><dd>' +
-      escape(snapshot.mission?.purpose || snapshot.mission?.target || (snapshot.mission?.status === "RUNNING" ? "Το ερώτημα δεν είναι ακόμη διαθέσιμο στα δεδομένα της έρευνας." : "Δεν καταγράφηκε αρχικό ερώτημα.")) +
-      "</dd></div><div><dt>Περίοδος</dt><dd>" +
-      escape(snapshot.mission?.date_range || (snapshot.mission?.status === "RUNNING" ? "Η περίοδος δεν είναι ακόμη διαθέσιμη." : "Δεν ορίστηκε περίοδος")) +
-      "</dd></div></dl>" +
-      (story
-        ? '<section class="research-narrative" aria-label="Αφήγηση έρευνας"><h3>Αφήγηση</h3>' +
-          story +
-          notFound +
-          "</section>"
-        : "<p>" + escape(data.message) + "</p>") +
-      '<details class="overview-details"><summary>Λεπτομέρειες</summary><dl class="overview-counts">' +
-      [
-        [data.related, "Σχετικές αναφορές"],
-        [data.claims, "Ιστορικοί ισχυρισμοί"],
-        [data.contradictions, "Καταγεγραμμένες αντιφάσεις"],
-        [data.blockers, "Εμπόδια πρόσβασης"],
-      ]
-        .map(([n, label]) => "<div><dt>" + label + "</dt><dd>" + n + "</dd></div>")
-        .join("") +
-      "</dl><p>" +
-      escape(data.message) +
-      "</p></details>" +
-      '<p class="overview-next"><strong>Επόμενο βήμα:</strong> ' +
-      escape(data.next) +
-      "</p>";
+    // Story first; question / period / counts / next stay behind closed Λεπτομέρειες.
+    summary.innerHTML = renderOverviewStory(snapshot, data);
     if (window.NABOU_FACT_PINS) window.NABOU_FACT_PINS.fromSnapshot(snapshot);
   },
   onState: (mode) => {

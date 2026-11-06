@@ -1,6 +1,8 @@
 // NABOU//X — mockup chrome (top bar, sidebar, query filters, cards, right column) wired to the real research feed.
 // Presentation only: it reads the same shared live feed as the rest of the page and routes clicks to the existing views.
 import { connectResearchFeed } from "./live-bridge.js";
+import { openNarrativePanel, closeNarrativePanel } from "./research-narrative-panel.js";
+import { isNarrativeReady } from "./research-narrative-view.js";
 
 const $ = (id) => document.getElementById(id);
 const body = document.body;
@@ -107,14 +109,27 @@ function settingsHtml() {
     `<p style="margin-top:12px"><button class="btn-l" type="button" data-latest>Άνοιγμα της πιο πρόσφατης έρευνας</button></p>` +
     `<p><button class="btn-l" type="button" data-reset>Επαναφορά χάρτη</button></p>`;
 }
+function showStory(mode) {
+  // Keep the map visible; story panel carries ΙΣΤΟΡΙΑ / ΕΔΑΦΗ / ΠΡΟΣΩΠΑ.
+  openView("universe");
+  closeNarrativePanel();
+  openNarrativePanel(mode);
+}
+
 function go(where) {
   lastGo = where;
   closeMenu();
   if (where !== "layers" && where !== "settings") closePop();
+  if (!["history", "territory", "people"].includes(where)) closeNarrativePanel();
   switch (where) {
-    case "home": case "map": case "operator": case "territory":
+    case "home": case "map": case "operator":
       openView("universe");
       if (where !== "operator") $("resetView")?.click();
+      break;
+    case "territory":
+      openView("universe");
+      $("resetView")?.click();
+      showStory("territory");
       break;
     case "search":
       openView("universe");
@@ -134,13 +149,16 @@ function go(where) {
       findings(() => document.querySelector('[data-dossier-section="researchFindings"]')?.click());
       break;
     case "people":
-      findings(() => window.dispatchEvent(new CustomEvent("jarvis:results-filter", { detail: { filter: "claims" } })));
+      showStory("people");
       break;
     case "sourcelist":
       findings(() => { document.querySelector('[data-dossier-section="researchFindings"]')?.click(); $("resultSearch")?.focus({ preventScroll: true }); });
       break;
-    case "targets": case "history":
+    case "targets":
       findings(() => { const h = $("researchHistory"); if (h) { h.open = true; h.scrollIntoView({ block: "start" }); $("historySearch")?.focus({ preventScroll: true }); } });
+      break;
+    case "history":
+      showStory("history");
       break;
     case "learning": openView("pdf"); break;
     case "agents": agentsFilter("all"); break;
@@ -323,7 +341,7 @@ function renderStatus() {
   const records = s ? (s.discoveries?.length || 0) + (s.claims?.length || 0) : NaN;
   const conflicts = s ? (Array.isArray(s.contradictions?.records) ? s.contradictions.records.length : 0) : NaN;
   const narrative = s?.research_answer?.greek_narrative;
-  const narrativeReady = narrative && ["NARRATIVE_PENDING_HUMAN_REVIEW", "NO_USABLE_EVIDENCE"].includes(narrative.status);
+  const narrativeReady = isNarrativeReady(narrative);
   const storyBit = narrativeReady
     ? (narrative.paragraphs || []).map((x) => x.text_el).filter(Boolean)[0] || narrative.title_el || "Αφήγηση διαθέσιμη"
     : "";
@@ -385,7 +403,7 @@ function activityItems() {
     const claims = s.claims?.length || 0, contra = Array.isArray(s.contradictions?.records) ? s.contradictions.records.length : 0;
     const at = s.generated_utc || latest(all);
     const narrative = s.research_answer?.greek_narrative;
-    const narrativeReady = narrative && ["NARRATIVE_PENDING_HUMAN_REVIEW", "NO_USABLE_EVIDENCE"].includes(narrative.status);
+    const narrativeReady = isNarrativeReady(narrative);
     if (narrativeReady) {
       items.push({
         at,
@@ -459,18 +477,21 @@ function renderCards() {
   const related = (s?.discoveries || []).filter((d) => ["TARGET_MATCH", "POSSIBLE_TARGET"].includes(d.topical_match?.category)).length + (s?.claims?.length || 0);
   const repos = new Set((s?.discoveries || []).map((d) => d.repository).filter(Boolean));
   const narrative = s?.research_answer?.greek_narrative;
-  const narrativeReady = narrative && ["NARRATIVE_PENDING_HUMAN_REVIEW", "NO_USABLE_EVIDENCE"].includes(narrative.status);
+  const narrativeReady = isNarrativeReady(narrative);
   const mapPlaces = narrative?.map_places?.length || 0;
-  $("cardPlaces").textContent = narrativeReady && mapPlaces
-    ? mapPlaces + " τόποι αφήγησης"
+  // Labels stay secondary to the story; avoid big count messaging.
+  $("cardPlaces").textContent = narrativeReady
+    ? (mapPlaces ? "τόποι στον χάρτη" : "βλ. αφήγηση")
     : lanes.filter((l) => l.kind === "archive").length + " αρχεία";
   $("cardEvents").textContent = narrativeReady
-    ? ((narrative.events || []).length + " γεγονότα αφήγησης")
+    ? "χρονολόγιο"
     : s ? fmt(s.events?.length || 0) + " συμβάντα" : "—";
   $("cardPeople").textContent = narrativeReady
     ? (narrative.status === "NO_USABLE_EVIDENCE" ? "χωρίς αφήγηση" : "αφήγηση")
     : s ? fmt(related) + " αναφορές" : "—";
-  $("cardSources").textContent = s ? fmt(repos.size) + " πηγές" : "—";
+  $("cardSources").textContent = narrativeReady
+    ? "πηγές στις λεπτομέρειες"
+    : s ? fmt(repos.size) + " πηγές" : "—";
   if (window.NABOU_FACT_PINS) window.NABOU_FACT_PINS.fromSnapshot(s);
 }
 function renderMission() {

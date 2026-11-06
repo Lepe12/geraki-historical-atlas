@@ -1,5 +1,6 @@
 import { matchesSource } from "./source-search.js";
 import { exportResearch } from "./research-export.js";
+import { isNarrativeReady, renderStoryHtml } from "./research-narrative-view.js";
 import { connectResearchFeed, missionState, selectResearchRun, waitForResearchRequest } from "./live-bridge.js";
 const $ = (id) => document.getElementById(id);
 // Greek display labels for status codes (presentation only; logic keeps the codes).
@@ -97,24 +98,9 @@ function conflictEvidence(record) {
 }
 function greekNarrative(data) {
   const n = data?.greek_narrative;
-  if (!n || !["NARRATIVE_PENDING_HUMAN_REVIEW", "NO_USABLE_EVIDENCE"].includes(n.status)) return "";
-  const body = (n.paragraphs || [])
-    .map((row) => "<p>" + esc(row.text_el || "") + "</p>")
-    .join("");
-  const gaps =
-    Array.isArray(n.not_found) && n.not_found.length
-      ? "<details open><summary>Τι δεν βρέθηκε</summary>" +
-        n.not_found.map((x) => "<p>" + esc(x.note_el || "") + "</p>").join("") +
-        "<small>«Δεν βρέθηκε στις εξετασθείσες πηγές» δεν σημαίνει «δεν συνέβη».</small></details>"
-      : "";
-  return (
-    '<section class="result-item research-narrative"><b>ΑΦΗΓΗΣΗ · ΠΡΟΣ ΕΛΕΓΧΟ</b><small>' +
-    esc(n.title_el || "") +
-    "</small>" +
-    body +
-    gaps +
-    "</section>"
-  );
+  if (!isNarrativeReady(n)) return "";
+  // Full story leads; citation sits under each fact. No "counts" banner.
+  return '<div class="result-item research-narrative-wrap">' + renderStoryHtml(n, { mode: "default", heading: true }) + "</div>";
 }
 function semanticAnswer(data) {
   if (!["pct-semantic-answer-v1", "pct-semantic-answer-v2", "pct-semantic-answer-v3"].includes(data?.schema)) return "";
@@ -471,9 +457,7 @@ function renderResults() {
       b.dataset.count = snapshot ? String(counts[b.dataset.resultFilter] ?? "") : "";
     });
   }
-  const narrativeReady = ["NARRATIVE_PENDING_HUMAN_REVIEW", "NO_USABLE_EVIDENCE"].includes(
-    snapshot?.research_answer?.greek_narrative?.status,
-  );
+  const narrativeReady = isNarrativeReady(snapshot?.research_answer?.greek_narrative);
   meta.textContent = narrativeReady
     ? "Αφήγηση και χάρτης · οι αριθμοί στις Λεπτομέρειες"
     : related.length +
@@ -686,13 +670,15 @@ function renderResults() {
           ? "Το αίτημα παραλήφθηκε. Αναμένουμε τα αποτελέσματα της νέας έρευνας."
           : "Δεν υπάρχουν καταγεγραμμένα στοιχεία για αυτό το φίλτρο. Δοκιμάστε άλλο φίλτρο ή ανοίξτε μια άλλη έρευνα.") +
       "</div>";
-  const wrappedRaw =
-    narrativeFirst && resultFilter === "all" && !q && !resultPage
+  const leadWithStory = Boolean(narrativeFirst && resultFilter === "all" && !q && !resultPage);
+  const wrappedRaw = leadWithStory
       ? '<details class="result-raw"><summary>Λεπτομέρειες · πρώτες ύλες και μετρήσεις</summary>' +
+        context +
         rawBlock +
         "</details>"
       : rawBlock;
-  list.innerHTML = context + narrativeFirst + wrappedRaw;
+  // Story first; mission context and raw records stay behind closed Λεπτομέρειες when a narrative exists.
+  list.innerHTML = leadWithStory ? narrativeFirst + wrappedRaw : context + narrativeFirst + wrappedRaw;
   if (q && !total)
     list.innerHTML =
       context + '<div class="result-empty">Δεν υπάρχουν ευρήματα που να ταιριάζουν στην αναζήτηση.</div>';
