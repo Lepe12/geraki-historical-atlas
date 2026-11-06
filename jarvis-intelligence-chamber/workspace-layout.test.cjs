@@ -12,7 +12,7 @@ async function navTo(page,view){
   }
   if(view==='universe'){
     await page.locator('#atlasHome:not([hidden]) .atlas-topnav [data-atlas-nav="map"], #atlasResearch:not([hidden]) .atlas-topnav [data-atlas-nav="map"]').first().click();
-    await page.waitForFunction(()=>document.body.dataset.atlasPage==='home');
+    await page.waitForFunction(()=>document.body.dataset.readerView==='map');
     return;
   }
   await openResearch();
@@ -58,9 +58,11 @@ async function navTo(page,view){
   assert.ok(await page.locator('#operatorQuery').evaluate(e=>e.offsetHeight)>=initialHeight,'Query field remains usable');
   await navTo(page,'findings');await layout('.atlas-research-panel');
   await navTo(page,'universe');
+  await page.locator('#atlasResearch .atlas-brand').click();
   await page.waitForFunction(()=>document.body.dataset.atlasPage==='home');
   await page.locator('#atlasExplore').click();
   await page.waitForFunction(()=>document.body.dataset.atlasPage==='research');
+  await navTo(page,'findings');
   await page.locator('#operatorQuery').fill('');await page.waitForTimeout(150);
   if(shotDir)await page.screenshot({path:path.join(shotDir,width+'-overview.png'),animations:'disabled'});
   for(const [view,panel] of [['agents','#nxsAgentsPage'],['findings','#resultsDrawer'],['pdf','#learningPanel']]){
