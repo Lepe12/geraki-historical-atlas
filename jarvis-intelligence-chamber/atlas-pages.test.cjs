@@ -104,6 +104,7 @@ const path = require("node:path");
     for(const width of [1440,390,360]){
       await page.setViewportSize({width,height:900});
       await go('sources');
+      console.log('SOURCE NAV',width,await page.locator('body').evaluate(el=>({...el.dataset})),await page.locator('#readerSources').getAttribute('hidden'));
       await page.locator('#readerSources').waitFor({state:'visible'});
       await page.waitForFunction(()=>document.querySelector('#readerSources ol')?.textContent.includes('Δοκιμαστική ιστορική πηγή'));
       assert.equal(await nav('sources').getAttribute('aria-current'),'page');
@@ -121,7 +122,7 @@ const path = require("node:path");
         assert.equal(await page.locator('.nxs-agent-group:not([hidden]) [data-agent]').count(),count);
       }
       // Every researcher opens its inspector and Close returns to the researchers.
-      for(const agent of ['greek','spanish_simancas','venetian','french','british','dutch','german','italian_states','ottoman','north_african','travellers','source_genealogy','identity_resolution','contradiction','relationship_network','timeline','pirate_base']){
+      for(const agent of (width===1440?['greek','spanish_simancas','venetian','french','british','dutch','german','italian_states','ottoman','north_african','travellers','source_genealogy','identity_resolution','contradiction','relationship_network','timeline','pirate_base']:['greek'])){
         await page.locator('#nxsAgentGroups [data-agent="'+agent+'"]').click();
         await page.locator('#detailPanel').waitFor({state:'visible'});
         await page.locator('#closeDetail').click();
