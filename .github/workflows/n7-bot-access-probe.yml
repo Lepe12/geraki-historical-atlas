@@ -1,0 +1,58 @@
+name: N7 bot FTPS access diagnostic
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ops_ftps_requests/n7-bot-access-probe.json'
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 6
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: ops_ftps_requests
+      - name: Read only N7 bot deployment location diagnosis
+        run: |
+          python3 - <<'PY'
+          import ftplib,json,os,socket,ssl
+          from pathlib import Path
+          data=json.loads(Path("ops_ftps_requests/n7-bot-access-probe.json").read_text())
+          assert data=={"purpose":"n7-bot-readonly-path-check","authorization":"READ-ONLY"}
+          host=os.environ["PCT_FTPS_HOST"];port=int(os.environ.get("PCT_FTPS_PORT","21"))
+          name=os.environ.get("PCT_FTPS_TLS_SERVER_NAME","").strip()
+          if name:
+              expected={x[4][0] for x in socket.getaddrinfo(host,port,type=socket.SOCK_STREAM)}
+              actual={x[4][0] for x in socket.getaddrinfo(name,port,type=socket.SOCK_STREAM)}
+              assert expected.intersection(actual),"TLS_NAME_NOT_VERIFIED"
+          ftp=ftplib.FTP_TLS(timeout=25,context=ssl.create_default_context())
+          ftp.connect(host,port)
+          if name:ftp.host=name
+          ftp.login(os.environ["PCT_FTPS_USER"],os.environ["PCT_FTPS_PASSWORD"])
+          ftp.prot_p()
+          paths=["/bot.piratecartography.com","/bot.piratecartography.com/httpdocs",
+              "/bot.piratecartography.com/public","/piratecartography-gateway/server/command-center-live"]
+          result=[]
+          for p in paths:
+              try:
+                  ftp.cwd(p)
+                  names={v.rstrip("/").split("/")[-1] for v in ftp.nlst()}
+                  result.append({"path":p,"accessible":True,
+                     "server_js":"server.js" in names,
+                     "package_json":"package.json" in names,
+                     "public":"public" in names,
+                     "index_html":"index.html" in names})
+              except ftplib.all_errors:
+                  result.append({"path":p,"accessible":False})
+          print(json.dumps({"status":"READ_ONLY","results":result}))
+          ftp.quit()
+          PY
