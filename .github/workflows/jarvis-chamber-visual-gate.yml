@@ -36,8 +36,12 @@ jobs:
         run: |
           node --check jarvis-intelligence-chamber/chamber.js
           node --check jarvis-intelligence-chamber/gpu-field.js
+          node --check jarvis-intelligence-chamber/atlas-pages.js
           grep -q 'src="./chamber.js' jarvis-intelligence-chamber/index.html
           grep -q 'src="./gpu-field.js' jarvis-intelligence-chamber/index.html
+          grep -q 'atlas-pages.js' jarvis-intelligence-chamber/index.html
+          grep -q 'atlas-ui' jarvis-intelligence-chamber/index.html
+          ! grep -q 'n7-live-control.js' jarvis-intelligence-chamber/index.html
           ! grep -q 'src="./world3d.js"' jarvis-intelligence-chamber/index.html
       - name: Install required PDF text replay tool
         run: |
@@ -58,6 +62,8 @@ jobs:
         run: node jarvis-intelligence-chamber/historical-map-review-browser.test.cjs
       # The current four-destination workspace replaces the legacy cinematic and voice shell.
       # Each browser suite starts its own isolated server and never dispatches production work.
+      - name: Verify atlas home vs research page states
+        run: node jarvis-intelligence-chamber/atlas-pages.test.cjs
       - name: Verify renderer, workspace navigation and responsive layout
         env:
           NABOU_SCREENSHOT_DIR: jarvis-intelligence-chamber/screenshots

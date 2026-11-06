@@ -42,23 +42,29 @@ new ResizeObserver(() => body.style.setProperty("--composer-height", composer.ge
 /* ---------- compass ticks + date ---------- */
 {
   const g = document.querySelector("#compass .c-ticks");
-  let h = "";
-  for (let i = 0; i < 32; i++) {
-    const a = (i * Math.PI) / 16, r1 = 27, r2 = i % 4 ? 24.5 : 22;
-    h += `<line x1="${(Math.sin(a) * r1).toFixed(2)}" y1="${(-Math.cos(a) * r1).toFixed(2)}" x2="${(Math.sin(a) * r2).toFixed(2)}" y2="${(-Math.cos(a) * r2).toFixed(2)}"/>`;
+  if (g) {
+    let h = "";
+    for (let i = 0; i < 32; i++) {
+      const a = (i * Math.PI) / 16, r1 = 27, r2 = i % 4 ? 24.5 : 22;
+      h += `<line x1="${(Math.sin(a) * r1).toFixed(2)}" y1="${(-Math.cos(a) * r1).toFixed(2)}" x2="${(Math.sin(a) * r2).toFixed(2)}" y2="${(-Math.cos(a) * r2).toFixed(2)}"/>`;
+    }
+    g.innerHTML = h;
   }
-  g.innerHTML = h;
 }
 const months = ["ΙΑΝ", "ΦΕΒ", "ΜΑΡ", "ΑΠΡ", "ΜΑΪ", "ΙΟΥΝ", "ΙΟΥΛ", "ΑΥΓ", "ΣΕΠ", "ΟΚΤ", "ΝΟΕ", "ΔΕΚ"];
 function tickDate() {
   const d = new Date();
   const p = Object.fromEntries(new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Athens", day: "numeric", month: "numeric", year: "numeric" }).formatToParts(d).map((x) => [x.type, x.value]));
-  $("clkDate").textContent = p.day + " " + months[p.month - 1] + " " + p.year;
+  const clkDate = $("clkDate");
+  if (clkDate) clkDate.textContent = p.day + " " + months[p.month - 1] + " " + p.year;
 }
 tickDate();
 setInterval(tickDate, 60000);
 // live clock: the map's render loop only refreshes it while animating, so tick it every second here too
-function tickClock() { $("clock").textContent = new Date().toLocaleTimeString("el-GR", { timeZone: "Europe/Athens", hour12: false }) + " ώρα Ελλάδας"; }
+function tickClock() {
+  const clock = $("clock");
+  if (clock) clock.textContent = new Date().toLocaleTimeString("el-GR", { timeZone: "Europe/Athens", hour12: false }) + " ώρα Ελλάδας";
+}
 tickClock();
 setInterval(tickClock, 1000);
 
@@ -125,6 +131,7 @@ function go(where) {
     case "home": case "map": case "operator":
       openView("universe");
       if (where !== "operator") $("resetView")?.click();
+      if (where === "home" && window.NABOU_ATLAS) window.NABOU_ATLAS.setPage("home");
       break;
     case "territory":
       openView("universe");
@@ -138,11 +145,15 @@ function go(where) {
     case "reset": case "theater":
       openView("universe");
       $("resetView")?.click();
-      $("compass").classList.remove("spin");
-      void $("compass").offsetWidth;
-      $("compass").classList.add("spin");
+      const compass = $("compass");
+      if (compass) {
+        compass.classList.remove("spin");
+        void compass.offsetWidth;
+        compass.classList.add("spin");
+      }
       break;
     case "research":
+      if (window.NABOU_ATLAS) window.NABOU_ATLAS.setPage("research", { focusSearch: false, openDrawer: true });
       findings(() => document.querySelector('[data-dossier-section="researchOverview"]')?.click());
       break;
     case "evidence":
@@ -188,7 +199,7 @@ function setActive() {
   document.querySelectorAll("#sidenav .nxs-dock .side-item").forEach((b) => b.classList.toggle("dim-current", !!side));
   const hi = histFor[lastGo] ?? (view === "universe" ? 1 : view === "agents" && lastGo === "intelligence" ? 3 : -1);
   document.querySelectorAll("#histList .hist").forEach((b, i) => b.classList.toggle("on", i === hi));
-  if (hi >= 0) $("histDash").style.top = 8 + hi * 18 + "px";
+  if (hi >= 0 && $("histDash")) $("histDash").style.top = 8 + hi * 18 + "px";
   document.querySelectorAll("#cards .card").forEach((c) => c.classList.toggle("active", c.dataset.nxGo === lastGo && view !== "universe"));
 }
 new MutationObserver(setActive).observe(body, { attributes: true, attributeFilter: ["data-nxs-view"] });
@@ -354,8 +365,10 @@ function renderStatus() {
       : ["ΕΓΓΡΑΦΕΣ", provisional ? "—" : fmt(records), provisional ? 0 : logMeter(records), provisional ? "Τα τελικά ευρήματα δεν έχουν δημοσιευτεί ακόμη" : s ? `${s.discoveries?.length || 0} καταγεγραμμένες πηγές · ${s.claims?.length || 0} ισχυρισμοί` : ""],
     ["ΑΝΤΙΦΑΣΕΙΣ", provisional ? "—" : fmt(conflicts), provisional ? 0 : Math.min(7, conflicts || 0), provisional ? "Οι αντιφάσεις και τα εμπόδια δεν έχουν συγκεντρωθεί ακόμη" : s ? `${conflicts} καταγεγραμμένες αντιφάσεις · ${s.blockers?.length || 0} εμπόδια πρόσβασης` : ""],
   ];
-  $("statRows").innerHTML = rows.map(([k, n, lit, title]) => `<div class="srow" title="${esc(title)}"><span class="k">${k}</span><span class="n">${esc(n)}</span>${meter(lit)}</div>`).join("");
-  $("agentsDot").hidden = !act;
+  const statRows = $("statRows");
+  if (statRows) statRows.innerHTML = rows.map(([k, n, lit, title]) => `<div class="srow" title="${esc(title)}"><span class="k">${k}</span><span class="n">${esc(n)}</span>${meter(lit)}</div>`).join("");
+  const agentsDot = $("agentsDot");
+  if (agentsDot) agentsDot.hidden = !act;
 }
 function evTime(e) {
   const d = new Date(e.created_utc || e.timestamp || e.at || 0);
@@ -425,7 +438,8 @@ function activityItems() {
 }
 function renderActivity() {
   const rows = activityItems();
-  $("activityLive").innerHTML = rows.length
+  const activityLive = $("activityLive");
+  if (activityLive) activityLive.innerHTML = rows.length
     ? rows.map((r) => `<div class="row" title="${esc(r.title + (r.sub ? " — " + r.sub : "") + (r.detail ? " — " + r.detail : ""))}"><i class="dot ${r.cls}"></i><span class="t">${esc(evTime({ created_utc: r.at }))}</span><span class="ti">${esc(r.title)}</span><span class="su">${esc(r.sub || "")}</span></div>`).join("")
     : '<div class="empty">Δεν έχει καταγραφεί δραστηριότητα.</div>';
 }
@@ -446,15 +460,18 @@ function renderNodes() {
     }
     const rose = (x, y, r) => `<g class="mrose" transform="translate(${x.toFixed(0)},${y.toFixed(0)})"><circle r="${r}"/>` +
       [0, 90, 180, 270].map((a) => `<g transform="rotate(${a})"><path d="M0,${-r * 1.25}L${r * 0.22},0L0,0Z"/><path class="s" d="M0,${-r * 1.25}L${-r * 0.22},0L0,0Z"/></g>`).join("") + "</g>";
-    $("miniChart").innerHTML = `<svg viewBox="${x0.toFixed(0)} ${y0.toFixed(0)} ${w.toFixed(0)} ${h.toFixed(0)}" preserveAspectRatio="xMidYMid meet" overflow="visible" aria-hidden="true">` +
-      `<defs><radialGradient id="mwRed" cx=".36" cy=".3"><stop offset="0" stop-color="#cf5a43"/><stop offset=".5" stop-color="#8e231b"/><stop offset="1" stop-color="#5a110d"/></radialGradient>` +
-      `<radialGradient id="mwGold" cx=".36" cy=".3"><stop offset="0" stop-color="#f6e2a4"/><stop offset=".5" stop-color="#b48d45"/><stop offset="1" stop-color="#6e5222"/></radialGradient>` +
-      `<radialGradient id="mwOx" cx=".36" cy=".3"><stop offset="0" stop-color="#7b2a20"/><stop offset=".6" stop-color="#4c0e0b"/><stop offset="1" stop-color="#2a0705"/></radialGradient></defs>` +
-      `<g>${rh}</g><path class="ml" d="${d}"/>` +
-      `<g>${lanes.map((l) => `<path class="mn" d="M${l.x.toFixed(0)},${l.y.toFixed(0)}L${(l.kind === "archive" ? core[0] : hub[0]).toFixed(0)},${(l.kind === "archive" ? core[1] : hub[1]).toFixed(0)}"/>`).join("")}</g>` +
-      rose(core[0], core[1], 40) + rose(hub[0], hub[1], 24) +
-      lanes.map((l, i) => `<g data-i="${i}"><circle class="md IDLE" cx="${l.x.toFixed(0)}" cy="${l.y.toFixed(0)}" r="${l.kind === "archive" ? 22 : 17}"><title>${esc(l.name)}</title></circle>` +
-        `<path class="mx" hidden d="M${(l.x - 9).toFixed(0)},${(l.y - 9).toFixed(0)}l18,18m0,-18l-18,18"/></g>`).join("") + "</svg>";
+    const miniChart = $("miniChart");
+    if (miniChart) {
+      miniChart.innerHTML = `<svg viewBox="${x0.toFixed(0)} ${y0.toFixed(0)} ${w.toFixed(0)} ${h.toFixed(0)}" preserveAspectRatio="xMidYMid meet" overflow="visible" aria-hidden="true">` +
+        `<defs><radialGradient id="mwRed" cx=".36" cy=".3"><stop offset="0" stop-color="#cf5a43"/><stop offset=".5" stop-color="#8e231b"/><stop offset="1" stop-color="#5a110d"/></radialGradient>` +
+        `<radialGradient id="mwGold" cx=".36" cy=".3"><stop offset="0" stop-color="#f6e2a4"/><stop offset=".5" stop-color="#b48d45"/><stop offset="1" stop-color="#6e5222"/></radialGradient>` +
+        `<radialGradient id="mwOx" cx=".36" cy=".3"><stop offset="0" stop-color="#7b2a20"/><stop offset=".6" stop-color="#4c0e0b"/><stop offset="1" stop-color="#2a0705"/></radialGradient></defs>` +
+        `<g>${rh}</g><path class="ml" d="${d}"/>` +
+        `<g>${lanes.map((l) => `<path class="mn" d="M${l.x.toFixed(0)},${l.y.toFixed(0)}L${(l.kind === "archive" ? core[0] : hub[0]).toFixed(0)},${(l.kind === "archive" ? core[1] : hub[1]).toFixed(0)}"/>`).join("")}</g>` +
+        rose(core[0], core[1], 40) + rose(hub[0], hub[1], 24) +
+        lanes.map((l, i) => `<g data-i="${i}"><circle class="md IDLE" cx="${l.x.toFixed(0)}" cy="${l.y.toFixed(0)}" r="${l.kind === "archive" ? 22 : 17}"><title>${esc(l.name)}</title></circle>` +
+          `<path class="mx" hidden d="M${(l.x - 9).toFixed(0)},${(l.y - 9).toFixed(0)}l18,18m0,-18l-18,18"/></g>`).join("") + "</svg>";
+    }
     miniBuilt = true;
   }
   const agents = snapshot?.agents || [];
@@ -469,7 +486,8 @@ function renderNodes() {
     c.querySelector("title").textContent = laneName(id) + " — " + (a ? GR.status(a.status) : "χωρίς δεδομένα");
     g.querySelector(".mx").toggleAttribute("hidden", cls !== "BLOCKED");
   });
-  $("nodeCount").textContent = lanes.length + " κόμβοι" + (snapshot ? " · " + (active ? active + " ενεργοί" : agents.length + " στην έρευνα") : "");
+  const nodeCount = $("nodeCount");
+  if (nodeCount) nodeCount.textContent = lanes.length + " κόμβοι" + (snapshot ? " · " + (active ? active + " ενεργοί" : agents.length + " στην έρευνα") : "");
 }
 function renderCards() {
   const s = snapshot;
@@ -480,16 +498,20 @@ function renderCards() {
   const narrativeReady = isNarrativeReady(narrative);
   const mapPlaces = narrative?.map_places?.length || 0;
   // Labels stay secondary to the story; avoid big count messaging.
-  $("cardPlaces").textContent = narrativeReady
+  const cardPlaces = $("cardPlaces");
+  if (cardPlaces) cardPlaces.textContent = narrativeReady
     ? (mapPlaces ? "τόποι στον χάρτη" : "βλ. αφήγηση")
     : lanes.filter((l) => l.kind === "archive").length + " αρχεία";
-  $("cardEvents").textContent = narrativeReady
+  const cardEvents = $("cardEvents");
+  if (cardEvents) cardEvents.textContent = narrativeReady
     ? "χρονολόγιο"
     : s ? fmt(s.events?.length || 0) + " συμβάντα" : "—";
-  $("cardPeople").textContent = narrativeReady
+  const cardPeople = $("cardPeople");
+  if (cardPeople) cardPeople.textContent = narrativeReady
     ? (narrative.status === "NO_USABLE_EVIDENCE" ? "χωρίς αφήγηση" : "αφήγηση")
     : s ? fmt(related) + " αναφορές" : "—";
-  $("cardSources").textContent = narrativeReady
+  const cardSources = $("cardSources");
+  if (cardSources) cardSources.textContent = narrativeReady
     ? "πηγές στις λεπτομέρειες"
     : s ? fmt(repos.size) + " πηγές" : "—";
   if (window.NABOU_FACT_PINS) window.NABOU_FACT_PINS.fromSnapshot(s);
@@ -497,11 +519,13 @@ function renderCards() {
 function renderMission() {
   const m = snapshot?.mission || {};
   const target = m.target || snapshot?.research_answer?.question || "";
-  $("heroQuery").textContent = target ? "«" + target + "» · #" + (snapshot?.run_id || "—") : "";
+  const heroQuery = $("heroQuery");
+  if (heroQuery) heroQuery.textContent = target ? "«" + target + "» · #" + (snapshot?.run_id || "—") : "";
   const q = $("operatorQuery");
   q.placeholder = target ? "Τρέχουσα: " + target + " — νέο ερώτημα…" : "Τι θέλετε να ερευνήσετε;";
   const blockers = snapshot?.blockers?.length || 0;
-  $("moonPhase").textContent = snapshot ? GR.status(m.status || "—") + (blockers ? " · " + blockers + " εμπόδια" : "") : "Χωρίς φορτωμένη έρευνα";
+  const moonPhase = $("moonPhase");
+  if (moonPhase) moonPhase.textContent = snapshot ? GR.status(m.status || "—") + (blockers ? " · " + blockers + " εμπόδια" : "") : "Χωρίς φορτωμένη έρευνα";
 }
 function renderAll() {
   renderStatus();

@@ -2,7 +2,22 @@
 const {chromium}=require('playwright'),assert=require('node:assert/strict'),http=require('node:http'),fs=require('node:fs'),path=require('node:path');
 const NAVMAP={universe:'map',findings:'research',agents:'agents'};
 // Το παλιό dock αντικαταστάθηκε από τη ράγα v2 (κινητό: κάτω μπάρα). Ίδιοι προορισμοί: χάρτης=universe, έρευνα=findings, ερευνητές=agents, εργαλεία→PDF=pdf.
-async function navTo(page,view){if(view==='pdf'){await page.locator('#v2ToolsBtn:visible,#v2MoreBtn:visible').first().click();await page.locator('#v2ToolsMenu [data-nx-go="learning"]').click();}else await page.locator(':is(#v2rail,#v2tabbar) .v2-nav[data-nx-go="'+NAVMAP[view]+'"]:visible').click();}
+async function navTo(page,view){
+  async function openResearch(){
+    if(await page.locator('#atlasHome:not([hidden])').count()){
+      await page.locator('#atlasExplore').click();
+      await page.waitForFunction(()=>document.body.dataset.atlasPage==='research');
+    }
+  }
+  if(view==='universe'){
+    await page.locator('#atlasHome:not([hidden]) .atlas-topnav [data-atlas-nav="map"], #atlasResearch:not([hidden]) .atlas-topnav [data-atlas-nav="map"]').first().click();
+    await page.waitForFunction(()=>document.body.dataset.atlasPage==='home');
+    return;
+  }
+  await openResearch();
+  const key=view==='pdf'?'tools':(NAVMAP[view]||view);
+  await page.locator('#atlasResearch:not([hidden]) .atlas-topnav [data-atlas-nav="'+key+'"]').click();
+}
 (async()=>{const root=path.resolve(__dirname,'..');const server=http.createServer((req,res)=>{let file=path.join(root,new URL(req.url,'http://local').pathname);if(file.endsWith('/'))file+='index.html';try{res.setHeader('content-type',file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':file.endsWith('.json')?'application/json':'text/html');res.end(fs.readFileSync(file));}catch{res.writeHead(404);res.end();}});await new Promise(r=>server.listen(0,'127.0.0.1',r));let browser;try{
  browser=await chromium.launch({executablePath:process.env.JARVIS_BROWSER_EXECUTABLE||'/usr/bin/chromium',headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--enable-unsafe-swiftshader','--use-angle=swiftshader']});
  for(const width of [1440,390]){const page=await browser.newPage({viewport:{width,height:900},reducedMotion:'reduce'});const errors=[];page.on('pageerror',e=>errors.push(e.message));let socket,current,dispatches=0;
