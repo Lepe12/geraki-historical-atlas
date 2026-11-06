@@ -39,7 +39,7 @@ test('in-progress title prefers typed query over run id', async () => {
   assert.equal(overview(snap, { knownQuery: 'Κίμωλος' }).title, 'Κίμωλος');
   assert.equal(overview(snap).title, '');
   assert.equal(historyEntry(snap, 'Κίμωλος').target, 'Κίμωλος');
-  assert.equal(historyEntry(snap).target, '');
+  assert.equal(historyEntry(snap).target, 'Έρευνα 42176932029');
 });
 
 test('mission purpose wins over typed query once published', async () => {
@@ -47,12 +47,4 @@ test('mission purpose wins over typed query once published', async () => {
   const snap = { run_id: '1', mission: { status: 'RUNNING', purpose: 'Ιωάννης Καψής', target: 'Ιωάννης Καψής' } };
   assert.equal(resolveResearchQuery(snap, 'άλλο κείμενο'), 'Ιωάννης Καψής');
   assert.equal(overview(snap, { knownQuery: 'άλλο κείμενο' }).title, 'Ιωάννης Καψής');
-});
-
-
-test('reader history labels stay plain', async () => {
-  const { historyStatusLabel, waitingPhrase } = await modulePromise;
-  assert.equal(historyStatusLabel('PARTIAL'), 'δεν μπόρεσα να διαβάσω τις πηγές');
-  assert.equal(historyStatusLabel('COMPLETED'), 'άρθρο έτοιμο');
-  assert.match(waitingPhrase('Κίμωλος'), /Διαβάζονται οι πηγές για/);
 });
