@@ -45,6 +45,16 @@ previous=json.loads(report_path.read_text()) if report_path.exists() else {}
 if previous and previous.get('request_sha256')!=request_sha:
     raise SystemExit('ACQUISITION_REQUEST_MISMATCH')
 results=previous.get('results',[])
+# Local owned library (PCT_OWNED_LIBRARY): seed matching published sources first.
+try:
+    from owned_source_library import inject_into_results, resolve_root
+    if resolve_root() is not None:
+        inject_into_results(results, OUT, [ctx['target'], *ctx.get('aliases', []), ctx.get('purpose','')])
+except Exception as owned_exc:
+    # Missing optional library must not abort web acquisition; record only.
+    (OUT/'owned_library_hook.json').write_text(__import__('json').dumps({
+        'status':'OWNED_LIBRARY_HOOK_SKIPPED','error_type':type(owned_exc).__name__
+    })+'\n')
 def key(x):
     return (str(x.get('discovery_repository') or x.get('repository')),str(x.get('identifier') or x.get('url') or x.get('title')))
 completed={key(x) for x in results if x.get('status')!='ACQUISITION_ERROR' and (x.get('status')!='LOCATED_CITATION_CHASE' or x.get('web_acquisition_attempted') or not (x.get('url') or x.get('digital_url')))}

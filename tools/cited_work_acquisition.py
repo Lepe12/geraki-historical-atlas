@@ -110,8 +110,21 @@ def cited_bibliography_entries(root, results, findings):
 
 def lookup(query,lane):
     from connectors.citation_search import search
+    # Prefer the owner's published-source library when PCT_OWNED_LIBRARY (or the
+    # default local folder) is present; CI can mount it privately later.
+    owned_rows=[]
+    try:
+        from owned_source_library import search_as_citation_rows, resolve_root
+        if resolve_root() is not None:
+            owned_rows=search_as_citation_rows(query)
+    except Exception:
+        owned_rows=[]
     status,rows,detail=search(query,lane,'Cited Work Continuation')
-    diagnostics=[{'route':'EXISTING_CITATION_SEARCH','status':status,'detail':detail}]
+    diagnostics=[{'route':'OWNED_PUBLISHED_LIBRARY','status':'MATCHED' if owned_rows else 'NO_MATCH',
+                  'detail':{'count':len(owned_rows)}}]
+    if owned_rows:
+        rows=list(owned_rows)+list(rows)
+    diagnostics.append({'route':'EXISTING_CITATION_SEARCH','status':status,'detail':detail})
     # Greek older scholarship is often outside scholarly DOI catalogues. Use
     # the already supported anonymous collection search, without requiring keys.
     if re.search(r'[Α-ω]',query) and not any(citation_title_match(query,r) for r in rows):
@@ -225,8 +238,17 @@ def continue_citations(root,ctx,results,*,searcher=lookup,reader=acquire,
                              'identity_status':'NOT_ESTABLISHED'}
                     search['acquisitions'].append(receipt);save()
                     try:
-                        document=reader(url,out,follow=True)
-                        receipt.update(status=document['status'],source_url=document['url'],
+                        if str(url).startswith('owned-library://'):
+                            from owned_source_library import acquire_owned_query
+                            owned_docs=acquire_owned_query(query,out)
+                            if not owned_docs:
+                                receipt.update(status='OWNED_LIBRARY_MISS');save();continue
+                            document=owned_docs[0]
+                            document.setdefault('linked_documents',[])
+                            document.setdefault('errors',[])
+                        else:
+                            document=reader(url,out,follow=True)
+                        receipt.update(status=document['status'],source_url=document.get('url') or document.get('acquired_source_url'),
                                        sha256=document.get('sha256'),files=document['files'],
                                        linked_errors=document.get('errors',[]))
                         for acquired in [document,*document.get('linked_documents',[])]:
