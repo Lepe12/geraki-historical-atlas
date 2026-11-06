@@ -156,6 +156,7 @@ async function readGroqStream(response,onDelta){
   while(true){
    const part=await reader.read();if(part.done)break;
    pending+=decoder.decode(part.value,{stream:true});
+   pending=pending.replace(/\r\n/g,'\n'); // Groq can send SSE over CRLF
    if(pending.length>500000)throw Error('Groq stream buffer exceeded');
    let ix;
    while((ix=pending.indexOf('\n\n'))!==-1){
@@ -271,7 +272,7 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
     const request={model:MODEL,messages:ask,temperature:0.3,stream:true,
       max_completion_tokens:1800};
     if(BASE==='https://api.groq.com/openai/v1'&&MODEL==='qwen/qwen3.8-27b'){
-      request.reasoning_effort='none';request.max_completion_tokens=4096;
+      request.reasoning_effort='none';request.max_completion_tokens=1800;
     }
     let completion;
     try{
