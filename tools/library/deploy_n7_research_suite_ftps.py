@@ -92,7 +92,7 @@ try:
         (STAGE/"n7-research-upload-route.snippet").read_bytes(),
         b"    if(p==='/api/library/upload'){")
     current=add_once(current,
-        b"    if(req.method==='GET'&&p==='/api/skills/feedback')",
+        b"    if(p==='/api/library/search'){",
         (STAGE/"n7-research-capabilities.snippet").read_bytes(),
         b"    if(req.method==='GET'&&p==='/api/research/capabilities')")
     if b"pdf_upload:false" in current:
