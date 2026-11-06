@@ -133,7 +133,9 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
       return true;
     }
     if(p==="/n7/library/search" || p==="/n7/library/page"){
-      if(req.method!=="GET"){json(res,405,{error:"method_not_allowed"});return true;}
+      if(req.method!=="GET" && !(p==="/n7/library/search" && req.method==="POST")){
+        json(res,405,{error:"method_not_allowed"});return true;
+      }
       // Public pages and untrusted origins are forbidden even when the URL is known.
       const origin=String(req.headers.origin||"");
       if(origin && !["https://lepe12.github.io","https://pct-live.piratecartography.com","https://bot.piratecartography.com"].includes(origin)){
@@ -145,7 +147,16 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
       const params=new URL(req.url||p,"http://localhost").searchParams;
       let command,argument;
       if(p==="/n7/library/search"){
-        const term=String(params.get("q")||"").trim();
+        let term=String(params.get("q")||"").trim();
+        if(req.method==="POST"){
+          let request;
+          try {request=JSON.parse(await readBody(req,4096));}
+          catch(_){json(res,400,{error:"invalid_json"});return true;}
+          if(typeof request?.query!=="string"){
+            json(res,400,{error:"invalid_library_query"});return true;
+          }
+          term=request.query.trim();
+        }
         if(term.length<2||term.length>150||[...term].some(x=>x.codePointAt(0)<32)){
           json(res,400,{error:"invalid_library_query"});return true;
         }
@@ -160,8 +171,14 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
       }
       try{
         const data=await libraryRunner(command,argument);
-        json(res,200,{schema:"n7-private-library-read-v1",operation:command,
-          result:data,historically_verified:false});
+        if(p==="/n7/library/search" && req.method==="POST"){
+          json(res,200,{schema:"n7-library-read-v1",
+            matches:Array.isArray(data.matches)?data.matches:[],
+            historically_verified:false});
+        }else{
+          json(res,200,{schema:"n7-private-library-read-v1",operation:command,
+            result:data,historically_verified:false});
+        }
       }catch(_){json(res,503,{error:"private_library_unavailable"});}
       return true;
     }

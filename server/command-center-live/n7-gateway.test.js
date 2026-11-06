@@ -271,3 +271,25 @@ test("private library PDF upload is OAuth and origin protected",async()=>{
   assert.equal(result.payload.historically_verified,false);
   assert.deepEqual(invoked,["application/pdf"]);
 });
+
+
+test("N7 chat POST search accepts query and returns flat matches while legacy GET remains intact",async()=>{
+  const out=[],calls=[];
+  const handle=createN7Gateway({
+    json:(_r,status,payload)=>out.push({status,payload}),
+    operatorAuthorized:()=>true,
+    sessionAuthorized:()=>false,
+    readBody:async()=>JSON.stringify({query:"Λάντζας"}),
+    statusFor:async()=>({snapshot:null}),
+    libraryRunner:async (command,args)=>{calls.push({command,args});return {matches:[{source_id:"a".repeat(64),title:"Λάσκαρις",scan_index:3,printed_page:"15",excerpt:"Λάντζας"}]};}
+  });
+  await handle({method:"POST",url:"/pct-api/live/n7/library/search",headers:{origin:"https://bot.piratecartography.com"}},{}, "/n7/library/search");
+  assert.equal(out.at(-1).status,200);
+  assert.equal(out.at(-1).payload.schema,"n7-library-read-v1");
+  assert.equal(out.at(-1).payload.matches[0].printed_page,"15");
+  assert.deepEqual(calls[0],{command:"search",args:["Λάντζας"]});
+  await handle({method:"POST",url:"/pct-api/live/n7/library/page",headers:{}},{}, "/n7/library/page");
+  assert.equal(out.at(-1).status,405);
+  await handle({method:"GET",url:"/pct-api/live/n7/library/search?q=Lanza",headers:{}},{}, "/n7/library/search");
+  assert.equal(out.at(-1).payload.schema,"n7-private-library-read-v1");
+});
