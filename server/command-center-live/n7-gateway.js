@@ -3,6 +3,7 @@ const crypto=require("node:crypto");
 const {execFile}=require("node:child_process");
 const path=require("node:path");
 const fs=require("node:fs");
+const {verifyLibraryBridge}=require("./n7-library-bridge");
 
 // Fixed local CLI, no shell or client-specified paths. All reads require authenticated operator.
 function readPrivateLibrary(command,arg) {
@@ -91,7 +92,7 @@ async function privateLibraryUpload(req){
 
 // Routes are explicitly scoped to the existing live service. No shell,
 // database writer, privileged host action, or arbitrary workflow selection.
-function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,readBody,statusFor,githubWorkflowDispatch,githubCodingDispatch,githubPrivateDispatch,libraryRunner=readPrivateLibrary,libraryUploadRunner=privateLibraryUpload}) {
+function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,readBody,statusFor,githubWorkflowDispatch,githubCodingDispatch,githubPrivateDispatch,libraryRunner=readPrivateLibrary,libraryUploadRunner=privateLibraryUpload,libraryBridgeVerifier=verifyLibraryBridge}) {
   let lastAccepted=0;
   return async function handleN7(req,res,p) {
     if (p!=="/n7/status" && p!=="/n7/dispatch" && p!=="/n7/code" && p!=="/n7/brain/task" && p!=="/n7/library/search" && p!=="/n7/library/page" && p!=="/n7/library/upload") return false;
@@ -141,7 +142,15 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
       if(origin && !["https://lepe12.github.io","https://pct-live.piratecartography.com","https://bot.piratecartography.com"].includes(origin)){
         json(res,403,{error:"origin_not_allowed"});return true;
       }
-      if(!operatorAuthorized(req) && !sessionAuthorized(req)){
+      let bridgeBody=null;
+      const normalAuthorized=operatorAuthorized(req)||sessionAuthorized(req);
+      if(!normalAuthorized && p==="/n7/library/search" && req.method==="POST"){
+        try{
+          const raw=await readBody(req,4096);
+          if(libraryBridgeVerifier(req,raw))bridgeBody=JSON.parse(raw);
+        }catch(_){}
+      }
+      if(!normalAuthorized && bridgeBody===null){
         json(res,401,{error:"operator_authorization_required"});return true;
       }
       const params=new URL(req.url||p,"http://localhost").searchParams;
@@ -150,7 +159,7 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
         let term=String(params.get("q")||"").trim();
         if(req.method==="POST"){
           let request;
-          try {request=JSON.parse(await readBody(req,4096));}
+          try {request=bridgeBody!==null?bridgeBody:JSON.parse(await readBody(req,4096));}
           catch(_){json(res,400,{error:"invalid_json"});return true;}
           if(typeof request?.query!=="string"){
             json(res,400,{error:"invalid_library_query"});return true;
