@@ -1,0 +1,29 @@
+name: N7 character assets production audit
+on:
+  pull_request:
+    paths: ['tools/library/diagnose_n7_art_ftps.py','.github/workflows/n7-character-assets-audit.yml']
+  push:
+    branches: [main]
+    paths: ['ops_ftps_requests/n7-character-audit.json']
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 5
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/library
+            ops_ftps_requests
+      - run: |
+          python3 -m py_compile tools/library/diagnose_n7_art_ftps.py
+          python3 tools/library/diagnose_n7_art_ftps.py
