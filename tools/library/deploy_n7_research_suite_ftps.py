@@ -73,15 +73,20 @@ try:
         b"\nconst historicalResearch = require('./historical-research');",
         b"const historicalResearch = require('./historical-research');")
 
-    original_chat=b"      const history=[...item.messages,{role:'user',content}];\n      let reply;try {reply=await answer(history);}catch(e){return json(res,502,{error:e.message});}\n"
+    # Live chat uses a multiline history object. Preserve it and the existing
+    # message saving/title logic, changing only the assistant answer stage.
     replacement_chat=(STAGE/"n7-research-chat-handler.snippet").read_bytes()
+    split=b"      let researchData=null,reply;"
+    if replacement_chat.count(split)!=1:raise RuntimeError("RESEARCH_SNIPPET_CHANGED")
+    response_stage=split+replacement_chat.split(split,1)[1]
     if b"historicalResearch.research(content" not in current:
-        if current.count(original_chat)!=1:
-            lines=current.splitlines()
-            pos=next((i for i,line in enumerate(lines) if b"const history" in line),-1)
-            print(json.dumps({"live_chat_block":[x.decode("utf-8","replace")[:240] for x in lines[pos:pos+27]] if pos>=0 else []}))
-            raise RuntimeError("LIVE_CHAT_HANDLER_CHANGED")
-        current=current.replace(original_chat,replacement_chat)
+        start=current.find(b"      let reply;",current.find(b"const history = ["))
+        end=current.find(b"      item.messages =",start)
+        if start<0 or end<=start:raise RuntimeError("LIVE_CHAT_BOUNDARY_CHANGED")
+        old_answer_stage=current[start:end]
+        if b"reply = await answer(history);" not in old_answer_stage or len(old_answer_stage)>1100:
+            raise RuntimeError("LIVE_CHAT_ANSWER_STAGE_CHANGED")
+        current=current[:start]+response_stage+current[end:]
     current=add_once(current,
         b"    if(p==='/api/library/search'){",
         (STAGE/"n7-research-upload-route.snippet").read_bytes(),
