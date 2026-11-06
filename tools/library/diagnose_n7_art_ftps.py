@@ -27,7 +27,7 @@ try:
                     "n7_branding":b"N7" in payload,
                     "old_generic_branding":b"INDEPENDENT" in payload})
             if name=="app.js":
-                results[name].update({"presence_mount":b"N7Presence" in payload})
+                results[name].update({"presence_mount":b"N7Presence" in payload,"approved_character_embedded":b"N7_APPROVED_CHARACTER_V1" in payload,"approved_art_embedding":b"const art={base:" in payload,"approved_welcome_mount":b"mount(welcome,false)" in payload})
             if name=="n7-presence.js":
                 results[name].update({"draws_character":b"canvas" in payload,
                     "references_base_layer":b"n7-agent-base.webp" in payload,
