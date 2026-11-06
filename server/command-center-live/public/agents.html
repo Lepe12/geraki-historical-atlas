@@ -331,7 +331,6 @@ $("n7LibrarySubmit").addEventListener("click",async()=>{
   }catch(_){out.textContent="Αδυναμία πρόσβασης στη βιβλιοθήκη.";}
   finally{$("n7LibrarySubmit").disabled=false;}
 });
-let n7PendingSourceId=null;
 $("n7LibraryUpload").addEventListener("click",async()=>{
   const out=$("n7LibraryImportState"),file=$("n7LibraryPdf").files?.[0];
   if(!authenticated){out.textContent="Χρειάζεται σύνδεση με GitHub.";return;}
@@ -339,41 +338,27 @@ $("n7LibraryUpload").addEventListener("click",async()=>{
     out.textContent="Επίλεξε PDF μέχρι 25 MB.";return;
   }
   $("n7LibraryUpload").disabled=true;
+  out.textContent="Μεταφορά PDF, ανάγνωση και μόνιμη καταχώριση…";
   try{
-    if(!n7PendingSourceId){
-      out.textContent="Μεταφορά PDF στον ιδιωτικό αποθηκευτικό χώρο…";
-      const upload=await fetch(API_BASE+"/pct-api/live/knowledge/upload",{
-        method:"POST",body:file,credentials:"include",
-        headers:{"Content-Type":"application/pdf","X-File-Name":encodeURIComponent(file.name),
-          "X-NABOU-Agent-Room":"1"},signal:AbortSignal.timeout(65000)
-      });
-      const saved=await upload.json().catch(()=>({}));
-      if(!upload.ok||!saved.source_id)throw Error("upload_http_"+upload.status);
-      n7PendingSourceId=saved.source_id;
-    }
-    out.textContent="Ανάγνωση σελίδων και αποθήκευση στη MariaDB…";
-    const review=await fetch(API_BASE+"/pct-api/live/knowledge/review",{
-      method:"POST",credentials:"include",
-      headers:{"Content-Type":"application/json","X-NABOU-Agent-Room":"1"},
-      body:JSON.stringify({source_id:n7PendingSourceId,items:[],reason:"Operator requested N7 private page library ingestion"}),
-      signal:AbortSignal.timeout(190000)
+    const response=await fetch(API_BASE+"/pct-api/live/n7/library/upload",{
+      method:"POST",body:file,credentials:"include",
+      headers:{"Content-Type":"application/pdf","X-File-Name":encodeURIComponent(file.name),
+        "X-NABOU-Agent-Room":"1"},signal:AbortSignal.timeout(190000)
     });
-    const result=await review.json().catch(()=>({}));
-    if(!review.ok)throw Error("review_http_"+review.status+" "+String(result.error||""));
-    if(result.library_storage?.status==="DATABASE_COMMITTED"){
-      out.textContent="Το PDF καταχωρίστηκε στη μόνιμη βιβλιοθήκη: "+result.library_storage.imported_pages+
-        " σελίδες. Το OCR δεν έχει επαληθευτεί ιστορικά.";
-      n7PendingSourceId=null;
+    const result=await response.json().catch(()=>({}));
+    if(response.status===201 && result.status==="DATABASE_COMMITTED"){
+      out.textContent="Το PDF αποθηκεύτηκε στη MariaDB: "+result.imported_pages+
+        " σελίδες. Δεν έχει γίνει επιστημονική επαλήθευση OCR.";
+    }else if(result.status==="STAGED"){
+      out.textContent="Το PDF διατηρήθηκε ιδιωτικά, αλλά δεν επιβεβαιώθηκε πλήρης εισαγωγή. "+
+        "Εισήχθησαν "+Number(result.imported_pages||0)+" σελίδες· μπορείς να επαναλάβεις.";
     }else{
-      out.textContent="Το PDF αποθηκεύτηκε, αλλά η εγγραφή στη βιβλιοθήκη δεν επιβεβαιώθηκε: "+
-        String(result.library_storage?.reason||"UNKNOWN")+". Ξαναπάτησε για νέα προσπάθεια.";
+      out.textContent="Η εισαγωγή απέτυχε (HTTP "+response.status+
+        "). Έλεγξε αν το PDF υπερβαίνει τους περιορισμούς OCR.";
     }
-  }catch(error){
-    out.textContent="Η εισαγωγή δεν ολοκληρώθηκε: "+String(error.message||"unknown").slice(0,120)+
-      ". Αν το αρχείο έχει ήδη ανεβεί, μπορείς να ξαναπατήσεις για νέα προσπάθεια.";
-  }finally{$("n7LibraryUpload").disabled=false;}
+  }catch(_){out.textContent="Η εισαγωγή δεν ολοκληρώθηκε. Μπορείς να ξαναδοκιμάσεις.";}
+  finally{$("n7LibraryUpload").disabled=false;}
 });
-$("n7LibraryPdf").addEventListener("change",()=>{n7PendingSourceId=null;});
 $("n7LibraryTerm").addEventListener("keydown",event=>{
   if(event.key==="Enter"){$("n7LibrarySubmit").click();}
 });
