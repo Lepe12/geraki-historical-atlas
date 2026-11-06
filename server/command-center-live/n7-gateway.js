@@ -293,7 +293,8 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
         }else if(p==="/n7/library/page" && req.method==="POST"){
           if(!data||data.status==="NOT_FOUND"){json(res,404,{error:"page_not_found"});return true;}
           json(res,200,{schema:"n7-library-page-v1",page:data,
-            source_type:"SECONDARY_HISTORIOGRAPHY",historically_verified:false});
+            source_type:String(data.rights_note||"").toLowerCase().includes("historical secondary source")?
+              "SECONDARY_HISTORIOGRAPHY":"UNCLASSIFIED_REQUIRES_REVIEW",historically_verified:false});
         }else{
           json(res,200,{schema:"n7-private-library-read-v1",operation:command,
             result:data,historically_verified:false});
