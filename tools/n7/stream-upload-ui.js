@@ -88,8 +88,8 @@
   for(const file of files.filter(f=>/\.pdf$/i.test(f.name))){
    if(budget<=0||prepared.length>=4)break;
    if(notice)notice.textContent='Ελέγχω τις σελίδες του PDF…';
-   const pdfjs=await import('/n7-pdf/pdf.mjs');
-   pdfjs.GlobalWorkerOptions.workerSrc='/n7-pdf/pdf.worker.mjs';
+   const pdfjs=await import('/n7-pdf/pdf.js');
+   pdfjs.GlobalWorkerOptions.workerSrc='/n7-pdf/pdf.worker.js';
    const task=pdfjs.getDocument({data:new Uint8Array(await file.arrayBuffer()),isEvalSupported:false});
    let doc;const timer=setTimeout(()=>task.destroy(),20000);
    try{

@@ -11,9 +11,9 @@ FILES=[(ROOT,'document-reader.js','document-reader.js'),(ROOT,'pdf-reader-worker
  (ROOT+'/vendor','geometry.cjs','vendor/geometry.cjs'),(ROOT+'/vendor','pdf.mjs','vendor/pdf.mjs'),
  (ROOT+'/vendor','pdf.worker.mjs','vendor/pdf.worker.mjs'),(ROOT+'/vendor','PDFJS-LICENSE','vendor/PDFJS-LICENSE'),
  (ROOT+'/vendor','CANVAS-LICENSE','vendor/CANVAS-LICENSE'),
- (PUB+'/n7-pdf','pdf.mjs','vendor/pdf.mjs'),(PUB+'/n7-pdf','pdf.worker.mjs','vendor/pdf.worker.mjs'),
- (ROOT,'n7-stream-attachments.js','stream-attachments.js'),(ROOT,'n7-public-web-search.js','public-web-search.js'),(PUB,'app.js','stream-upload-ui.js')]
-NEW_FILES={'document-reader.js','pdf-reader-worker.cjs','geometry.cjs','pdf.mjs','pdf.worker.mjs','PDFJS-LICENSE','CANVAS-LICENSE'}
+ (PUB+'/n7-pdf','pdf.js','vendor/pdf.mjs'),(PUB+'/n7-pdf','pdf.worker.js','vendor/pdf.worker.mjs'),
+ (ROOT,'n7-stream-attachments.js','stream-attachments.js'),(ROOT,'n7-public-web-search.js','public-web-search.js'),(PUB,'app.js','stream-upload-ui.js'),(PUB,'index.html','@index')]
+NEW_FILES={'document-reader.js','pdf-reader-worker.cjs','geometry.cjs','pdf.mjs','pdf.worker.mjs','pdf.js','pdf.worker.js','PDFJS-LICENSE','CANVAS-LICENSE'}
 MARKER=b'N7_GROQ_TRUE_STREAM_AND_UPLOADS_V1'
 def sha(b):return hashlib.sha256(b).hexdigest()
 def read(f,folder,name):
@@ -89,7 +89,11 @@ def main():
    raise RuntimeError('N7_PROGRESS_STREAM_ROUTE_NOT_INSTALLED')
   for folder,name,local in FILES:
    previous=read_or_missing(f,folder,name)
-   data=(HERE/local).read_bytes()
+   if local=='@index':
+    import re
+    data,count=re.subn(rb'src=[\"\'](/app\.js(?:\?[^\"\']*)?)[\"\']',b'src=\"/app.js?n7doc=2\"',previous)
+    if count!=1:raise RuntimeError('N7_DOCUMENT_INDEX_SCRIPT_UNEXPECTED')
+   else:data=(HERE/local).read_bytes()
    if previous is None and name not in NEW_FILES:raise RuntimeError('N7_PROGRESS_MISSING_EXISTING_FILE_'+name)
    if name=='app.js':
     data=make_ui(previous,data)
@@ -102,7 +106,7 @@ def main():
      raise RuntimeError('N7_PROGRESS_RESEARCH_HELPER_UNEXPECTED')
    elif name=='europeana-api.js':
     if b'N7_EUROPEANA_API_V1' not in data:raise RuntimeError('N7_EUROPEANA_MODULE_INVALID')
-   if name.endswith(('.js','.cjs')):check(data)
+   if name.endswith(('.js','.cjs')) and folder!=PUB+'/n7-pdf':check(data)
    if previous!=data:changes.append((folder,name,previous,data))
   print('N7_PROGRESS_PREFLIGHT_OK dry_run='+str(dry)+' changed='+','.join(v[1] for v in changes))
   # Compare public static /app.js to exact FTPS file before changing anything.
