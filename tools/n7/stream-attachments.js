@@ -267,7 +267,7 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
       ...messages,{role:'assistant',content:final.slice(-4500)},
       {role:'user',content:'Συνέχισε ακριβώς από εκεί που σταμάτησες, χωρίς επανάληψη.'}
     ]:messages;
-    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),42000);
+    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),25000);
     const request={model:MODEL,messages:ask,temperature:0.3,stream:true,
       max_completion_tokens:1800};
     if(BASE==='https://api.groq.com/openai/v1'&&MODEL==='qwen/qwen3.8-27b'){
