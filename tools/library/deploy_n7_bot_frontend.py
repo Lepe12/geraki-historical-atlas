@@ -25,10 +25,11 @@ print(json.dumps({"structure":{
 "html_scripts":re.findall(r'<script[^>]*src=["\\x27]([^"\\x27]+)',html.decode("utf-8","replace"))[:12],
 "html_title":(re.search(r'<title>([^<]+)</title>',html.decode("utf-8","replace")) or [None,""])[1][:100]
 }}))
-assert server.count(b"\x27/app.js\x27:\x27app.js\x27,")==1
-assert html.count(b'<script src="/app.js" defer></script>')==1
-payload["server.js"]=server.replace(b"\x27/app.js\x27:\x27app.js\x27,",b"\x27/app.js\x27:\x27app.js\x27,\x27/historical-library.js\x27:\x27historical-library.js\x27,").replace(b"\x27/app.js\x27,\x27/style.css\x27,",b"\x27/app.js\x27,\x27/historical-library.js\x27,\x27/style.css\x27,").replace(b"connect-src \x27self\x27;",b"connect-src \x27self\x27 https://pct-live.piratecartography.com;")
-payload["public/index.html"]=html.replace(b'<script src="/app.js" defer></script>',b'<script src="/app.js" defer></script><script src="/historical-library.js" defer></script>')
+assert server.count(b"'/app.js': 'app.js',")==1
+assert __import__("re").search(rb'<script[^>]*src="/app.js[^"]*"[^>]*></script>',html)
+payload["server.js"]=server.replace(b"'/app.js': 'app.js',",b"'/app.js': 'app.js', '/historical-library.js': 'historical-library.js',").replace(b"'/app.js',",b"'/app.js', '/historical-library.js',").replace(b"connect-src 'self';",b"connect-src 'self' https://pct-live.piratecartography.com;")
+match=__import__("re").search(rb'<script[^>]*src="/app.js[^"]*"[^>]*></script>',html)
+payload["public/index.html"]=html.replace(match.group(),match.group()+b'<script src="/historical-library.js" defer></script>')
 for name,data in payload.items():
     current=None
     try:current=get(name)
