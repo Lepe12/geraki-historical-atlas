@@ -120,7 +120,7 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
          source.source_uri!==book.uri||!Array.isArray(source.pages)||
          source.pages.length<1||source.pages.length>18||
          source.pages.some(pg=>!Number.isSafeInteger(pg?.scan_index)||pg.scan_index<1||pg.scan_index>10000||
-           typeof pg.text!=="string"||pg.text.length<40||pg.text.length>60000||
+           typeof pg.text!=="string"||pg.text.length<1||pg.text.length>60000||
            pg.ocr_status!=="UNREVIEWED"||
            !(pg.printed_page===null||typeof pg.printed_page==="string"&&pg.printed_page.length<=24))
       ){
