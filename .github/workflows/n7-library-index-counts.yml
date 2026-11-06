@@ -61,6 +61,8 @@ jobs:
           PY
       - name: Upgrade N7 index reporting on Top.Host
         run: python3 tools/library/deploy_library_counts_ftps.py
+      - name: Confirm actual MariaDB index counts through signed production query
+        run: python3 tools/library/probe_n7_library_counts.py
       - name: Check both apps survived installation
         run: |
           python3 - <<'PY'
