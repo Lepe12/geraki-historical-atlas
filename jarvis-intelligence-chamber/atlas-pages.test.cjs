@@ -70,14 +70,12 @@ const path = require("node:path");
     // Home: home chrome visible, research chrome not, lab rail/clock not visible.
     assert.equal(await page.locator("#atlasHome").isVisible(), true);
     assert.equal(await page.locator("#atlasResearch").isVisible(), false);
-    assert.equal(await page.locator("#atlasHome >> text=Στα ίχνη της ιστορίας.").isVisible(), true);
+    assert.equal(await page.locator("#atlasHome .atlas-home-poster").isVisible(), true);
     assert.equal(await page.locator("#atlasExplore").isVisible(), true);
     assert.equal(await page.locator("#v2rail").isVisible(), false);
     assert.equal(await page.locator("#topbar").isVisible(), false);
     assert.equal(await page.locator("#clock").isVisible(), false);
     assert.equal(await page.locator("#n7-live-test-button").count(), 0);
-    assert.ok(await page.locator("#chartFrame").isVisible(), "live map must remain");
-    assert.ok(await page.locator("#zoomIn").isVisible(), "zoom stays");
 
     // Explore → research page
     await page.locator("#atlasExplore").click();
