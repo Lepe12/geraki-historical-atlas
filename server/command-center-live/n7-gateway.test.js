@@ -202,3 +202,39 @@ test("private N7 dispatch only accepts signed owner bot origin and CSRF header",
   assert.equal(await request("https://bot.piratecartography.com",true),202);
   assert.equal(calls.length,1);
 });
+
+test("N7 library reads exact pages only for authenticated operators",async()=>{
+  const replies=[],calls=[];
+  let allow=false;
+  const handle=createN7Gateway({
+    json:(_res,status,payload)=>replies.push({status,payload}),
+    operatorAuthorized:()=>allow,sessionAuthorized:()=>false,
+    statusFor:async()=>({snapshot:null}),
+    libraryRunner:async(cmd,args)=>{
+      calls.push({cmd,args});
+      return cmd==="search"?{matches:[{title:"Laskaris",scan_index:12,printed_page:"9",excerpt:"Λάντζας"}]}:
+        {source_id:args[0],scan_index:Number(args[1]),printed_page:"9",ocr_text:"Λάντζας"};
+    }
+  });
+  const request=async(url,p,headers={})=>{
+    await handle({method:"GET",url,headers},{},p);
+    return replies.at(-1);
+  };
+  const searchPath="/n7/library/search";
+  const url="/pct-api/live/n7/library/search?q="+encodeURIComponent("Λάντζας");
+  assert.equal((await request(url,searchPath)).status,401);
+  allow=true;
+  assert.equal((await request(url,searchPath,{origin:"https://evil.example"})).status,403);
+  const search=await request(url,searchPath,{origin:"https://bot.piratecartography.com"});
+  assert.equal(search.status,200);
+  assert.equal(search.payload.result.matches[0].printed_page,"9");
+  assert.equal(search.payload.historically_verified,false);
+  const id="a".repeat(64);
+  const page=await request("/n7/library/page?source_id="+id+"&scan_index=12","/n7/library/page");
+  assert.equal(page.status,200);
+  assert.equal(page.payload.result.ocr_text,"Λάντζας");
+  assert.deepEqual(calls.map(x=>x.cmd),["search","page"]);
+  assert.equal((await request("/n7/library/page?source_id=bad&scan_index=12","/n7/library/page")).status,400);
+  assert.equal((await request("/n7/library/search?q=a","/n7/library/search")).status,400);
+  assert.equal(calls.length,2);
+});
