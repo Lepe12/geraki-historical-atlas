@@ -49,7 +49,34 @@ document.addEventListener("DOMContentLoaded",()=>{
   pagePanel.append(back,pageTitle,pageMeta,pageSource,pageText);
   back.onclick=()=>{pagePanel.style.display="none";results.style.display="block";form.style.display="block";};
 
-  form.append(query,submit);overlay.append(close,title,form,status,results,pagePanel);document.body.append(overlay);
+  const uploadArea=document.createElement("div");
+  uploadArea.style.cssText="margin:16px 0;padding:12px;border:1px solid #386478;border-radius:8px";
+  const uploadLabel=document.createElement("label");uploadLabel.textContent="Προσθήκη ιδιωτικού ιστορικού PDF (έως 25 MB, έως 500 σελίδες· OCR περιορισμένο σε 30 σελίδες)";
+  const pdfFile=document.createElement("input");pdfFile.type="file";pdfFile.accept=".pdf,application/pdf";
+  pdfFile.style.cssText="display:block;margin:10px 0";
+  const uploadButton=document.createElement("button");uploadButton.type="button";uploadButton.textContent="Εισαγωγή PDF στη βιβλιοθήκη";
+  const pdfHint=document.createElement("p");pdfHint.style.cssText="font-size:12px;opacity:.82";
+  pdfHint.textContent="Το PDF παραμένει στον ιδιωτικό χώρο του N7. Η αυτόματη μεταγραφή δεν σημαίνει ιστορική επαλήθευση.";
+  uploadButton.onclick=async()=>{
+    const file=pdfFile.files?.[0];
+    if(!file){status.textContent="Επίλεξε πρώτα ένα αρχείο PDF.";return;}
+    if(file.size>25*1024*1024){status.textContent="Το PDF υπερβαίνει το όριο 25 MB.";return;}
+    uploadButton.disabled=true;status.textContent="Εισαγωγή και επεξεργασία PDF στη μόνιμη βιβλιοθήκη...";
+    try{
+      const response=await fetch("/api/library/upload",{
+        method:"POST",credentials:"same-origin",
+        headers:{"Content-Type":"application/pdf","X-File-Name":encodeURIComponent(file.name)},
+        body:file
+      });
+      const result=await response.json().catch(()=>({}));
+      if(!response.ok)throw new Error(result.error||"HTTP "+response.status);
+      status.textContent="Εισήχθησαν "+result.imported_pages+" σελίδες στη μόνιμη βιβλιοθήκη. Οι μεταγραφές απαιτούν έλεγχο.";
+      pdfFile.value="";
+    }catch(error){status.textContent="Αποτυχία εισαγωγής PDF: "+error.message;}
+    finally{uploadButton.disabled=false;}
+  };
+  uploadArea.append(uploadLabel,pdfFile,uploadButton,pdfHint);
+  form.append(query,submit);overlay.append(close,title,form,uploadArea,status,results,pagePanel);document.body.append(overlay);
   open.onclick=()=>{overlay.style.display="block";query.focus()};
   close.onclick=()=>{overlay.style.display="none"};
   form.onsubmit=async(e)=>{
