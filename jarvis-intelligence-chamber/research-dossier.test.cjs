@@ -38,5 +38,10 @@ test('dossier embeds the greek narrative instead of a pointer', async () => {
   assert.match(html, /ΠΑΡΑΔΕΙΓΜΑ, σελ\. 1/);
   assert.doesNotMatch(html, /Η αφήγηση είναι διαθέσιμη στο ερώτημα/);
   assert.match(html, /Πορεία έρευνας/);
-  assert.match(html, /Εμπόδια πρόσβασης/);
+  assert.match(html, /Βρέθηκαν 5 τεκμήρια/);
+  assert.ok(html.indexOf('Τι δεν βρέθηκε') > html.indexOf('Πορεία έρευνας'));
+  // Leftover dashboard tallies no longer sit in the opened Πορεία έρευνας.
+  assert.doesNotMatch(html, /Εμπόδια πρόσβασης/);
+  assert.doesNotMatch(html, /Καταγεγραμμένες αντιφάσεις/);
+  assert.doesNotMatch(html, /Αφήγηση έρευνας/);
 });

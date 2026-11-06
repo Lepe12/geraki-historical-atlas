@@ -1,6 +1,6 @@
 import { matchesSource } from "./source-search.js";
 import { exportResearch } from "./research-export.js";
-import { isNarrativeReady, renderStoryHtml } from "./research-narrative-view.js";
+import { isNarrativeReady, renderStoryHtml, renderResearchPath } from "./research-narrative-view.js";
 import { connectResearchFeed, missionState, selectResearchRun, waitForResearchRequest } from "./live-bridge.js";
 const $ = (id) => document.getElementById(id);
 // Greek display labels for status codes (presentation only; logic keeps the codes).
@@ -100,7 +100,13 @@ function greekNarrative(data) {
   const n = data?.greek_narrative;
   if (!isNarrativeReady(n)) return "";
   // Full story leads; citation sits under each fact. No "counts" banner.
-  return '<div class="result-item research-narrative-wrap">' + renderStoryHtml(n, { mode: "default", heading: true }) + "</div>";
+  // «Τι δεν βρέθηκε» and found/passed/cut sit in the closed Πορεία έρευνας below.
+  return (
+    '<div class="result-item research-narrative-wrap">' +
+    renderStoryHtml(n, { mode: "default", heading: true }) +
+    renderResearchPath(n) +
+    "</div>"
+  );
 }
 function semanticAnswer(data) {
   if (!["pct-semantic-answer-v1", "pct-semantic-answer-v2", "pct-semantic-answer-v3"].includes(data?.schema)) return "";
@@ -459,7 +465,7 @@ function renderResults() {
   }
   const narrativeReady = isNarrativeReady(snapshot?.research_answer?.greek_narrative);
   meta.textContent = narrativeReady
-    ? "Αφήγηση και χάρτης · τα πλήθη στην Πορεία έρευνας"
+    ? "Άρθρο, πηγές και χάρτης · όσα βρέθηκαν, πέρασαν και κόπηκαν στην Πορεία έρευνας"
     : related.length +
       " πιθανές σχετικές αναφορές · " +
       supporting.length +
