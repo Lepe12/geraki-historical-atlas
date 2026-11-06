@@ -1,0 +1,41 @@
+name: N7 scoped library verifier install
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ops_ftps_requests/n7-verifier-only.json'
+permissions:
+  contents: read
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 7
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            server/command-center-live
+            tools/library
+            ops_ftps_requests
+      - name: Verify scoped deployment request and Node syntax
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('ops_ftps_requests/n7-verifier-only.json').read_text())
+          assert d['confirmation']=='INSTALL-N7-BRIDGE-VERIFIER'
+          assert d['scope']=='two-backend-js-files-only'
+          PY
+          node --check server/command-center-live/n7-gateway.js
+          node --check server/command-center-live/n7-library-bridge.js
+          node --test server/command-center-live/n7-gateway.test.js
+      - name: Deploy only signature verifier and existing N7 gateway
+        run: python3 tools/library/deploy_n7_verifier_only.py
