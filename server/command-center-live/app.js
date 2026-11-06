@@ -11,6 +11,7 @@ const {execFile}=require("node:child_process");
 const {fromReviewedKnowledge,compileQuery,scoreExcerpt,compareScores}=require("./historical-evidence");
 const {replayPdf}=require("./pdf-evidence");
 const {createN7Gateway}=require("./n7-gateway");
+const {createN7Library}=require("./n7-library");
 const {createN7OAuth}=require("./n7-oauth");
 
 const PORT=Number(process.env.PORT||process.env.PCT_COMMAND_CENTER_PORT||8787);
@@ -261,6 +262,7 @@ async function publishSnapshots(){
 }
 const oauth=createN7OAuth({json});
 const handleN7=createN7Gateway({json,operatorAuthorized,sessionAuthorized:oauth.sessionAuthorized,readBody,statusFor,githubWorkflowDispatch,githubCodingDispatch,githubPrivateDispatch});
+const handleN7Library=createN7Library({json,readBody,operatorAuthorized,sessionAuthorized:oauth.sessionAuthorized});
 const server=http.createServer(async(req,res)=>{
   try{
     const u=new URL(req.url,"http://localhost");const p=normalizePath(u.pathname);
@@ -268,6 +270,7 @@ const server=http.createServer(async(req,res)=>{
     if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":res.nabouCorsOrigin||"https://lepe12.github.io","access-control-allow-credentials":"true","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type,x-file-name,x-nabou-agent-room"});return res.end();}
     if(await oauth.handle(req,res,p))return;
     if(await handleN7(req,res,p))return;
+    if(await handleN7Library(req,res,p,u))return;
     if(req.method==="GET"&&p==="/health"){const b=await refreshBaseline();return json(res,200,{status:"PASS",service:"piratecartography-command-center-live",websocket:true,dispatch_configured:Boolean(GITHUB_DISPATCH_TOKEN),knowledge_memory:true,session_auth:true,revision:"no-session-dispatch-v1",baseline_run_id:b?.run_id||null});}
     if(req.method==="GET"&&p==="/session"){return json(res,200,{authenticated:sessionAuthorized(req)});}
     if(req.method==="POST"&&p==="/session"){

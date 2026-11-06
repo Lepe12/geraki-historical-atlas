@@ -1,0 +1,15 @@
+name: N7 library bridge checks
+on:
+  pull_request:
+    paths:
+      - 'server/command-center-live/n7-library*'
+      - 'server/command-center-live/app.js'
+      - 'tools/gateway/deploy_ftps.py'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: node --check server/command-center-live/n7-library.js
+      - run: node --check server/command-center-live/app.js
+      - run: node --test server/command-center-live/n7-library.test.js
