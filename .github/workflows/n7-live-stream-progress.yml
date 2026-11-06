@@ -1,0 +1,91 @@
+name: N7 restore live stream and research progress
+
+on:
+  pull_request:
+    paths:
+      - tools/n7/stream-attachments.js
+      - tools/n7/stream-upload-ui.js
+      - tools/n7/test_stream_attachments.cjs
+      - tools/n7/deploy_live_stream_progress.py
+      - .github/workflows/n7-live-stream-progress.yml
+      - ops_ftps_requests/n7-live-stream-progress.json
+  push:
+    branches: [main]
+    paths:
+      - ops_ftps_requests/n7-live-stream-progress.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n7-live-stream-progress-restore
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test SSE status, tokens, attachments, source regressions
+        run: |
+          node --check tools/n7/stream-attachments.js
+          node --check tools/n7/stream-upload-ui.js
+          node --test tools/n7/test_stream_attachments.cjs
+          python3 -m py_compile tools/n7/deploy_live_stream_progress.py
+      - name: Verify exact current Top.Host app.js and live stream route without changes
+        run: python3 tools/n7/deploy_live_stream_progress.py
+
+  deploy:
+    if: github.event_name == 'push'
+    needs: validate
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify owner-directed restore scope
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          expected={
+            'authorization':'N7-RESTORE-REAL-TIME-RESEARCH-STREAM',
+            'target':'/bot.piratecartography.com/n7-app',
+            'preserve_existing_ui_and_conversations':True,
+            'restore_multimodal_picker_and_live_tokens':True,
+            'rollback_on_failure':True
+          }
+          assert json.loads(Path('ops_ftps_requests/n7-live-stream-progress.json').read_text())==expected
+          print('N7_PROGRESS_OWNER_SCOPE_VALID=true')
+          PY
+      - name: Restore existing fast chat progressive display, safe backup and HTTPS verification
+        run: python3 tools/n7/deploy_live_stream_progress.py
