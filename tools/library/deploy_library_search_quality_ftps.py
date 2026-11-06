@@ -51,10 +51,10 @@ try:
         raise RuntimeError("BOT_SEARCH_ROUTE_CHANGED")
     # Add a new page-only proxy without replacing working search, login or agent logic.
     if b"if(p==='/api/library/page')" not in bot_server:
-        marker=b"    if(req.method==='POST'&&p==='/api/tasks')"
-        if bot_server.count(marker)!=1:raise RuntimeError("BOT_TASK_ROUTE_CHANGED")
+        marker=re.search(rb"(?m)^[ \\t]*if\\s*\\(\\s*p\\s*===\\s*['\\\"]/api/library/search['\\\"]\\s*\\)\\s*\\{",bot_server)
+        if not marker:raise RuntimeError("BOT_LIBRARY_SEARCH_ANCHOR_CHANGED")
         page_route=(source/"n7-bot-full-page-route.snippet").read_bytes()
-        bot_server=bot_server.replace(marker,page_route+marker)
+        bot_server=bot_server[:marker.start()]+page_route+bot_server[marker.start():]
     with tempfile.TemporaryDirectory() as tmp:
         script=Path(tmp)/"server.js";script.write_bytes(bot_server)
         subprocess.run(["node","--check",str(script)],check=True,capture_output=True,timeout=20)
