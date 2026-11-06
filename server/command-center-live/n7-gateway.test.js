@@ -289,7 +289,7 @@ test("N7 chat POST search accepts query and returns flat matches while legacy GE
   assert.equal(out.at(-1).payload.matches[0].printed_page,"15");
   assert.deepEqual(calls[0],{command:"search",args:["Λάντζας"]});
   await handle({method:"POST",url:"/pct-api/live/n7/library/page",headers:{}},{}, "/n7/library/page");
-  assert.equal(out.at(-1).status,405);
+  assert.equal(out.at(-1).status,400);
   await handle({method:"GET",url:"/pct-api/live/n7/library/search?q=Lanza",headers:{}},{}, "/n7/library/search");
   assert.equal(out.at(-1).payload.schema,"n7-private-library-read-v1");
 });
@@ -331,4 +331,26 @@ test("signed public-domain import refuses anonymous requests and unlisted Gutenb
   assert.equal(replies.at(-1).status,401);
   await handler({method:"GET",headers:{},url:"/pct-api/live/n7/library/import-signed"},{}, "/n7/library/import-signed");
   assert.equal(replies.at(-1).status,405);
+});
+
+
+test("signed private full-page request returns source page, rejects unsigned requests",async()=>{
+  const replies=[];
+  const id="a".repeat(64);
+  const handler=createN7Gateway({
+    json:(_r,status,payload)=>replies.push({status,payload}),
+    operatorAuthorized:()=>false,sessionAuthorized:()=>false,
+    libraryBridgeVerifier:(req,raw)=>req.headers["x-n7-library-signature"]==="valid"&&raw.includes(id),
+    readBody:async()=>JSON.stringify({source_id:id,scan_index:42}),
+    libraryRunner:async()=>({source_id:id,scan_index:42,printed_page:"39",title:"Historical Work",ocr_text:"Full page text",source_uri:"https://www.gutenberg.org/ebooks/22169"})
+  });
+  const p="/n7/library/page";
+  await handler({method:"POST",url:p,headers:{}},{},p);
+  assert.equal(replies.at(-1).status,401);
+  await handler({method:"POST",url:p,headers:{"x-n7-library-signature":"valid"}},{},p);
+  assert.equal(replies.at(-1).status,200);
+  assert.equal(replies.at(-1).payload.schema,"n7-library-page-v1");
+  assert.equal(replies.at(-1).payload.page.printed_page,"39");
+  await handler({method:"POST",url:p,headers:{"x-n7-library-signature":"valid",origin:"https://evil.test"}},{},p);
+  assert.equal(replies.at(-1).status,403);
 });

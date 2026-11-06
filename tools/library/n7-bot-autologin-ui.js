@@ -8,9 +8,18 @@ async function n7LibrarySearch(query) {
   if(response.status===401)throw new Error("Χρειάζεται σύνδεση στο N7 για την ιστορική βιβλιοθήκη.");
   if(!response.ok)throw new Error("Αποτυχία βιβλιοθήκης: HTTP "+response.status);
   const result=await response.json();
-  return {matches:Array.isArray(result.matches)?result.matches.slice(0,8):[],source_count:result.source_count,page_count:result.page_count};
+  return {matches:Array.isArray(result.matches)?result.matches.slice(0,20):[],source_count:result.source_count,page_count:result.page_count};
 }
-window.N7Library={search:n7LibrarySearch};
+async function n7LibraryPage(hit){
+  const response=await fetch("/api/library/page",{method:"POST",credentials:"same-origin",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({source_id:hit.source_id,scan_index:Number(hit.scan_index)})});
+  if(!response.ok)throw new Error("Αδυναμία ανάγνωσης πλήρους σελίδας: HTTP "+response.status);
+  const value=await response.json();
+  if(value.schema!=="n7-library-page-v1"||!value.page)throw new Error("Μη έγκυρη σελίδα πηγής");
+  return value.page;
+}
+window.N7Library={search:n7LibrarySearch,page:n7LibraryPage};
 
 document.addEventListener("DOMContentLoaded",()=>{
   const sidebar=document.querySelector(".sidebar");
@@ -29,11 +38,22 @@ document.addEventListener("DOMContentLoaded",()=>{
   const submit=document.createElement("button");submit.type="submit";submit.textContent="Αναζήτηση";submit.style.marginLeft="8px";
   const status=document.createElement("p");status.setAttribute("role","status");
   const results=document.createElement("div");
-  form.append(query,submit);overlay.append(close,title,form,status,results);document.body.append(overlay);
+  const pagePanel=document.createElement("section");
+  pagePanel.style.cssText="display:none;margin:16px 0;border:1px solid #6b9aab;border-radius:8px;padding:16px;background:#102536;white-space:pre-wrap;line-height:1.7";
+  const back=document.createElement("button");back.type="button";back.textContent="← Επιστροφή στα αποτελέσματα";
+  const pageTitle=document.createElement("h3");
+  const pageMeta=document.createElement("p");
+  const pageText=document.createElement("div");
+  pageText.style.cssText="white-space:pre-wrap;line-height:1.75;max-height:65vh;overflow:auto";
+  const pageSource=document.createElement("a");pageSource.target="_blank";pageSource.rel="noopener noreferrer";pageSource.textContent="Ψηφιακή έκδοση της πηγής";
+  pagePanel.append(back,pageTitle,pageMeta,pageSource,pageText);
+  back.onclick=()=>{pagePanel.style.display="none";results.style.display="block";form.style.display="block";};
+
+  form.append(query,submit);overlay.append(close,title,form,status,results,pagePanel);document.body.append(overlay);
   open.onclick=()=>{overlay.style.display="block";query.focus()};
   close.onclick=()=>{overlay.style.display="none"};
   form.onsubmit=async(e)=>{
-    e.preventDefault();results.replaceChildren();status.textContent="Αναζήτηση στη μόνιμη βιβλιοθήκη...";
+    e.preventDefault();pagePanel.style.display="none";results.style.display="block";form.style.display="block";results.replaceChildren();status.textContent="Αναζήτηση στη μόνιμη βιβλιοθήκη...";
     submit.disabled=true;
     try {
       const found=await n7LibrarySearch(query.value.trim());
@@ -42,17 +62,35 @@ document.addEventListener("DOMContentLoaded",()=>{
       for(const hit of matches){
         const section=document.createElement("article");section.style.cssText="padding:12px;margin:12px 0;border:1px solid #386478;border-radius:6px";
         const heading=document.createElement("strong");
-        heading.textContent=String(hit.title||"Άγνωστη πηγή").slice(0,250)+" · Σάρωση "+hit.scan_index+(hit.printed_page==null?"":" · Σελίδα "+hit.printed_page);
-        const excerpt=document.createElement("p");excerpt.textContent=String(hit.excerpt||"").slice(0,360);
+        heading.textContent=String(hit.title||"Άγνωστη πηγή").slice(0,250)+(hit.printed_page==null?"":" · Τυπωμένη σελίδα "+hit.printed_page)+" · Τμήμα ψηφιακού κειμένου "+hit.scan_index;
+        const excerpt=document.createElement("p");excerpt.textContent=String(hit.excerpt||"");
+        const sourceDetails=document.createElement("p");sourceDetails.style.cssText="font-size:12px;opacity:.85";
+        sourceDetails.textContent=(hit.author||"Άγνωστος συγγραφέας")+(hit.publication_year?" ("+hit.publication_year+")":"")+" · Δευτερογενής ιστοριογραφία · μη επαληθευμένη ιστορικά";
+        const showPage=document.createElement("button");showPage.type="button";showPage.textContent="Πλήρες κείμενο σελίδας";
+        showPage.onclick=async()=>{
+          showPage.disabled=true;
+          try{
+            const pg=await n7LibraryPage(hit);
+            pageTitle.textContent=pg.title+(pg.printed_page?" · Τυπωμένη σελίδα "+pg.printed_page:"");
+            pageMeta.textContent=(pg.author||"Άγνωστος συγγραφέας")+" · Δευτερογενής ιστορική μελέτη · ψηφιακή μεταγραφή χωρίς ανεξάρτητη επαλήθευση";
+            const uri=String(pg.source_uri||"");
+            pageSource.style.display=uri.startsWith("https://www.gutenberg.org/ebooks/")?"inline":"none";
+            if(pageSource.style.display!=="none")pageSource.href=uri;
+            pageText.textContent=String(pg.ocr_text||"");
+            pagePanel.style.display="block";results.style.display="none";form.style.display="none";
+            pagePanel.scrollIntoView({block:"start"});
+          }catch(error){status.textContent=error.message;}
+          finally{showPage.disabled=false;}
+        };
         const use=document.createElement("button");use.textContent="Προσθήκη στη συνομιλία";use.type="button";
         use.onclick=()=>{
           const input=document.querySelector("#message");
-          const cite="Πηγή: "+String(hit.title||"")+" · σαρωμένη σελίδα "+hit.scan_index+
+          const cite="Δευτερογενής ιστοριογραφία, μη επαληθευμένη: "+String(hit.author||"")+" · "+String(hit.title||"")+" · ψηφιακό τμήμα "+hit.scan_index+
             (hit.printed_page==null?"":" · τυπωμένη σελίδα "+hit.printed_page)+" · OCR "+String(hit.ocr_status||"UNREVIEWED");
           input.value+=(input.value?"\n\n":"")+"Παρακαλώ εξέτασε το ακόλουθο μη επαληθευμένο ιστορικό απόσπασμα, χωρίς να επινοήσεις γεγονότα.\n"+cite+"\nΑπόσπασμα: "+String(hit.excerpt||"").slice(0,360);
           overlay.style.display="none";input.focus();
         };
-        section.append(heading,excerpt,use);results.append(section);
+        section.append(heading,sourceDetails,excerpt,showPage,use);results.append(section);
       }
     }catch(error){
       status.textContent=error.message;

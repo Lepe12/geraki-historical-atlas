@@ -80,24 +80,37 @@ function n7import(PDO $db,array $source): array {
 }
 function n7search(PDO $db,string $term): array {
     $term=trim($term);
-    if (mb_strlen($term)<2||mb_strlen($term)>150) n7fail('INVALID_SEARCH');
-    // Literal substring search avoids false assumptions about historical spelling and FULLTEXT tokenization.
-    // Escape LIKE wildcards; return only bounded excerpts and 30 hits.
+    if(mb_strlen($term)<2||mb_strlen($term)>150)n7fail('INVALID_SEARCH');
     $pattern='%'.str_replace(['!','%','_'],['!!','!%','!_'],$term).'%';
-    $rows=n7query($db,"SELECT s.source_id,s.title,s.author,s.bibliographic_reference,
-        p.scan_index,p.printed_page,p.ocr_status,p.ocr_text,p.text_sha256
-        FROM pc_library_pages p JOIN pc_library_sources s ON s.source_id=p.source_id
-        WHERE p.ocr_text LIKE ? ESCAPE '!' ORDER BY s.title,p.scan_index LIMIT 30",[$pattern])->fetchAll();
-    foreach ($rows as &$row) {
-        $position=mb_stripos($row['ocr_text'],$term);
-        $start=max(0,($position===false?0:$position)-120);
-        $row['excerpt']=mb_substr($row['ocr_text'],$start,360);
+    $rows=n7query($db,"SELECT s.source_id,s.title,s.author,s.publication_year,s.bibliographic_reference,s.source_uri,s.rights_note,p.scan_index,p.printed_page,p.ocr_status,p.ocr_text,p.text_sha256 FROM pc_library_pages p JOIN pc_library_sources s ON s.source_id=p.source_id WHERE p.ocr_text LIKE ? ESCAPE '!' ORDER BY p.scan_index LIMIT 600",[$pattern])->fetchAll();
+    $ranked=[];
+    foreach($rows as $row){
+        $label=(string)($row['printed_page']??'');
+        $full=$row['ocr_text'];
+        if($label!==''&&!ctype_digit($label))continue;
+        if(preg_match('/^(contents|list of illustrations|illustrations|index)\\b/i',trim($full)))continue;
+        preg_match_all('/(?<![\\p{L}\\p{N}])'.preg_quote($term,'/').'(?![\\p{L}\\p{N}])/iu',$full,$hits,PREG_OFFSET_CAPTURE);
+        $count=count($hits[0]);
+        if(!$count)continue;
+        $pos=mb_strlen(substr($full,0,$hits[0][0][1]),'UTF-8');
+        $start=max(0,$pos-140);
+        if($start>0){
+            $opening=mb_substr($full,$start,40,'UTF-8');
+            if(preg_match('/^[^\\s]{0,36}\\s/u',$opening,$m))$start+=mb_strlen($m[0],'UTF-8');
+        }
+        $excerpt=mb_substr($full,$start,440,'UTF-8');
+        if($start+440<mb_strlen($full,'UTF-8'))$excerpt=preg_replace('/\\s+\\S*$/u','',$excerpt);
+        $row['excerpt']=($start>0?'…':'').trim($excerpt).($start+440<mb_strlen($full,'UTF-8')?'…':'');
+        $row['relevance_score']=$count*10;
+        $row['source_type']='SECONDARY_HISTORIOGRAPHY';
+        $row['evidence_state']='UNVERIFIED_SOURCE_TEXT';
         unset($row['ocr_text']);
-        $row['evidence_state']='UNVERIFIED_OCR_OR_TRANSCRIPTION';
+        $ranked[]=$row;
     }
-    unset($row);
-    return $rows;
+    usort($ranked,static fn($a,$b)=>($b['relevance_score']<=>$a['relevance_score'])?:strcmp($a['title'],$b['title'])?:($a['scan_index']<=>$b['scan_index']));
+    return array_slice($ranked,0,30);
 }
+
 try {
     $action=$argv[1]??'';
     if ($action==='self-test') {
