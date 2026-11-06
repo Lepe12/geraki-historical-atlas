@@ -82,7 +82,7 @@ const path = require("node:path");
     await page.waitForFunction(() => document.body.dataset.atlasPage === "research");
     assert.equal(await page.locator("#atlasHome").isVisible(), false);
     assert.equal(await page.locator("#atlasResearch").isVisible(), true);
-    assert.equal(await page.locator("#atlasResearch .atlas-crumb").isVisible(), true);
+    assert.equal(await page.locator("#atlasResearch .atlas-panel-head").isVisible(), true);
     assert.equal(await page.locator("#atlasResearch .atlas-panel-title-row h1").isVisible(), false);
     assert.equal(await page.locator("body").evaluate(el => el.classList.contains("atlas-reading")), true);
     assert.equal(await page.locator("#resultsDrawer").isVisible(), true);
