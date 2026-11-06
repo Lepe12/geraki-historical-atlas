@@ -52,7 +52,9 @@ try:
     # Add a new page-only proxy without replacing working search, login or agent logic.
     if b"if(p==='/api/library/page')" not in bot_server:
         marker=re.search(rb"(?m)^[ \\t]*if\\s*\\(\\s*p\\s*===\\s*['\\\"]/api/library/search['\\\"]\\s*\\)\\s*\\{",bot_server)
-        if not marker:raise RuntimeError("BOT_LIBRARY_SEARCH_ANCHOR_CHANGED")
+        if not marker:
+            print(json.dumps({"library_route_lines":[line.decode("utf-8","replace")[:160] for line in bot_server.splitlines() if b"library/search" in line][:6]}))
+            raise RuntimeError("BOT_LIBRARY_SEARCH_ANCHOR_CHANGED")
         page_route=(source/"n7-bot-full-page-route.snippet").read_bytes()
         bot_server=bot_server[:marker.start()]+page_route+bot_server[marker.start():]
     with tempfile.TemporaryDirectory() as tmp:
