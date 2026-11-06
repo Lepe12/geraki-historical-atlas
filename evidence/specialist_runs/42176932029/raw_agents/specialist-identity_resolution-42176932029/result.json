@@ -1,0 +1,512 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "identity_resolution",
+  "label": "Identity Resolution Agent",
+  "assignment_id": "identity_resolution:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "entity_candidates",
+    "variant_names",
+    "same_entity_assessment",
+    "collision_warnings"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "1d27bb68adff6c35bfc0d1b91bedcb85c5a9ac0865978e12d7deea457000f84e",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "identity_resolution",
+    "assignment_id": "identity_resolution:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:SearchCulture.gr / EKT",
+      "repo:Gallica/BnF",
+      "repo:Internet Culturale",
+      "repo:OpenArchives.gr / EKT"
+    ],
+    "queries": [
+      "\"πετρο λάνζτα τον κερκυραιο κορσάρο\" variant spelling",
+      "\"πετρο λάνζτα τον κερκυραιο κορσάρο\" alias OR aliases",
+      "\"πετρο λάνζτα τον κερκυραιο κορσάρο\" historical name",
+      "\"πετρο λάνζτα τον κερκυραιο κορσάρο\" transliteration"
+    ],
+    "operation": "search",
+    "search_budget": 16,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:SearchCulture.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "SearchCulture.gr / EKT",
+        "connector_id": null,
+        "score": 130,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 102,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 4,
+    "total_search_budget": 16,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πετρο λάνζτα τον κερκυραιο κορσάρο\" alias OR aliases",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF++alias+OR+aliases%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF++alias+OR+aliases%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 677, \"response_sha256\": \"a9e2a37751c7e14cdf5329651fd7c72f0dd28a897608f47b4d1ff64781787611\", \"elapsed_ms\": 808}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF++alias+OR+aliases%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πετρο λάνζτα τον κερκυραιο κορσάρο\" variant spelling",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF++variant+spelling%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF++variant+spelling%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 677, \"response_sha256\": \"c9cb6e56631896d73032c2490066efc13d8b7dcd7e2dbc3a8ffa77c63ac06862\", \"elapsed_ms\": 920}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF++variant+spelling%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πετρο λάνζτα τον κερκυραιο κορσάρο\" alias OR aliases",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+alias+OR+aliases\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+alias+OR+aliases\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1004}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+alias+OR+aliases\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πετρο λάνζτα τον κερκυραιο κορσάρο\" historical name",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+historical+name\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+historical+name\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1005}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+historical+name\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πετρο λάνζτα τον κερκυραιο κορσάρο\" transliteration",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+transliteration\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+transliteration\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1018}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+transliteration\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πετρο λάνζτα τον κερκυραιο κορσάρο\" variant spelling",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+variant+spelling\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+variant+spelling\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1022}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+variant+spelling\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πετρο λάνζτα τον κερκυραιο κορσάρο\" historical name",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF++historical+name%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF++historical+name%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 676, \"response_sha256\": \"d73259a677d8e93975cd0d67c65feadaed4e039b33e2dd151c08972a24247531\", \"elapsed_ms\": 394}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF++historical+name%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πετρο λάνζτα τον κερκυραιο κορσάρο\" transliteration",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF++transliteration%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF++transliteration%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 676, \"response_sha256\": \"dfbdf523701c746236a1b87278475b9ea253e7875f6a9c6377b3d8bf7a720385\", \"elapsed_ms\": 328}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF++transliteration%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πετρο λάνζτα τον κερκυραιο κορσάρο\" historical name",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+historical+name&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+historical+name&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25781, \"response_sha256\": \"5b1cc002a5010bfb9f1a86231b048f9df407f756d4f95efd6d75658be04de589\", \"elapsed_ms\": 644}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+historical+name&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πετρο λάνζτα τον κερκυραιο κορσάρο\" variant spelling",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+variant+spelling&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+variant+spelling&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25781, \"response_sha256\": \"930bb72f58222c00d5333711072f57d908471954358f94a92e9d75b89f91bf6e\", \"elapsed_ms\": 660}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+variant+spelling&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πετρο λάνζτα τον κερκυραιο κορσάρο\" alias OR aliases",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+alias+OR+aliases&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+alias+OR+aliases&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 31568, \"response_sha256\": \"c962a29925e5898d8ebbf90e40a369cda78a842446c75ed02f6187ea23cf094b\", \"elapsed_ms\": 660}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+alias+OR+aliases&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πετρο λάνζτα τον κερκυραιο κορσάρο\" transliteration",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+transliteration&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+transliteration&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25781, \"response_sha256\": \"92f5767c1a741aa896f2cbf23d34f688f233dca806f6f72a56c4214c99feafb1\", \"elapsed_ms\": 645}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+transliteration&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "REMOTE_ERROR",
+      "query": "\"πετρο λάνζτα τον κερκυραιο κορσάρο\" alias OR aliases",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+alias+OR+aliases&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20203}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ERROR",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+alias+OR+aliases&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20203}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "REMOTE_ERROR",
+      "query": "\"πετρο λάνζτα τον κερκυραιο κορσάρο\" variant spelling",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+variant+spelling&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20252}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ERROR",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+variant+spelling&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20252}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "REMOTE_ERROR",
+      "query": "\"πετρο λάνζτα τον κερκυραιο κορσάρο\" transliteration",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+transliteration&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20101}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ERROR",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+transliteration&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20101}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "REMOTE_ERROR",
+      "query": "\"πετρο λάνζτα τον κερκυραιο κορσάρο\" historical name",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+historical+name&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20104}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ERROR",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+historical+name&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20104}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "historical_evidence": {
+    "schema": "nabou-discovery-evidence-queue-v1",
+    "run_id": "42176932029",
+    "agent_id": "identity_resolution",
+    "source_leads": [],
+    "connector_errors": [
+      {
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "status": "REMOTE_ERROR",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+alias+OR+aliases&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20203}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "status": "REMOTE_ERROR",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+variant+spelling&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20252}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "status": "REMOTE_ERROR",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+transliteration&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20101}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "status": "REMOTE_ERROR",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%AC%CE%BD%CE%B6%CF%84%CE%B1+%CF%84%CE%BF%CE%BD+%CE%BA%CE%B5%CF%81%CE%BA%CF%85%CF%81%CE%B1%CE%B9%CE%BF+%CE%BA%CE%BF%CF%81%CF%83%CE%AC%CF%81%CE%BF%22+historical+name&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20104}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      }
+    ],
+    "historical_attestations": [],
+    "verified_count": 0,
+    "learned_pdf_evidence": {
+      "status": "EXECUTED",
+      "hits": [],
+      "verified_count": 0,
+      "source": "PRODUCTION_LEARNING_EVIDENCE",
+      "original_pdf_replayed": false
+    },
+    "historical_map_catalogue": {
+      "schema": "nabou-map-catalogue-bridge-v1",
+      "status": "NOT_RELEVANT_TO_OPERATOR_QUERY",
+      "leads": [],
+      "historically_verified": 0,
+      "archival_search_executed": false
+    }
+  },
+  "result_count": 0,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
