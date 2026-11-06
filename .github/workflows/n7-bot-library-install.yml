@@ -21,11 +21,18 @@ jobs:
       - uses: actions/checkout@v4
         with:
           path: atlas
+          filter: blob:none
+          sparse-checkout: tools/library
       - uses: actions/checkout@v4
         with:
           repository: Lepe12/independent-ai-bot
           ref: main
           path: n7-bot-source
+          filter: blob:none
+          sparse-checkout: |
+            public
+            server.js
+            package.json
       - name: Verify sources
         run: |
           node --check n7-bot-source/server.js
