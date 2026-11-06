@@ -1,6 +1,7 @@
 'use strict';
 // N7_PUBLIC_SEARCH_V1: private server-side read-only retrieval, no API key.
 // Bounded public search feeds and Wikimedia reference material; not a full browser.
+const documentReader=require('./document-reader'); // N7_GENERAL_READING_V1
 const DEFAULT_UA='N7PublicResearch/1.0 (https://piratecartography.com)';
 const n7Europeana=require('./europeana-api'); // N7_EUROPEANA_SEARCH_INTEGRATION_V1
 const n7HistoricalAudit=require('./historical-source-audit'); // N7_HISTORICAL_DEEP_READING_V1
@@ -65,7 +66,8 @@ function classify(messages,at=new Date()){
   const explicit=/(?:ψάξε|αναζήτησε|βρες\s+(?:στο\s+)?(?:διαδίκτυο|πηγές|online)|έλεγξε\s+(?:στο\s+)?(?:ίντερνετ|διαδίκτυο)|search\s+(?:the\s+)?web|look\s+up|πηγές\s+στο\s+διαδίκτυο)/iu.test(last);
   const current=/(?:χθεσιν|χθες|σήμερα|προχθές|φέτος|πρόσφατ|τελευταί|τρέχον|τωριν|αυτή\s+την\s+εβδομάδα|εξελίξε|είδησ|νέα\s+για|εκλογ|πρόεδρ|κυβέρνησ|αποτελέσματ|latest|recent|breaking|yesterday|today|now|current|election|midterm|president|news|result)/iu.test(context);
   const history=/(?:τι\s+ξέρεις\s+για|ποιος\s+(?:ήταν|είναι)|ποια\s+(?:ήταν|είναι)|ιστορικ|κουρσάρ|πειρατ|μεσαιων|αναγέννησ|16(?:ος|ου)|17(?:ος|ου)|archiv|historical|corsair|pirat|history|lanz|λάντζ|πετρο\s+λαντζ|pietro\s+lanza|πέτρο\s+λάντζ)/iu.test(context);
-  if(!explicit&&!current&&!history)return null;
+  const directUrls=[...last.matchAll(/https:\/\/[^\s<>"'\[\]]+/gu)].map(x=>safeLink(x[0].replace(/[).,;]+$/,''))).filter(Boolean).slice(0,3);
+  if(!explicit&&!current&&!history&&!directUrls.length)return null;
   const year=Number(new Intl.DateTimeFormat('en',{timeZone:'Europe/Athens',year:'numeric'}).format(at));
   let query=compact(context,MAX_QUERY),kind=history&&!current?'historical':(current?'news':'general');
   const election=/(?:εκλογ|election|midterm)/iu.test(context);
@@ -81,7 +83,7 @@ function classify(messages,at=new Date()){
   }else if(kind==='news'&&!/\b20\d{2}\b/.test(query)){
     query=compact(query+' '+year,MAX_QUERY);
   }
-  return {query,kind,userText:last,historicalLanza:lanza};
+  return {query,kind,userText:last,historicalLanza:lanza,directUrls};
 }
 async function boundedFetch(url,{transport=fetch,timeout=TIMEOUT}={}){
   const uri=new URL(url);
@@ -155,7 +157,7 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
     })),
     europeanaJob
   ]);
-  const merged=[],seen=new Set();let successful=0;
+  const merged=(request.directUrls||[]).map(url=>({title:new URL(url).pathname.split('/').pop()||new URL(url).hostname,url,source:new URL(url).hostname,provider:'User supplied URL',direct:true})),seen=new Set();let successful=0;
   for(const r of results){
     if(r.status!=='fulfilled')continue;successful++;
     for(const x of r.value) {
@@ -245,14 +247,16 @@ async function publisherArticle(url,{transport=fetch,timeout=7000}={}){
 async function enrichPublisherArticles(research,{transport=fetch}={}){
  if(!research?.searched||!research.items?.length)return research;
  const chosen=research.items.filter(x=>{
-  try{return ARTICLE_HOSTS.has(new URL(x.url).hostname)}catch{return false}
+  try{return !x.recordType&&new URL(x.url).protocol==='https:'}catch{return false}
  }).slice(0,3);
  const jobs=chosen.map(async x=>{
   try{
-   const content=await publisherArticle(x.url,{transport});
-   if(content){x.articleText=content;x.articleRead=true;}
-   else x.articleRead=false;
-  }catch{ x.articleRead=false; }
+   const trusted=ARTICLE_HOSTS.has(new URL(x.url).hostname);
+   const result=trusted?{text:await publisherArticle(x.url,{transport})}:await documentReader.readDocument(x.url);
+   x.readStatus=result.reason||'ok';x.partial=!!result.partial;x.pdfPages=result.pages;x.ocrRequired=!!result.ocrRequired;
+   if(result.text){x.articleText=result.text;x.articleRead=true;}
+   else{x.articleRead=false;x.readStatus=result.reason||'no_readable_text';}
+  }catch(e){x.articleRead=false;x.readStatus=String(e.message||'read_failed').slice(0,80);}
  });
  // Independently consult an academic encyclopedia for the sultan's dates,
  // never infer that the source was read merely from a memorized chronology.
@@ -317,14 +321,14 @@ function contextForResearch(research){
   const items=research.items.slice(0,9).map((x,i)=>{
     const metadata='[S'+(i+1)+'] '+x.title+' | '+x.source+' | '+x.url+
       (x.published?' | '+x.published:'');
-    if(!x.articleRead)return metadata+' | ONLY SEARCH METADATA. NOT READ.';
+    if(!x.articleRead)return metadata+' | ONLY SEARCH METADATA. NOT READ. '+(x.readStatus?'Read status: '+x.readStatus:'');
     const source=String(x.articleText||'');
-    const cap=isHistory&&/piratecartography\.com/i.test(x.url)?6500:1400;
+    const cap=x.direct?6500:(isHistory&&/piratecartography\.com/i.test(x.url)?6500:1400);
     const excerpt=source.length>cap
       ?source.slice(0,Math.floor(cap*0.73))+
        '\n[ARTICLE MIDDLE OMITTED FOR CONTEXT BUDGET]\n'+
        source.slice(-Math.floor(cap*0.27)):source;
-    return metadata+' | ACTUAL ARTICLE TEXT EXTRACTED ('+source.length+
+    return metadata+(x.pdfPages?' | PDF physical page numbers; cite only pages present below.':'')+(x.partial?' | PARTIAL extraction; do not claim whole document read.':'')+(x.ocrRequired?' | Some examined pages have no text and need OCR.':'')+' | ACTUAL ARTICLE TEXT EXTRACTED ('+source.length+
       ' chars, possibly bounded):\n'+excerpt;
   });
   return [
@@ -348,6 +352,7 @@ function sourceFooter(research){
   const items=research.items.slice(0,9);
   return '\n\nΠηγές έρευνας (αναγνωσμένα αποσπάσματα επισημαίνονται· άλλες είναι μεταδεδομένα):\n'+
     items.map((x,i)=>'[S'+(i+1)+'] '+x.title+' — '+x.source+
-      (x.published?' ('+x.published+')':'')+(x.articleRead?' [αναγνώστηκε περιεχόμενο]':' [μόνο μεταδεδομένα]')+'\n'+x.url).join('\n');
+      (x.published?' ('+x.published+')':'')+(x.articleRead?' [αναγνώστηκε περιεχόμενο'+(x.pdfPages?' · PDF σ. '+x.pdfPages.map(p=>p.page).join(', '):'')+(x.partial?' · μερική ανάγνωση':'')+']':' [μόνο μεταδεδομένα'+(x.readStatus?' · '+x.readStatus:'')+']')+'\n'+x.url).join('\n');
 }
 module.exports={classify,parseRss,wikiParse,boundedFetch,researchMessages,contextForResearch,sourceFooter,safeLink,extractVisibleArticle,publisherArticle,enrichPublisherArticles,cleanHistoryForTopic};
+

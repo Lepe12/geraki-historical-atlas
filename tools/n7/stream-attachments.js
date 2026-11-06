@@ -1,5 +1,6 @@
 'use strict';
 // N7_STREAM_ATTACHMENTS_V1 - genuine Groq SSE token streaming, private bounded attachments.
+const documentReader=require('./document-reader'); // N7_PDF_ATTACHMENTS_V1
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),zlib=require('node:zlib');
 const MAX_BODY=9*1024*1024,MAX_FILE=5*1024*1024,MAX_TOTAL=6*1024*1024;
 const FILES=4,MAX_TEXT=26000;
@@ -68,7 +69,7 @@ function unpackAttachment(x){
     !/^[A-Za-z0-9+/]*={0,2}$/.test(x.base64)||x.base64.length%4)throw Error('Μη έγκυρα δεδομένα αρχείου');
  const b=Buffer.from(x.base64,'base64');
  if(!b.length||b.length>MAX_FILE||!checkMagic(type,b))throw Error('Μη έγκυρος τύπος ή μέγεθος αρχείου');
- if(type==='application/pdf')throw Error('Η ανάγνωση PDF δεν είναι ακόμη διαθέσιμη. Στείλε TXT/DOCX ή εικόνες των σελίδων.');
+
  const text=type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document'?
    docxText(b):type.startsWith('text/')||type==='application/json'?b.toString('utf8').slice(0,MAX_TEXT):'';
  return {name,type,buffer:b,text};
@@ -98,6 +99,7 @@ function privateStore(dir,conversationId,attachments){
  return attachments.map(x=>{
   const id=crypto.randomUUID(),file=path.join(root,id);
   fs.writeFileSync(file,x.buffer,{mode:0o600,flag:'wx'});
+  if(x.pdfEvidence)fs.writeFileSync(file+'.text.json',JSON.stringify(x.pdfEvidence),{mode:0o600,flag:'wx'});
   return {id,name:x.name,type:x.type,size:x.buffer.length};
  });
 }
@@ -108,9 +110,14 @@ function loadStored(dir,conversationId,meta){
   const stat=fs.lstatSync(file);
   if(!stat.isFile()||stat.isSymbolicLink()||stat.size>MAX_FILE)return null;
   const buf=fs.readFileSync(file);
-  return unpackAttachment({name:meta.name,base64:buf.toString('base64')});
+  const attachment=unpackAttachment({name:meta.name,base64:buf.toString('base64')});
+  if(attachment.type==='application/pdf'){
+   try{const cache=file+'.text.json',st=fs.lstatSync(cache);if(st.isSymbolicLink()||st.size>250000)return null;const evidence=JSON.parse(fs.readFileSync(cache,'utf8'));attachment.text=pdfPrompt(evidence);}catch{attachment.text='[PDF μη αναγνωσμένο: λείπει η εξαγωγή κειμένου.]';}
+  }
+  return attachment;
  }catch{return null;}
 }
+function pdfPrompt(e){return '[PDF: φυσική αρίθμηση σελίδων, όχι απαραίτητα έντυπη. '+(e.partial?'ΜΕΡΙΚΗ ανάγνωση. ':'')+(e.ocrRequired?'Σελίδες χωρίς εξαγώγιμο κείμενο: '+e.emptyPages.join(', ')+'. Χρειάζονται OCR και ΔΕΝ αναγνώστηκαν. ':'')+']\n'+(e.text||'[Δεν ανακτήθηκε κείμενο. Μην επινοήσεις περιεχόμενο.]');}
 function buildPrompt(history,conversationId,dir,promptMessages){
  const recent=history.slice(-24);
  const visibleImageIds=new Set();
@@ -127,6 +134,7 @@ function buildPrompt(history,conversationId,dir,promptMessages){
    if(!attachment)continue;
    if(attachment.type.startsWith('image/')){
     if(!visibleImageIds.has(meta.id))continue; // Groq Qwen supports up to three images per request
+    if(/PDF page \d+\.jpg$/u.test(attachment.name))parts[0].text+='\n[Εικόνα σαρωμένης σελίδας: '+attachment.name+'. Κάνε οπτική μεταγραφή μόνο όσων διαβάζονται. Σήμανε δυσανάγνωστα σημεία, χωρίς συμπλήρωση. Η σελίδα αυτή διαβάζεται οπτικά, όχι από το κειμενικό επίπεδο PDF.]';
     parts.push({type:'image_url',image_url:{url:'data:'+attachment.type+';base64,'+attachment.buffer.toString('base64')}});
 
    }else if(attachment.text){
@@ -186,6 +194,7 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
     return writeError(res,400,'Το μήνυμα πρέπει να περιέχει έως 12000 χαρακτήρες');
    attachments=parseAttachments(input.attachments);
   }catch(e){return writeError(res,400,e.message);}
+  try{await Promise.all(attachments.filter(a=>a.type==='application/pdf').map(async a=>{a.pdfEvidence=await documentReader.pdfText(a.buffer);a.text=pdfPrompt(a.pdfEvidence);}));}catch(e){return writeError(res,400,'Δεν αναγνώστηκε το PDF: '+String(e.message).slice(0,80));}
   const content=input.message.trim();
   // Write once before invoking model; stored images are private, never served publicly.
   let metadata;
@@ -340,3 +349,4 @@ function writeError(res,status,message){
  res.end(JSON.stringify({error:message}));
 }
 module.exports={makeHandler,parseAttachments,docxText,readGroqStream,buildPrompt,safeName,unpackAttachment};
+
