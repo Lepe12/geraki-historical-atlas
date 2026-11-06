@@ -26,9 +26,16 @@ def extract(filename):
     resource.setrlimit(resource.RLIMIT_AS, (768 * 1024**2, 768 * 1024**2))
     resource.setrlimit(resource.RLIMIT_FSIZE, (64 * 1024**2, 64 * 1024**2))
     resource.setrlimit(resource.RLIMIT_CPU, (120, 120))
-    raw = Path(filename).read_bytes()
-    if len(raw) > 25 * 1024**2 or not raw.startswith(b'%PDF-'):
-        raise ValueError('INVALID_PDF')
+    source=Path(filename)
+    if source.stat().st_size > 200 * 1024**2 or source.stat().st_size < 5:
+        raise ValueError('INVALID_PDF_SIZE')
+    with source.open('rb') as stream:
+        if stream.read(5)!=b'%PDF-':
+            raise ValueError('INVALID_PDF')
+    original_hash=hashlib.sha256()
+    with source.open('rb') as stream:
+        for piece in iter(lambda:stream.read(512*1024),b''):
+            original_hash.update(piece)
     info = run(['pdfinfo', filename])
     count = next((int(line.split(':', 1)[1]) for line in info.splitlines() if line.startswith('Pages:')), 0)
     if not 0 < count <= 500:
@@ -45,7 +52,12 @@ def extract(filename):
             if len(value.strip()) < 30:
                 ocr_count += 1
                 if ocr_count > 30:
-                    raise ValueError('OCR_PAGE_BUDGET_EXCEEDED')
+                    pages.append({'page':number,'printed_page':None,'text':'','words':[],
+                        'method':'OCR_DEFERRED','ocr_pending':True,'text_sha256':hashlib.sha256(b'').hexdigest(),
+                        'language':'UNDETERMINED','language_method':'NOT_EXTRACTED',
+                        'ocr_languages':[],'ocr_confidence':None,'bbox_units':None,
+                        'text_order':'UNREAD_PAGE_NO_TEXT_RECOGNITION'})
+                    continue
                 if available is None:
                     langs = run(['tesseract', '--list-langs'])
                     available = [x for x in ('ell', 'eng', 'fra', 'ita') if x in langs.splitlines()]
@@ -79,8 +91,9 @@ def extract(filename):
                           'language_method': 'SCRIPT_HEURISTIC_NOT_LANGUAGE_MODEL',
                           'ocr_languages': available if method == 'TESSERACT_OCR' else [],
                           'ocr_confidence': confidence, 'bbox_units': 'raster_pixels' if words else None})
-    return {'schema': 'nabou-pdf-replay-v1', 'source_sha256': hashlib.sha256(raw).hexdigest(),
+    return {'schema': 'nabou-pdf-replay-v1', 'source_sha256': original_hash.hexdigest(),
             'pages': pages, 'original_pdf_replayed': True, 'historically_verified': False,
+            'ocr_pending_pages':sum(bool(p.get('ocr_pending')) for p in pages),
             'htr_status': 'UNSUPPORTED_NO_HANDWRITING_MODEL',
             'parser_version': run(['pdftotext', '-v']).strip()[:200]}
 
