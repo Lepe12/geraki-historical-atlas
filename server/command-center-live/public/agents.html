@@ -149,6 +149,13 @@ footer{color:#6d94a5;font-size:.77rem;margin-top:24px}
     <input id="n7LibraryTerm" type="search" placeholder="π.χ. Λάντζας" maxlength="150" style="width:min(100%,600px);padding:12px;border:1px solid #3a7184;border-radius:8px;background:#071723;color:#ebfbff">
     <div class="actions"><button type="button" id="n7LibrarySubmit" class="primary">Αναζήτηση βιβλιοθήκης</button></div>
     <div class="console" id="n7LibraryResults" role="status" aria-live="polite">Συνδέσου με GitHub για να αναζητήσεις ιδιωτικές πηγές.</div>
+    <hr class="sep">
+    <h3>Προσθήκη βιβλίου PDF στη μόνιμη βιβλιοθήκη</h3>
+    <p class="notes">Ένα PDF έως 25 MB. Η εισαγωγή γίνεται ανά 20 σελίδες. Για μεγάλα σαρωμένα βιβλία ισχύουν ακόμη περιορισμοί OCR.</p>
+    <label for="n7LibraryPdf">Επιλογή ιδιωτικού PDF</label>
+    <input id="n7LibraryPdf" type="file" accept="application/pdf,.pdf">
+    <div class="actions"><button type="button" id="n7LibraryUpload" class="primary">Εισαγωγή στη βιβλιοθήκη</button></div>
+    <div class="console" id="n7LibraryImportState" role="status" aria-live="polite">Δεν έχει επιλεγεί PDF.</div>
   </section>
   <footer>PROJECT NABOU · TWO AGENTS · VERIFIED STATUS, NOT SIMULATED AI</footer>
 </main>
@@ -324,6 +331,49 @@ $("n7LibrarySubmit").addEventListener("click",async()=>{
   }catch(_){out.textContent="Αδυναμία πρόσβασης στη βιβλιοθήκη.";}
   finally{$("n7LibrarySubmit").disabled=false;}
 });
+let n7PendingSourceId=null;
+$("n7LibraryUpload").addEventListener("click",async()=>{
+  const out=$("n7LibraryImportState"),file=$("n7LibraryPdf").files?.[0];
+  if(!authenticated){out.textContent="Χρειάζεται σύνδεση με GitHub.";return;}
+  if(!file || !file.name.toLowerCase().endsWith(".pdf") || file.size>25*1024*1024){
+    out.textContent="Επίλεξε PDF μέχρι 25 MB.";return;
+  }
+  $("n7LibraryUpload").disabled=true;
+  try{
+    if(!n7PendingSourceId){
+      out.textContent="Μεταφορά PDF στον ιδιωτικό αποθηκευτικό χώρο…";
+      const upload=await fetch(API_BASE+"/pct-api/live/knowledge/upload",{
+        method:"POST",body:file,credentials:"include",
+        headers:{"Content-Type":"application/pdf","X-File-Name":encodeURIComponent(file.name),
+          "X-NABOU-Agent-Room":"1"},signal:AbortSignal.timeout(65000)
+      });
+      const saved=await upload.json().catch(()=>({}));
+      if(!upload.ok||!saved.source_id)throw Error("upload_http_"+upload.status);
+      n7PendingSourceId=saved.source_id;
+    }
+    out.textContent="Ανάγνωση σελίδων και αποθήκευση στη MariaDB…";
+    const review=await fetch(API_BASE+"/pct-api/live/knowledge/review",{
+      method:"POST",credentials:"include",
+      headers:{"Content-Type":"application/json","X-NABOU-Agent-Room":"1"},
+      body:JSON.stringify({source_id:n7PendingSourceId,items:[],reason:"Operator requested N7 private page library ingestion"}),
+      signal:AbortSignal.timeout(190000)
+    });
+    const result=await review.json().catch(()=>({}));
+    if(!review.ok)throw Error("review_http_"+review.status+" "+String(result.error||""));
+    if(result.library_storage?.status==="DATABASE_COMMITTED"){
+      out.textContent="Το PDF καταχωρίστηκε στη μόνιμη βιβλιοθήκη: "+result.library_storage.imported_pages+
+        " σελίδες. Το OCR δεν έχει επαληθευτεί ιστορικά.";
+      n7PendingSourceId=null;
+    }else{
+      out.textContent="Το PDF αποθηκεύτηκε, αλλά η εγγραφή στη βιβλιοθήκη δεν επιβεβαιώθηκε: "+
+        String(result.library_storage?.reason||"UNKNOWN")+". Ξαναπάτησε για νέα προσπάθεια.";
+    }
+  }catch(error){
+    out.textContent="Η εισαγωγή δεν ολοκληρώθηκε: "+String(error.message||"unknown").slice(0,120)+
+      ". Αν το αρχείο έχει ήδη ανεβεί, μπορείς να ξαναπατήσεις για νέα προσπάθεια.";
+  }finally{$("n7LibraryUpload").disabled=false;}
+});
+$("n7LibraryPdf").addEventListener("change",()=>{n7PendingSourceId=null;});
 $("n7LibraryTerm").addEventListener("keydown",event=>{
   if(event.key==="Enter"){$("n7LibrarySubmit").click();}
 });

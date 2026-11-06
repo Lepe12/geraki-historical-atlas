@@ -9,6 +9,7 @@ from pathlib import Path
 import posixpath
 import re
 import socket
+import subprocess
 import ssl
 import sys
 import time
@@ -20,6 +21,7 @@ ROOT=Path(__file__).resolve().parents[2]
 FILES={
     "n7-gateway.js":(ROOT/"server/command-center-live/n7-gateway.js").read_bytes(),
     "public/agents.html":(ROOT/"server/command-center-live/public/agents.html").read_bytes(),
+    "app.js":(ROOT/"server/command-center-live/app.js").read_bytes(),
 }
 APP="/piratecartography-gateway/server/command-center-live"
 if os.environ.get("PCT_FTPS_APP_ROOT")!=APP:sys.exit("BLOCKED_APP_ROOT")
@@ -68,6 +70,14 @@ try:
         raise RuntimeError("UNEXPECTED_APP_ROOT")
     for name in FILES:
         backups[name]=get(name)
+    # Never replace a locally modified live app.js with a different GitHub version.
+    try:
+        previous=subprocess.check_output(["git","show","HEAD^:server/command-center-live/app.js"],
+                                         cwd=ROOT,timeout=20)
+    except (subprocess.CalledProcessError,subprocess.TimeoutExpired,FileNotFoundError):
+        raise RuntimeError("PREVIOUS_APP_REVISION_UNAVAILABLE")
+    if hashlib.sha256(backups["app.js"]).digest()!=hashlib.sha256(previous).digest():
+        raise RuntimeError("LIVE_APP_DIFFERS_FROM_PREVIOUS_COMMIT")
     phase="STAGE"
     for name,data in FILES.items():
         stage=posixpath.join(posixpath.dirname(name),".n7-bridge-stage-"+nonce+"-"+posixpath.basename(name))
