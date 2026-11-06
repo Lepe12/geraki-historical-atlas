@@ -41,7 +41,7 @@ try:
         from pathlib import Path
         file=Path(directory)/"server.js";file.write_bytes(patched)
         subprocess.run(["node","--check",str(file)],check=True,capture_output=True,timeout=15)
-        test_code="const b=/[\\x00-\\x1f]/;for(const s of ['Barbarossa','Dragut','Doria','Λάντζας'])if(b.test(s))process.exit(1);for(const s of ['a\\u0000b','a\\nb'])if(!b.test(s))process.exit(2);"
+        test_code=r"const b=/[\\x00-\\x1f]/;for(const s of ['Barbarossa','Dragut','Doria','Λάντζας'])if(b.test(s))process.exit(1);for(const s of ['a\\u0000b','a\\nb'])if(!b.test(s))process.exit(2);"
         subprocess.run(["node","-e",test_code],check=True,timeout=10,capture_output=True)
     ftp.storbinary("STOR "+temp,io.BytesIO(patched))
     if sha(get(temp))!=sha(patched):raise RuntimeError("STAGE_HASH_MISMATCH")
