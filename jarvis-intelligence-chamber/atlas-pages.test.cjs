@@ -31,7 +31,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
  const bounds=await page.evaluate(()=>{const C=window.NABOU_CHART,plane=document.querySelector('#chartPlane'),p=plane.getBoundingClientRect(),frame=document.querySelector('#chartView').getBoundingClientRect();const scale=p.width/C.W,M=lat=>Math.log(Math.tan(Math.PI/4+lat*Math.PI/360))*180/Math.PI;return [[-5.5,36],[35.5,34]].map(([lon,lat])=>{const x=p.left+(lon-C.lon0)*C.k*scale,y=p.top+(C.my1-M(lat))*C.k*scale;return x>=frame.left-2&&x<=frame.right+2&&y>=frame.top-2&&y<=frame.bottom+2;});});
  assert.deepEqual(bounds,[true,true],'Gibraltar and the Levant must both be inside the chart');
  const transform=await page.locator('#chartPlane').getAttribute('style');
- await page.locator('#zoomIn').click();await page.waitForTimeout(450);
+ await page.locator('#zoomIn').click();await page.waitForFunction(old=>document.querySelector('#chartPlane').getAttribute('style')!==old,transform,{timeout:10000});
  assert.notEqual(await page.locator('#chartPlane').getAttribute('style'),transform,'Zoom acts on the actual chart');
  await page.locator('#resetView').click();
  await page.locator('#atlasResearch [data-atlas-nav="research"]').click();
