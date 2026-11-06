@@ -189,11 +189,26 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
   let metadata;
   try{metadata=privateStore(DATA_DIR,id,attachments);}catch(e){return writeError(res,400,e.message);}
   const history=[...item.messages,{role:'user',content,attachments:metadata}];
+  // N7_RESEARCH_PROGRESS_STREAM_V1: acknowledge before slow web fetching.
+  let started=false,final='',done=false;
+  const emit=(type,value)=>{
+   if(res.destroyed||res.writableEnded)return;
+   if(!started){
+    res.writeHead(200,{'Content-Type':'application/x-ndjson; charset=utf-8',
+      'Cache-Control':'no-store, no-transform','X-Accel-Buffering':'no',
+      'X-Content-Type-Options':'nosniff'});
+    started=true;
+   }
+   res.write(JSON.stringify({type,...value})+'\n');
+  };
+  emit('status',{stage:'research',message:'Ελέγχω πηγές και προετοιμάζω την ιστορική έρευνα…'});
   let evidence=null,messages;
   try{
    evidence=await publicSearch.researchMessages(history);
-   if(typeof publicSearch.enrichPublisherArticles==='function')
+   if(typeof publicSearch.enrichPublisherArticles==='function'){
+     if(evidence?.searched)emit('status',{stage:'reading',message:'Διαβάζω διαθέσιμα άρθρα και ελέγχω βιβλιογραφία…'});
      evidence=await publicSearch.enrichPublisherArticles(evidence);
+   }
    messages=buildPrompt(typeof publicSearch.cleanHistoryForTopic==='function'?publicSearch.cleanHistoryForTopic(history):history,id,DATA_DIR,promptMessages);
    const n7ImageCount=attachments.filter(a=>a.type.startsWith('image/')).length;
    if(n7ImageCount){
@@ -214,26 +229,18 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
    }
    const context=publicSearch.contextForResearch(evidence);
    if(context&&messages[0]?.role==='system')messages[0].content+='\n\n'+context;
-  }catch(e){return writeError(res,502,'Πρόβλημα προετοιμασίας: '+e.message);}
+  }catch(e){emit('error',{error:'Η προετοιμασία της έρευνας απέτυχε: '+String(e.message||e).slice(0,160)});if(!res.writableEnded)res.end();return;}
   const url=BASE.replace(/\/$/,'')+'/chat/completions';
-  if(!/^https:\/\//.test(url))return writeError(res,502,'Unsafe model endpoint');
-  let started=false,final='',done=false;
-  const emit=(type,value)=>{
-   if(res.destroyed)return;
-   if(!started){
-    res.writeHead(200,{'Content-Type':'application/x-ndjson; charset=utf-8','Cache-Control':'no-store, no-transform',
-      'X-Accel-Buffering':'no','X-Content-Type-Options':'nosniff'});
-    started=true;
-   }
-   res.write(JSON.stringify({type,...value})+'\n');
-  };
+  if(!/^https:\/\//.test(url)){emit('error',{error:'Μη έγκυρη διεύθυνση μοντέλου'});res.end();return;}
+
+  emit('status',{stage:'model',message:'Οι πηγές ελέγχθηκαν. Το N7 συντάσσει την απάντηση…'});
   try{
    for(let pass=0;pass<3;pass++){
     const ask=pass?[
       ...messages,{role:'assistant',content:final.slice(-4500)},
       {role:'user',content:'Συνέχισε ακριβώς από εκεί που σταμάτησες, χωρίς επανάληψη.'}
     ]:messages;
-    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),85000);
+    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),65000);
     const request={model:MODEL,messages:ask,temperature:0.3,stream:true};
     if(BASE==='https://api.groq.com/openai/v1'&&MODEL==='qwen/qwen3.8-27b'){
       request.reasoning_effort='none';request.max_completion_tokens=4096;
