@@ -35,7 +35,7 @@ def verify(expected_ui):
    if r.status!=200 or not v.get('modelConfigured'):raise RuntimeError('N7_PROGRESS_MODEL_UNAVAILABLE')
  import time
  verified=False
- for attempt in range(1,7):
+ for attempt in range(1,13):
   query='?n7progress='+secrets.token_hex(7)
   req=urllib.request.Request(BASE+'/app.js'+query,headers={'Cache-Control':'no-cache','Pragma':'no-cache'})
   with urllib.request.urlopen(req,timeout=18,context=ctx) as r:
@@ -48,7 +48,7 @@ def verify(expected_ui):
     ' length='+str(len(data))+' expected='+str(len(expected_ui)))
   if hash_match and marker_ok and status_ok:
    verified=True;break
-  if attempt<6:time.sleep(2)
+  if attempt<12:time.sleep(5)
  if not verified:raise RuntimeError('N7_PROGRESS_UI_NOT_SERVED')
  for route,method in (('/api/n7/approved-lessons','GET'),
   ('/api/conversations/11111111-1111-4111-8111-111111111111/stream','POST')):
