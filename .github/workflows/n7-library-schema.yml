@@ -1,5 +1,8 @@
 name: N7 library migration validation
 on:
+  push:
+    branches: [main]
+    paths: ['tools/storage/n7_library_schema_request.php']
   pull_request:
     paths:
       - 'tools/storage/n7_library_schema_request.php'
@@ -16,3 +19,13 @@ jobs:
           php -l tools/storage/n7_library_schema_request.php
           php -l tools/storage/pct_research_store.php
           python3 -m py_compile tools/library/deploy_library_schema_ftps.py
+  install:
+    needs: validate
+    if: github.event_name == 'push'
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - run: python3 tools/library/deploy_library_schema_ftps.py
