@@ -13,8 +13,14 @@ def fold(text):
                    if not unicodedata.combining(c)).casefold()
 
 
-ROLE = r'(?:βασιλια(?:ς)?|βασιλε(?:υς|ας)|κυβερνητη(?:ς)?|πειρατη(?:ς)?|ναυαρχο(?:ς)?|καπετανιο(?:ς)?|king|governor|pirate|admiral|captain)'
+ROLE = r'(?:βασιλια(?:ς)?|βασιλε(?:υς|ας)|κυβερνητη(?:ς)?|διοικητη(?:ς)?|πειρατη(?:ς)?|κορσαρ(?:ος|ο|οι|ουσ)?|κουρσαρ(?:ος|ο|οι|ουσ)?|ναυαρχο(?:ς)?|καπεταν(?:ιο(?:ς)?|ι(?:ος)?)?|king|governor|pirate|corsair|corsaro|admiral|captain)'
 ROLE_CLAUSE = re.compile((r'\s*[,;—–-]?\s+(' + ROLE + r')\s+(?:(?:της|τησ|του|των|of(?:\s+the)?)\s+)(.+)$').replace('ς','σ'))
+# "πετρο λάνζτα τον κερκυραίο κορσάρο" / "Henry Morgan corsair": role at the end.
+TRAILING_ROLE = re.compile(
+    # Adjective only with a Greek article («τον κερκυραίο κορσάρο»);
+    # bare «Henry Morgan corsair» must not swallow the surname.
+    (r'\s+(?:(?:(?:τον|την|το|του|τησ)\s+)([^\s]+)\s+)?(' + ROLE + r')$').replace('ς', 'σ')
+)
 ALTERNATE_NAMES = re.compile(r'\s+(?:/|\||·)\s+')
 STOP = {'βρες','πληροφοριες','πηγες','τεκμηρια','ιστορια','ψαξε','για','τον','την','του','της','και','the','find','about','history','information','of','on','island','port'}
 # Search equivalents for a supplied given name. They are retrieval hypotheses,
@@ -29,9 +35,9 @@ _GIVEN_EQUIVALENTS = {
     'Jean': ('Giovanni','Juan','John','Ioannes'),
     'John': ('Giovanni','Juan','Jean','Ioannes'),
     'Johannes': ('Giovanni','Juan','John'),
-    'Πέτρος': ('Pietro','Pedro','Pierre','Peter'),
-    'Πέτρου': ('Pietro','Pedro','Pierre','Peter'),
-    'Πέτρο': ('Pietro','Pedro','Pierre','Peter'),
+    'Πέτρος': ('Pietro','Pedro','Pierre','Peter','Petros'),
+    'Πέτρου': ('Pietro','Pedro','Pierre','Peter','Petros'),
+    'Πέτρο': ('Pietro','Pedro','Pierre','Peter','Petros'),
     'Petros': ('Pietro','Pedro','Pierre','Peter'),
     'Petrus': ('Pietro','Pedro','Peter'),
     'Pietro': ('Pedro','Pierre','Peter'),
@@ -61,19 +67,35 @@ def split_supplied_names(target):
 
 
 def _split_role(target):
-    """Return person, role words and place from one explicit clause."""
+    """Return person, role words, place, and whether descriptors are soft.
+
+    Soft descriptors come from a trailing «τον κερκυραίο κορσάρο»-style
+    clause: useful for search queries, but not required on every catalogue
+    title before a full-name hit may be acquired.
+    """
     target=str(target).strip()
     surface=[]; offsets=[]
     for i,c in enumerate(target):
         for f in fold(c):
             surface.append(f); offsets.append(i)
-    match=ROLE_CLAUSE.search(''.join(surface))
-    if not match:
-        return target,[],[]
-    person=target[:offsets[match.start()]].strip(' ,;—–-')
-    roles=[target[offsets[match.start(1)]:offsets[match.end(1)-1]+1]]
-    places=[target[offsets[match.start(2)]:].strip(' .;,:?')]
-    return person,roles,places
+    folded=''.join(surface)
+    match=ROLE_CLAUSE.search(folded)
+    if match:
+        person=target[:offsets[match.start()]].strip(' ,;—–-')
+        roles=[target[offsets[match.start(1)]:offsets[match.end(1)-1]+1]]
+        places=[target[offsets[match.start(2)]:].strip(' .;,:?')]
+        return person,roles,places,False
+    match=TRAILING_ROLE.search(folded)
+    if match:
+        person=target[:offsets[match.start()]].strip(' ,;—–-')
+        # Keep bare role phrases intact; only peel a trailing role off a name.
+        if len(_words(person)) >= 2:
+            roles=[target[offsets[match.start(2)]:offsets[match.end(2)-1]+1]]
+            places=[]
+            if match.group(1):
+                places=[target[offsets[match.start(1)]:offsets[match.end(1)-1]+1].strip(' .;,:?')]
+            return person,roles,places,True
+    return target,[],[],False
 
 
 def _latin_token(token):
@@ -82,10 +104,19 @@ def _latin_token(token):
 
 
 def _surname_orthography(latin):
-    """Mechanical orthography only: k/c, -is/-i, ντζ/nz. Not an attested alias."""
+    """Mechanical orthography only: k/c, -is/-i, ντζ/nz, ζτ/τζ. Not an attested alias."""
     forms=[latin]
     if latin.startswith('k') and len(latin)>2:
         forms.append('c'+latin[1:])
+    # λάνζτα → lanzta also yields lantza/lantzas for Latin catalogues.
+    seeded=[]
+    for form in forms:
+        seeded.append(form)
+        if 'zt' in form:
+            seeded.append(form.replace('zt','tz'))
+        if 'tz' in form and 'zt' not in form:
+            seeded.append(form.replace('tz','zt'))
+    forms=list(dict.fromkeys(seeded))
     more=[]
     for form in forms:
         if form.endswith('is') and len(form)>4:
@@ -101,6 +132,10 @@ def _surname_orthography(latin):
             more.extend((form[:-3]+'ntza', form+'s', form[:-3]+'ntzas'))
         elif form.endswith('nzas'):
             more.extend((form[:-1], form[:-4]+'ntza', form[:-4]+'ntzas'))
+        elif form.endswith('nzta'):
+            more.extend((form[:-4]+'ntza', form[:-4]+'ntzas', form+'s'))
+        elif form.endswith('ntza'):
+            more.extend((form+'s', form[:-4]+'nza', form[:-4]+'nzas'))
     return list(dict.fromkeys([*forms,*more]))
 
 
@@ -113,18 +148,27 @@ def decompose(target, aliases=(), purpose='', kind='unknown', regions=()):
     supplied=split_supplied_names(target)
     target=supplied[0]
     aliases=[*supplied[1:], *[str(a).strip() for a in aliases if str(a).strip()]]
-    person,roles,places=_split_role(target)
+    person,roles,places,soft=_split_role(target)
     places=[*list(regions or []),*places]
     names=[person]
+    search_contexts=[]
+    if soft:
+        search_contexts.extend([*roles,*places])
+        roles=[]; places=list(regions or [])
     for alias in aliases:
-        alias_person,alias_roles,alias_places=_split_role(alias)
+        alias_person,alias_roles,alias_places,alias_soft=_split_role(alias)
         if alias_person:
             names.append(alias_person)
+        if alias_soft:
+            search_contexts.extend([*alias_roles,*alias_places])
+            if alias_roles:
+                kind='person'
+            continue
         roles.extend(alias_roles)
         places.extend(alias_places)
         if alias_roles:
             kind='person'
-    if roles:
+    if roles or search_contexts:
         kind='person'
     words=_words(person)
     # A bare two/three-word name is only a retrieval hypothesis. Avoid treating
@@ -137,6 +181,7 @@ def decompose(target, aliases=(), purpose='', kind='unknown', regions=()):
     return {'schema':'pct-research-focus-v1','kind':kind,'entity':person,
             'names':list(dict.fromkeys(n for n in names if n)),
             'roles':list(dict.fromkeys(roles)),'places':list(dict.fromkeys(p for p in places if p)),
+            'search_contexts':list(dict.fromkeys(c for c in search_contexts if c)),
             'interpretation':'REQUEST_CONSTRAINTS_NOT_VERIFIED_FACTS'}
 
 
@@ -146,7 +191,7 @@ def focused_queries(focus, qualifiers=(), include_hypotheses=False):
         from research_topics import topic_queries
         return topic_queries(focus)
     queries=[]
-    contexts=[*focus.get('places',[]),*focus.get('roles',[])]
+    contexts=[*focus.get('places',[]),*focus.get('roles',[]),*focus.get('search_contexts',[])]
     batches=[]
     for name in (retrieval_names(focus) if include_hypotheses else focus['names']):
         queries=[]
@@ -200,15 +245,29 @@ def retrieval_names(focus):
             given,surname=words[0],words[-1]
             base=_latin_token(surname)
             surnames=_surname_orthography(base)
-            # Prefer Capsi/Lanza over another copy of the direct transliteration.
+            # Prefer Capsi/Lanza/Lantzas over another copy of the direct transliteration.
             ranked=sorted((s for s in surnames if s!=base), key=lambda s:(
-                not (s.endswith('i') or s.endswith('nza')),
+                not (s.endswith('i') or s.endswith('nza') or s.endswith('ntzas')),
                 not ('ntz' in base and 'nz' in s and 'ntz' not in s),
                 s))
             forms=[ranked[0]] if ranked else []
             if base not in forms:
                 forms.append(base)
-            for given_form in GIVEN_EQUIVALENTS.get(fold(given),()):
+            # Prefer historical -ntzas when the Greek source had ζτ/τζ.
+            for preferred in ('ntzas','ntza','nzas','nza'):
+                hit=next((s for s in surnames if s.endswith(preferred)),None)
+                if hit and hit not in forms:
+                    forms.insert(0,hit);break
+            given_forms=list(GIVEN_EQUIVALENTS.get(fold(given),()))
+            latin_given=_latin_token(given)
+            if latin_given and latin_given[:1].upper()+latin_given[1:] not in given_forms:
+                given_forms.append(latin_given[:1].upper()+latin_given[1:])
+            if latin_given.endswith('o'):
+                petros=latin_given+'s'
+                label=petros[:1].upper()+petros[1:]
+                if label not in given_forms:
+                    given_forms.append(label)
+            for given_form in given_forms:
                 for surname_form in forms:
                     candidate=given_form+' '+surname_form[:1].upper()+surname_form[1:]
                     key=fold(candidate)
@@ -244,6 +303,8 @@ def _token_pattern(name):
     """Bounded Greek inflection tolerance; no first-name-only identity match."""
     n=fold(name)
     if re.search(r'[α-ω]',n):
+        # λάνζτα ↔ λάντζας: treat ζτ and τζ as the same cluster.
+        n=n.replace('ζτ','τζ')
         n=re.sub(r'(?:ησ|η|οσ|ου|ασ|α|εσ|ε|ο)$','',n)
         if len(n)>=3:
             return r'(?<!\w)'+re.escape(n)+r'(?:ησ|η|οσ|ου|ασ|α|εσ|ε|ο|ων|ουσ)?(?!\w)'

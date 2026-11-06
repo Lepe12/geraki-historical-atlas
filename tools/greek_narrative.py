@@ -523,18 +523,32 @@ def not_found_items(answer: dict, events: list[dict]) -> list[dict]:
         or "το ζητούμενο"
     )
     if not events:
-        items.append(
-            {
-                "facet_el": "Χρήσιμα τεκμηριωμένα γεγονότα",
-                "reason": "NOT_FOUND_IN_CONSULTED_SOURCES",
-                "note_el": (
-                    "Στις πηγές που εξετάστηκαν δεν προέκυψε αποδεκτό, "
-                    "χρονολογημένο ή τεκμηριωμένο γεγονός για "
-                    + str(target)
-                    + ". Αυτό δεν αποδεικνύει ότι δεν συνέβη κάτι· σημαίνει μόνο ότι δεν τεκμηριώθηκε εδώ."
-                ),
-            }
-        )
+        display = _title_from(answer) if request.get("target") else target
+        if _sources_were_read(answer):
+            items.append(
+                {
+                    "facet_el": "Χρήσιμα τεκμηριωμένα γεγονότα",
+                    "reason": "NOT_FOUND_IN_CONSULTED_SOURCES",
+                    "note_el": (
+                        "Στις πηγές που εξετάστηκαν δεν προέκυψε αποδεκτό, "
+                        "χρονολογημένο ή τεκμηριωμένο γεγονός για "
+                        + str(display)
+                        + ". Αυτό δεν αποδεικνύει ότι δεν συνέβη κάτι· σημαίνει μόνο ότι δεν τεκμηριώθηκε εδώ."
+                    ),
+                }
+            )
+        else:
+            items.append(
+                {
+                    "facet_el": "Ανάγνωση πηγών",
+                    "reason": "SOURCES_NOT_READ",
+                    "note_el": (
+                        "Δεν μπόρεσα να διαβάσω τις πηγές για "
+                        + str(display)
+                        + ". Χωρίς ανοιχτά κείμενα δεν μπορεί να γραφτεί βιογραφικό άρθρο."
+                    ),
+                }
+            )
         return items
     dated = [e for e in events if e.get("year")]
     if not dated:
@@ -917,8 +931,36 @@ def _llm_narrative(events: list[dict], question: str, title: str, caller) -> dic
     }
 
 
+
+def _display_person_name(name: str) -> str:
+    """Capitalize each word for a finished heading; do not invent spelling."""
+    parts = []
+    for word in str(name or "").split():
+        if not word:
+            continue
+        parts.append(word[:1].upper() + word[1:] if word else word)
+    return " ".join(parts) if parts else str(name or "").strip()
+
+
+def _sources_were_read(answer: dict) -> bool:
+    """True only when acquired passages were actually opened for reading."""
+    coverage = answer.get("coverage") if isinstance(answer.get("coverage"), dict) else {}
+    if int(coverage.get("unique_passages") or 0) > 0:
+        return True
+    if int(coverage.get("reading_batches") or 0) > 0:
+        return True
+    if int(coverage.get("selected_passages") or 0) > 0:
+        return True
+    evidence = answer.get("evidence")
+    if isinstance(evidence, list) and evidence:
+        return True
+    if isinstance(evidence, dict) and evidence:
+        return True
+    return False
+
+
 def _title_from(answer: dict, events: list[dict] | None = None) -> str:
-    """Title line: name (variants, birth–death years when known)."""
+    """Finished heading: person name and years when known — never the typed command."""
     request = answer.get("normalized_request") or answer.get("request") or {}
     if not isinstance(request, dict):
         request = {}
@@ -927,12 +969,9 @@ def _title_from(answer: dict, events: list[dict] | None = None) -> str:
         a for a in (request.get("aliases") or request.get("name_variants") or [])
         if isinstance(a, str) and a.strip()
     ]
-    # Birth/death only when present on the request or on accepted events — never invented.
+    # Birth/death only when present on the request — never invented from prose.
     birth = request.get("birth_year") or request.get("born")
     death = request.get("death_year") or request.get("died")
-    years = []
-    if events:
-        years = sorted({e["year"] for e in events if e.get("year")})
     life = None
     if _year(birth) or _year(death):
         b = _year(birth)
@@ -943,15 +982,51 @@ def _title_from(answer: dict, events: list[dict] | None = None) -> str:
             life = f"γενν. {b}"
         elif d:
             life = f"θάν. {d}"
-    name = target.strip() if isinstance(target, str) and target.strip() else None
+    name = None
+    raw_target = target.strip() if isinstance(target, str) and target.strip() else None
+    if raw_target:
+        try:
+            from research_focus import decompose
+            kind = "unknown"
+            supplied = request.get("target_context")
+            if isinstance(supplied, dict) and supplied.get("type") in ("person", "place", "event", "topic"):
+                kind = supplied["type"]
+            focus = decompose(
+                raw_target,
+                aliases,
+                str(request.get("purpose") or ""),
+                kind=kind,
+            )
+            if focus.get("kind") == "person" and focus.get("entity"):
+                name = _display_person_name(focus["entity"])
+            elif focus.get("entity"):
+                name = str(focus["entity"]).strip()
+        except Exception:
+            name = raw_target
+        if not name:
+            name = raw_target
+    # Never leave a search-command sentence as the finished article title.
+    commandish = re.compile(
+        r"^(?:ψάξε|ψαξε|βρες|βρεις|αναζήτησε|αναζητησε|find|search)\b",
+        re.I,
+    )
+    if name and commandish.search(fold(name).replace("ς", "σ")):
+        try:
+            from orchestrator.research_query import split_research_query
+            cleaned, _, _ = split_research_query(name)
+            if cleaned and cleaned != name:
+                name = _display_person_name(cleaned)
+        except Exception:
+            pass
     if not name:
         q = answer.get("question")
         if isinstance(q, str) and q.strip():
-            name = q.strip().split("\n")[0][:160]
+            head = q.strip().split("\n")[0][:160]
+            if not commandish.search(fold(head).replace("ς", "σ")):
+                name = head
     if not name:
         name = "Έρευνα"
     bits = [name]
-    # Variants excluding the main name
     variant_bits = [a.strip() for a in aliases if fold(a) != fold(name)]
     paren_parts = []
     if variant_bits:
@@ -961,6 +1036,7 @@ def _title_from(answer: dict, events: list[dict] | None = None) -> str:
     if paren_parts:
         bits.append("(" + " · ".join(paren_parts) + ")")
     return " ".join(bits)
+
 
 
 def build(answer: dict, caller=None, use_llm: bool = True) -> dict:
@@ -991,24 +1067,35 @@ def build(answer: dict, caller=None, use_llm: bool = True) -> dict:
         ],
     }
     if not events:
+        if _sources_were_read(answer):
+            frame = (
+                "Δεν προέκυψε τεκμηριωμένη βιογραφία ή ιστορία για "
+                + title
+                + " από τις πηγές που εξετάστηκαν. Αυτό σημαίνει ότι δεν βρέθηκαν αποδεκτά "
+                "γεγονότα εδώ· δεν σημαίνει ότι το πρόσωπο ή το γεγονός «δεν υπήρξε»."
+            )
+            empty_method = "HONEST_EMPTY"
+        else:
+            frame = (
+                "Δεν μπόρεσα να διαβάσω τις πηγές για "
+                + title
+                + ". Γι’ αυτό δεν υπάρχει ακόμη βιογραφικό άρθρο· δεν σημαίνει ότι το πρόσωπο "
+                "ή το γεγονός «δεν υπήρξε»."
+            )
+            empty_method = "SOURCES_UNREAD"
         base.update(
             {
                 "status": "NO_USABLE_EVIDENCE",
                 "paragraphs": [
                     {
-                        "text_el": (
-                            "Δεν προέκυψε τεκμηριωμένη βιογραφία ή ιστορία για "
-                            + title
-                            + " από τις πηγές που εξετάστηκαν. Αυτό σημαίνει ότι δεν βρέθηκαν αποδεκτά "
-                            "γεγονότα εδώ· δεν σημαίνει ότι το πρόσωπο ή το γεγονός «δεν υπήρξε»."
-                        ),
+                        "text_el": frame,
                         "claim_ids": [],
                         "event_ids": [],
                         "kind": "frame",
                     }
                 ],
                 "not_found": not_found_items(answer, events),
-                "generation": {"method": "HONEST_EMPTY", "llm": False},
+                "generation": {"method": empty_method, "llm": False},
             }
         )
         return base
