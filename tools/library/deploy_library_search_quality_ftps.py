@@ -44,6 +44,11 @@ try:
         raise RuntimeError("WRONG_BOT")
     if b"/api/library/search" not in bot_server or (b"x-n7-library-signature" not in bot_server and b"X-N7-Library-Signature" not in bot_server):
         raise RuntimeError("AUTHENTICATED_BOT_PROXY_MISSING")
+    # Increase the existing server-side search cap to match the ranked top 30.
+    if b"result.matches.slice(0,15)" in bot_server:
+        bot_server=bot_server.replace(b"result.matches.slice(0,15)",b"result.matches.slice(0,30)")
+    elif b"result.matches.slice(0,30)" not in bot_server:
+        raise RuntimeError("BOT_SEARCH_ROUTE_CHANGED")
     # Add a new page-only proxy without replacing working search, login or agent logic.
     if b"if(p==='/api/library/page')" not in bot_server:
         marker=b"    if(req.method==='POST'&&p==='/api/tasks')"
