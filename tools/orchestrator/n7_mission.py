@@ -159,6 +159,11 @@ def run(root: Path, run_id: str, worker: Callable | None = None, max_steps: int 
             continue
         if executed >= max_steps:
             break
+        # Re-read live policy before each unit of external work.
+        policy = load_policy()
+        validate_runtime_policy(policy)
+        if not policy.get("dispatch", {}).get("dispatch_enabled") or policy.get("dispatch", {}).get("kill_switch"):
+            raise RuntimeError("JARVIS_DISPATCH_DISABLED")
         validate_specialist_assignment(state["plan"], agent, policy)
         step["attempts"] += 1
         step["status"] = "RUNNING"
@@ -172,8 +177,11 @@ def run(root: Path, run_id: str, worker: Callable | None = None, max_steps: int 
                             event_root=directory / "events", history_path=directory / "task_history.jsonl")
             if result.get("agent_id") != aid or result.get("verified_promotion_allowed") is not False:
                 raise ValueError("UNTRUSTED_WORKER_RESULT")
-            if not isinstance(result.get("search_runs"), list):
+            if not isinstance(result.get("search_runs"), list) or not result["search_runs"]:
                 raise ValueError("INVALID_WORKER_RESULT")
+            if not any(isinstance(row, dict) and row.get("status") in ("EXECUTED", "PARTIAL")
+                       for row in result["search_runs"]):
+                raise ValueError("NO_SUCCESSFUL_SEARCH_ROUTES")
             atomic_json(directory / "results" / f"{aid}.json", result)
             step["status"] = "COMPLETED"
             step["candidate_records"] = sum(len(row.get("records") or []) for row in result["search_runs"]
