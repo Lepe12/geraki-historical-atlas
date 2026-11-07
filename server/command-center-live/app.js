@@ -123,6 +123,33 @@ async function githubResearchStatus(requestId){
     research_conclusion:child?.conclusion||null,
     review_status:"HUMAN_SOURCE_INSPECTION_REQUIRED",
     note:"GitHub workflow state is not historical verification or a source-level audit."};
+  // A reviewed research answer can be projected back into the private chat
+  // without returning raw PDF bytes or the multi-megabyte evidence corpus.
+  if(child?.status==="completed"&&child.conclusion==="success"&&/^[0-9]+$/.test(String(child.id))){
+    try{
+      const doc=await getJson("https://raw.githubusercontent.com/"+REPO+
+        "/main/evidence/runs/"+child.id+"/research_answer/answer.json",8_000_000);
+      const greek=doc.greek_narrative||{};
+      const greekParagraphs=greek.status==="COMPLETED"&&Array.isArray(greek.paragraphs)?greek.paragraphs:[];
+      const rawSections=greekParagraphs.length?greekParagraphs.map(x=>x.text_el):
+        (Array.isArray(doc.answer_sections)?doc.answer_sections.map(x=>x.text):[]);
+      const paragraphs=rawSections.filter(x=>typeof x==="string"&&x.trim())
+        .slice(0,8).map(x=>x.slice(0,1600));
+      const sources=Array.isArray(greek.sources)?greek.sources.slice(0,10)
+        .map(x=>String(x?.label_el||"").slice(0,650)).filter(Boolean):[];
+      report.preview={
+        report_status:String(doc.status||"UNKNOWN").slice(0,100),
+        language:greekParagraphs.length?"el":"source_original",
+        paragraphs,sources,
+        limitations:Array.isArray(doc.limitations)?doc.limitations.slice(0,8).map(x=>String(x).slice(0,180)):[],
+        verified:false,human_review_required:true,
+        evidence_link:"https://github.com/"+REPO+"/tree/main/evidence/runs/"+child.id+"/research_answer"
+      };
+    }catch(_){
+      report.preview={report_status:"NOT_YET_PUBLISHED",paragraphs:[],sources:[],
+        verified:false,human_review_required:true};
+    }
+  }
   if(n7MissionStatusCache.size>100)n7MissionStatusCache.clear();
   n7MissionStatusCache.set(requestId,{at:Date.now(),report});
   return report;
