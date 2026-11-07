@@ -120,6 +120,15 @@ class N7MissionTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "UNSAFE_HISTORICAL_VERIFICATION_FLAG"):
             load_state(self.root, "naxos-1670")
 
+    def test_all_failed_search_routes_do_not_count_as_completed(self):
+        self.init()
+        def failed_search(agent, *args, **kwargs):
+            return {"agent_id": agent["agent_id"], "verified_promotion_allowed": False,
+                    "search_runs": [{"status": "FAILED", "records": []}]}
+        report = run(self.root, "naxos-1670", worker=failed_search, max_steps=1)
+        self.assertEqual(report["status"], "INCOMPLETE")
+        self.assertIn("NO_SUCCESSFUL_SEARCH_ROUTES", report["agent_states"][PREFERRED[0]]["last_error"])
+
     def test_stop_switch_on_resume(self):
         self.init()
         with patch("jarvis_runtime_guard.load_policy", return_value=policy(kill=True)):
