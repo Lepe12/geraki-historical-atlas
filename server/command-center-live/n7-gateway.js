@@ -255,7 +255,7 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
         return true;
       }
       const {target,purpose,date_range="",aliases=""}=payload;
-      const safeText=s=>typeof s==="string"&&!/[\\x00-\\x1f]/.test(s);
+      const safeText=s=>typeof s==="string"&&![...s].some(ch=>ch.codePointAt(0)<32);
       if(!safeText(target)||target.trim().length<3||target.length>250||
          !safeText(purpose)||purpose.trim().length<12||purpose.length>1000||
          !safeText(date_range)||date_range.length>80||
