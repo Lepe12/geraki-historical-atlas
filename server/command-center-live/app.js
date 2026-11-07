@@ -135,8 +135,16 @@ async function githubResearchStatus(requestId){
         (Array.isArray(doc.answer_sections)?doc.answer_sections.map(x=>x.text):[]);
       const paragraphs=rawSections.filter(x=>typeof x==="string"&&x.trim())
         .slice(0,8).map(x=>x.slice(0,1600));
-      const sources=Array.isArray(greek.sources)?greek.sources.slice(0,10)
+      let sources=Array.isArray(greek.sources)?greek.sources.slice(0,10)
         .map(x=>String(x?.label_el||"").slice(0,650)).filter(Boolean):[];
+      if(!sources.length&&Array.isArray(doc.claims)){
+        sources=doc.claims.flatMap(claim=>(Array.isArray(claim.source_occurrences)?claim.source_occurrences:[])
+          .slice(0,1).map(source=>[
+            String(source.title||"Άγνωστη πηγή"),
+            source.locator?.printed_page?"σ. "+source.locator.printed_page:"",
+            typeof source.url==="string"&&source.url.startsWith("https://")?source.url:""
+          ].filter(Boolean).join(" · "))).filter(Boolean).slice(0,10);
+      }
       report.preview={
         report_status:String(doc.status||"UNKNOWN").slice(0,100),
         language:greekParagraphs.length?"el":"source_original",
