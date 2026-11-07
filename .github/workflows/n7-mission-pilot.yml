@@ -1,0 +1,107 @@
+name: N7 Research Mission Pilot
+
+on:
+  pull_request:
+    paths:
+      - 'tools/orchestrator/n7_mission.py'
+      - 'tools/orchestrator/test_n7_mission.py'
+      - '.github/workflows/n7-mission-pilot.yml'
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Research target (place or pirate base)'
+        required: true
+        default: 'Naxos'
+        type: string
+      purpose:
+        description: 'Research question'
+        required: true
+        default: 'Investigate 17th-century piracy and pirate anchorage at Naxos'
+        type: string
+      date_range:
+        description: 'Chronology'
+        required: false
+        default: '1600-1700'
+        type: string
+      aliases:
+        description: 'Aliases separated by |'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  offline-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            .github/workflows/n7-mission-pilot.yml
+      - name: Compile and test bounded mission state machine
+        env:
+          PYTHONPATH: .:tools:tools/orchestrator
+        run: |
+          python3 -m py_compile tools/orchestrator/n7_mission.py tools/orchestrator/test_n7_mission.py
+          python3 -m unittest tools/orchestrator/test_n7_mission.py -v
+      - name: Exercise real JARVIS planner and policy (offline)
+        env:
+          PYTHONPATH: .:tools:tools/orchestrator
+        run: |
+          python3 tools/orchestrator/n7_mission.py init --root "$RUNNER_TEMP/n7-offline" --run-id offline-naxos \
+            --target Naxos --purpose 'Seventeenth-century piracy and anchorage' --date-range 1600-1700
+          python3 tools/orchestrator/n7_mission.py status --root "$RUNNER_TEMP/n7-offline" --run-id offline-naxos
+
+  live-discovery:
+    if: github.event_name == 'workflow_dispatch'
+    needs: offline-contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Workflow never writes to main, the host, WordPress or public databases.
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            config
+            data
+      - name: Start and run N7 research mission
+        env:
+          PYTHONPATH: .:tools:tools/orchestrator:tools/connectors
+          TARGET: ${{ inputs.target }}
+          PURPOSE: ${{ inputs.purpose }}
+          DATE_RANGE: ${{ inputs.date_range }}
+          ALIASES: ${{ inputs.aliases }}
+        run: |
+          python3 tools/orchestrator/n7_mission.py init --root .n7_missions --run-id "$GITHUB_RUN_ID" \
+            --target "$TARGET" --purpose "$PURPOSE" --date-range "$DATE_RANGE" --aliases "$ALIASES"
+          python3 tools/orchestrator/n7_mission.py run --root .n7_missions --run-id "$GITHUB_RUN_ID"
+      - name: Publish checkpoint, result and search evidence as private run artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n7-mission-${{ github.run_id }}
+          path: .n7_missions/
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Signal incomplete research after preserving artifacts
+        if: success()
+        env:
+          PYTHONPATH: .:tools:tools/orchestrator
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          p = Path('.n7_missions') / os.environ['GITHUB_RUN_ID'] / 'report.json'
+          report = json.loads(p.read_text(encoding='utf-8'))
+          if report['status'] != 'DISCOVERY_FINISHED':
+              raise SystemExit('N7_MISSION_INCOMPLETE: review artifact and resume from checkpoint')
+          print('N7_DISCOVERY_COMPLETE; HUMAN_REVIEW_REQUIRED; VERIFIED=false')
+          PY
