@@ -82,7 +82,7 @@ jobs:
           python3 tools/orchestrator/n7_mission.py init --root .n7_missions --run-id "$GITHUB_RUN_ID" \
             --target "$TARGET" --purpose "$PURPOSE" --date-range "$DATE_RANGE" --aliases "$ALIASES"
           python3 tools/orchestrator/n7_mission.py run --root .n7_missions --run-id "$GITHUB_RUN_ID"
-      - name: Publish checkpoint, result and search evidence as private run artifacts
+      - name: Publish checkpoint, result and search evidence as GitHub Actions artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
