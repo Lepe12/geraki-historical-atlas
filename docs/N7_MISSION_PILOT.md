@@ -60,6 +60,27 @@ rerun of completed work, finite retries, corrupted historical-verification
 flags, untrusted worker outputs and path traversal rejection. CI also performs
 a real no-network planning smoke test using the existing JARVIS planner.
 
+## N7 private chat integration (companion PR)
+
+The N7 Command Center gateway now has two **HMAC-authenticated, server-to-server**
+routes: `/n7/mission/dispatch-signed` and `/n7/mission/status-signed`.
+They share the existing 32-byte private library bridge signing key; both
+reject unsigned or browser-origin requests. The gateway dispatches a **fixed**
+`n7-research-orchestrate.yml` workflow, which runs the existing full
+`pct-parallel-multi-agent.yml` pipeline using JARVIS routing and
+`auto_continue=false` (bounded, no automatic re-chain).
+
+The status route resolves the parent planning run and its child research run
+from GitHub. If the research completes, it attempts to read the existing
+`evidence/runs/<run-id>/research_answer/answer.json` and return only a small
+source-cited narrative preview, bibliography cues, and an evidence folder link
+to the owner UI. Missing/unpublished reports fail gracefully: **a successful
+workflow is not a verified historical claim or a promise that a report exists**.
+The actual corpus and PDF bytes are not sent through the mission-status route.
+
+Requires companion N7 bot PR (private repository), reviewed merges, and
+a production bridge smoke test. No Plesk rollout happens from this PR.
+
 ## Status boundaries
 
 `DISCOVERY_FINISHED` means **the four assignments returned**. It does not
