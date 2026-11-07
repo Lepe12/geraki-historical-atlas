@@ -25,6 +25,7 @@ const RUN_EVENTS_LIMIT=1000;
 const OPERATOR_TOKEN=String(process.env.PCT_OPERATOR_TOKEN||"");
 const GITHUB_DISPATCH_TOKEN=String(process.env.PCT_GITHUB_DISPATCH_TOKEN||"");
 const CONTROLLED_WORKFLOW="jarvis-controlled-dispatch.yml";
+const N7_RESEARCH_WORKFLOW="n7-research-orchestrate.yml";
 const ALLOWED_BROWSER_ORIGINS=new Set(["https://lepe12.github.io","https://pct-live.piratecartography.com","https://bot.piratecartography.com"]);
 const SESSION_COOKIE="naboux_session";
 const SESSION_MAX_AGE=30*24*60*60;
@@ -70,7 +71,7 @@ function safeEqual(a,b){
 }
 function githubDispatchWorkflow(workflow,inputs,repo=REPO){
   const privateN7=repo==="Lepe12/independent-ai-bot"&&workflow==="n7-private-model.yml";
-  if(!privateN7&&(repo!==REPO||![CONTROLLED_WORKFLOW,"nabou-coder-v03.yml"].includes(workflow)))
+  if(!privateN7&&(repo!==REPO||![CONTROLLED_WORKFLOW,"nabou-coder-v03.yml",N7_RESEARCH_WORKFLOW].includes(workflow)))
     return Promise.reject(new Error("workflow_not_allowed"));
   return new Promise((resolve,reject)=>{
     if(!GITHUB_DISPATCH_TOKEN)return reject(new Error("github_dispatch_not_configured"));
@@ -98,6 +99,35 @@ function githubDispatchWorkflow(workflow,inputs,repo=REPO){
 function githubWorkflowDispatch(inputs){return githubDispatchWorkflow(CONTROLLED_WORKFLOW,inputs);}
 function githubCodingDispatch(inputs){return githubDispatchWorkflow("nabou-coder-v03.yml",inputs);}
 function githubPrivateDispatch(inputs){return githubDispatchWorkflow("n7-private-model.yml",inputs,"Lepe12/independent-ai-bot");}
+
+function githubResearchDispatch(inputs){return githubDispatchWorkflow(N7_RESEARCH_WORKFLOW,inputs);}
+let n7MissionStatusCache=new Map();
+async function githubResearchStatus(requestId){
+  // Always constrain GitHub lookups to the two fixed, public workflow identifiers.
+  const cached=n7MissionStatusCache.get(requestId);
+  if(cached&&Date.now()-cached.at<15000)return cached.report;
+  const prefix="https://api.github.com/repos/"+REPO+"/actions/workflows/";
+  const [planRuns,researchRuns]=await Promise.all([
+    getJson(prefix+N7_RESEARCH_WORKFLOW+"/runs?event=workflow_dispatch&per_page=50",2000000),
+    getJson(prefix+"pct-parallel-multi-agent.yml/runs?event=workflow_dispatch&per_page=50",2000000)
+  ]);
+  const select=(data,title)=>(Array.isArray(data.workflow_runs)?data.workflow_runs:[])
+    .find(x=>x.display_title===title);
+  const parent=select(planRuns,"N7 Mission "+requestId);
+  const child=select(researchRuns,"Research "+requestId);
+  const status=child?(child.status==="completed"?(child.conclusion==="success"?"PIPELINE_COMPLETED":"PIPELINE_FAILED"):"PIPELINE_"+String(child.status).toUpperCase()):
+    parent?(parent.status==="completed"&&parent.conclusion!=="success"?"DISPATCH_FAILED":"WAITING_FOR_RESEARCH"):"DISPATCH_NOT_OBSERVED";
+  const report={status,planner_status:parent?.status||null,planner_conclusion:parent?.conclusion||null,
+    planner_run_id:parent?.id||null,planner_url:parent?.html_url||null,
+    research_run_id:child?.id||null,research_url:child?.html_url||null,
+    research_conclusion:child?.conclusion||null,
+    review_status:"HUMAN_SOURCE_INSPECTION_REQUIRED",
+    note:"GitHub workflow state is not historical verification or a source-level audit."};
+  if(n7MissionStatusCache.size>100)n7MissionStatusCache.clear();
+  n7MissionStatusCache.set(requestId,{at:Date.now(),report});
+  return report;
+}
+
 async function refreshBaseline(force=false){
   if(!force && Date.now()-baselineFetchedAt<15000 && baseline)return baseline;
   if(baselineRefresh)return baselineRefresh;
@@ -261,7 +291,7 @@ async function publishSnapshots(){
   for(const [run,clients] of sockets){if(!clients.size)continue;try{const state=await statusFor(run),frame=frameText(JSON.stringify({schema:"pct-command-center-bootstrap-v1",...state}));for(const socket of clients)if(!socket.destroyed)socket.write(frame);}catch(_){}}
 }
 const oauth=createN7OAuth({json});
-const handleN7=createN7Gateway({json,operatorAuthorized,sessionAuthorized:oauth.sessionAuthorized,readBody,statusFor,githubWorkflowDispatch,githubCodingDispatch,githubPrivateDispatch});
+const handleN7=createN7Gateway({json,operatorAuthorized,sessionAuthorized:oauth.sessionAuthorized,readBody,statusFor,githubWorkflowDispatch,githubCodingDispatch,githubPrivateDispatch,githubResearchDispatch,githubResearchStatus});
 const handleN7Library=createN7Library({json,readBody,operatorAuthorized,sessionAuthorized:oauth.sessionAuthorized});
 const server=http.createServer(async(req,res)=>{
   try{
