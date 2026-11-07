@@ -1,0 +1,29 @@
+name: N7 Mission Bridge Integration CI
+
+on:
+  pull_request:
+    paths:
+      - 'server/command-center-live/n7-gateway.js'
+      - 'server/command-center-live/n7-mission.test.js'
+      - 'server/command-center-live/app.js'
+      - '.github/workflows/n7-mission-bridge-ci.yml'
+      - '.github/workflows/n7-research-orchestrate.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  mission-bridge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            server/command-center-live
+            .github/workflows/n7-research-orchestrate.yml
+            .github/workflows/n7-mission-bridge-ci.yml
+      - name: Syntax and signed-bridge regression checks
+        run: |
+          node --check server/command-center-live/app.js
+          node --check server/command-center-live/n7-gateway.js
+          node --test server/command-center-live/n7-gateway.test.js server/command-center-live/n7-mission.test.js
