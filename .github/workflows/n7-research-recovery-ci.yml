@@ -5,6 +5,8 @@ on:
     paths:
       - 'tools/aggregate_source_genealogy.py'
       - 'tools/publish_research_outputs.py'
+      - 'tools/n7_recovery_public_summary.py'
+      - 'tools/test_n7_recovery_public_summary.py'
       - 'tools/test_publish_research_outputs.py'
       - 'tools/test_n7_research_recovery.py'
       - '.github/workflows/n7-recover-existing-evidence.yml'
@@ -30,8 +32,8 @@ jobs:
           PYTHONPATH: tools
           PCT_LLM_PROVIDER: disabled
         run: |
-          python3 -m py_compile tools/aggregate_source_genealogy.py tools/publish_research_outputs.py tools/research_lane_handoff.py tools/test_n7_research_recovery.py
-          python3 -m unittest tools/test_n7_research_recovery.py tools/test_publish_research_outputs.py tools/test_research_lane_handoff.py -v
+          python3 -m py_compile tools/aggregate_source_genealogy.py tools/publish_research_outputs.py tools/research_lane_handoff.py tools/n7_recovery_public_summary.py tools/test_n7_research_recovery.py tools/test_n7_recovery_public_summary.py
+          python3 -m unittest tools/test_n7_research_recovery.py tools/test_n7_recovery_public_summary.py tools/test_publish_research_outputs.py tools/test_research_lane_handoff.py -v
       - name: Verify recovery workflow never dispatches new archive searches
         run: |
           python3 - <<'PY'
@@ -44,5 +46,7 @@ jobs:
           assert 'skip_citation_acquisition=true' in w
           assert 'auto_continue=false' in w
           assert 'pct-parallel-multi-agent.yml' not in w
+          assert 'RECOVERY_SUMMARY.json' in w
+          assert 'publication_mode == \'full\'' in w
           print('N7_NO_RESEARCH_RESCAN_AND_NO_AUTOMATIC_CHAIN_PASS')
           PY

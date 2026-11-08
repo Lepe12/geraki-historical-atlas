@@ -45,6 +45,8 @@ class ResearchRecoveryTests(unittest.TestCase):
             (b"remote: Permission to repository denied", "GITHUB_PERMISSION_OR_RULESET", False),
             (b"error: RPC failed; HTTP 502 curl 22", "GIT_TRANSPORT_FAILURE", True),
             (b"remote: error: pack exceeds maximum allowed size", "PUSH_PAYLOAD_TOO_LARGE", False),
+            (b"remote: GH013 push declined due to repository rule violations", "GITHUB_REPOSITORY_RULE_VIOLATION", False),
+            (b"remote: Push cannot contain secrets", "GITHUB_SECRET_SCANNING_PROTECTION", False),
         ]
         for message, expected, retry in examples:
             with self.subTest(expected=expected):
