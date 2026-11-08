@@ -46,17 +46,29 @@
       const a=el("a",label);a.href=u.href;a.target="_blank";a.rel="noopener noreferrer";status.append(a);
     }catch(_){}
   }
+  function linkRecovery(value){
+    try{
+      if(!value)return;
+      const u=new URL(String(value));
+      if(u.protocol!=="https:"||u.hostname!=="github.com"||
+         !/^\/Lepe12\/geraki-historical-atlas\/blob\/main\/evidence\/runs\/[0-9]+\/RECOVERY_SUMMARY\.json$/.test(u.pathname))return;
+      const a=el("a","Αναφορά διασωθέντων τεκμηρίων");
+      a.href=u.href;a.target="_blank";a.rel="noopener noreferrer";
+      status.append(a);
+    }catch(_){}
+  }
   function render(data){
     status.replaceChildren();
     const labels={DISPATCH_NOT_OBSERVED:"Η αποστολή έγινε δεκτή και αναμένεται στο GitHub",
       WAITING_FOR_RESEARCH:"Ο JARVIS αναθέτει τις εργασίες",PIPELINE_QUEUED:"Η αποστολή είναι στην ουρά",
       PIPELINE_IN_PROGRESS:"Οι agents εργάζονται",PIPELINE_COMPLETED:"Η ερευνητική εκτέλεση ολοκληρώθηκε",
-      PIPELINE_FAILED:"Η ερευνητική εκτέλεση απέτυχε",DISPATCH_FAILED:"Η ανάθεση απέτυχε"};
+      PIPELINE_FAILED:"Η ερευνητική εκτέλεση απέτυχε",DISPATCH_FAILED:"Η ανάθεση απέτυχε",EVIDENCE_PRESERVED_REVIEW_REQUIRED:"Τα ερευνητικά τεκμήρια διασώθηκαν· η σύνθεση παραμένει εκκρεμής."};
     status.append(el("p",labels[data.status]||"Κατάσταση: "+String(data.status||"άγνωστη")),
       el("p","Αποστολή: "+(data.request_id||id)),
       el("p","Οι πληροφορίες απαιτούν έλεγχο πρωτότυπων πηγών. Δεν είναι αυτόματα επιβεβαιωμένες."));
     link(data.planner_url,"Πλάνο JARVIS");
     link(data.research_url,"Ερευνητική εκτέλεση");
+    linkRecovery(data.recovery_summary_url);
     if(data.preview&&typeof data.preview==="object"){
       status.append(el("h3","Σύνθεση υπό έλεγχο"));
       status.append(el("p","Κατάσταση αναφοράς: "+String(data.preview.report_status||"άγνωστη")));
