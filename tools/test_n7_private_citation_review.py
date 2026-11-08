@@ -1,4 +1,5 @@
 """Offline N7 source-replay and review-budget regression tests; no model/hosting access."""
+import copy
 import json
 import os
 import tempfile
@@ -54,7 +55,8 @@ class N7PrivateCitationReview(unittest.TestCase):
             self.assertFalse(replayed)
             self.assertEqual(rejections[0]['reason'],'PRIVATE_REVIEW_ORIGINAL_CITATION_CHANGED')
             # Restoring the quote text but changing the source bytes also fails.
-            old['claims'][0]=claims[0]
+            old['claims'][0]=copy.deepcopy(claims[0])
+            old['evidence'][0]['text']=TEXT
             old['evidence'][0]['text']='A substituted account.'
             p.write_text(json.dumps(old))
             replayed,rejections,_=resume_private_proposals(p,'Naxos source check',records,
