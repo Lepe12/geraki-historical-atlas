@@ -1,0 +1,91 @@
+name: N7 Owner Mission Plesk — Review and Deploy
+
+on:
+  pull_request:
+    paths:
+      - 'tools/library/n7-mission-owner-ui.js'
+      - 'tools/library/deploy_n7_owner_mission_ftps.py'
+      - '.github/workflows/n7-owner-mission-deploy.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/library/n7-mission-owner-ui.js'
+      - 'tools/library/deploy_n7_owner_mission_ftps.py'
+      - '.github/workflows/n7-owner-mission-deploy.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n7-private-owner-missions-plesk
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            tools/library
+      - name: Validate stable source, owner authentication and patch idempotency
+        run: |
+          python3 -m py_compile tools/library/deploy_n7_owner_mission_ftps.py
+          node --check tools/library/n7-mission-owner-ui.js
+          python3 - <<'PY'
+          import importlib.util,pathlib,tempfile,subprocess
+          path=pathlib.Path('tools/library/deploy_n7_owner_mission_ftps.py')
+          spec=importlib.util.spec_from_file_location('owner_deploy',path)
+          m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+          original=b"""'use strict';
+          const historicalResearch = require('./historical-research');
+          function serve(res,p){const assets={'/':'index.html','/app.js':'app.js',};}
+          const server=http.createServer(async (req,res)=>{
+            if(p.startsWith('/api/') && !originOK(req))return json(res,403,{error:'origin'});
+            if(!session(req))return json(res,401,{error:'Authentication required'});
+            if(p==='/api/library/search'){return json(res,200,{});}
+          });
+          """
+          out=m.patch_server(original)
+          assert out.count(b"n7OwnerMission(")>=3
+          assert out.index(b"if(!session(req))") < out.index(b"if(p==='/api/research/missions')")
+          assert b"p==='/n7-mission-owner-ui.js'" in out
+          assert m.patch_server(out)==out
+          with tempfile.TemporaryDirectory() as d:
+            p=pathlib.Path(d)/'server.js';p.write_bytes(out)
+            subprocess.run(['node','--check',str(p)],check=True)
+          html=b'<body><div id="messages"></div></body>'
+          result=m.patch_index(html)
+          assert b'n7-mission-owner-ui.js' in result
+          assert m.patch_index(result)==result
+          try:m.patch_server(b'const server=http.createServer();')
+          except RuntimeError:pass
+          else:raise AssertionError('unsafe shell accepted')
+          print('N7_OWNER_BRIDGE_PATCH_CONTRACT_PASS')
+          PY
+
+  deploy:
+    if: github.event_name == 'push'
+    needs: preflight
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+      N7_DEPLOY_CONFIRM: INSTALL-N7-OWNER-MISSIONS
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            tools/library
+      - name: Guarded N7 private mission patch with SHA readback and HTTP smoke
+        run: python3 tools/library/deploy_n7_owner_mission_ftps.py
