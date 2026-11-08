@@ -3,7 +3,7 @@
 Uses a separate Git index. A rejected push rebuilds the tree on the new main.
 The runner checkout and concurrent writers' unrelated files are preserved.
 """
-import json,os,re,subprocess,tempfile
+import json,os,re,subprocess,tempfile,time
 from pathlib import Path,PurePosixPath
 from research_execution_policy import from_environment
 
@@ -47,7 +47,35 @@ def shared_output(path,incoming,parent):
     merged={**current,**proposed,'runs':sorted(runs.values(),key=lambda r:int(r['run_id']) if str(r['run_id']).isdigit() else 0,reverse=True)}
     return git('hash-object','-w','--stdin',input=(json.dumps(merged,ensure_ascii=False,indent=2)+'\n').encode()).decode().strip()
 
-def publish(attempts=5):
+def classify_push_failure(stderr: bytes) -> str:
+    """Diagnostics without exposing credential-bearing remote URLs."""
+    message=stderr.decode("utf-8","replace").lower()
+    if any(x in message for x in ("non-fast-forward","fetch first","stale info","failed to update ref")):
+        return "CONCURRENT_MAIN_UPDATE"
+    if any(x in message for x in ("file size limit","exceeds github","larger than 100.00 mb","gh001")):
+        return "GITHUB_FILE_SIZE_LIMIT"
+    if any(x in message for x in ("pack exceeds","pack size","too large","request entity too large","http 413")):
+        return "PUSH_PAYLOAD_TOO_LARGE"
+    if any(x in message for x in ("permission denied","403","write access not granted","protected branch","permission to")):
+        return "GITHUB_PERMISSION_OR_RULESET"
+    if any(x in message for x in ("remote end hung up","curl 18","curl 22","http 5","connection reset","timed out")):
+        return "GIT_TRANSPORT_FAILURE"
+    return "GIT_PUSH_REJECTED_UNKNOWN"
+
+
+def safe_push_diagnostic(stderr: bytes) -> str:
+    """Only a bounded, sanitised Git stderr excerpt goes into the CI log."""
+    s=stderr.decode("utf-8","replace")
+    s=re.sub(r"https?://\S+","[remote]",s)
+    s=re.sub(r"(?i)(gh[pousr]_[A-Za-z0-9_]+|github_pat_[A-Za-z0-9_]+)","[redacted]",s)
+    return " | ".join(line.strip()[:260] for line in s.splitlines()[-5:])[:900]
+
+
+def retry_is_useful(category: str) -> bool:
+    return category not in ("GITHUB_FILE_SIZE_LIMIT","PUSH_PAYLOAD_TOO_LARGE","GITHUB_PERMISSION_OR_RULESET")
+
+
+def publish(attempts=10):
     if not from_environment()['production_writes_allowed']:
         raise ValueError('EXPERIMENT_PRODUCTION_WRITE_FORBIDDEN')
     # Call after creating the output commit. No branch history is replayed.
@@ -90,7 +118,16 @@ def publish(attempts=5):
         else:
             commit=git('commit-tree',tree,'-p',parent,'-m','Publish research outputs '+os.getenv('GITHUB_RUN_ID','local')).decode().strip()
             pushed=subprocess.run(['git','push','origin',commit+':refs/heads/main'],capture_output=True)
-            if pushed.returncode:continue
+            if pushed.returncode:
+                category=classify_push_failure(pushed.stderr)
+                print("PUBLICATION_PUSH_FAILED",json.dumps({
+                    "attempt":attempt+1, "category":category,
+                    "message":safe_push_diagnostic(pushed.stderr),
+                    "files":len(applied)},ensure_ascii=False),flush=True)
+                if not retry_is_useful(category):
+                    raise RuntimeError("PUBLICATION_PUSH_BLOCKED:"+category)
+                time.sleep(min(0.6*(attempt+1),4))
+                continue
         # Read back the published object identity for every file.
         git('fetch','--quiet','origin','main')
         head=git('rev-parse','refs/remotes/origin/main').decode().strip()
@@ -117,7 +154,7 @@ def publish(attempts=5):
         receipt={'status':'SUCCEEDED','commit':commit,'readback_commit':head,'files':len(applied),'retained_newer_shared_outputs':len(changes)-len(applied),'attempts':attempt+1,'run_id':os.getenv('GITHUB_RUN_ID','')}
         Path('publication_receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
         print(json.dumps(receipt));return receipt
-    raise RuntimeError('PUBLICATION_REJECTED_AFTER_RETRIES')
+    raise RuntimeError('PUBLICATION_REJECTED_AFTER_RETRIES: inspect PUBLICATION_PUSH_FAILED category and sanitized message above')
 
 if __name__=='__main__':publish()
 

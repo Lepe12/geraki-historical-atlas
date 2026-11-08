@@ -1,0 +1,139 @@
+name: N7 Recover Existing Research Evidence Without Re-search
+run-name: Recover preserved research ${{ inputs.run_id || '42434462262' }}
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/n7-recover-existing-evidence.yml'
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Existing original GitHub research run with checksum-bound lane artifacts'
+        required: true
+        type: string
+        default: '42434462262'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: n7-recover-evidence-${{ inputs.run_id || '42434462262' }}
+  cancel-in-progress: false
+
+jobs:
+  recover-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      SOURCE_RUN: ${{ inputs.run_id || '42434462262' }}
+      PCT_AUTO_CONTINUE: 'false'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/evidence/runs/
+            /evidence/runs/${{ inputs.run_id || '42434462262' }}/
+            !/evidence/specialist_runs/
+            !/backups/
+      - name: Validate recovery identity and existing publisher, no model or searches
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_RUN" =~ ^[0-9]{8,20}$ ]]
+          PYTHONPATH=tools python3 -m unittest tools/test_n7_research_recovery.py tools/test_publish_research_outputs.py -v
+          python3 -m py_compile tools/research_lane_handoff.py tools/aggregate_source_genealogy.py tools/research_system_health.py tools/publish_research_outputs.py
+
+      - name: Restore original lane artifacts from the previous run, not the internet
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.run_id || '42434462262' }}
+          pattern: pct-lane-handoff-${{ inputs.run_id || '42434462262' }}-*
+          path: lane_handoffs
+          merge-multiple: false
+
+      - name: Verify SHA-256 manifests and rebuild the original evidence tree
+        run: |
+          set -euo pipefail
+          python3 tools/research_lane_handoff.py merge \
+            --run-id "$SOURCE_RUN" \
+            --expected '["greek","travellers","spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african"]' \
+            --incoming lane_handoffs
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path('evidence/runs')/os.environ['SOURCE_RUN']
+          obj=json.loads((root/'LANE_HANDOFF.json').read_text())
+          assert len(obj['received_lanes'])==11, obj['received_lanes']
+          assert not obj['missing_lanes'],obj['missing_lanes']
+          assert obj.get('status')=='READY_FOR_DURABLE_PUBLICATION'
+          print('N7_RECOVERED_11_OF_11_SHA256_VERIFIED; HISTORICALLY_VERIFIED=false')
+          PY
+
+      - name: Build source genealogy and completeness report without re-running discovery
+        run: |
+          set -euo pipefail
+          python3 tools/aggregate_source_genealogy.py --run-id "$SOURCE_RUN"
+          python3 tools/research_system_health.py --run-id "$SOURCE_RUN"
+          mkdir -p "evidence/runs/$SOURCE_RUN/research_continuation"
+          printf '{"auto_continue":false,"set_by_run":"%s","source":"manual_artifact_recovery"}\n' "$GITHUB_RUN_ID" \
+            > "evidence/runs/$SOURCE_RUN/research_continuation/auto_continue.json"
+
+      - name: Publish restored original evidence with independent readback
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "evidence/runs/$SOURCE_RUN/"
+          if ! git diff --cached --quiet; then
+            git commit -m "Recover checksum-verified historical evidence from run $SOURCE_RUN"
+            PYTHONPATH=tools python3 tools/publish_research_outputs.py
+          else
+            echo "N7_RESEARCH_EVIDENCE_ALREADY_PRESENT"
+          fi
+          git fetch --quiet origin main
+          git cat-file -e "refs/remotes/origin/main:evidence/runs/$SOURCE_RUN/LANE_HANDOFF.json"
+          git cat-file -e "refs/remotes/origin/main:evidence/runs/$SOURCE_RUN/SOURCE_GENEALOGY.json"
+          git cat-file -e "refs/remotes/origin/main:evidence/runs/$SOURCE_RUN/SYSTEM_HEALTH.json"
+          echo "N7_RECOVERY_DURABLE_READBACK_PASS"
+
+      - name: Retain recovery manifests and exact source status on failure or success
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n7-research-recovery-${{ inputs.run_id || '42434462262' }}-${{ github.run_id }}
+          path: |
+            evidence/runs/${{ inputs.run_id || '42434462262' }}/LANE_HANDOFF.json
+            evidence/runs/${{ inputs.run_id || '42434462262' }}/SOURCE_GENEALOGY.json
+            evidence/runs/${{ inputs.run_id || '42434462262' }}/SYSTEM_HEALTH.json
+            publication_receipt.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  resume-synthesis:
+    needs: recover-and-publish
+    if: needs.recover-and-publish.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_RUN: ${{ inputs.run_id || '42434462262' }}
+    steps:
+      - name: Resume only semantic analysis of retained sources, not 11 searches
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_RUN" =~ ^[0-9]{8,20}$ ]]
+          gh workflow run research-semantic-reanalysis.yml \
+            --ref main \
+            -f run_id="$SOURCE_RUN" \
+            -f auto_continue=false \
+            -f skip_citation_acquisition=true \
+            -f semantic_shards=1
+          echo "N7_SEMANTIC_RESUME_ACCEPTED for source run $SOURCE_RUN; NOT_HISTORICAL_VERIFICATION"

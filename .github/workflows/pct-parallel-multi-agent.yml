@@ -399,7 +399,8 @@ jobs:
 
   aggregate-health:
     needs: [prepare, publish-lanes]
-    if: always() && needs.prepare.result == 'success' && github.ref == 'refs/heads/main'
+    # Source genealogy must consume durably published evidence, not an empty checkout.
+    if: always() && needs.prepare.result == 'success' && needs.publish-lanes.result == 'success' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     env:
       PCT_EXPECTED_REQUEST_SHA256: ${{ needs.prepare.outputs.request_sha256 }}
