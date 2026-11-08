@@ -66,7 +66,7 @@ def classify_push_failure(stderr: bytes) -> str:
 def safe_push_diagnostic(stderr: bytes) -> str:
     """Only a bounded, sanitised Git stderr excerpt goes into the CI log."""
     s=stderr.decode("utf-8","replace")
-    s=re.sub(r"https?://[^\\s]+","[remote]",s)
+    s=re.sub(r"https?://\S+","[remote]",s)
     s=re.sub(r"(?i)(gh[pousr]_[A-Za-z0-9_]+|github_pat_[A-Za-z0-9_]+)","[redacted]",s)
     return " | ".join(line.strip()[:260] for line in s.splitlines()[-5:])[:900]
 
