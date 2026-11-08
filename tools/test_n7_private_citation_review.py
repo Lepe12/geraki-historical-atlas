@@ -48,6 +48,7 @@ class N7PrivateCitationReview(unittest.TestCase):
     def test_citation_mutation_cannot_survive_private_review(self):
         with tempfile.TemporaryDirectory() as tmp:
             p,records,claims,old=self.proposals(tmp)
+            pristine=copy.deepcopy(claims[0])
             old['claims'][0]['source_occurrences']=[{'locator':{'start_char':99}}]
             p.write_text(json.dumps(old))
             replayed,rejections,_=resume_private_proposals(p,'Naxos source check',records,
@@ -55,7 +56,7 @@ class N7PrivateCitationReview(unittest.TestCase):
             self.assertFalse(replayed)
             self.assertEqual(rejections[0]['reason'],'PRIVATE_REVIEW_ORIGINAL_CITATION_CHANGED')
             # Restoring the quote text but changing the source bytes also fails.
-            old['claims'][0]=copy.deepcopy(claims[0])
+            old['claims'][0]=pristine
             old['evidence'][0]['text']=TEXT
             old['evidence'][0]['text']='A substituted account.'
             p.write_text(json.dumps(old))
