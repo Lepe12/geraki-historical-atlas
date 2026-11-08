@@ -28,8 +28,8 @@ ROUTE=b'''    if(req.method==='GET'&&/^\\/api\\/research\\/corpus\\/[0-9]{8,20}$
 def patched(source:bytes)->bytes:
     if b"if(!session(req))" not in source or b"n7OwnerMission(" not in source:
         raise RuntimeError("N7_LIVE_AUTH_OR_MISSION_MISSING")
-    if b"/api/research/corpus/" in source:
-        if source.count(b"/api/research/corpus/")!=1 or HELPER not in source:
+    if b"readOwnerAnswer(DATA_DIR," in source:
+        if source.count(b"readOwnerAnswer(DATA_DIR,")!=1 or HELPER not in source:
             raise RuntimeError("N7_PRIVATE_ANSWER_PARTIAL_OR_INCONSISTENT")
         return source
     if source.count(b"'use strict';\n")!=1:
@@ -54,8 +54,8 @@ def validate(files):
             f.write_bytes(body)
             subprocess.run(["node","--check",str(f)],check=True,capture_output=True,timeout=15)
     server=files["server.js"]
-    assert b"/api/research/corpus/" in server and b"readOwnerAnswer(DATA_DIR" in server
-    assert server.index(b"if(!session(req))")<server.index(b"/api/research/corpus/")
+    assert b"readOwnerAnswer(DATA_DIR" in server and b"PRIVATE_ANSWER_NOT_READY" in server
+    assert server.index(b"if(!session(req))")<server.index(b"readOwnerAnswer(DATA_DIR")
     assert b"PRIVATE_ANSWER_NOT_READY" in server
     assert patched(server)==server
 
