@@ -314,6 +314,22 @@ def answer_upload(run_id):
         if not maybe_read(ftp, "index.json", 100000):
             raise RuntimeError("PRIVATE_SOURCE_INDEX_MISSING")
         sealed = crypt("seal", raw, secret, "research:" + run_id + ":answer")
+        # Never lose the prior source-bound model result when reviewing again.
+        prior_index = maybe_read(ftp, "answer-index.json", 100000)
+        prior_encrypted = maybe_read(ftp, "answer.json.enc", 10_000_000)
+        if prior_index is not None or prior_encrypted is not None:
+            if prior_index is None or prior_encrypted is None:
+                raise RuntimeError("PRIOR_PRIVATE_ANSWER_INDEX_INCOMPLETE")
+            old_index=json.loads(prior_index)
+            # Fully re-authenticate the old answer before retaining a snapshot.
+            decode_private_answer(old_index, prior_encrypted, secret, run_id)
+            historical_name="answer-history-" + digest(prior_encrypted) + ".enc"
+            existing=maybe_read(ftp, historical_name, 10_000_000)
+            if existing is None:
+                write(ftp, historical_name, prior_encrypted)
+                existing=remote_read(ftp, historical_name, 10_000_000)
+            if existing!=prior_encrypted:
+                raise RuntimeError("PRIVATE_ANSWER_HISTORY_READBACK_MISMATCH")
         # No source text is written to a public Git commit or unencrypted artifact.
         write(ftp, "answer.json.enc", sealed)
         verify = remote_read(ftp, "answer.json.enc", 10_000_000)
