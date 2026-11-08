@@ -242,6 +242,59 @@ def restore(run_id):
           "files", report["files"], "historically_verified=false")
 
 
+
+def decode_private_answer(index, encrypted, secret, run_id):
+    """Private-only decrypt. The index and AEAD binding both must match this run."""
+    if (index.get("schema") != "n7-private-answer-index-v1"
+            or index.get("run_id") != run_id
+            or index.get("historically_verified") is not False
+            or not re.fullmatch(r"[0-9a-f]{64}", str(index.get("sealed_sha256", "")))
+            or digest(encrypted) != index["sealed_sha256"]):
+        raise RuntimeError("PRIVATE_ANSWER_INDEX_OR_SHA_INVALID")
+    clear = crypt("open", encrypted, secret, "research:" + run_id + ":answer")
+    if len(clear) > 8_000_000:
+        raise RuntimeError("PRIVATE_ANSWER_PLAINTEXT_TOO_LARGE")
+    answer = json.loads(clear)
+    if (not isinstance(answer, dict) or not isinstance(answer.get("status"), str)
+            or answer.get("verified") is True or answer.get("historically_verified") is True
+            or not isinstance(answer.get("claims"), list)):
+        raise RuntimeError("PRIVATE_PREVIOUS_ANSWER_UNSAFE")
+    return clear, answer
+
+
+def answer_restore(run_id):
+    """Retrieve the encrypted previous N7 answer into THIS ephemeral runner only."""
+    run_id = checked_run(run_id)
+    with connect() as ftp:
+        secret = key_from_bot(ftp)
+        root(ftp, run_id)
+        index = json.loads(remote_read(ftp, "answer-index.json", 100000))
+        encrypted = remote_read(ftp, "answer.json.enc", 10_000_000)
+        clear, answer = decode_private_answer(index, encrypted, secret, run_id)
+    out = REPO / "evidence" / "runs" / run_id / "previous_model_answer" / "answer.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    if out.exists():
+        if out.read_bytes() != clear:
+            raise RuntimeError("PREVIOUS_PRIVATE_ANSWER_ALREADY_PRESENT_DIFFERENT")
+    else:
+        out.write_bytes(clear)
+        out.chmod(0o600)
+    review = answer.get("review") or {}
+    from collections import Counter
+    outcomes = Counter(str(row.get("decision", "UNKNOWN")) for row in review.get("flagged_claims", [])
+                       if isinstance(row, dict))
+    print("N7_PRIVATE_ANSWER_DECRYPTED_WITH_AEAD", json.dumps({
+        "run_id": run_id, "status": answer["status"],
+        "model_claims": len(answer["claims"]),
+        "supported": len(review.get("supported_claim_ids") or []),
+        "flagged_by_decision": dict(sorted(outcomes.items())),
+        "pending": len((answer.get("coverage") or {}).get("claims_awaiting_review") or []),
+        "missing_review": len(review.get("missing_claim_ids") or []),
+        "historically_verified": False
+    }, sort_keys=True))
+
+
+
 def answer_upload(run_id):
     run_id = checked_run(run_id)
     answer_file = REPO / "evidence" / "runs" / run_id / "research_answer" / "answer.json"
@@ -283,7 +336,7 @@ def answer_upload(run_id):
 
 def main():
     p=argparse.ArgumentParser()
-    p.add_argument("mode", choices=("upload", "restore", "answer-upload"))
+    p.add_argument("mode", choices=("upload", "restore", "answer-upload", "answer-restore"))
     p.add_argument("--run-id", required=True)
     p.add_argument("--incoming", default="lane_handoffs")
     args=p.parse_args()
@@ -291,6 +344,8 @@ def main():
         upload(args.run_id, args.incoming)
     elif args.mode == "restore":
         restore(args.run_id)
+    elif args.mode == "answer-restore":
+        answer_restore(args.run_id)
     else:
         answer_upload(args.run_id)
 
