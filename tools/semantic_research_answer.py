@@ -1066,9 +1066,34 @@ class SemanticBudgetReached(Exception):
         self.answer=answer
 
 
+def mark_unreviewed_claims_pending(answer):
+    """Fail closed when a bounded pass ends before every claim is reviewed."""
+    claims=answer.get('claims') or []
+    if not claims:
+        return answer
+    review=answer.setdefault('review', {})
+    supported=set(review.get('supported_claim_ids') or [])
+    flagged={row.get('claim_id') for row in review.get('flagged_claims') or []
+             if isinstance(row, dict)}
+    pending=answer.setdefault('coverage', {}).setdefault('claims_awaiting_review', [])
+    decided=supported | flagged
+    pending[:]=list(dict.fromkeys([*pending, *(c['claim_id'] for c in claims
+                          if c.get('claim_id') and c['claim_id'] not in decided)]))
+    if pending:
+        answer['status']='REVIEW_INCOMPLETE'
+        answer['verified']=False
+        answer['historically_verified']=False
+        answer.setdefault('limitations', []).append('QUOTATION_REVIEW_PENDING_AFTER_BUDGET')
+    return answer
+
+
 def execute(*args,**kwargs):
     try:answer=_execute(*args,**kwargs)
-    except SemanticBudgetReached as error:answer=error.answer
+    except SemanticBudgetReached as error:
+        answer=error.answer
+        # A timeout during quotation review must not silently turn unreviewed
+        # proposals into zero pending decisions. Preserve every claim ID.
+        mark_unreviewed_claims_pending(answer)
     # Recompute question coverage on every result, including cached/partial ones.
     root=Path(args[0] if args else kwargs['run_root'])
     request={}
