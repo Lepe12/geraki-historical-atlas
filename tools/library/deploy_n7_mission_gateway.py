@@ -37,13 +37,27 @@ def patch_gateway(live:bytes,canonical:bytes)->bytes:
     if not fragment or marker not in fragment:raise RuntimeError("CANONICAL_MISSION_ROUTE_MISSING")
     return add_exact(live,stop,start+fragment)
 
+def patch_recovery_preview(live:bytes,canonical:bytes)->bytes:
+    marker=b"  // N7_RECOVERY_SAFE_SUMMARY_V1"
+    stop=b"  // A reviewed research answer can be projected back into the private chat"
+    if marker in live:
+        if live.count(marker)!=1:raise RuntimeError("DUPLICATE_RECOVERY_STATUS")
+        return live
+    if canonical.count(marker)!=1 or canonical.count(stop)!=1:
+        raise RuntimeError("CANONICAL_RECOVERY_STATUS_MISSING")
+    fragment=marker+canonical.split(marker,1)[1].split(stop,1)[0]
+    if b"RECOVERY_SUMMARY.json" not in fragment:
+        raise RuntimeError("CANONICAL_RECOVERY_SUMMARY_MISSING")
+    return add_exact(live,stop,fragment)
+
+
 def patch_app(live:bytes,canonical:bytes)->bytes:
     if b"function githubDispatchWorkflow(" not in live or b"createN7Gateway({" not in live:
         raise RuntimeError("GATEWAY_WRONG_APPLICATION")
     if b"function githubResearchDispatch(" in live:
         if b"function githubResearchStatus(" not in live or b"N7_RESEARCH_WORKFLOW" not in live:
             raise RuntimeError("GATEWAY_MISSION_PATCH_INCOMPLETE")
-        return live
+        return patch_recovery_preview(live,canonical)
     const=b'const CONTROLLED_WORKFLOW="jarvis-controlled-dispatch.yml";'
     newconst=b'\nconst N7_RESEARCH_WORKFLOW="n7-research-orchestrate.yml";'
     if newconst.strip() not in canonical:raise RuntimeError("CANONICAL_WORKFLOW_CONSTANT_MISSING")
