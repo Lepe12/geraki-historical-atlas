@@ -275,7 +275,7 @@ def answer_restore(run_id):
             history=[]
             for remote_name in ftp.nlst():
                 name=pathlib.Path(str(remote_name)).name
-                if not re.fullmatch(r"answer-history-[a-f0-9]{64}\\.enc",name):
+                if not re.fullmatch(r"answer-history-[a-f0-9]{64}\.enc",name):
                     continue
                 candidate=remote_read(ftp,name,10_000_000)
                 expected=name[len("answer-history-"):-len(".enc")]
