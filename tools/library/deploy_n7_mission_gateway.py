@@ -51,13 +51,36 @@ def patch_recovery_preview(live:bytes,canonical:bytes)->bytes:
     return add_exact(live,stop,fragment)
 
 
+def patch_private_corpus_status(live:bytes,canonical:bytes)->bytes:
+    marker=b"  // N7_PRIVATE_CAS_STATUS_V1"
+    recovery=b"  // N7_RECOVERY_SAFE_SUMMARY_V1"
+    if marker in live:
+        if live.count(marker)!=1:raise RuntimeError("DUPLICATE_N7_PRIVATE_STATUS")
+        return live
+    if canonical.count(marker)!=1 or recovery not in live:
+        raise RuntimeError("N7_PRIVATE_STATUS_ANCHOR_MISSING")
+    old=b"const [planRuns,researchRuns]=await Promise.all(["
+    new=b"const [planRuns,researchRuns,privateRuns]=await Promise.all(["
+    live=replace_exact(live,old,new)
+    old=b'    getJson(prefix+"pct-parallel-multi-agent.yml/runs?event=workflow_dispatch&per_page=50",2000000)\n  ]);'
+    new=b'    getJson(prefix+"pct-parallel-multi-agent.yml/runs?event=workflow_dispatch&per_page=50",2000000),\n    getJson(prefix+"n7-private-corpus-synthesis.yml/runs?event=workflow_dispatch&per_page=50",2000000)\n  ]);'
+    live=replace_exact(live,old,new)
+    old=b'  const child=select(researchRuns,"Research "+requestId);'
+    new=old+b'\n  const privateRun=child?select(privateRuns,"N7 encrypted-source synthesis from "+String(child.id)):null;'
+    live=replace_exact(live,old,new)
+    snippet=marker+canonical.split(marker,1)[1].split(recovery,1)[0]
+    if b"PRIVATE_SYNTHESIS_COMPLETED" not in snippet:
+        raise RuntimeError("CANONICAL_PRIVATE_STATUS_INCOMPLETE")
+    return add_exact(live,recovery,snippet)
+
+
 def patch_app(live:bytes,canonical:bytes)->bytes:
     if b"function githubDispatchWorkflow(" not in live or b"createN7Gateway({" not in live:
         raise RuntimeError("GATEWAY_WRONG_APPLICATION")
     if b"function githubResearchDispatch(" in live:
         if b"function githubResearchStatus(" not in live or b"N7_RESEARCH_WORKFLOW" not in live:
             raise RuntimeError("GATEWAY_MISSION_PATCH_INCOMPLETE")
-        return patch_recovery_preview(live,canonical)
+        return patch_private_corpus_status(patch_recovery_preview(live,canonical),canonical)
     const=b'const CONTROLLED_WORKFLOW="jarvis-controlled-dispatch.yml";'
     newconst=b'\nconst N7_RESEARCH_WORKFLOW="n7-research-orchestrate.yml";'
     if newconst.strip() not in canonical:raise RuntimeError("CANONICAL_WORKFLOW_CONSTANT_MISSING")
