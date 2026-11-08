@@ -57,7 +57,7 @@ jobs:
           }
           """
           output=m.patched(original)
-          assert output.index(b"if(!session(req))")<output.index(b"/api/research/corpus/")
+          assert output.index(b"if(!session(req))")<output.index(b"readOwnerAnswer(DATA_DIR")
           assert output.count(b"readOwnerAnswer")==2
           assert m.patched(output)==output
           try:m.patched(b"'use strict';\nif(!session(req))return json(res,401,{});")
