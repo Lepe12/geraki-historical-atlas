@@ -114,5 +114,36 @@ class N7PrivateCitationReview(unittest.TestCase):
             self.assertEqual(out['status'],'NO_MODEL_SUPPORTED_CLAIMS')
 
 
+    def test_full_preflight_replays_without_invoking_any_model(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture(tmp)
+            eid=collect(tmp)[0][0]['evidence_id']
+            def original_caller(role,prompt):
+                if role=='evidence_extractor':
+                    return response({'items':[{**item(eid),'statement':
+                        'The consulted account reports an attack during 1677.'}]})
+                if role=='adversarial_reviewer':
+                    return response({'decisions':[{'claim_index':0,'decision':'UNSUPPORTED',
+                                                   'reason':'Proposed event exceeds quotation.'}]})
+                raise AssertionError('No automatic synthesis without supported source')
+            previous=execute(tmp,'Naxos source check',caller=original_caller,
+                             config={'configured':True,'missing':[]})
+            self.assertEqual(len(previous['claims']),1)
+            self.assertTrue(previous['model_used'])
+            original=Path(tmp)/'previous_model_answer/answer.json'
+            original.parent.mkdir(parents=True)
+            original.write_text(json.dumps(previous))
+            with patch.dict(os.environ,{'PCT_PRIVATE_REVIEW_PREFLIGHT_ONLY':'1'},clear=False):
+                output=execute(tmp,'Naxos source check',
+                               caller=lambda *_: (_ for _ in ()).throw(AssertionError('MODEL_CALL_FORBIDDEN')),
+                               config={'configured':True,'missing':[]},
+                               resume_private_proposals_from=original)
+            self.assertEqual(output['status'],'PRIVATE_CITATION_REPLAY_ONLY')
+            self.assertEqual(output['private_proposal_replay']['replayed_source_bound_proposals'],1)
+            self.assertEqual(output['private_proposal_replay']['rejected_source_bound_proposals'],0)
+            self.assertFalse(output['calls'])
+            self.assertFalse(output['private_proposal_replay']['carried_over_review_verdicts'])
+
+
 if __name__=='__main__':
     unittest.main()
