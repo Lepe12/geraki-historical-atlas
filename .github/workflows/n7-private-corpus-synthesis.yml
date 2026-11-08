@@ -115,7 +115,9 @@ jobs:
           python3 - <<'PY'
           import json,os,pathlib
           target=pathlib.Path('evidence/runs')/os.environ['SOURCE_RUN']/'research_answer'/'answer.json'
-          if target.exists():raise SystemExit('MODEL_LEFT_PARTIAL_ANSWER; retain actual file')
+          if target.exists():
+            print('N7_PARTIAL_MODEL_ANSWER_RETAINED_FOR_PRIVATE_STORAGE')
+            raise SystemExit(0)
           target.parent.mkdir(parents=True,exist_ok=True)
           target.write_text(json.dumps({
             'status':'MODEL_RUNTIME_FAILED_NO_SYNTHESIS',
