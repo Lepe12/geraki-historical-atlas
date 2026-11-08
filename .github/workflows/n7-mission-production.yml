@@ -1,0 +1,88 @@
+name: N7 Signed Research Mission Gateway — Review and Production Install
+
+on:
+  pull_request:
+    paths:
+      - 'server/command-center-live/app.js'
+      - 'server/command-center-live/n7-gateway.js'
+      - 'tools/library/deploy_n7_mission_gateway.py'
+      - '.github/workflows/n7-mission-production.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/library/deploy_n7_mission_gateway.py'
+      - 'server/command-center-live/app.js'
+      - 'server/command-center-live/n7-gateway.js'
+      - '.github/workflows/n7-mission-production.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n7-signed-research-mission-deployment
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 3
+          filter: blob:none
+          sparse-checkout: |
+            tools/library
+            server/command-center-live
+            .github/workflows
+      - name: Validate safe patch, exact anchors, preservation and JS syntax
+        run: |
+          set -euo pipefail
+          python3 -m py_compile tools/library/deploy_n7_mission_gateway.py
+          node --check server/command-center-live/app.js
+          node --check server/command-center-live/n7-gateway.js
+          node --test server/command-center-live/n7-gateway.test.js server/command-center-live/n7-mission.test.js
+          git fetch --depth=1 origin main:refs/remotes/origin/main
+          python3 - <<'PY'
+          import importlib.util, pathlib, subprocess
+          target=pathlib.Path("tools/library/deploy_n7_mission_gateway.py")
+          spec=importlib.util.spec_from_file_location("deploy_n7",target)
+          m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+          files=["app.js","n7-gateway.js"]
+          repo=pathlib.Path("server/command-center-live")
+          local={name:(repo/name).read_bytes() for name in files}
+          before={}
+          for name in files:
+              base=subprocess.run(["git","show","origin/main:server/command-center-live/"+name],
+                                  capture_output=True,check=True).stdout
+              before[name]=base
+          output=m.patched(local,before)
+          m.validate(output)
+          assert output==local,"UNEXPECTED_OVERWRITE_OUTSIDE_MISSION_PATCH"
+          assert m.patched(local,output)==local,"PATCH_NOT_IDEMPOTENT"
+          print("N7_SAFE_GATEWAY_PATCH_MATCHES_REVIEWED_SOURCE")
+          PY
+
+  deploy:
+    if: github.event_name == 'push'
+    needs: preflight
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 12
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+      N7_DEPLOY_CONFIRM: N7-SIGNED-MISSION-GATEWAY
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            tools/library
+            server/command-center-live
+      - name: Install guarded mission routes on the existing gateway
+        run: python3 tools/library/deploy_n7_mission_gateway.py

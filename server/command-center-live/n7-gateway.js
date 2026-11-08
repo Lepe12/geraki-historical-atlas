@@ -114,7 +114,7 @@ async function privateLibraryUpload(req,rawOverride=null){
 
 // Routes are explicitly scoped to the existing live service. No shell,
 // database writer, privileged host action, or arbitrary workflow selection.
-function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,readBody,statusFor,githubWorkflowDispatch,githubCodingDispatch,githubPrivateDispatch,libraryRunner=readPrivateLibrary,libraryUploadRunner=privateLibraryUpload,libraryBridgeVerifier=verifyLibraryBridge}) {
+function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,readBody,statusFor,githubWorkflowDispatch,githubCodingDispatch,githubPrivateDispatch,githubResearchDispatch,githubResearchStatus,missionBridgeVerifier=verifyLibraryBridge,libraryRunner=readPrivateLibrary,libraryUploadRunner=privateLibraryUpload,libraryBridgeVerifier=verifyLibraryBridge}) {
   let lastAccepted=0;
   return async function handleN7(req,res,p) {
     // PDF ingestion requires the existing N7 session on the bot and a fresh
@@ -224,6 +224,61 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
       finally{
         if(dir)try{fs.rmSync(dir,{recursive:true,force:true});}catch(_){}
       }
+      return true;
+    }
+    // Private N7 operator-to-research bridge. HMAC uses the existing server-only
+    // secret; browser traffic cannot call either signed route directly.
+    if(p==="/n7/mission/dispatch-signed"||p==="/n7/mission/status-signed"){
+      if(req.method!=="POST"){json(res,405,{error:"method_not_allowed"});return true;}
+      let payload,raw;
+      try{
+        raw=await readBody(req,4096);
+        if(!missionBridgeVerifier(req,raw)){json(res,401,{error:"signed_bridge_required"});return true;}
+        payload=JSON.parse(raw);
+      }catch(_){json(res,400,{error:"invalid_signed_mission_request"});return true;}
+      if(!payload||typeof payload!=="object"||Array.isArray(payload)){
+        json(res,400,{error:"invalid_mission_body"});return true;
+      }
+      if(p==="/n7/mission/status-signed"){
+        const requestId=payload.request_id;
+        if(typeof requestId!=="string"||!/^n7mission-[a-f0-9]{24}$/.test(requestId)){
+          json(res,400,{error:"invalid_mission_id"});return true;
+        }
+        if(typeof githubResearchStatus!=="function"){
+          json(res,503,{error:"research_status_unavailable"});return true;
+        }
+        try{
+          const report=await githubResearchStatus(requestId);
+          json(res,200,{schema:"n7-mission-status-v1",request_id:requestId,
+            ...report,historically_verified:false,publication_allowed:false});
+        }catch(_){json(res,503,{error:"research_status_unavailable"});}
+        return true;
+      }
+      const {target,purpose,date_range="",aliases=""}=payload;
+      const safeText=s=>typeof s==="string"&&![...s].some(ch=>ch.codePointAt(0)<32);
+      if(!safeText(target)||target.trim().length<3||target.length>250||
+         !safeText(purpose)||purpose.trim().length<12||purpose.length>1000||
+         !safeText(date_range)||date_range.length>80||
+         !safeText(aliases)||aliases.length>220||
+         typeof githubResearchDispatch!=="function"){
+        json(res,400,{error:"invalid_mission_request"});return true;
+      }
+      if(!String(process.env.PCT_GITHUB_DISPATCH_TOKEN||"")){
+        json(res,503,{error:"dispatch_not_configured"});return true;
+      }
+      const now=Date.now();
+      if(now-lastAccepted<10000){json(res,429,{error:"n7_rate_limited"});return true;}
+      const requestId="n7mission-"+crypto.randomBytes(12).toString("hex");
+      lastAccepted=now;
+      try{
+        await githubResearchDispatch({
+          request_id:requestId,target:target.trim(),purpose:purpose.trim(),
+          date_range:date_range.trim(),aliases:aliases.trim()
+        });
+      }catch(_){json(res,502,{error:"research_dispatch_failed"});return true;}
+      json(res,202,{schema:"n7-mission-dispatch-v1",status:"ACCEPTED",
+        request_id:requestId,workflow:"n7-research-orchestrate.yml",
+        historically_verified:false,publication_allowed:false});
       return true;
     }
     if (p!=="/n7/status" && p!=="/n7/dispatch" && p!=="/n7/code" && p!=="/n7/brain/task" && p!=="/n7/library/search" && p!=="/n7/library/page" && p!=="/n7/library/upload") return false;

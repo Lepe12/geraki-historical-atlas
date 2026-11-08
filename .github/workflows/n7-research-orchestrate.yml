@@ -1,0 +1,99 @@
+name: N7 Research Orchestrate
+run-name: N7 Mission ${{ inputs.request_id }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      request_id:
+        description: 'N7 signed operator request ID'
+        required: true
+        type: string
+      target:
+        description: 'Historical research target'
+        required: true
+        type: string
+      purpose:
+        description: 'Research question'
+        required: true
+        type: string
+      date_range:
+        description: 'Date range'
+        required: false
+        type: string
+      aliases:
+        description: 'Aliases separated by |'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  plan-and-dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            tools
+      - name: Validate signed-bridge mission inputs and freeze JARVIS plan
+        id: plan
+        env:
+          INPUT_REQUEST_ID: ${{ inputs.request_id }}
+          INPUT_TARGET: ${{ inputs.target }}
+          INPUT_PURPOSE: ${{ inputs.purpose }}
+          INPUT_DATE_RANGE: ${{ inputs.date_range }}
+          INPUT_ALIASES: ${{ inputs.aliases }}
+        run: |
+          set -euo pipefail
+          mkdir -p .n7_runtime
+          PYTHONPATH=tools/orchestrator python3 - <<'PY'
+          import json,os,pathlib,re
+          rid=os.environ['INPUT_REQUEST_ID']
+          if not re.fullmatch(r'n7mission-[a-f0-9]{24}',rid):
+              raise SystemExit('INVALID_MISSION_REQUEST_ID')
+          req={'target':os.environ['INPUT_TARGET'],'purpose':os.environ['INPUT_PURPOSE'],
+               'date_range':os.environ['INPUT_DATE_RANGE'],
+               'aliases':[x.strip() for x in os.environ['INPUT_ALIASES'].split('|') if x.strip()]}
+          pathlib.Path('.n7_runtime/request.json').write_text(json.dumps(req,ensure_ascii=False),encoding='utf-8')
+          PY
+          python3 tools/orchestrator/jarvis_dispatch.py \
+            --request .n7_runtime/request.json \
+            --run-id "$GITHUB_RUN_ID" \
+            --request-id "$INPUT_REQUEST_ID" \
+            --github-output "$GITHUB_OUTPUT" \
+            --write-audit .n7_runtime/dispatch_audit.json
+      - name: Dispatch existing full-source research and synthesis pipeline (no auto chain)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET: ${{ steps.plan.outputs.target }}
+          PURPOSE: ${{ steps.plan.outputs.purpose }}
+          DATE_RANGE: ${{ steps.plan.outputs.date_range }}
+          ALIASES: ${{ steps.plan.outputs.aliases }}
+          REQUEST_ID: ${{ steps.plan.outputs.request_id }}
+          SELECTED_AGENTS: ${{ steps.plan.outputs.workflow_selected_agents }}
+        run: |
+          set -euo pipefail
+          gh workflow run pct-parallel-multi-agent.yml --ref main \
+            -f request_id="$REQUEST_ID" \
+            -f target="$TARGET" -f purpose="$PURPOSE" \
+            -f date_range="$DATE_RANGE" -f aliases="$ALIASES" \
+            -f selected_agents="$SELECTED_AGENTS" \
+            -f auto_continue=false \
+            -f require_semantic_analysis=true \
+            -f initial_semantic_shards=1 \
+            -f semantic_shards=1
+          echo "N7_RESEARCH_DISPATCH_ACCEPTED request_id=$REQUEST_ID"
+          echo "Full pipeline handles PDF extraction, source inspection gates and evidence-bound synthesis."
+          echo "Workflow dispatch is not proof that the research or verification succeeded."
+      - name: Preserve frozen plan for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n7-planning-${{ github.run_id }}
+          path: .n7_runtime/
+          if-no-files-found: warn
+          retention-days: 30
