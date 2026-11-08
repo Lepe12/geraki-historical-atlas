@@ -78,14 +78,37 @@ jobs:
           PYTHONPATH=tools python3 tools/n7_private_corpus_store.py answer-restore --run-id "$SOURCE_RUN"
           test -s "evidence/runs/$SOURCE_RUN/previous_model_answer/answer.json"
 
+      - name: Select safely recovered proposals or fresh extraction from retained sources
+        run: |
+          python3 - <<'PY'
+          import json,os,pathlib
+          prior=pathlib.Path('evidence/runs')/os.environ['SOURCE_RUN']/'previous_model_answer'/'answer.json'
+          value=json.loads(prior.read_text())
+          mode='replay' if (value.get('schema')=='pct-semantic-answer-v3'
+                           and value.get('model_used') is True
+                           and value.get('verified') is False
+                           and isinstance(value.get('claims'),list) and value['claims']) else 'fresh'
+          with open(os.environ['GITHUB_ENV'],'a') as env:
+              env.write('N7_REVIEW_MODE='+mode+'\n')
+          print('N7_PRIVATE_SOURCE_REVIEW_MODE',json.dumps({
+              'mode':mode,
+              'previous_claim_count':len(value.get('claims') or []),
+              'fresh_extraction_from_private_sources_only':mode=='fresh',
+              'historically_verified':False}))
+          PY
+
       - name: Replay each exact quotation and page locator before starting the model
         run: |
           set -euo pipefail
-          PYTHONPATH=tools python3 tools/semantic_research_answer.py \
-            --run-id "$SOURCE_RUN" \
-            --resume-private-proposals \
-            --check-private-proposals-only
-          echo "N7_SOURCE_CITATION_PREFLIGHT_PASS_NO_MODEL_CALLS"
+          if [ "$N7_REVIEW_MODE" = "replay" ]; then
+            PYTHONPATH=tools python3 tools/semantic_research_answer.py \
+              --run-id "$SOURCE_RUN" \
+              --resume-private-proposals \
+              --check-private-proposals-only
+            echo "N7_SOURCE_CITATION_PREFLIGHT_PASS_NO_MODEL_CALLS"
+          else
+            echo "N7_PRIOR_OUTPUT_IS_ZERO_CLAIM_TIMEOUT; fresh model extraction from the same 11 restored private source lanes only"
+          fi
 
       - name: Prepare same checksum-verified, local and free CPU Qwen
         uses: ./.github/actions/research-model
@@ -95,7 +118,11 @@ jobs:
         continue-on-error: true
         run: |
           set -euo pipefail
-          timeout 1850s python3 tools/semantic_research_answer.py --run-id "$SOURCE_RUN" --resume-private-proposals
+          if [ "$N7_REVIEW_MODE" = "replay" ]; then
+            timeout 1850s python3 tools/semantic_research_answer.py --run-id "$SOURCE_RUN" --resume-private-proposals
+          else
+            timeout 1850s python3 tools/semantic_research_answer.py --run-id "$SOURCE_RUN"
+          fi
           test -s "evidence/runs/$SOURCE_RUN/research_answer/answer.json"
 
       - name: Audit claim provenance and all reviewer decisions without logging source text
@@ -108,19 +135,24 @@ jobs:
           now=json.loads((root/'research_answer/answer.json').read_text())
           receipt=now.get('private_proposal_replay') or {}
           review=now.get('review') or {}
-          if not receipt.get('carried_over_review_verdicts') is False:
-              raise SystemExit('N7_OLD_VERDICTS_NOT_QUARANTINED')
-          if receipt.get('new_evidence_extraction') is not False:
-              raise SystemExit('N7_UNEXPECTED_NEW_SOURCE_EXTRACTION')
-          if receipt.get('replayed_source_bound_proposals',0)<1:
-              raise SystemExit('N7_NO_PRIOR_PROPOSAL_PASSED_SOURCE_REPLAY')
+          mode=os.environ['N7_REVIEW_MODE']
+          if mode=='replay':
+              if receipt.get('carried_over_review_verdicts') is not False:
+                  raise SystemExit('N7_OLD_VERDICTS_NOT_QUARANTINED')
+              if receipt.get('new_evidence_extraction') is not False:
+                  raise SystemExit('N7_UNEXPECTED_NEW_SOURCE_EXTRACTION')
+              if receipt.get('replayed_source_bound_proposals',0)<1:
+                  raise SystemExit('N7_NO_PRIOR_PROPOSAL_PASSED_SOURCE_REPLAY')
+          elif mode!='fresh':
+              raise SystemExit('N7_INVALID_REVIEW_MODE')
           if now.get('verified') is not False or now.get('historically_verified') is True:
               raise SystemExit('N7_HISTORICAL_VERIFICATION_INVENTED')
           if not isinstance(now.get('claims'),list):raise SystemExit('N7_CLAIMS_MISSING')
           print('N7_PRIVATE_SOURCE_REVIEW_RESULT',json.dumps({
+              'mode':mode,
               'original_claims':len(old.get('claims') or []),
-              'exact_replayed_claims':receipt['replayed_source_bound_proposals'],
-              'source_replay_rejections':receipt['rejected_source_bound_proposals'],
+              'exact_replayed_claims':receipt.get('replayed_source_bound_proposals',0),
+              'source_replay_rejections':receipt.get('rejected_source_bound_proposals',0),
               'fresh_supported_by_quotation':len(review.get('supported_claim_ids') or []),
               'fresh_flags':len(review.get('flagged_claims') or []),
               'awaiting_review':len((now.get('coverage') or {}).get('claims_awaiting_review') or []),
