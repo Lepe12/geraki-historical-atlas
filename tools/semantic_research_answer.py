@@ -1454,6 +1454,9 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         if not replayed:
             out['status']='PRIVATE_PREVIOUS_PROPOSALS_NOT_SOURCE_REPLAYABLE'
             return out
+        if os.getenv('PCT_PRIVATE_REVIEW_PREFLIGHT_ONLY')=='1':
+            out['status']='PRIVATE_CITATION_REPLAY_ONLY'
+            return out
     new_batches_read=0;batch_seconds=[];extra_read=0;reading_stop=None
     position=0
     while not resume_reviewed_from and not resume_private_proposals_from:
@@ -1818,6 +1821,7 @@ def render(out):
 def main():
     p=argparse.ArgumentParser();p.add_argument('--run-id',required=True);p.add_argument('--repo',default='.')
     p.add_argument('--resume-private-proposals',action='store_true')
+    p.add_argument('--check-private-proposals-only',action='store_true')
     args=p.parse_args()
     if not re.fullmatch(r'\d+',args.run_id):raise SystemExit('NUMERIC_RUN_ID_REQUIRED')
     root=Path(args.repo)/'evidence/runs'/args.run_id
@@ -1836,8 +1840,25 @@ def main():
     previous=root/'previous_model_answer'/'answer.json'
     if args.resume_private_proposals and not previous.is_file():
         raise SystemExit('N7_PRIVATE_PREVIOUS_ANSWER_NOT_DECRYPTED')
+    if args.check_private_proposals_only and not args.resume_private_proposals:
+        raise SystemExit('N7_PRIVATE_PREFLIGHT_REQUIRES_RESUME')
+    if args.check_private_proposals_only:
+        os.environ['PCT_PRIVATE_REVIEW_PREFLIGHT_ONLY']='1'
     out=execute(root,question or 'Historical research',
+                config={'configured':True,'missing':[]} if args.check_private_proposals_only else None,
                 resume_private_proposals_from=previous if args.resume_private_proposals else None)
+    if args.check_private_proposals_only:
+        receipt=out.get('private_proposal_replay') or {}
+        print('N7_PRIVATE_SOURCE_REPLAY_PREFLIGHT',json.dumps({
+            'status':out.get('status'),
+            'replayed_proposals':receipt.get('replayed_source_bound_proposals',0),
+            'rejected_proposals':receipt.get('rejected_source_bound_proposals',0),
+            'historically_verified':False}))
+        if (out.get('status')!='PRIVATE_CITATION_REPLAY_ONLY'
+            or not receipt.get('replayed_source_bound_proposals')
+            or receipt.get('rejected_source_bound_proposals')):
+            raise SystemExit('N7_PRIVATE_REVIEW_CITATION_REPLAY_NOT_COMPLETE')
+        return
     out['research_run_id']=args.run_id
     if os.getenv('PCT_INITIAL_SEMANTIC_MERGE')=='1':
         summary=read(root/'first_pass/merge.json')
