@@ -89,7 +89,7 @@ class N7PrivateCitationReview(unittest.TestCase):
                     return response({'decisions':[{'claim_index':0,'decision':'UNSUPPORTED',
                                                    'reason':'The proposed statement exceeds what is quoted.'}]})
                 raise AssertionError('No supported claims; synthesis must not execute')
-            with patch.dict(os.environ,{'PCT_SEMANTIC_PARTIAL_ANSWER':'1'},clear=False):
+            with patch.dict(os.environ,{'PCT_SEMANTIC_PARTIAL_ANSWER':'1','PCT_REVIEW_ALL_EXTRACTED':'0'},clear=False):
                 out=execute(tmp,'question',caller=fake,config={'configured':True,'missing':[]})
             self.assertEqual(len(out['claims']),5)
             self.assertEqual(len(out['coverage']['claims_awaiting_review']),1)
