@@ -47,6 +47,8 @@ def title_creator_key(rec):
 ap=argparse.ArgumentParser()
 ap.add_argument("--run-id",required=True)
 args=ap.parse_args()
+if not re.fullmatch(r"[0-9]{1,20}",args.run_id):
+    ap.error("numeric run id required")
 root=pathlib.Path("evidence/runs")/args.run_id
 sources=[]
 for lane in LANES:
@@ -136,5 +138,6 @@ out={
  ]
 }
 dest=root/"SOURCE_GENEALOGY.json"
+dest.parent.mkdir(parents=True,exist_ok=True)
 dest.write_text(json.dumps(out,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print("SOURCE GENEALOGY",args.run_id,"sources",len(clean),"exact_duplicate_groups",out["exact_duplicate_groups"],"possible_derivative_groups",out["possible_derivative_groups"])
