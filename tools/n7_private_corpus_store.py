@@ -271,6 +271,29 @@ def answer_restore(run_id):
         index = json.loads(remote_read(ftp, "answer-index.json", 100000))
         encrypted = remote_read(ftp, "answer.json.enc", 10_000_000)
         clear, answer = decode_private_answer(index, encrypted, secret, run_id)
+        if not answer.get("claims"):
+            history=[]
+            for remote_name in ftp.nlst():
+                name=pathlib.Path(str(remote_name)).name
+                if not re.fullmatch(r"answer-history-[a-f0-9]{64}\\.enc",name):
+                    continue
+                candidate=remote_read(ftp,name,10_000_000)
+                expected=name[len("answer-history-"):-len(".enc")]
+                if digest(candidate)!=expected:
+                    raise RuntimeError("PRIVATE_ANSWER_HISTORY_HASH_MISMATCH")
+                idx={"schema":"n7-private-answer-index-v1","run_id":run_id,
+                     "historically_verified":False,"sealed_sha256":expected}
+                candidate_clear,candidate_answer=decode_private_answer(idx,candidate,secret,run_id)
+                if candidate_answer.get("claims"):
+                    history.append((len(candidate_answer["claims"]),candidate_clear,candidate_answer))
+            if history:
+                history.sort(key=lambda item:item[0],reverse=True)
+                _,clear,answer=history[0]
+                print("N7_PRIVATE_OLDER_SOURCE_BOUND_ANSWER_RECOVERED",json.dumps({
+                    "run_id":run_id,"claims":len(answer["claims"]),
+                    "historically_verified":False}))
+            else:
+                print("N7_NO_SOURCE_BOUND_ANSWER_IN_ENCRYPTED_HISTORY",run_id)
     out = REPO / "evidence" / "runs" / run_id / "previous_model_answer" / "answer.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     if out.exists():
