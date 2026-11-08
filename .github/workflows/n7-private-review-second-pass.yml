@@ -1,0 +1,133 @@
+name: N7 Private Source-Bound Citation Re-review
+run-name: N7 re-review retained exact citations ${{ inputs.run_id || '42434462262' }}
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/n7-private-review-second-pass.yml'
+  workflow_dispatch:
+    inputs:
+      run_id:
+        type: string
+        required: true
+        default: '42434462262'
+        description: Original completed N7 research run, with source data already encrypted in Plesk
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: n7-private-re-review-${{ inputs.run_id || '42434462262' }}
+  cancel-in-progress: false
+
+jobs:
+  review-proposals-from-private-sources:
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 70
+    env:
+      SOURCE_RUN: ${{ inputs.run_id || '42434462262' }}
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+      PCT_LLM_PROVIDER: local_llama_cpp
+      PCT_LLM_MODEL: Qwen/Qwen3-8B-GGUF
+      PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen3-8B-GGUF
+      PCT_SEMANTIC_PARTIAL_ANSWER: '1'
+      PCT_REVIEW_ALL_EXTRACTED: '1'
+      PCT_SEMANTIC_BUDGET_SECONDS: '1350'
+      PCT_SEMANTIC_CALLS_PER_PASS: '22'
+      PCT_SEMANTIC_BATCHES: '6'
+      PCT_PREFILTER: '1'
+      PCT_SEMANTIC_READING_MAX_PASSAGES: '240'
+      PCT_AUTO_CONTINUE: 'false'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            .github/actions/research-model
+            config
+            data
+            tests/fixtures
+
+      - name: Enforce bounded re-review, no new search or public artifact
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_RUN" =~ ^[0-9]{8,20}$ ]]
+          python3 -m py_compile tools/n7_private_corpus_store.py tools/semantic_research_answer.py
+          PYTHONPATH=tools python3 -m unittest tools/test_n7_private_citation_review.py -v
+          echo "N7_PRIVATE_CITATION_REPLAY_PREFLIGHT_PASS"
+
+      - name: Restore original 11 encrypted source lanes from private N7 host
+        run: |
+          set -euo pipefail
+          PYTHONPATH=tools python3 tools/n7_private_corpus_store.py restore --run-id "$SOURCE_RUN"
+
+      - name: Decrypt prior model answer into this ephemeral runner only
+        run: |
+          set -euo pipefail
+          PYTHONPATH=tools python3 tools/n7_private_corpus_store.py answer-restore --run-id "$SOURCE_RUN"
+          test -s "evidence/runs/$SOURCE_RUN/previous_model_answer/answer.json"
+
+      - name: Prepare same checksum-verified, local and free CPU Qwen
+        uses: ./.github/actions/research-model
+
+      - name: Revalidate original quotes and review all proposals from source pages
+        id: inference
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          timeout 1850s python3 tools/semantic_research_answer.py --run-id "$SOURCE_RUN" --resume-private-proposals
+          test -s "evidence/runs/$SOURCE_RUN/research_answer/answer.json"
+
+      - name: Audit claim provenance and all reviewer decisions without logging source text
+        if: steps.inference.outcome == 'success'
+        run: |
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path('evidence/runs')/os.environ['SOURCE_RUN']
+          old=json.loads((root/'previous_model_answer/answer.json').read_text())
+          now=json.loads((root/'research_answer/answer.json').read_text())
+          receipt=now.get('private_proposal_replay') or {}
+          review=now.get('review') or {}
+          if not receipt.get('carried_over_review_verdicts') is False:
+              raise SystemExit('N7_OLD_VERDICTS_NOT_QUARANTINED')
+          if receipt.get('new_evidence_extraction') is not False:
+              raise SystemExit('N7_UNEXPECTED_NEW_SOURCE_EXTRACTION')
+          if receipt.get('replayed_source_bound_proposals',0)<1:
+              raise SystemExit('N7_NO_PRIOR_PROPOSAL_PASSED_SOURCE_REPLAY')
+          if now.get('verified') is not False or now.get('historically_verified') is True:
+              raise SystemExit('N7_HISTORICAL_VERIFICATION_INVENTED')
+          if not isinstance(now.get('claims'),list):raise SystemExit('N7_CLAIMS_MISSING')
+          print('N7_PRIVATE_SOURCE_REVIEW_RESULT',json.dumps({
+              'original_claims':len(old.get('claims') or []),
+              'exact_replayed_claims':receipt['replayed_source_bound_proposals'],
+              'source_replay_rejections':receipt['rejected_source_bound_proposals'],
+              'fresh_supported_by_quotation':len(review.get('supported_claim_ids') or []),
+              'fresh_flags':len(review.get('flagged_claims') or []),
+              'awaiting_review':len((now.get('coverage') or {}).get('claims_awaiting_review') or []),
+              'status':now.get('status'),
+              'answer_sections':len(now.get('answer_sections') or []),
+              'historically_verified':False
+          },sort_keys=True))
+          PY
+
+      - name: Store the actual result privately, preserving the earlier encrypted answer
+        if: steps.inference.outcome == 'success'
+        run: |
+          set -euo pipefail
+          PYTHONPATH=tools python3 tools/n7_private_corpus_store.py answer-upload --run-id "$SOURCE_RUN"
+          echo "N7_PRIVATE_CITATION_REVIEW_RESULT_AEAD_READBACK_PASS"
+
+      - name: Enforce truthful job completion
+        if: steps.inference.outcome != 'success'
+        run: |
+          echo "N7_PRIVATE_CITATION_REVIEW_INFERENCE_FAILED; earlier encrypted answer retained"
+          exit 1
