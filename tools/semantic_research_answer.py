@@ -892,6 +892,69 @@ def validate_items(payload, records, question_kind=None, requested_range=None, t
             'verification_status':'UNVERIFIED'})
     return accepted,rejected
 
+def resume_private_proposals(path, question, records, question_kind, requested_range,
+                             target_names, root, identity_linkage=None):
+    """Revalidate old *model proposals* against current durable source bytes.
+
+    Model verdicts, statuses, chronology, and source verification are NEVER
+    carried over. A previous quote must replay against the same original text,
+    same occurrence and exact Unicode offsets before it can be reviewed again.
+    """
+    root=Path(root).resolve()
+    source=Path(path).resolve()
+    if not source.is_relative_to(root):
+        raise ValueError('PRIVATE_REVIEW_PATH_OUTSIDE_ORIGINAL_RESEARCH_RUN')
+    original=read(source)
+    if (original.get('schema')!=VERSION or original.get('question')!=question
+        or original.get('model_used') is not True or original.get('verified') is not False
+        or not isinstance(original.get('claims'),list) or len(original['claims'])>100
+        or not isinstance(original.get('evidence'),list)):
+        raise ValueError('PRIVATE_REVIEW_ANSWER_IDENTITY_INVALID')
+    current={row['evidence_id']:row for row in records}
+    previous={row['evidence_id']:row for row in original['evidence']}
+    retained=[];rejected=[];seen=set()
+    for proposal in original['claims']:
+        eid=proposal.get('evidence_id')
+        row=current.get(eid);old=previous.get(eid)
+        if not row or not old or digest(model_evidence(row))!=digest(model_evidence(old)):
+            rejected.append({'reason':'PRIVATE_REVIEW_SOURCE_CONTEXT_CHANGED','evidence_id':eid})
+            continue
+        item={k:proposal.get(k) for k in ('statement','evidence_id','quote','kind','actors','places','dates')}
+        item.update(passage_kind=proposal.get('passage_kind','NARRATIVE_EVIDENCE'),
+                    usage_type=proposal.get('usage_type','UNRESOLVED'),
+                    source_type=proposal.get('model_proposed_source_classification') or 'UNVERIFIED')
+        accepted,issues=validate_items({'items':[item]},[row],question_kind,
+                                       requested_range,target_names,identity_linkage,
+                                       section_records=records)
+        if len(accepted)!=1:
+            rejected.extend(issues or [{'reason':'PRIVATE_REVIEW_REVALIDATION_REJECTED','evidence_id':eid}])
+            continue
+        claim=accepted[0]
+        start=proposal.get('quote_offset_in_excerpt')
+        if (type(start) is not int or start<0 or row['text'][start:start+len(claim['quote'])]!=claim['quote']
+            or start!=claim['quote_offset_in_excerpt'] or claim['claim_id']!=proposal.get('claim_id')
+            or claim['claim_id'] in seen):
+            rejected.append({'reason':'PRIVATE_REVIEW_QUOTE_OFFSET_OR_ID_MISMATCH','evidence_id':eid})
+            continue
+        original_occurrences=proposal.get('source_occurrences')
+        if (not isinstance(original_occurrences,list)
+            or digest(original_occurrences)!=digest(claim['source_occurrences'])):
+            rejected.append({'reason':'PRIVATE_REVIEW_ORIGINAL_CITATION_CHANGED','evidence_id':eid})
+            continue
+        seen.add(claim['claim_id']);retained.append(claim)
+    return retained,rejected,{
+        'source':'AEAD_DECRYPTED_PREVIOUS_MODEL_ANSWER',
+        'source_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),
+        'proposal_count':len(original['claims']),
+        'replayed_source_bound_proposals':len(retained),
+        'rejected_source_bound_proposals':len(rejected),
+        'carried_over_review_verdicts':False,
+        'original_history_verified':False,
+        'new_archive_search':False,
+        'new_evidence_extraction':False,
+    }
+
+
 def resume_reviewed_claims(path,question,records,question_kind,requested_range,root,identity_linkage=None):
     """Replay real extractor receipts and source bytes; never inherit a verdict."""
     root=Path(root).resolve();path=Path(path).resolve()
@@ -1056,7 +1119,7 @@ def extraction_request(group, question, question_kind):
     return prompt, schema
 
 
-def _execute(run_root, question, caller=call, config=None, output_root=None, provenance_root=None,resume_reviewed_from=None):
+def _execute(run_root, question, caller=call, config=None, output_root=None, provenance_root=None,resume_reviewed_from=None,resume_private_proposals_from=None):
     from research_focus import decompose
     all_records,excluded=collect(run_root,provenance_root)
     request={}
@@ -1064,6 +1127,17 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         request=read(manifest).get('normalized_request') or {}
         if request:break
     question_kind=decompose(request.get('target',''),request.get('aliases',[])).get('kind') if request else None
+    if resume_reviewed_from and resume_private_proposals_from:
+        raise ValueError('MUTUALLY_EXCLUSIVE_PRIVATE_REVIEW_AND_REVIEWED_RESUME')
+    previous_private=None
+    if resume_private_proposals_from:
+        saved_path=Path(resume_private_proposals_from).resolve()
+        base=Path(provenance_root or run_root).resolve()
+        if not saved_path.is_relative_to(base):
+            raise ValueError('PRIVATE_REVIEW_PATH_OUTSIDE_ORIGINAL_RESEARCH_RUN')
+        previous_private=read(saved_path)
+        if previous_private.get('question')!=question or not isinstance(previous_private.get('claims'),list):
+            raise ValueError('PRIVATE_REVIEW_QUESTION_OR_PROPOSALS_MISMATCH')
     # Normalized one-word place requests can have no explicit type. The
     # research acceptance contract already requires geographic findings for
     # every non-person request; apply the same requirement during extraction.
@@ -1213,7 +1287,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         covered={r['evidence_id'] for g in grouped for r in g}
         deferred=[r for r in deferred if r['evidence_id'] not in covered]
     adaptive=adaptive_reading_settings()
-    adaptive['enabled']=bool(adaptive['enabled'] and batch_limit and not shard and not resume_reviewed_from)
+    adaptive['enabled']=bool(adaptive['enabled'] and batch_limit and not shard and not resume_reviewed_from and not resume_private_proposals_from)
     extra_groups=[]
     if adaptive['enabled'] and adaptive['max_batches']>batch_limit:
         # Next ranked unread batches, read only if time remains (see the loop).
@@ -1228,6 +1302,15 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
                       'selected_excerpts':sum(len(g) for g in grouped)}
     queue.inventory(all_records,grouped,deferred,filtered_items)
     selected=list({r['evidence_id']:r for b in grouped for r in b}.values())
+    if resume_private_proposals_from:
+        bound_ids={c.get('evidence_id') for c in previous_private['claims']}
+        lookup={r['evidence_id']:r for r in all_records}
+        if any(eid not in lookup for eid in bound_ids):
+            raise ValueError('PRIVATE_REVIEW_SOURCE_EXCERPT_NOT_AVAILABLE')
+        selected=[lookup[eid] for eid in bound_ids]
+        grouped=[]
+        deferred=[{'evidence_id':r['evidence_id'],'reason':'REVIEW_ONLY_NO_NEW_EXTRACTION'}
+                  for r in all_records if r['evidence_id'] not in bound_ids]
     from research_priority import selection_report
     conf=configuration() if config is None else config
     out={'schema':VERSION,'question':question,'request_kind':question_kind,'evidence_hash':digest(all_records),'status':'BLOCKED_CONFIGURATION',
@@ -1350,9 +1433,20 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         out['claims']=resumed;out['rejected'].extend(rejections)
         out['reused_semantic_calls']=receipts;out['resume_context']=context
         if not resumed:out['status']='NO_REUSABLE_REVIEWED_SOURCE_CLAIMS';return out
+    if resume_private_proposals_from:
+        replayed,issues,receipt=resume_private_proposals(
+            resume_private_proposals_from,question,selected,question_kind,
+            requested_range,target_names,provenance_root or run_root,identity_linkage)
+        out['claims']=replayed
+        out['rejected'].extend(issues)
+        out['private_proposal_replay']=receipt
+        out['coverage']['pass_priority']='REVALIDATE_PREVIOUS_PRIVATE_PROPOSALS_ONLY'
+        if not replayed:
+            out['status']='PRIVATE_PREVIOUS_PROPOSALS_NOT_SOURCE_REPLAYABLE'
+            return out
     new_batches_read=0;batch_seconds=[];extra_read=0;reading_stop=None
     position=0
-    while not resume_reviewed_from:
+    while not resume_reviewed_from and not resume_private_proposals_from:
         if position>=len(grouped):
             if not extra_groups:break
             if not reading_allowed(time.monotonic()-pass_started,batch_seconds,pass_seconds,new_calls,max_new_calls,adaptive,
@@ -1411,7 +1505,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
             'pass_budget_seconds':pass_seconds,'new_batches_read':new_batches_read,'extra_batches_read':extra_read,
             'batch_seconds':[round(s,1) for s in batch_seconds],'stopped':reading_stop}
     queue.inventory(all_records,grouped,out['coverage']['deferred'],filtered_items)
-    if out['coverage']['deferred'] and not (os.getenv('PCT_SEMANTIC_PARTIAL_ANSWER')=='1' and out['claims']):
+    if out['coverage']['deferred'] and not (resume_private_proposals_from or os.getenv('PCT_SEMANTIC_PARTIAL_ANSWER')=='1' and out['claims']):
         out['status']='EXTRACTION_FAILED_OR_UNSUPPORTED' if not out['claims'] and any(r['reason']=='EXTRACTION_RESPONSE_FAILED' for r in out['coverage']['deferred']) else 'RESEARCH_COVERAGE_PENDING'
         return out
     if not out['claims']:out['status']='EXTRACTION_FAILED_OR_UNSUPPORTED';return out
@@ -1442,7 +1536,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
     out['claim_reviews']=[]
     out['coverage']['claims_awaiting_review']=[]
     fresh_supported=[];new_review_calls=0
-    review_limit=4 if os.getenv('PCT_SEMANTIC_PARTIAL_ANSWER')=='1' else len(claims)*2+1
+    review_limit=len(claims) if resume_private_proposals_from or os.getenv('PCT_REVIEW_ALL_EXTRACTED')=='1' else 4 if os.getenv('PCT_SEMANTIC_PARTIAL_ANSWER')=='1' else len(claims)*2+1
     # Full context is reviewed once per claim, so valid extraction from several
     # sources cannot exceed the local context window by repeating every context
     # in one combined prompt. Unreviewed claims never enter synthesis.
@@ -1478,7 +1572,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         out['status']='SHARD_EXTRACTION_AND_REVIEW_COMPLETE';return out
     supported=set(review['supported_claim_ids'])
     if not supported:
-        out['status']='REVIEW_FAILED' if review['invalid_review_claim_ids'] else 'REVIEW_INCOMPLETE' if review['missing_claim_ids'] else 'NO_MODEL_SUPPORTED_CLAIMS'
+        out['status']='REVIEW_FAILED' if review['invalid_review_claim_ids'] else 'REVIEW_INCOMPLETE' if review['missing_claim_ids'] or out['coverage']['claims_awaiting_review'] else 'NO_MODEL_SUPPORTED_CLAIMS'
         return out
     fidelity_held=[c['claim_id'] for c in claims if c['claim_id'] in supported and (c.get('fidelity_status') in FIDELITY_FLAGGED or (c.get('place_fidelity') or {}).get('status')=='PLACE_NOT_IN_QUOTE')]
     relevance_held=[c['claim_id'] for c in claims if c['claim_id'] in supported and c['claim_id'] not in fidelity_held and c.get('relevance_status')==RELEVANCE_OFF]
@@ -1712,6 +1806,7 @@ def render(out):
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('--run-id',required=True);p.add_argument('--repo',default='.')
+    p.add_argument('--resume-private-proposals',action='store_true')
     args=p.parse_args()
     if not re.fullmatch(r'\d+',args.run_id):raise SystemExit('NUMERIC_RUN_ID_REQUIRED')
     root=Path(args.repo)/'evidence/runs'/args.run_id
@@ -1727,7 +1822,11 @@ def main():
         if question:break
         data=read(path);question=data.get('question') or data.get('target')
         if question:break
-    out=execute(root,question or 'Historical research')
+    previous=root/'previous_model_answer'/'answer.json'
+    if args.resume_private_proposals and not previous.is_file():
+        raise SystemExit('N7_PRIVATE_PREVIOUS_ANSWER_NOT_DECRYPTED')
+    out=execute(root,question or 'Historical research',
+                resume_private_proposals_from=previous if args.resume_private_proposals else None)
     out['research_run_id']=args.run_id
     if os.getenv('PCT_INITIAL_SEMANTIC_MERGE')=='1':
         summary=read(root/'first_pass/merge.json')
