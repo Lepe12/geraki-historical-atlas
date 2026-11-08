@@ -26,7 +26,7 @@ class N7PrivateCitationReview(unittest.TestCase):
             'schema':VERSION,'question':'Naxos source check','model_used':True,
             'verified':False,'historically_verified':False,
             'status':'NO_MODEL_SUPPORTED_CLAIMS',
-            'claims':accepted,'evidence':[record],
+            'claims':copy.deepcopy(accepted),'evidence':[copy.deepcopy(record)],
             'review':{'supported_claim_ids':[], 'flagged_claims':[]}
         }
         answer=Path(root)/'previous_model_answer/answer.json'
