@@ -21,10 +21,17 @@ function fixture(){
   const keyFile=path.join(base,"key");fs.writeFileSync(keyFile,key);
   const body=Buffer.from(JSON.stringify({
     status:"MODEL_ASSISTED_REQUIRES_REVIEW",model_used:true,historically_verified:false,
-    claims:[{claim_id:"c1",source_occurrences:[{
-      title:"Test historical source",url:"https://example.org/document",
-      locator:{printed_page:42}
-    }]}],
+    claims:[{claim_id:"c1",
+      statement:"The source might mention an anchorage",
+      quote:"The original acquired excerpt is preserved with exact text.",
+      source_occurrences:[{
+        title:"Test historical source",url:"https://example.org/document",
+        source_text_sha256:"a".repeat(64),
+        locator:{printed_page:42,start_line:3,end_line:4}
+      }]}],
+    review:{supported_claim_ids:[],flagged_claims:[
+      {claim_id:"c1",decision:"UNSUPPORTED",reason:"The quotation does not identify a genuine anchorage."}
+    ]},
     answer_sections:[{text:"The source mentions an anchorage, subject to original-page review."}],
     coverage:{selected_passages:12}
   }));
@@ -50,6 +57,14 @@ test("private owner answer decrypts and preserves citations without asserting ve
     assert.match(result.references[0],/42/);
     assert.equal(result.historical_verification,"NOT_VERIFIED");
     assert.equal(result.raw_source_text,undefined);
+    assert.equal(result.source_candidates.length,1);
+    assert.equal(result.source_candidates[0].page_locator,"έντυπη σ. 42");
+    assert.match(result.source_candidates[0].exact_acquired_quote,/original acquired excerpt/);
+    assert.equal(result.source_candidates[0].source_text_sha256,"a".repeat(64));
+    assert.equal(result.source_candidates[0].model_review_decision,"UNSUPPORTED");
+    assert.equal(result.source_candidates[0].historically_verified,false);
+    assert.equal(result.source_candidates[0].original_page_verified,false);
+
   }finally{f.cleanup();}
 });
 

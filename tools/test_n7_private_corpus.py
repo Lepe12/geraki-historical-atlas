@@ -8,7 +8,7 @@ import unittest
 from unittest.mock import patch
 import urllib.error
 
-from n7_private_corpus_store import checked_run, handoffs_on_disk, private_visibility_check
+from n7_private_corpus_store import checked_run, handoffs_on_disk, private_visibility_check, decode_private_answer, crypt, digest
 from research_lane_handoff import pack, LANES
 
 NODE=Path(__file__).with_name("n7_private_aead.js")
@@ -80,6 +80,33 @@ class N7PrivateCorpusTests(unittest.TestCase):
         with patch("n7_private_corpus_store.urllib.request.urlopen",return_value=Public()):
             with self.assertRaisesRegex(RuntimeError,"PRIVATE_DATA_PATH_PUBLICLY_ACCESSIBLE"):
                 private_visibility_check("42434462262")
+
+
+    def test_encrypted_answer_restore_enforces_run_sha_and_verification(self):
+        run_id="42434462262"
+        secret=bytes(range(32))
+        original=json.dumps({
+            "schema":"pct-semantic-answer-v3",
+            "status":"NO_MODEL_SUPPORTED_CLAIMS",
+            "claims":[{"claim_id":"c1","quote":"Original Naxos passage"}],
+            "historically_verified":False,"verified":False
+        }).encode()
+        sealed=crypt("seal",original,secret,"research:"+run_id+":answer")
+        receipt={"schema":"n7-private-answer-index-v1","run_id":run_id,
+                 "sealed_sha256":digest(sealed),"historically_verified":False}
+        restored,answer=decode_private_answer(receipt,sealed,secret,run_id)
+        self.assertEqual(restored,original)
+        self.assertEqual(answer["status"],"NO_MODEL_SUPPORTED_CLAIMS")
+        with self.assertRaisesRegex(RuntimeError,"INDEX_OR_SHA_INVALID"):
+            decode_private_answer(receipt,sealed+b"x",secret,run_id)
+        with self.assertRaisesRegex(RuntimeError,"INDEX_OR_SHA_INVALID"):
+            decode_private_answer(receipt,sealed,secret,"99999999999")
+        receipt["sealed_sha256"]=digest(sealed)
+        bad=json.dumps({"status":"REVIEWED","claims":[],"verified":True}).encode()
+        illegal=crypt("seal",bad,secret,"research:"+run_id+":answer")
+        receipt["sealed_sha256"]=digest(illegal)
+        with self.assertRaisesRegex(RuntimeError,"PRIVATE_PREVIOUS_ANSWER_UNSAFE"):
+            decode_private_answer(receipt,illegal,secret,run_id)
 
 
 if __name__=="__main__":

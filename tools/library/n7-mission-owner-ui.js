@@ -113,6 +113,29 @@
           if(typeof entry==="string")ul.append(el("li",entry));
         section.append(ul);
       }
+      if(Array.isArray(answer.source_candidates)&&answer.source_candidates.length){
+        section.append(el("h4","Αυτούσια αποσπάσματα για έλεγχο πηγής και σελίδας"));
+        section.append(el("p","Οι εγγραφές είναι προτεινόμενες παραπομπές σε αποκτημένο κείμενο, όχι ιστορικά επαληθευμένα γεγονότα. Ο έλεγχος της πρωτότυπης σελίδας και της ανεξαρτησίας των πηγών εκκρεμεί."));
+        const labels={
+          SUPPORTED_QUOTATION_ONLY:"Το απόσπασμα στηρίζει την απόδοση στην πηγή — όχι την ιστορική αλήθεια",
+          UNSUPPORTED:"Ο ισχυρισμός δεν υποστηρίχθηκε από το απόσπασμα",
+          UNCERTAIN:"Η στήριξη παραμένει αβέβαιη",
+          NOT_REVIEWED:"Δεν ολοκληρώθηκε ακόμη ο έλεγχος"
+        };
+        for(const candidate of answer.source_candidates.slice(0,12)){
+          if(!candidate||typeof candidate!=="object")continue;
+          const detail=el("details");
+          detail.append(el("summary",String(candidate.source_title||"Πηγή")+" · "+String(candidate.page_locator||"σελίδα μη διαθέσιμη")));
+          detail.append(el("p","Προτεινόμενος ισχυρισμός μοντέλου: "+String(candidate.proposed_statement||"")));
+          detail.append(el("blockquote",String(candidate.exact_acquired_quote||"")));
+          detail.append(el("p","Θέση: "+String(candidate.page_locator||"σελίδα μη διαθέσιμη")+
+            (candidate.source_lines?" · "+String(candidate.source_lines):"")));
+          detail.append(el("p",labels[candidate.model_review_decision]||"Δεν έχει αποδειχθεί η τεκμηρίωση."));
+          if(candidate.review_reason)detail.append(el("p","Αιτιολόγηση ελέγχου: "+String(candidate.review_reason)));
+          if(candidate.source_text_sha256)detail.append(el("p","SHA-256 κειμένου: "+String(candidate.source_text_sha256)));
+          section.append(detail);
+        }
+      }
       if(!answer.paragraphs?.length)
         section.append(el("p","Δεν υπάρχει ακόμη τελική τεκμηριωμένη σύνθεση από μοντέλο."));
     }catch(e){
