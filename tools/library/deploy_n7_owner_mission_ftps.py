@@ -83,7 +83,10 @@ def patch_server(src:bytes)->bytes:
             return src
         raise RuntimeError("N7_MISSION_PATCH_PARTIAL")
     helper=SERVER_HELPER.encode()+b"\n"
-    src=replace_once(src,b"const server=http.createServer(",helper+b"const server=http.createServer(")
+    server_anchor=list(re.finditer(rb"(?m)^const\s+server\s*=\s*http\.createServer\(",src))
+    if len(server_anchor)!=1:raise RuntimeError("N7_SERVER_DECLARATION_CHANGED")
+    at=server_anchor[0].start()
+    src=src[:at]+helper+src[at:]
     # Must insert AFTER authentication and SAME-ORIGIN checks.
     guard=re.search(rb"(?m)^([ \t]*if\(!session\(req\)\)\s*return json\(res,401,[^\r\n]+[\r]?\n)",src)
     if not guard:raise RuntimeError("N7_SESSION_GUARD_CHANGED")
