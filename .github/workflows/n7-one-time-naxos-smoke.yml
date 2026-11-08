@@ -1,0 +1,35 @@
+name: N7 One-Time Naxos Research E2E Smoke
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/n7-one-time-naxos-smoke.yml'
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: n7-one-time-naxos-smoke-20261108
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Start one bounded JARVIS research via the production N7 orchestrator
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          tag=$(printf '%s' "$RUN" | sha256sum | cut -c1-24)
+          request_id="n7mission-$tag"
+          echo "N7_SAMPLE_REQUEST_ID=$request_id"
+          gh workflow run n7-research-orchestrate.yml -R "$REPO" --ref main \
+            -f request_id="$request_id" \
+            -f target="Naxos" \
+            -f purpose="Find exact source evidence and contradictions concerning 17th-century pirate anchorages on Naxos; do not automatically verify historical claims" \
+            -f date_range="1600-1700" \
+            -f aliases="Νάξος|Nasso"
+          echo "N7_SAMPLE_DISPATCH_ACCEPTED=$request_id"
+          echo "This accepts a job only; historical evidence and final outcomes are not yet verified."
