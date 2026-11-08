@@ -345,7 +345,21 @@ def answer_upload(run_id):
                 raise RuntimeError("PRIOR_PRIVATE_ANSWER_INDEX_INCOMPLETE")
             old_index=json.loads(prior_index)
             # Fully re-authenticate the old answer before retaining a snapshot.
-            decode_private_answer(old_index, prior_encrypted, secret, run_id)
+            old_clear,old_answer=decode_private_answer(old_index, prior_encrypted, secret, run_id)
+            if len(old_answer.get("claims") or [])>0 and not answer.get("claims"):
+                # A timed-out model is not allowed to replace a more informative
+                # prior source-bound analysis. Keep the failed attempt encrypted.
+                attempt_name="answer-failed-attempt-" + digest(sealed) + ".enc"
+                existing_attempt=maybe_read(ftp,attempt_name,10_000_000)
+                if existing_attempt is None:
+                    write(ftp,attempt_name,sealed)
+                    existing_attempt=remote_read(ftp,attempt_name,10_000_000)
+                if existing_attempt!=sealed:
+                    raise RuntimeError("FAILED_ATTEMPT_ENCRYPTED_READBACK_MISMATCH")
+                print("N7_WEAKER_MODEL_ANSWER_HELD_OLDER_SOURCE_BOUND_RESULT",
+                      run_id,"previous_claims",len(old_answer["claims"]),
+                      "new_claims",len(answer.get("claims") or []))
+                return
             historical_name="answer-history-" + digest(prior_encrypted) + ".enc"
             existing=maybe_read(ftp, historical_name, 10_000_000)
             if existing is None:
