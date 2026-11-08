@@ -1080,7 +1080,7 @@ def mark_unreviewed_claims_pending(answer):
     pending[:]=list(dict.fromkeys([*pending, *(c['claim_id'] for c in claims
                           if c.get('claim_id') and c['claim_id'] not in decided)]))
     if pending:
-        answer['status']='REVIEW_INCOMPLETE'
+        answer['status']=('RESEARCH_REVIEW_PENDING' if answer.get('status')=='RESEARCH_REVIEW_PENDING' else 'REVIEW_INCOMPLETE')
         answer['verified']=False
         answer['historically_verified']=False
         answer.setdefault('limitations', []).append('QUOTATION_REVIEW_PENDING_AFTER_BUDGET')
