@@ -336,9 +336,48 @@ jobs:
           # checksum-bound handoff; this artifact retains runtime diagnostics.
           if-no-files-found: warn
 
+  # N7 owner missions store their original source bundles exclusively in the
+  # encrypted private N7 corpus. This replaces the public evidence git push
+  # that GitHub rightfully blocked under repository/secret-scanning rules.
+  private-n7-corpus-handoff:
+    needs: [prepare, research-lanes]
+    if: always() && needs.prepare.result == 'success' && github.ref == 'refs/heads/main' && startsWith(inputs.request_id, 'n7mission-')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    timeout-minutes: 8
+    steps:
+      - name: Require all 11 source lanes to have completed before private transfer
+        env:
+          RESEARCH_LANES: ${{ needs.research-lanes.result }}
+          PREPARED: ${{ needs.prepare.outputs.matrix }}
+        run: |
+          set -euo pipefail
+          if [ "$RESEARCH_LANES" != "success" ]; then
+            echo "N7_PRIVATE_CORPUS_NOT_DISPATCHED: lane handoff incomplete"
+            exit 1
+          fi
+          python3 - <<'PY'
+          import json,os
+          lanes=json.loads(os.environ['PREPARED'])
+          expected={"greek","travellers","spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african"}
+          assert set(lanes)==expected, "N7_PRIVATE_SOURCE_LANE_SET_INCOMPLETE"
+          print("N7_PRIVATE_CORPUS_HANDOFF_11_LANES_READY")
+          PY
+      - name: Dispatch source-bound encrypted N7 corpus and real local synthesis
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run n7-private-corpus-synthesis.yml --ref main \
+            -f run_id="$GITHUB_RUN_ID"
+          echo "N7_PRIVATE_CORPUS_DISPATCH_ACCEPTED original_run=$GITHUB_RUN_ID"
+          echo "This only dispatches; encryption, model inference and owner delivery have independent checks."
+
   publish-lanes:
     needs: [prepare, research-lanes]
-    if: always() && needs.prepare.result == 'success' && github.ref == 'refs/heads/main'
+    if: always() && needs.prepare.result == 'success' && github.ref == 'refs/heads/main' && !startsWith(inputs.request_id, 'n7mission-')
     runs-on: ubuntu-latest
     concurrency:
       group: pct-research-lane-publisher-${{ github.run_id }}

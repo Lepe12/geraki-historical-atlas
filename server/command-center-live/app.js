@@ -107,14 +107,16 @@ async function githubResearchStatus(requestId){
   const cached=n7MissionStatusCache.get(requestId);
   if(cached&&Date.now()-cached.at<15000)return cached.report;
   const prefix="https://api.github.com/repos/"+REPO+"/actions/workflows/";
-  const [planRuns,researchRuns]=await Promise.all([
+  const [planRuns,researchRuns,privateRuns]=await Promise.all([
     getJson(prefix+N7_RESEARCH_WORKFLOW+"/runs?event=workflow_dispatch&per_page=50",2000000),
-    getJson(prefix+"pct-parallel-multi-agent.yml/runs?event=workflow_dispatch&per_page=50",2000000)
+    getJson(prefix+"pct-parallel-multi-agent.yml/runs?event=workflow_dispatch&per_page=50",2000000),
+    getJson(prefix+"n7-private-corpus-synthesis.yml/runs?event=workflow_dispatch&per_page=50",2000000)
   ]);
   const select=(data,title)=>(Array.isArray(data.workflow_runs)?data.workflow_runs:[])
     .find(x=>x.display_title===title);
   const parent=select(planRuns,"N7 Mission "+requestId);
   const child=select(researchRuns,"Research "+requestId);
+  const privateRun=child?select(privateRuns,"N7 encrypted-source synthesis from "+String(child.id)):null;
   const status=child?(child.status==="completed"?(child.conclusion==="success"?"PIPELINE_COMPLETED":"PIPELINE_FAILED"):"PIPELINE_"+String(child.status).toUpperCase()):
     parent?(parent.status==="completed"&&parent.conclusion!=="success"?"DISPATCH_FAILED":"WAITING_FOR_RESEARCH"):"DISPATCH_NOT_OBSERVED";
   const report={status,planner_status:parent?.status||null,planner_conclusion:parent?.conclusion||null,
@@ -123,6 +125,19 @@ async function githubResearchStatus(requestId){
     research_conclusion:child?.conclusion||null,
     review_status:"HUMAN_SOURCE_INSPECTION_REQUIRED",
     note:"GitHub workflow state is not historical verification or a source-level audit."};
+  // N7_PRIVATE_CAS_STATUS_V1: the public JARVIS dispatcher merely starts
+  // private work; GitHub source publication is deliberately skipped.
+  if(privateRun){
+    report.private_synthesis_run_id=privateRun.id;
+    report.private_synthesis_url=privateRun.html_url||null;
+    report.private_synthesis_status=privateRun.status;
+    report.private_synthesis_conclusion=privateRun.conclusion||null;
+    report.status=privateRun.status==="completed"?
+      (privateRun.conclusion==="success"?"PRIVATE_SYNTHESIS_COMPLETED":"PRIVATE_SYNTHESIS_FAILED"):
+      "PRIVATE_SYNTHESIS_IN_PROGRESS";
+    report.preview={report_status:report.status,paragraphs:[],sources:[],
+      verified:false,human_review_required:true};
+  }
   // N7_RECOVERY_SAFE_SUMMARY_V1: expose only public-safe metadata after a
   // failed raw-evidence push; never infer source-level historical verification.
   if(child?.status==="completed"&&child.conclusion!=="success"&&
