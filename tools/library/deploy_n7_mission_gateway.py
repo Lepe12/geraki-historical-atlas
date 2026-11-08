@@ -55,7 +55,7 @@ def patch_app(live:bytes,canonical:bytes)->bytes:
     stop=b"async function refreshBaseline("
     fragment=canonical.split(start,1)[1].split(stop,1)[0]
     if b"function githubResearchStatus(" not in fragment:raise RuntimeError("CANONICAL_MISSION_STATUS_MISSING")
-    live=add_exact(live,stop,start+fragment)
+    live=add_exact(live,stop,b"\n"+start+fragment)
     old=b"githubWorkflowDispatch,githubCodingDispatch,githubPrivateDispatch});"
     new=b"githubWorkflowDispatch,githubCodingDispatch,githubPrivateDispatch,githubResearchDispatch,githubResearchStatus});"
     return replace_exact(live,old,new)
