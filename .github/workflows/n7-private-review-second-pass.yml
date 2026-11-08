@@ -76,6 +76,15 @@ jobs:
           PYTHONPATH=tools python3 tools/n7_private_corpus_store.py answer-restore --run-id "$SOURCE_RUN"
           test -s "evidence/runs/$SOURCE_RUN/previous_model_answer/answer.json"
 
+      - name: Replay each exact quotation and page locator before starting the model
+        run: |
+          set -euo pipefail
+          PYTHONPATH=tools python3 tools/semantic_research_answer.py \
+            --run-id "$SOURCE_RUN" \
+            --resume-private-proposals \
+            --check-private-proposals-only
+          echo "N7_SOURCE_CITATION_PREFLIGHT_PASS_NO_MODEL_CALLS"
+
       - name: Prepare same checksum-verified, local and free CPU Qwen
         uses: ./.github/actions/research-model
 
