@@ -56,6 +56,10 @@ def classify_push_failure(stderr: bytes) -> str:
         return "GITHUB_FILE_SIZE_LIMIT"
     if any(x in message for x in ("pack exceeds","pack size","too large","request entity too large","http 413")):
         return "PUSH_PAYLOAD_TOO_LARGE"
+    if "push cannot contain secrets" in message or "secret scanning" in message or "push protection" in message:
+        return "GITHUB_SECRET_SCANNING_PROTECTION"
+    if "repository rule violations" in message or "gh013" in message:
+        return "GITHUB_REPOSITORY_RULE_VIOLATION"
     if any(x in message for x in ("permission denied","403","write access not granted","protected branch","permission to")):
         return "GITHUB_PERMISSION_OR_RULESET"
     if any(x in message for x in ("remote end hung up","curl 18","curl 22","http 5","connection reset","timed out")):
@@ -72,7 +76,7 @@ def safe_push_diagnostic(stderr: bytes) -> str:
 
 
 def retry_is_useful(category: str) -> bool:
-    return category not in ("GITHUB_FILE_SIZE_LIMIT","PUSH_PAYLOAD_TOO_LARGE","GITHUB_PERMISSION_OR_RULESET")
+    return category not in ("GITHUB_FILE_SIZE_LIMIT","PUSH_PAYLOAD_TOO_LARGE","GITHUB_PERMISSION_OR_RULESET","GITHUB_SECRET_SCANNING_PROTECTION","GITHUB_REPOSITORY_RULE_VIOLATION")
 
 
 def publish(attempts=10):
