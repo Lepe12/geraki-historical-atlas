@@ -35,26 +35,31 @@ def patched(source:bytes)->bytes:
     if source.count(b"'use strict';\n")!=1:
         raise RuntimeError("N7_LIVE_MODULE_ANCHOR_CHANGED")
     source=source.replace(b"'use strict';\n",b"'use strict';\n"+HELPER,1)
-    # Find the actual active cookie-session rejection, independent of server
-    # formatting or additional operator-side statements on the same line.
-    guard=b"if(!session(req))"
-    if source.count(guard)!=1:
-        print("N7_SESSION_GUARD_SHAPE",{
-            "compact":source.count(guard),
-            "spaced":source.count(b"if (!session(req))"),
-            "auth_message":source.count(b"Authentication required"),
-            "mission_route":source.count(b"/api/research/missions"),
-            "user_session_refs":source.count(b"session(req)"),
-        })
-        raise RuntimeError("N7_LIVE_SESSION_GUARD_MISSING_OR_DUPLICATE")
-    at=source.index(guard)
-    end=source.find(b"\n",at)
-    if end<0:raise RuntimeError("N7_SESSION_GUARD_TRUNCATED")
-    line=source[at:end]
-    if b"json(" not in line or b"401" not in line or len(line)>350:
-        raise RuntimeError("N7_LIVE_SESSION_BOUNDARY_CHANGED")
-    pos=end+1
-    source=source[:pos]+ROUTE+source[pos:]
+    # The existing live N7 has multiple session checks. Insert after the
+    # nearest authentication rejection *before* the existing research route.
+    # This preserves existing private-chat authorization instead of adding a
+    # second independent session implementation.
+    marker=b"if(p==='/api/research/missions')"
+    if source.count(marker)!=1:
+        raise RuntimeError("N7_LIVE_RESEARCH_ROUTE_ANCHOR_CHANGED")
+    boundary=source.index(marker)
+    candidates=list(re.finditer(rb"if\s*\(!session\(req\)\)",source))
+    usable=[]
+    for match in candidates:
+        if match.start()>=boundary or boundary-match.start()>2500:continue
+        end=source.find(b"\n",match.end())
+        if end<0:continue
+        line=source[match.start():end]
+        if b"json(" in line and b"401" in line and len(line)<=350:
+            usable.append((match.start(),end))
+    if not usable:
+        print("N7_SESSION_GUARD_DIAGNOSTIC",{
+            "mission_anchor_count":source.count(marker),
+            "session_check_count":len(candidates),
+            "candidate_distances":[boundary-m.start() for m in candidates if m.start()<boundary][-8:]})
+        raise RuntimeError("N7_AUTHENTICATED_RESEARCH_BOUNDARY_NOT_FOUND")
+    _,last_end=max(usable,key=lambda item:item[0])
+    source=source[:last_end+1]+ROUTE+source[last_end+1:]
     return source
 
 
