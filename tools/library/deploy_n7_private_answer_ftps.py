@@ -35,10 +35,17 @@ def patched(source:bytes)->bytes:
     if source.count(b"'use strict';\n")!=1:
         raise RuntimeError("N7_LIVE_MODULE_ANCHOR_CHANGED")
     source=source.replace(b"'use strict';\n",b"'use strict';\n"+HELPER,1)
-    matches=list(re.finditer(rb"(?m)^[ \t]*if\(!session\(req\)\)\s*return json\(res,401,[^\r\n]+\);[\r]?\n",source))
-    if len(matches)!=1:
+    # Find the actual active cookie-session rejection, independent of server
+    # formatting or additional operator-side statements on the same line.
+    guard=b"if(!session(req))"
+    if source.count(guard)!=1:raise RuntimeError("N7_LIVE_SESSION_GUARD_MISSING_OR_DUPLICATE")
+    at=source.index(guard)
+    end=source.find(b"\n",at)
+    if end<0:raise RuntimeError("N7_SESSION_GUARD_TRUNCATED")
+    line=source[at:end]
+    if b"json(" not in line or b"401" not in line or len(line)>350:
         raise RuntimeError("N7_LIVE_SESSION_BOUNDARY_CHANGED")
-    pos=matches[0].end()
+    pos=end+1
     source=source[:pos]+ROUTE+source[pos:]
     return source
 
