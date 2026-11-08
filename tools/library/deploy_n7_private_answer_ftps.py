@@ -38,7 +38,15 @@ def patched(source:bytes)->bytes:
     # Find the actual active cookie-session rejection, independent of server
     # formatting or additional operator-side statements on the same line.
     guard=b"if(!session(req))"
-    if source.count(guard)!=1:raise RuntimeError("N7_LIVE_SESSION_GUARD_MISSING_OR_DUPLICATE")
+    if source.count(guard)!=1:
+        print("N7_SESSION_GUARD_SHAPE",{
+            "compact":source.count(guard),
+            "spaced":source.count(b"if (!session(req))"),
+            "auth_message":source.count(b"Authentication required"),
+            "mission_route":source.count(b"/api/research/missions"),
+            "user_session_refs":source.count(b"session(req)"),
+        })
+        raise RuntimeError("N7_LIVE_SESSION_GUARD_MISSING_OR_DUPLICATE")
     at=source.index(guard)
     end=source.find(b"\n",at)
     if end<0:raise RuntimeError("N7_SESSION_GUARD_TRUNCATED")
