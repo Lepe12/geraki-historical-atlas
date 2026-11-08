@@ -1,0 +1,135 @@
+name: N7 Private Evidence Corpus and Local Model Synthesis
+run-name: N7 encrypted-source synthesis from ${{ inputs.run_id || '42434462262' }}
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/n7-private-corpus-synthesis.yml'
+  workflow_dispatch:
+    inputs:
+      run_id:
+        type: string
+        required: true
+        default: '42434462262'
+        description: Existing original GitHub research run, no new discovery
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: n7-private-corpus-${{ inputs.run_id || '42434462262' }}
+  cancel-in-progress: false
+
+jobs:
+  seal-and-store:
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 25
+    env:
+      SOURCE_RUN: ${{ inputs.run_id || '42434462262' }}
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            tools
+      - name: Source identity and offline security checks
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_RUN" =~ ^[0-9]{8,20}$ ]]
+          node --check tools/n7_private_aead.js
+          python3 -m py_compile tools/n7_private_corpus_store.py tools/research_lane_handoff.py
+          PYTHONPATH=tools python3 -m unittest tools/test_n7_private_corpus.py -v
+      - name: Retrieve 11 original checksum-bound lane artifacts
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.run_id || '42434462262' }}
+          pattern: pct-lane-handoff-${{ inputs.run_id || '42434462262' }}-*
+          path: lane_handoffs
+          merge-multiple: false
+      - name: Seal and persist original archive and provenance under private bot directory
+        run: |
+          set -euo pipefail
+          PYTHONPATH=tools python3 tools/n7_private_corpus_store.py upload --run-id "$SOURCE_RUN"
+          echo "N7_PRIVATE_CORPUS_PERSISTED: FTPS private app storage; not public Git"
+
+  decrypt-and-analyse:
+    needs: seal-and-store
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 75
+    env:
+      SOURCE_RUN: ${{ inputs.run_id || '42434462262' }}
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+      PCT_LLM_PROVIDER: local_llama_cpp
+      PCT_LLM_MODEL: Qwen/Qwen3-8B-GGUF
+      PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen3-8B-GGUF
+      PCT_SEMANTIC_PARTIAL_ANSWER: '1'
+      PCT_SEMANTIC_BUDGET_SECONDS: '1300'
+      PCT_SEMANTIC_CALLS_PER_PASS: '24'
+      PCT_SEMANTIC_BATCHES: '6'
+      PCT_PREFILTER: '1'
+      PCT_SEMANTIC_READING_MAX_PASSAGES: '240'
+      PCT_AUTO_CONTINUE: 'false'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            .github/actions/research-model
+            config
+            data
+            tests/fixtures
+      - name: Restore source corpus from private host, not GitHub artifacts or raw git
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_RUN" =~ ^[0-9]{8,20}$ ]]
+          PYTHONPATH=tools python3 tools/n7_private_corpus_store.py restore --run-id "$SOURCE_RUN"
+      - name: Prepare checksum-verified local CPU Qwen model
+        uses: ./.github/actions/research-model
+      - name: Run real model reading and source-cited synthesis
+        id: analyze
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          timeout 1800s python3 tools/semantic_research_answer.py --run-id "$SOURCE_RUN"
+          test -s "evidence/runs/$SOURCE_RUN/research_answer/answer.json"
+      - name: Keep a truthful failure receipt if the model could not produce an answer
+        if: steps.analyze.outcome != 'success'
+        run: |
+          python3 - <<'PY'
+          import json,os,pathlib
+          target=pathlib.Path('evidence/runs')/os.environ['SOURCE_RUN']/'research_answer'/'answer.json'
+          if target.exists():raise SystemExit('MODEL_LEFT_PARTIAL_ANSWER; retain actual file')
+          target.parent.mkdir(parents=True,exist_ok=True)
+          target.write_text(json.dumps({
+            'status':'MODEL_RUNTIME_FAILED_NO_SYNTHESIS',
+            'model_used':False,'claims':[],'answer_sections':[],
+            'verified':False,'historically_verified':False,
+            'limitations':['Actual local model run failed; no synthesis claimed. Original sources remain encrypted on private host.']
+          },ensure_ascii=False,indent=2)+'\n')
+          PY
+      - name: Store final answer privately and prove encrypted readback
+        run: |
+          set -euo pipefail
+          PYTHONPATH=tools python3 tools/n7_private_corpus_store.py answer-upload --run-id "$SOURCE_RUN"
+      - name: Enforce meaningful model outcome
+        if: steps.analyze.outcome != 'success'
+        run: |
+          echo "N7_LOCAL_MODEL_SYNTHESIS_FAILED_OR_INCOMPLETE; PRIVATE_SOURCES_RETAINED"
+          exit 1
