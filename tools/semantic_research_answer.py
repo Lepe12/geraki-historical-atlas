@@ -892,6 +892,16 @@ def validate_items(payload, records, question_kind=None, requested_range=None, t
             'verification_status':'UNVERIFIED'})
     return accepted,rejected
 
+def citation_review_window(row, claim, flank=260):
+    """Small exact Unicode window: enough narrative context, never another source."""
+    text=row['text'];quote=claim['quote']
+    start=claim.get('quote_offset_in_excerpt')
+    if (type(start) is not int or start<0 or text[start:start+len(quote)]!=quote):
+        raise ValueError('N7_REVIEW_CANNOT_REPLAY_EXACT_QUOTATION')
+    left=max(0,start-flank);right=min(len(text),start+len(quote)+flank)
+    return text[left:right]
+
+
 def resume_private_proposals(path, question, records, question_kind, requested_range,
                              target_names, root, identity_linkage=None):
     """Revalidate old *model proposals* against current durable source bytes.
@@ -1529,6 +1539,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         out['limitations'].append('CORPUS_AND_CITATION_COVERAGE_PENDING')
     evidence_by_id={r['evidence_id']:r for r in selected}
     review_rules=RULES+'\nQUESTION: '+question+'\nROLE: check whether EVERY source-attributed statement faithfully reports its supplied quotation. This is QUOTATION SUPPORT, not historical truth or verification. Missing original inspection, primary authorship, independent corroboration or human review are limitations, not reasons to reject a faithful attribution to a consulted source. An explicitly attributed source conjecture may be supported AS A HYPOTHESIS, never as an established fact. Do not reject solely because an optional date is unresolved. Flag invented facts, wrong dates, conflated people, a raid falsely called a base, and places demonstrably outside the requested region. Do not invent a geographic identity. Return decisions records with claim_index, reason and decision, plus a limitations list. Explain the actual quotation support or precise mismatch in reason BEFORE choosing the verdict. Return EXACTLY ONE decision for EVERY supplied claim_index. Use SUPPORTED, UNSUPPORTED or UNCERTAIN. Do not output claim IDs. Unsupported PRIMARY_SOURCE classification must remain UNVERIFIED.'
+    review_rules+='\nDecision protocol: evaluate quotation fidelity FIRST using the EXACT quote and the nearby context, not unrelated sections of the document. For a SOURCE_STATEMENT that faithfully reports what the consulted source says, SUPPORTED means only quotation-attribution support, NEVER confirmation of the historical event. Inference must be explicitly labelled. If you select UNSUPPORTED or UNCERTAIN, name the precise factual mismatch, missing date/person/place, or relevance problem; source publication date and question time range do not date an event.'
     review_rules+='\nAlso check QUESTION RELEVANCE and passage genre. A faithful quote about a different namesake, a modern minister, an index entry, a bibliographic reference, or unrelated trade/building materials does not answer a historical piracy question. Use UNSUPPORTED for demonstrated irrelevance, UNCERTAIN for unresolved target identity or temporal applicability, and explain that separately from quotation fidelity. Do not require an exact date when the source context supports the requested period; never infer that context from the question itself.'
     review={'supported_claim_ids':[],'flagged_claims':[],'contradictions':[],
             'limitations':['CLAIM_FIDELITY_REVIEWED_SEPARATELY; CROSS_SOURCE_CORROBORATION_NOT_ESTABLISHED'],
@@ -1545,7 +1556,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
     review_order=sorted(claims,key=lambda c:not bool(requested_facets & set(claim_facets(c)))) if requested_facets else claims
     for claim in review_order:
         row=evidence_by_id[claim['evidence_id']]
-        review_claim={**model_claim(claim),'claim_index':0,'source_context':row['text'],
+        review_claim={**model_claim(claim),'claim_index':0,'source_context':citation_review_window(row,claim),
                       'consulted_source':model_evidence(row)['consulted_source']}
         prompt=review_rules+'\nCLAIMS_JSON:\n'+json.dumps([review_claim],ensure_ascii=False)
         before_review=new_calls
