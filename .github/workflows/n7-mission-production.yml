@@ -42,6 +42,7 @@ jobs:
           node --check server/command-center-live/app.js
           node --check server/command-center-live/n7-gateway.js
           node --test server/command-center-live/n7-gateway.test.js server/command-center-live/n7-mission.test.js
+          git fetch --depth=1 origin main:refs/remotes/origin/main
           python3 - <<'PY'
           import importlib.util, pathlib, subprocess
           target=pathlib.Path("tools/library/deploy_n7_mission_gateway.py")
