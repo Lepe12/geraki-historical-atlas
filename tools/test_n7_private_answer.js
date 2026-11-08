@@ -6,7 +6,11 @@ const fs=require("node:fs");
 const path=require("node:path");
 const crypto=require("node:crypto");
 const {seal,open}=require("./n7_private_aead");
-const {readOwnerAnswer}=require("./library/n7-private-answer-reader");
+// Test the exact production layout (reader + envelope in the same app directory).
+const moduleDir=fs.mkdtempSync(path.join(os.tmpdir(),"n7-prod-modules-"));
+fs.copyFileSync(path.join(__dirname,"n7_private_aead.js"),path.join(moduleDir,"n7_private_aead.js"));
+fs.copyFileSync(path.join(__dirname,"library/n7-private-answer-reader.js"),path.join(moduleDir,"n7-private-answer-reader.js"));
+const {readOwnerAnswer}=require(path.join(moduleDir,"n7-private-answer-reader.js"));
 const ID="42434462262";
 
 function fixture(){
