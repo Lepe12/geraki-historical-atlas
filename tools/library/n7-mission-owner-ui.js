@@ -27,7 +27,10 @@
   const submit=el("button","Εκκίνηση αποστολής");submit.type="submit";form.append(submit);
   const status=el("div","Δεν έχει ξεκινήσει ακόμη αποστολή.");
   status.id="missionstatus";status.setAttribute("role","status");status.setAttribute("aria-live","polite");
-  panel.append(form,status);main.insertBefore(panel,messages);
+  const recovered=el("button","Ανάγνωση ιδιωτικής έρευνας Νάξου (1600–1700)");
+  recovered.type="button";
+  recovered.id="n7-private-naxos-result";
+  panel.append(form,recovered,status);main.insertBefore(panel,messages);
   const safeId=/^n7mission-[a-f0-9]{24}$/;
   let id="";
   try{id=localStorage.getItem("n7-last-mission")||"";}catch(_){}
@@ -83,9 +86,53 @@
       }
     }
   }
+  async function showPrivateSynthesis(originalRunId){
+    if(!/^[0-9]{8,20}$/.test(String(originalRunId)))return;
+    const section=el("section");
+    section.className="n7-private-analysis";
+    try{
+      const answer=await request("/api/research/corpus/"+encodeURIComponent(String(originalRunId)));
+      if(answer.schema!=="n7-private-research-owner-answer-v1"||
+         answer.run_id!==String(originalRunId)||answer.historically_verified!==false)return;
+      section.append(el("h3","Ιδιωτική ανάλυση αποθηκευμένων πηγών"));
+      section.append(el("p","Κατάσταση: "+String(answer.status||"άγνωστη")+
+        " · Τοπικό μοντέλο: "+(answer.model_used?"ενεργοποιήθηκε":"δεν ολοκλήρωσε σύνθεση")));
+      section.append(el("p","Επεξεργασμένοι ισχυρισμοί: "+String(answer.claims_examined||0)+
+        " · Δεν έχει ολοκληρωθεί ανθρώπινη ιστορική επαλήθευση."));
+      for(const paragraph of (Array.isArray(answer.paragraphs)?answer.paragraphs:[]).slice(0,10)){
+        if(typeof paragraph==="string")section.append(el("p",paragraph));
+      }
+      if(Array.isArray(answer.references)&&answer.references.length){
+        section.append(el("h4","Παραπομπές προς επιθεώρηση πρωτοτύπου"));
+        const ul=el("ul");
+        for(const entry of answer.references.slice(0,12))
+          if(typeof entry==="string")ul.append(el("li",entry));
+        section.append(ul);
+      }
+      if(!answer.paragraphs?.length)
+        section.append(el("p","Δεν υπάρχει ακόμη τελική τεκμηριωμένη σύνθεση από μοντέλο."));
+    }catch(e){
+      if(e.message==="PRIVATE_ANSWER_NOT_READY"||e.message.includes("404")){
+        section.append(el("p","Τα πρωτογενή τεκμήρια διατηρούνται. Η ιδιωτική σύνθεση δεν έχει ολοκληρωθεί ακόμη."));
+      }else{
+        section.append(el("p","Η ιδιωτική αναφορά δεν είναι διαθέσιμη: "+e.message));
+      }
+    }
+    status.querySelector(".n7-private-analysis")?.remove();
+    status.append(section);
+  }
+  recovered.addEventListener("click",()=>{
+    status.replaceChildren(el("p","Ανάκτηση ιδιωτικής αναφοράς Νάξου..."));
+    showPrivateSynthesis("42434462262");
+  });
   async function refresh(){
     if(!safeId.test(id)||panel.classList.contains("hidden"))return;
-    try{render(await request("/api/research/missions/"+encodeURIComponent(id)));}
+    try{
+      const mission=await request("/api/research/missions/"+encodeURIComponent(id));
+      render(mission);
+      if(/^[0-9]{8,20}$/.test(String(mission.research_run_id||"")))
+        await showPrivateSynthesis(String(mission.research_run_id));
+    }
     catch(e){status.textContent="Αδυναμία ανάκτησης κατάστασης: "+e.message;}
   }
   button.addEventListener("click",()=>{
