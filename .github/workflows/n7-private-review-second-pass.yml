@@ -63,6 +63,8 @@ jobs:
           [[ "$SOURCE_RUN" =~ ^[0-9]{8,20}$ ]]
           python3 -m py_compile tools/n7_private_corpus_store.py tools/semantic_research_answer.py
           PYTHONPATH=tools python3 -m unittest tools/test_n7_private_citation_review.py -v
+          PYTHONPATH=tools python3 -m unittest tools/test_n7_private_corpus.py -v
+          node --test tools/test_n7_private_answer.js
           echo "N7_PRIVATE_CITATION_REPLAY_PREFLIGHT_PASS"
 
       - name: Restore original 11 encrypted source lanes from private N7 host
