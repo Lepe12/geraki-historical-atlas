@@ -96,10 +96,12 @@ def patch_server(src:bytes)->bytes:
     src=src[:token.end()]+b"'/n7-mission-owner-ui.js':'n7-mission-owner-ui.js',"+src[token.end():]
     # Existing serve() is a fixed static whitelist: explicitly allow this one new path.
     if b"p==='/n7-mission-owner-ui.js'" not in src:
-        target=re.search(rb"(?m)^([ \t]*if\(p\.startsWith\('/api/'\)\s*&&\s*!originOK\(req\)\))",src)
-        if not target:raise RuntimeError("N7_SAME_ORIGIN_GATE_CHANGED")
+        # Static script (not an API) must be served before cookie-auth check.
+        # API request validation remains guarded by the original origin/session rules.
+        static_guard=re.search(rb"(?m)^([ \t]*if\(!session\(req\)\)\s*return json\(res,401,[^\r\n]+[\r]?\n)",src)
+        if not static_guard:raise RuntimeError("N7_STATIC_AUTH_BOUNDARY_CHANGED")
         addition=b"    if(req.method==='GET'&&p==='/n7-mission-owner-ui.js')return serve(res,p);\n"
-        src=src[:target.start()]+addition+src[target.start():]
+        src=src[:static_guard.start()]+addition+src[static_guard.start():]
     return src
 
 def patch_index(src:bytes)->bytes:
