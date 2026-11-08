@@ -1,0 +1,89 @@
+name: N7 Private Answer — Authenticated Production Installation
+on:
+  pull_request:
+    paths:
+      - 'tools/n7_private_aead.js'
+      - 'tools/library/n7-private-answer-reader.js'
+      - 'tools/library/deploy_n7_private_answer_ftps.py'
+      - 'tools/test_n7_private_answer.js'
+      - '.github/workflows/n7-private-answer-deploy.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/n7_private_aead.js'
+      - 'tools/library/n7-private-answer-reader.js'
+      - 'tools/library/deploy_n7_private_answer_ftps.py'
+      - '.github/workflows/n7-private-answer-deploy.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n7-private-owner-answer-route-install
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools
+      - name: Node encryption and private answer regression
+        run: |
+          set -euo pipefail
+          node --check tools/n7_private_aead.js
+          node --check tools/library/n7-private-answer-reader.js
+          node --test tools/test_n7_private_answer.js
+          PYTHONPATH=tools python3 -m unittest tools/test_n7_private_corpus.py -q
+          python3 -m py_compile tools/library/deploy_n7_private_answer_ftps.py
+      - name: Offline gateway patch must preserve authorization boundary
+        run: |
+          python3 - <<'PY'
+          import importlib.util,pathlib
+          p=pathlib.Path('tools/library/deploy_n7_private_answer_ftps.py')
+          spec=importlib.util.spec_from_file_location('n7_install',p)
+          m=importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(m)
+          original=b"""'use strict';
+          const service = {};
+          const r = n7OwnerMission();
+          async function handler(req,res){
+            if(!session(req))return json(res,401,{error:'Authentication required'});
+            return 404;
+          }
+          """
+          output=m.patched(original)
+          assert output.index(b"if(!session(req))")<output.index(b"readOwnerAnswer(DATA_DIR")
+          assert output.count(b"readOwnerAnswer")==2
+          assert m.patched(output)==output
+          try:m.patched(b"'use strict';\nif(!session(req))return json(res,401,{});")
+          except RuntimeError:pass
+          else:raise AssertionError('missing mission guard accepted')
+          print('N7_PRIVATE_ANSWER_AUTH_BOUNDARY_PASS')
+          PY
+
+  deploy:
+    if: github.event_name == 'push'
+    needs: preflight
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 12
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+      N7_DEPLOY_CONFIRM: N7-PRIVATE-ANSWER-OWNER-AUTH
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools
+      - name: Install private owner answer route with staged FTPS rollback and live HTTP smoke
+        run: python3 tools/library/deploy_n7_private_answer_ftps.py
