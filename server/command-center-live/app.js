@@ -123,6 +123,44 @@ async function githubResearchStatus(requestId){
     research_conclusion:child?.conclusion||null,
     review_status:"HUMAN_SOURCE_INSPECTION_REQUIRED",
     note:"GitHub workflow state is not historical verification or a source-level audit."};
+  // N7_RECOVERY_SAFE_SUMMARY_V1: expose only public-safe metadata after a
+  // failed raw-evidence push; never infer source-level historical verification.
+  if(child?.status==="completed"&&child.conclusion!=="success"&&
+     /^[0-9]{8,20}$/.test(String(child.id))){
+    try{
+      const recovery=await getJson("https://raw.githubusercontent.com/"+REPO+
+        "/main/evidence/runs/"+child.id+"/RECOVERY_SUMMARY.json",150_000);
+      if(recovery?.schema==="n7-recovery-public-safe-summary-v1"&&
+         String(recovery.original_research_run_id)===String(child.id)&&
+         recovery.historically_verified===false&&
+         recovery.research_fingerprint_consistent===true&&
+         recovery.full_raw_evidence_publication==="BLOCKED_BY_GITHUB_REPOSITORY_RULE"&&
+         Number.isInteger(recovery.complete_lanes)&&recovery.complete_lanes===11&&
+         Number.isInteger(recovery.source_records)&&recovery.source_records>=0){
+        report.status="EVIDENCE_PRESERVED_REVIEW_REQUIRED";
+        report.recovery_summary_url="https://github.com/"+REPO+
+          "/blob/main/evidence/runs/"+child.id+"/RECOVERY_SUMMARY.json";
+        report.preview={
+          report_status:"SOURCES_PRESERVED_NOT_SYNTHESIZED",
+          language:"el",
+          paragraphs:[
+            "Οι 11 ερευνητικές διαδρομές εκτελέστηκαν και τα αρχεία τους διατηρούνται σε GitHub Actions artifacts.",
+            "Ανακτήθηκαν "+recovery.source_records+" εγγραφές πηγών, "+
+              Number(recovery.exact_duplicate_groups||0)+" ομάδες ακριβών διπλοτύπων και "+
+              Number(recovery.possible_derivative_groups||0)+" πιθανές συγγενείς εκδόσεις.",
+            "Το GitHub απέκλεισε τη δημόσια δημοσίευση του πλήρους πρωτογενούς υλικού. "+
+              "Δεν ολοκληρώθηκε η σημασιολογική σύνθεση ή η επιστημονική επαλήθευση."
+          ],
+          sources:[],
+          limitations:["Πρωτότυπα τεκμήρια παραμένουν στα artifacts του αρχικού run.",
+                       "Απαιτείται περαιτέρω έλεγχος αυθεντικών σελίδων και σύνθεση."],
+          verified:false,human_review_required:true
+        };
+      }
+    }catch(_){
+      // No valid manifest: retain true failed pipeline status.
+    }
+  }
   // A reviewed research answer can be projected back into the private chat
   // without returning raw PDF bytes or the multi-megabyte evidence corpus.
   if(child?.status==="completed"&&child.conclusion==="success"&&/^[0-9]+$/.test(String(child.id))){
