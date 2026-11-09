@@ -66,7 +66,7 @@ pid=int(sys.argv[1])
 lines=pathlib.Path(f'/proc/{pid}/status').read_text().splitlines()
 metrics={}
 for line in lines:
-    match=re.match(r'^(VmRSS|VmHWM|VmSize|Threads):\\s*(\\d+)',line)
+    match=re.match(r'^(VmRSS|VmHWM|VmSize|Threads):\s*(\d+)',line)
     if match: metrics[match.group(1)]=int(match.group(2))
 for key in ('VmRSS','VmHWM','VmSize','Threads'):
     if key not in metrics: raise SystemExit('MISSING_PROC_MEMORY_METRIC_'+key)
