@@ -80,7 +80,7 @@ jobs:
               node_modules=root+'/node_modules'
               print('N7_NPM_NODE_MODULES_DIR=' + str(exists_dir(node_modules)).lower())
               pkg=node_modules+'/openclaw/package.json'
-              info=read_small(pkg)
+              info=read_small(pkg,limit=2*1024*1024)
               if info:
                   package=json.loads(info)
                   print('N7_NPM_OPENCLAW_VERSION='+str(package.get('version','unknown'))[:30])
