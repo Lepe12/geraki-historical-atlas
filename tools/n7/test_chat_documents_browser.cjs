@@ -15,7 +15,7 @@ const app=http.createServer(async(req,res)=>{try{const p=new URL(req.url,'http:/
  const stream=p.match(/^\/api\/conversations\/([a-f0-9-]+)\/stream$/);if(stream)return handler(Readable.from([Buffer.from(raw)]),res,stream[1]);
  const cpath=p.match(/^\/api\/conversations\/([^/]+)(\/chat)?$/);if(cpath){const c=chats.find(x=>x.id===cpath[1]);if(!c)return json(res,404,{error:'not found'});if(cpath[2]){c.messages.push({role:'user',content:input.message},{role:'assistant',content:'Απάντηση στο επιλεγμένο κείμενο βιβλιοθήκης.'});return json(res,200,{conversation:c});}return json(res,200,{conversation:c});}
  if(p==='/api/n7/approved-lessons')return json(res,200,{lessons:[]});if(p==='/api/tasks')return json(res,200,{tasks:[]});if(p==='/api/skills/feedback')return json(res,200,{feedback:[]});
- if(p.startsWith('/n7-pdf/')){const name=p.split('/').pop()==='pdf.worker.js'?'pdf.worker.mjs':'pdf.mjs';res.setHeader('Content-Type','text/javascript');return res.end(fs.readFileSync(path.join(path.dirname(require.resolve('pdfjs-dist')),name)));}
+ if(p.startsWith('/n7-pdf/')){const name=p.split('/').pop()==='pdf.worker.js'?'pdf.worker.mjs':'pdf.mjs';res.setHeader('Content-Type','text/javascript');return res.end(fs.readFileSync(path.join(__dirname,'vendor',name)));}
  const name=p==='/'?'index.html':p.slice(1);if(!['index.html','app.js','style.css','n7-library-ui.js','n7-mission-owner-ui.js','historical-library.js'].includes(name)){res.writeHead(404);return res.end();}res.setHeader('Content-Type',name.endsWith('.js')?'text/javascript':name.endsWith('.css')?'text/css':'text/html');res.end(fs.readFileSync(path.join(dir,name)));
  }catch(e){json(res,500,{error:e.message});}});
 (async()=>{let browser;try{
@@ -25,7 +25,7 @@ const app=http.createServer(async(req,res)=>{try{const p=new URL(req.url,'http:/
  const textPdf=pdf(['PDF-PASSAGE-7392 A historical record from Corfu.']);
  await page.locator('#n7-chat-file-picker').setInputFiles({name:'source.pdf',mimeType:'application/pdf',buffer:textPdf});await page.locator('.n7-file-chip').waitFor({state:'visible'});await page.locator('#message').fill('Τι γράφει το PDF;');await submit();
  assert.match(JSON.stringify(payloads.at(-1).messages),/PDF-PASSAGE-7392/,'Actual PDF extraction must reach the model prompt');assert.equal(chats[0].messages[0].attachments[0].type,'application/pdf');assert.equal(await page.locator('.n7-file-chip').isVisible(),false);
- // A real PNG accepted by the existing server's signature checks, forwarded unchanged.
+ // Real PNG/JPEG fixtures accepted by the existing server's signature checks, forwarded unchanged.
  const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jV5kAAAAASUVORK5CYII=','base64');
  const canvas=require('@napi-rs/canvas').createCanvas(32,32);canvas.getContext('2d').fillRect(0,0,32,32);const jpeg=canvas.toBuffer('image/jpeg');
  await page.locator('#n7-chat-file-picker').setInputFiles({name:'photo.jpg',mimeType:'image/jpeg',buffer:jpeg});await page.locator('#message').fill('Περιέγραψε αυτή τη μία εικόνα.');await submit();const image=payloads.at(-1).messages.findLast(m=>m.role==='user').content.find(x=>x.type==='image_url');assert.equal(image.image_url.url,'data:image/jpeg;base64,'+jpeg.toString('base64'));
