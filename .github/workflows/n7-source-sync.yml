@@ -21,6 +21,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          sparse-checkout: |
+            tools/n7
+            tools/library
+            tools/check_n7_distribution.py
+            n7-distribution.json
           persist-credentials: false
       - name: Require existing private cross-repository connection
         env:
@@ -36,6 +41,7 @@ jobs:
       - name: Generate distribution from actual checked-out commit
         run: |
           python3 .canonical-n7/scripts/export_atlas_sources.py --destination "$GITHUB_WORKSPACE"
+          git add -- tools/n7 tools/library n7-distribution.json
           python3 tools/check_n7_distribution.py
           python3 .canonical-n7/scripts/export_atlas_sources.py --destination "$GITHUB_WORKSPACE" --check
       - name: Propose one-way generated update through a pull request
@@ -43,7 +49,7 @@ jobs:
           GH_TOKEN: ${{ secrets.PCT_GITHUB_DISPATCH_TOKEN }}
         run: |
           set -euo pipefail
-          if git diff --quiet -- tools/n7 tools/library n7-distribution.json; then
+          if git diff HEAD --quiet -- tools/n7 tools/library n7-distribution.json; then
             echo 'N7 distribution already matches canonical source.'
             exit 0
           fi

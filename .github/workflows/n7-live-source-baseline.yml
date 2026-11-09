@@ -16,6 +16,10 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/capture_n7_live_source.py
+            tools/test_capture_n7_live_source.py
       - name: Test source scope, secret refusal and concurrent-change detection
         run: python3 tools/test_capture_n7_live_source.py
       - name: Capture and re-read application source without any server writes
