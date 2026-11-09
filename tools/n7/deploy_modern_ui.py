@@ -9,8 +9,8 @@ ROOT='/bot.piratecartography.com/n7-app/public'
 BASE='https://bot.piratecartography.com'
 TLS='linux3087.grserver.gr'
 MARK='N7_MODERN_LIGHT_UI_V1'
-PREVIOUS_JS='00aed47aac991797c9f96bb646e855e04ab093f96f2c13a7c33ae4070cef92c4'
-PREVIOUS_CSS='519d51ef19962e9b3267d342da6769ba46da5125071bf223b23c5efab798fff6'
+PREVIOUS_JS='1feb557fbef1d923e57fd936e053d2b4b5b9b780ebad6e30fd8c0fd6d4385a2f'
+PREVIOUS_CSS='31419687b2d5774d2b67e38a5401b55cb376f8a83321315aa1bf475e1bb081aa'
 
 def canonical(text):return (text.rstrip()+'\n').encode()
 
@@ -22,6 +22,23 @@ def js_check(data):
         f.write(data);f.flush()
         result=subprocess.run(['node','--check',f.name],capture_output=True,timeout=20)
         if result.returncode:raise RuntimeError('N7_MODERN_JS_SYNTAX_FAILED')
+
+def patch_library(original):
+    text=original.decode('utf8')
+    if 'N7_SOURCE_LIBRARY_UI_V' not in text:raise RuntimeError('N7_LIBRARY_UI_UNRECOGNIZED')
+    marker='// N7_LIBRARY_CHAT_ATTACH_V1'
+    block="if(window.N7ChatDocuments){const chatButton=button('Στη συνομιλία',()=>window.N7ChatDocuments.attachLibrary(m).catch(showError));chatButton.className='n7-chat-attach';row.append(chatButton);} "
+    anchor="row.append(button('Στοιχεία',"
+    if marker in text:
+        if text.count(marker)!=1 or text.count(block)!=1:raise RuntimeError('N7_LIBRARY_CHAT_UNREVIEWED')
+        return original
+    if text.count(anchor)!=1:raise RuntimeError('N7_LIBRARY_CHAT_ANCHOR_MISSING')
+    text=text.replace(anchor,block+anchor,1)
+    if 'N7_SOURCE_LIBRARY_UI_V2' in text and 'Array.from(row.children).slice(2)' in text:
+        text=text.replace('Array.from(row.children).slice(2)',"Array.from(row.children).slice(2).filter(el=>!el.classList.contains('n7-chat-attach'))",1)
+    result=(marker+'\n'+text).encode()
+    js_check(result)
+    return result
 
 def patch_assets(original):
     app=original['app.js'].decode('utf8');css=original['style.css'].decode('utf8');html=original['index.html'].decode('utf8')
@@ -50,13 +67,13 @@ def patch_assets(original):
     revised_app=(app_prefix+editor+'\n'+addon+'\n').encode()
     revised_css=(css_prefix+theme+'\n').encode()
     release=sha(revised_app+revised_css)[:12]
-    for attr,name in [('src','app.js'),('href','style.css')]:
+    for attr,name in [('src','app.js'),('href','style.css'),('src','n7-library-ui.js')]:
         pattern=r'('+attr+r'=[\"\'])(?:https://bot\.piratecartography\.com)?/'+re.escape(name)+r'(?:\?[^\"\']*)?([\"\'])'
         html,n=re.subn(pattern,lambda m:m[1]+'/'+name+'?n7modern='+release+m[2],html)
         if n!=1:raise RuntimeError('N7_ASSET_REFERENCE_NOT_UNIQUE_'+name)
     html=re.sub(r'<title>.*?</title>','<title>N7 · Ο προσωπικός σου χώρος</title>',html,flags=re.S)
     html=re.sub(r'(name=[\"\']theme-color[\"\']\s+content=[\"\'])[^\"\']+',lambda m:m[1]+'#faf9f6',html)
-    revised={'app.js':revised_app,'style.css':revised_css,'index.html':html.encode()}
+    revised={'app.js':revised_app,'style.css':revised_css,'index.html':html.encode(),'n7-library-ui.js':patch_library(original['n7-library-ui.js'])}
     js_check(revised_app)
     return revised
 
@@ -97,15 +114,21 @@ def verify(files):
 def main():
     dry=os.getenv('N7_DRY_RUN','1')!='0';ftp=connect();stages=[];backups=[]
     try:
-        original={name:read(ftp,name) for name in ('app.js','style.css','index.html')}
+        # Read-only compatibility check: never replace backend code for this UI repair.
+        ftp.cwd('/bot.piratecartography.com/n7-app')
+        server=read(ftp,'server.js');stream=read(ftp,'n7-stream-attachments.js')
+        if b'/stream' not in server and b'\\/stream' not in server:raise RuntimeError('N7_STREAM_ROUTE_MISSING')
+        if any(x not in stream for x in (b'parseAttachments',b'buildPrompt',b'image_url',b'pdfText')):raise RuntimeError('N7_DOCUMENT_BACKEND_UNSUPPORTED')
+        ftp.cwd(ROOT)
+        original={name:read(ftp,name) for name in ('app.js','style.css','index.html','n7-library-ui.js')}
         revised=patch_assets(original)
         fixture=os.getenv('N7_FIXTURE_DIR')
         if fixture:
             target=Path(fixture);target.mkdir(parents=True,exist_ok=True)
             for name,data in revised.items():(target/name).write_bytes(data)
-            for name in ('n7-library-ui.js','n7-mission-owner-ui.js','historical-library.js'):
+            for name in ('n7-mission-owner-ui.js','historical-library.js'):
                 (target/name).write_bytes(read(ftp,name))
-        print('N7_MODERN_PREFLIGHT_OK dry_run='+str(dry)+' files=app.js,style.css,index.html backendChanged=false dataChanged=false')
+        print('N7_MODERN_PREFLIGHT_OK dry_run='+str(dry)+' files=app.js,style.css,index.html,n7-library-ui.js backendChanged=false dataChanged=false')
         if dry:return
         tag=secrets.token_hex(8)
         # Stage and verify all public assets before replacing any active file.
