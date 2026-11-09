@@ -23,7 +23,7 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           data=Path('.github/workflows/n7-openclaw-npm-status.yml').read_text()
-          probe=data.split('      - name: Check ONLY isolated npm target files via existing FTPS',1)[1]
+          probe=data.rsplit('      - name: Check ONLY isolated npm target files via existing FTPS',1)[1]
           for forbidden in ('f.storbinary(', 'f.storlines(', 'f.mkd(', 'f.delete(', 'f.rename(', 'f.sendcmd(', 'subprocess.', 'os.system('):
               assert forbidden not in probe, forbidden
           print('N7_NPM_PROBE_READ_ONLY=PASS')
