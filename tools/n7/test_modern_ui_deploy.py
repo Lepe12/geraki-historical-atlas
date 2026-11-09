@@ -11,11 +11,11 @@ class PatchTests(unittest.TestCase):
         html+=''.join('<div id="'+x+'"></div>' for x in ['loginform','application','new','conversations','taskview','messages','chat','message','send'])
         html+='<script src="/app.js?old=2" defer></script><script src="/n7-library-ui.js" defer></script></body></html>'
         app='// N7_OWNER_MEMORY_UI_V1\n// N7_CHAT_CORRECTION_CONFIRM_V1\n// N7_NONBLOCKING_QUEUE_WATCH_v1\nconst existingFeature="preserved";'
-        return {'index.html':html.encode(),'app.js':app.encode(),'style.css':b'.existing-feature{display:block}'}
+        return {'index.html':html.encode(),'app.js':app.encode(),'style.css':b'.existing-feature{display:block}','n7-library-ui.js':('// N7_SOURCE_LIBRARY_UI_V2\nfunction refresh(){row.append(button(\'Στοιχεία\',()=>{}));}').encode()}
 
     def test_preserves_existing_source_and_external_modules(self):
         original=self.source();result=deploy.patch_assets(original)
-        self.assertEqual(set(result),{'app.js','style.css','index.html'})
+        self.assertEqual(set(result),{'app.js','style.css','index.html','n7-library-ui.js'})
         self.assertTrue(result['app.js'].startswith(original['app.js']))
         self.assertTrue(result['style.css'].startswith(original['style.css']))
         self.assertIn(b'/n7-library-ui.js',result['index.html'])
@@ -23,6 +23,8 @@ class PatchTests(unittest.TestCase):
         self.assertIn(b'style.css?n7modern=',result['index.html'])
         self.assertIn(b'#faf9f6',result['index.html'])
         self.assertIn(b'N7_MODERN_LIGHT_UI_V1',result['app.js'])
+        self.assertIn(b'N7_LIBRARY_CHAT_ATTACH_V1',result['n7-library-ui.js'])
+        self.assertIn(b'n7-library-ui.js?n7modern=',result['index.html'])
 
     def test_missing_feature_and_duplicate_assets_abort_before_writes(self):
         original=self.source();original['app.js']=b'const unknown=true;'

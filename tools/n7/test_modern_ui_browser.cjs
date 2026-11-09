@@ -96,7 +96,7 @@ async function main(){
   assert.equal(await page.locator('#conversations button:visible').count(),1);
   await page.locator('#n7-conversation-search').fill('');
   await page.getByRole('button',{name:'Προσθήκη αρχείου',exact:true}).click();
-  await page.getByRole('button',{name:'Κείμενο TXT ή Markdown',exact:true}).click();
+  await page.getByRole('button',{name:'Αρχείο PDF, εικόνα ή έγγραφο',exact:true}).click();
   await page.locator('#chat input[type=file]').setInputFiles({name:'απόσπασμα.txt',mimeType:'text/plain',buffer:Buffer.from('Το αρχείο μου περιέχει αυτό το κείμενο.')});
   await page.locator('.n7-file-chip').waitFor({state:'visible'});
   await page.locator('.n7-file-chip').getByRole('button',{name:'Προβολή',exact:true}).click();await page.locator('.n7-file-preview[open]').waitFor();

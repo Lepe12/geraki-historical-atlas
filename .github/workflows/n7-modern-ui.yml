@@ -9,6 +9,7 @@ on:
       - 'tools/n7/deploy_modern_ui.py'
       - 'tools/n7/test_modern_ui_deploy.py'
       - 'tools/n7/test_modern_ui_browser.cjs'
+      - 'tools/n7/test_chat_documents_browser.cjs'
       - '.github/workflows/n7-modern-ui.yml'
       - 'ops_ftps_requests/n7-modern-ui.json'
   push:
@@ -53,14 +54,20 @@ jobs:
         run: python3 tools/n7/deploy_modern_ui.py
       - name: Prepare browser test runtime
         run: |
-          npm install --prefix "$RUNNER_TEMP/n7-browser" --ignore-scripts --no-audit --no-fund playwright@1.56.1
+          npm install --prefix "$RUNNER_TEMP/n7-browser" --ignore-scripts --no-audit --no-fund playwright@1.56.1 pdfjs-dist@5.6.205 @napi-rs/canvas@0.1.100
           "$RUNNER_TEMP/n7-browser/node_modules/.bin/playwright" install --with-deps chromium
+          mkdir -p tools/n7/vendor
+          cp "$RUNNER_TEMP/n7-browser/node_modules/pdfjs-dist/legacy/build/pdf.mjs" tools/n7/vendor/
+          cp "$RUNNER_TEMP/n7-browser/node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs" tools/n7/vendor/
+          cp "$RUNNER_TEMP/n7-browser/node_modules/@napi-rs/canvas/geometry.js" tools/n7/vendor/geometry.cjs
       - name: Browser checks against actual frontend with isolated API fixtures
         env:
           N7_FIXTURE_DIR: ${{ runner.temp }}/n7-modern-public-assets
           NODE_PATH: ${{ runner.temp }}/n7-browser/node_modules
           N7_SCREENSHOT_DIR: ${{ runner.temp }}/n7-modern-screenshots
-        run: node tools/n7/test_modern_ui_browser.cjs
+        run: |
+          node tools/n7/test_modern_ui_browser.cjs
+          node tools/n7/test_chat_documents_browser.cjs
   deploy:
     if: github.event_name == 'push'
     needs: validate
@@ -89,12 +96,12 @@ jobs:
           from pathlib import Path
           assert json.loads(Path('ops_ftps_requests/n7-modern-ui.json').read_text()) == {
             'confirmation':'N7-OWNER-MODERN-LIGHT-INTERFACE',
-            'release':'N7-EDITOR-COMPARISON-PRESENCE-V2',
+            'release':'N7-CHAT-DOCUMENTS-LIBRARY-V3',
             'target':'/bot.piratecartography.com/n7-app/public',
             'public_assets_only':True,
             'preserve_backend_models_conversations_and_memory':True,
             'backup_and_rollback':True
           }
           PY
-      - name: Install three public UI assets, verify live hashes and privacy, rollback on failure
+      - name: Install four public UI assets, verify live hashes and privacy, rollback on failure
         run: python3 tools/n7/deploy_modern_ui.py
