@@ -104,6 +104,17 @@ jobs:
           set -euo pipefail
           [[ "$SOURCE_RUN" =~ ^[0-9]{8,20}$ ]]
           PYTHONPATH=tools python3 tools/n7_private_corpus_store.py restore --run-id "$SOURCE_RUN"
+      - name: Publish quick source excerpts privately before slow Qwen analysis
+        run: |
+          set -euo pipefail
+          PYTHONPATH=tools python3 tools/n7_fast_evidence.py --run-id "$SOURCE_RUN"
+          python3 - <<'PY'
+          import json,os,pathlib
+          p=pathlib.Path('evidence/runs')/os.environ['SOURCE_RUN']/'research_answer'
+          fast=json.loads((p/'fast_evidence.json').read_text(encoding='utf-8'))
+          (p/'answer.json').write_text(json.dumps(fast,ensure_ascii=False,indent=2)+'\\n',encoding='utf-8')
+          PY
+          PYTHONPATH=tools python3 tools/n7_private_corpus_store.py answer-upload --run-id "$SOURCE_RUN"
       - name: Prepare checksum-verified local CPU Qwen model
         uses: ./.github/actions/research-model
       - name: Run real model reading and source-cited synthesis
@@ -129,6 +140,16 @@ jobs:
             'verified':False,'historically_verified':False,
             'limitations':['Actual local model run failed; no synthesis claimed. Original sources remain encrypted on private host.']
           },ensure_ascii=False,indent=2)+'\n')
+          PY
+      - name: Preserve fast evidence alongside model verdict
+        run: |
+          python3 - <<'PY'
+          import json,os,pathlib
+          p=pathlib.Path('evidence/runs')/os.environ['SOURCE_RUN']/'research_answer'
+          fast=json.loads((p/'fast_evidence.json').read_text(encoding='utf-8'))
+          answer=json.loads((p/'answer.json').read_text(encoding='utf-8'))
+          answer['fast_evidence']=fast
+          (p/'answer.json').write_text(json.dumps(answer,ensure_ascii=False,indent=2)+'\\n',encoding='utf-8')
           PY
       - name: Store final answer privately and prove encrypted readback
         run: |
