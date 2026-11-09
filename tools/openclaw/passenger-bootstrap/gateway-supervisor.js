@@ -66,6 +66,12 @@ async function start() {
     launchStatus = 'disabled_by_environment';
     return;
   }
+  // A live Top.Host test launched the Gateway but the host killed it with SIGKILL.
+  // Fail closed until the host's process/memory limits have been diagnosed.
+  if (process.env.N7_AGENT_OPENCLAW_ENABLED !== '1') {
+    launchStatus = 'disabled_after_host_sigkill';
+    return;
+  }
   if (!entry) {
     launchStatus = 'openclaw_package_not_readable';
     return;
