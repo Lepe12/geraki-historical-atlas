@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'tools/openclaw/smoke_gateway.sh'
+      - 'tools/openclaw/smoke_gateway_minimal.sh'
       - '.github/workflows/n7-openclaw-gateway-smoke.yml'
   workflow_dispatch:
 permissions:
@@ -16,6 +17,7 @@ jobs:
         with:
           sparse-checkout: |
             tools/openclaw/smoke_gateway.sh
+            tools/openclaw/smoke_gateway_minimal.sh
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -33,3 +35,8 @@ jobs:
       - name: Start real OpenClaw loopback Gateway and require authenticated health response
         shell: bash
         run: bash tools/openclaw/smoke_gateway.sh "$RUNNER_TEMP/n7-openclaw"
+      - name: Measure minimal OpenClaw Gateway footprint with optional plugins disabled
+        shell: bash
+        run: |
+          bash -n tools/openclaw/smoke_gateway_minimal.sh
+          bash tools/openclaw/smoke_gateway_minimal.sh "$RUNNER_TEMP/n7-openclaw"
