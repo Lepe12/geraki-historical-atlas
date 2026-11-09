@@ -39,6 +39,8 @@ jobs:
           node --check jarvis-intelligence-chamber/atlas-pages.js
           node --check jarvis-intelligence-chamber/atlas-reading.js
           node --check jarvis-intelligence-chamber/professional-atlas.js
+          node --check jarvis-intelligence-chamber/reference-preview.js
+          node --check jarvis-intelligence-chamber/reference-handoff.js
           grep -q 'src="./chamber.js' jarvis-intelligence-chamber/index.html
           grep -q 'src="./gpu-field.js' jarvis-intelligence-chamber/index.html
           grep -q 'atlas-pages.js' jarvis-intelligence-chamber/index.html
@@ -74,6 +76,8 @@ jobs:
         run: node jarvis-intelligence-chamber/atlas-pages.test.cjs
       - name: Verify professional atlas geography and controls
         run: node jarvis-intelligence-chamber/professional-atlas.browser.test.cjs
+      - name: Verify faithful reference preview and explicit research handoff
+        run: node jarvis-intelligence-chamber/reference-preview.browser.test.cjs
       - name: Verify renderer, workspace navigation and responsive layout
         env:
           NABOU_SCREENSHOT_DIR: jarvis-intelligence-chamber/screenshots
