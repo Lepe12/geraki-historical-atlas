@@ -1,0 +1,14 @@
+name: N7 fast evidence tests
+on:
+  push:
+    branches: [feature/n7-fast-evidence-first]
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile and run focused retrieval tests
+        run: |
+          python3 -m py_compile tools/n7_fast_evidence.py tools/test_n7_fast_evidence.py
+          PYTHONPATH=tools python3 -m unittest tools/test_n7_fast_evidence.py -v
