@@ -38,6 +38,7 @@ jobs:
           node --check jarvis-intelligence-chamber/gpu-field.js
           node --check jarvis-intelligence-chamber/atlas-pages.js
           node --check jarvis-intelligence-chamber/atlas-reading.js
+          node --check jarvis-intelligence-chamber/professional-atlas.js
           grep -q 'src="./chamber.js' jarvis-intelligence-chamber/index.html
           grep -q 'src="./gpu-field.js' jarvis-intelligence-chamber/index.html
           grep -q 'atlas-pages.js' jarvis-intelligence-chamber/index.html
@@ -71,6 +72,8 @@ jobs:
       # Each browser suite starts its own isolated server and never dispatches production work.
       - name: Verify atlas home vs research page states
         run: node jarvis-intelligence-chamber/atlas-pages.test.cjs
+      - name: Verify professional atlas geography and controls
+        run: node jarvis-intelligence-chamber/professional-atlas.browser.test.cjs
       - name: Verify renderer, workspace navigation and responsive layout
         env:
           NABOU_SCREENSHOT_DIR: jarvis-intelligence-chamber/screenshots
