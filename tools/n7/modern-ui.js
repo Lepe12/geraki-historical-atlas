@@ -82,6 +82,7 @@
    if(mode==='edit')text=editingInstruction+text;
    if(attached)text+='\n\nΣυνημμένο κείμενο: '+attached.name+'\n---\n'+attached.text;
    if(text.length>12000){$('message').value=originalMessage;throw Error('Το μήνυμα μαζί με το αρχείο ξεπερνά τους 12.000 χαρακτήρες.');}
+   report('');
    try{const result=await originalApi(url,{...opt,body:JSON.stringify({...payload,message:text})});if(attachment===attached){attachment=null;file.value='';refreshAttachment();}return result;}
    catch(e){$('message').value=originalMessage;throw e;}
   }

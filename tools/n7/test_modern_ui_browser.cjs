@@ -84,6 +84,10 @@ async function main(){
   await page.locator('#n7-source-library').getByRole('button',{name:'Προσθήκη βιβλίου',exact:true}).click();
   assert.ok(await page.locator('#n7-source-library input[type=file]').isVisible());
   await page.locator('#n7-source-library .n7-library-close').click();
+  await page.getByRole('button',{name:'▥  Αρχειακές πηγές',exact:true}).click();
+  const archive=page.locator('section[aria-label="Αναζήτηση ιστορικών πηγών"]');await archive.waitFor({state:'visible'});
+  assert.equal(await archive.evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(255, 255, 255)');
+  await archive.getByRole('button',{name:'Κλείσιμο',exact:true}).click();
   await page.getByRole('button',{name:'Έρευνα',exact:true}).click();await page.locator('#missions:not(.hidden)').waitFor();
   await page.locator('#missiontarget').fill('Νάξος');await page.locator('#missionpurpose').fill('Αναζήτησε ιστορικές πηγές για τη Νάξο τον 17ο αιώνα.');
   await page.locator('#missionform button[type=submit]').click();await page.waitForFunction(()=>localStorage.getItem('n7-last-mission'));
@@ -93,6 +97,8 @@ async function main(){
   await page.locator('#message').fill('N7_TEST_FAILURE: κράτησε το μήνυμά μου.');await page.locator('#send').click();
   await page.waitForFunction(()=>document.getElementById('notice').textContent.includes('Δοκιμαστική αποτυχία'));
   assert.match(await page.locator('#message').inputValue(),/N7_TEST_FAILURE/);await page.locator('#message').fill('');
+  await page.locator('#message').fill('Συνέχισε τη συζήτηση.');await page.locator('#send').click();await page.waitForFunction(()=>!document.getElementById('send').disabled);
+  assert.ok(!(await page.locator('#notice').textContent()).includes('Δοκιμαστική αποτυχία'));
   await page.getByRole('button',{name:'Ρυθμίσεις εμφάνισης',exact:true}).click();await page.getByLabel('Μέγεθος κειμένου',{exact:true}).selectOption('18');
   assert.equal(await page.evaluate(()=>localStorage.getItem('n7-font-size')),'18');await page.locator('.n7-preferences').getByRole('button',{name:'Κλείσιμο',exact:true}).click();
   if(process.env.N7_SCREENSHOT_DIR){fs.mkdirSync(process.env.N7_SCREENSHOT_DIR,{recursive:true});await page.screenshot({path:path.join(process.env.N7_SCREENSHOT_DIR,'n7-desktop.png'),fullPage:true});}
