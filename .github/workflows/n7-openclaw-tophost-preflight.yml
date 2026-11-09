@@ -1,0 +1,54 @@
+name: N7 OpenClaw existing Top.Host FTPS preflight (read-only)
+on:
+  pull_request:
+    paths:
+      - 'tools/openclaw/tophost_preflight.py'
+      - '.github/workflows/n7-openclaw-tophost-preflight.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/openclaw/tophost_preflight.py'
+      - '.github/workflows/n7-openclaw-tophost-preflight.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/openclaw/tophost_preflight.py
+      - run: python3 -m py_compile tools/openclaw/tophost_preflight.py
+      - name: Forbid remote writes and executable remote shell
+        run: |
+          python3 - <<'PY'
+          import ast
+          from pathlib import Path
+          source=Path('tools/openclaw/tophost_preflight.py').read_text()
+          tree=ast.parse(source)
+          disallowed={'storbinary','storlines','mkd','rmd','delete','rename','chmod','system','popen','spawn','execv','execve'}
+          names={n.attr for n in ast.walk(tree) if isinstance(n,ast.Attribute)}
+          assert not names.intersection(disallowed), names.intersection(disallowed)
+          assert "OPENCLAW_GATEWAY_RUNNING=UNVERIFIED" in source
+          print('OPENCLAW_HOST_PREFLIGHT_READ_ONLY=PASS')
+          PY
+  inspect:
+    if: github.event_name == 'push'
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 10
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/openclaw/tophost_preflight.py
+      - name: Verify existing signed-off OpenClaw stage and Plesk metadata via existing FTPS
+        run: python3 tools/openclaw/tophost_preflight.py
