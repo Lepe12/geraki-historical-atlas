@@ -2,6 +2,11 @@ name: N7 Private Evidence Corpus and Local Model Synthesis
 run-name: N7 encrypted-source synthesis from ${{ inputs.run_id || '42434462262' }}
 
 on:
+  # Owner-controlled one-shot trigger for the private corpus; main branch only.
+  push:
+    branches: [main]
+    paths:
+      - 'tools/.n7_private_reanalysis_trigger'
   workflow_dispatch:
     inputs:
       run_id:
