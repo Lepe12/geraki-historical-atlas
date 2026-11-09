@@ -1,0 +1,75 @@
+name: Sync canonical N7 sources
+on:
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: 'Canonical N7 commit or branch to propose (never deploys directly)'
+        required: true
+        default: main
+  schedule:
+    - cron: '17 6 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: n7-source-sync
+  cancel-in-progress: false
+jobs:
+  propose:
+    if: github.event_name == 'workflow_dispatch' || vars.N7_SOURCE_SYNC_ENABLED == 'true'
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            tools/library
+            tools/check_n7_distribution.py
+            n7-distribution.json
+          persist-credentials: false
+      - name: Require existing private cross-repository connection
+        env:
+          N7_SOURCE_TOKEN: ${{ secrets.PCT_GITHUB_DISPATCH_TOKEN }}
+        run: test -n "$N7_SOURCE_TOKEN"
+      - uses: actions/checkout@v4
+        with:
+          repository: Lepe12/independent-ai-bot
+          ref: ${{ inputs.source_ref || 'main' }}
+          token: ${{ secrets.PCT_GITHUB_DISPATCH_TOKEN }}
+          persist-credentials: false
+          path: .canonical-n7
+      - name: Generate distribution from actual checked-out commit
+        run: |
+          python3 .canonical-n7/scripts/export_atlas_sources.py --destination "$GITHUB_WORKSPACE"
+          git add -- tools/n7 tools/library n7-distribution.json
+          python3 tools/check_n7_distribution.py
+          python3 .canonical-n7/scripts/export_atlas_sources.py --destination "$GITHUB_WORKSPACE" --check
+      - name: Propose one-way generated update through a pull request
+        env:
+          GH_TOKEN: ${{ secrets.PCT_GITHUB_DISPATCH_TOKEN }}
+        run: |
+          set -euo pipefail
+          if git diff HEAD --quiet -- tools/n7 tools/library n7-distribution.json; then
+            echo 'N7 distribution already matches canonical source.'
+            exit 0
+          fi
+          source_commit=$(git -C .canonical-n7 rev-parse HEAD)
+          sync_branch="sync/n7-${source_commit}"
+          if gh pr list --repo "$GITHUB_REPOSITORY" --head "$sync_branch" --state all --json number --jq 'length' | rg -q '^[1-9]'; then
+            echo 'A synchronization PR for this commit already exists.'
+            exit 0
+          fi
+          git config user.name 'N7 source sync'
+          git config user.email 'n7-source-sync@users.noreply.github.com'
+          git switch -c "$sync_branch"
+          git add -- tools/n7 tools/library n7-distribution.json
+          git commit -m "Sync N7 distribution from ${source_commit}"
+          gh auth setup-git
+          git push origin "$sync_branch"
+          cat > "$RUNNER_TEMP/n7-sync-pr.md" <<EOF
+          Generated N7 distribution from Lepe12/independent-ai-bot commit ${source_commit}.
+
+          Edit canonical source in independent-ai-bot only. This PR preserves existing deployment paths and must pass canonical-distribution integrity and relevant regression checks before merge. Merging can trigger the existing guarded deployment workflows for changed components.
+          EOF
+          gh pr create --repo "$GITHUB_REPOSITORY" --base main --head "$sync_branch" --title "Sync canonical N7 ${source_commit:0:12}" --body-file "$RUNNER_TEMP/n7-sync-pr.md"
