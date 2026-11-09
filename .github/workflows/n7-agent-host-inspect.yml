@@ -1,0 +1,52 @@
+name: N7-agent new Top.Host subdomain inspection
+on:
+  pull_request:
+    paths:
+      - 'tools/openclaw/inspect_agent_subdomain.py'
+      - '.github/workflows/n7-agent-host-inspect.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/openclaw/inspect_agent_subdomain.py'
+      - '.github/workflows/n7-agent-host-inspect.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/openclaw/inspect_agent_subdomain.py
+      - name: Syntax and safety
+        run: |
+          python3 -m py_compile tools/openclaw/inspect_agent_subdomain.py
+          python3 - <<'PY'
+          import ast
+          from pathlib import Path
+          source=Path('tools/openclaw/inspect_agent_subdomain.py').read_text()
+          attrs={n.attr for n in ast.walk(ast.parse(source)) if isinstance(n,ast.Attribute)}
+          assert not attrs.intersection({'storbinary','storlines','mkd','rmd','delete','rename','system','popen','sendcmd','exec'})
+          assert 'n7-agent.piratecartography.com' in source
+          print('N7_AGENT_SUBDOMAIN_PROBE_READ_ONLY=PASS')
+          PY
+  inspect:
+    if: github.event_name == 'push'
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: nabou-production
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/openclaw/inspect_agent_subdomain.py
+      - name: Check existing FTPS directories and HTTPS endpoint of new subdomain
+        run: python3 tools/openclaw/inspect_agent_subdomain.py
