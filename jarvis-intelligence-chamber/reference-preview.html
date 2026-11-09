@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="el"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NABOU · Προεπισκόπηση σχεδιασμού</title><link rel="stylesheet" href="./reference-preview.css"></head>
+<body>
+<header class="masthead">
+ <a class="brand" href="./reference-preview.html"><img src="./assets/nautical/img/ship.png" alt=""><span><strong>NABOU</strong><small>N7 Historical Atlas</small></span></a>
+ <a class="n7-brand" href="https://bot.piratecartography.com/" target="_blank" rel="noopener"><span data-icon="wings"></span> N7</a>
+ <nav aria-label="Κύρια πλοήγηση"><a class="active" href="#map" data-icon="map">Χάρτης</a><a href="./?skip=1&view=research" data-icon="book">Ιστορική Έρευνα</a><a href="./?skip=1&view=tools" data-icon="library">Βιβλιοθήκη</a><a href="./?skip=1&view=sources" data-icon="sources">Πηγές</a></nav>
+ <div class="header-actions"><label class="global-search"><span data-icon="search"></span><input type="search" placeholder="Αναζήτηση" aria-label="Γενική αναζήτηση"></label><button class="icon-button" id="notifications" aria-label="Ενημερώσεις" data-icon="bell"></button><button class="icon-button" id="workspace" aria-label="Χώρος εργασίας" data-icon="user"></button></div>
+</header>
+<main id="map" aria-label="Προεπισκόπηση εικαστικού χάρτη Μεσογείου">
+ <svg id="atlasMap" viewBox="0 0 1672 941" preserveAspectRatio="xMidYMid slice" aria-label="Μεσόγειος: διαδραστική εικαστική απεικόνιση">
+  <image href="./assets/reference/mediterranean-art.png" width="1672" height="941"/>
+  <g class="graticule" aria-hidden="true"><path d="M0 280Q836 200 1672 280M0 530Q836 470 1672 530M0 780Q836 730 1672 780M300 0Q350 470 300 941M700 0Q730 470 700 941M1100 0Q1130 470 1100 941M1500 0Q1540 470 1500 941"/></g>
+  <g class="region-labels" aria-hidden="true"><text x="490" y="210">Ευρώπη</text><text x="1125" y="214">Οθωμανική<tspan x="1125" dy="33">Αυτοκρατορία</tspan></text><text x="420" y="782">Βόρεια Αφρική</text><text class="sea-label" x="854" y="616">Μεσόγειος<tspan x="854" dy="33">Θάλασσα</tspan></text></g>
+  <g id="narrativeRoute" hidden><path d="M983 398Q1050 465 1117 596"/><text x="990" y="485">Λάντζας · 1577 · Βιβλίο Γ΄</text></g>
+  <g id="placeMarkers"></g>
+ </svg>
+ <div class="map-vignette" aria-hidden="true"></div>
+ <button id="mobileLayers" class="mobile-layers" data-icon="layers" aria-expanded="false">Επίπεδα</button>
+ <aside class="layers-panel" aria-label="Επίπεδα και αναζήτηση">
+  <section><button class="section-heading" aria-expanded="true" aria-controls="layerOptions" data-icon="layers">Επίπεδα <span class="chevron">⌃</span></button><div id="layerOptions" class="section-body"><label class="check-row"><input id="centres" type="checkbox" checked><span data-icon="castle"></span>Κύρια κέντρα</label><label class="check-row"><input id="ports" type="checkbox"><span data-icon="anchor"></span>Λιμάνια</label><label class="check-row"><input id="routes" type="checkbox"><span data-icon="routes"></span>Κύριες θαλάσσιες<br>διαδρομές</label></div></section>
+  <section><button class="section-heading" aria-expanded="true" aria-controls="periodOptions" data-icon="clock">Χρονολόγηση <span class="chevron">⌄</span></button><div id="periodOptions" class="section-body period"><output id="periodLabel">1500 – 1700</output><div class="range-track"><input id="fromYear" aria-label="Από το έτος" type="range" min="1500" max="1700" value="1500"><input id="toYear" aria-label="Έως το έτος" type="range" min="1500" max="1700" value="1700"></div></div></section>
+  <section><button class="section-heading" aria-expanded="true" aria-controls="searchOptions" data-icon="search">Αναζήτηση <span class="chevron">⌄</span></button><div id="searchOptions" class="section-body"><input id="placeSearch" type="search" aria-label="Αναζήτηση τόπου" placeholder="Πόλη, περιοχή, πρόσωπο…"><div id="searchResults" aria-live="polite"></div></div></section>
+  <div class="ruins" aria-hidden="true"></div>
+ </aside>
+ <div class="map-controls" aria-label="Χειριστήρια χάρτη"><div><button id="zoomIn" aria-label="Μεγέθυνση">+</button><button id="zoomOut" aria-label="Σμίκρυνση">−</button></div><button id="resetMap" aria-label="Επαναφορά χάρτη" data-icon="target"></button></div>
+ <aside class="place-panel" id="placePanel" aria-label="Στοιχεία τόπου"><header><h1><span data-icon="pin"></span><span id="placeTitle">Αλγέρι</span></h1><button class="close-button" id="closePlace" aria-label="Κλείσιμο τόπου">×</button></header><div class="place-content"><div class="harbor-picture" role="img" aria-label="Εικαστική αναπαράσταση ιστορικού λιμανιού"></div><dl><dt>Περίοδος</dt><dd id="placePeriod">16ος – 17ος αι.</dd><dt>Κυρίαρχη εξουσία</dt><dd id="placePower">Οθωμανική<br>Αυτοκρατορία</dd><dt>Ρόλος</dt><dd id="placeRole">Κύριο κέντρο<br>πειρατείας της<br>Μπαρμπαριάς</dd></dl><div class="place-actions"><button id="contextAction" data-icon="info">Ιστορικό πλαίσιο <span>›</span></button><button id="peopleAction" data-icon="people">Πρόσωπα <span>›</span></button><button id="sourcesAction" data-icon="sources">Πηγές & τεκμήρια <span>›</span></button><button id="locateAction" data-icon="pin">Στον χάρτη <span>›</span></button></div></div></aside>
+ <div class="scale" title="Κλίμακα εικαστικού δείγματος, όχι μέτρηση αποστάσεων"><div><span>0</span><span>500</span><span>1.000</span><span>2.000 χλμ.</span></div><i></i></div>
+ <a class="assistant-pill" href="https://bot.piratecartography.com/" target="_blank" rel="noopener"><span class="n7-glyph" data-icon="wings"></span><span><strong>N7 Βοηθός</strong><small>Ρωτήστε για τόπους, γεγονότα, πηγές…</small></span><span data-icon="chat"></span></a>
+</main>
+<dialog id="infoDialog"><button id="closeDialog" class="close-button" aria-label="Κλείσιμο παραθύρου">×</button><h2 id="dialogTitle"></h2><div id="dialogBody"></div></dialog>
+<script src="./reference-preview.js" type="module"></script>
+</body></html>
