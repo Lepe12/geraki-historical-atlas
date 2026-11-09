@@ -54,3 +54,28 @@ Each selected run has a `?run=…` permalink, including after history selection 
 ```sh
 node --test jarvis-intelligence-chamber/research-dossier.test.cjs
 ```
+
+### Professional atlas presentation
+
+`professional-atlas.js` / `.css` add the NABOU dark/gold interface, geographic
+place markers, searchable place list, ordered date range, source card, and mobile
+layer drawer. They reuse the existing Natural Earth Mercator projection and the
+existing 2D controls / WebGL extension API. Canonical renderers and world geometry
+are unchanged. Researchers and nautical construction lines are optional layers.
+
+`assets/nautical/terrain/professional-relief.png` is derived from the existing
+NOAA ETOPO1 elevation raster (public domain, DOI: 10.7289/V5C8276M), using
+`python tools/build_professional_relief.py` (NumPy and Pillow). It has the same
+geographic extent and is clipped to the existing land geometry. It is a shaded
+physical surface, not a historical territorial reconstruction. Place coordinates
+are approximate city reference points; Chania and Candia/Heraklion are separate.
+
+Dates scope the research prompt and dated source matches. Undated search results
+can remain visible and require verification. Authority and port role are never
+inferred from coordinates. The harbor illustration is explicitly illustrative.
+Source cards use the selected research snapshot, restrict links to HTTP(S), and
+make no automatic verification claim. The N7 button opens the existing assistant.
+
+Verification: `node professional-atlas.browser.test.cjs`, `node atlas-pages.test.cjs`
+and `node workspace-layout.test.cjs` (Playwright). Tests isolate external requests
+and never dispatch production research.

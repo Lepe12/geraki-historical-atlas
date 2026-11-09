@@ -26,6 +26,8 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
  assert.equal(await page.locator('.atlas-research-panel').isVisible(),false);
  assert.equal(await page.locator('#chartFrame').isVisible(),true);
  assert.equal(await page.locator('#nodeLabels .node-label').count(),17);
+ assert.equal(await page.locator('body').getAttribute('data-pro-lanes'),'false','Research layers start collapsed on the geographic atlas');
+ await page.getByRole('checkbox',{name:'Ερευνητές',exact:true}).check();
  const visibleAgents=await page.locator('#nodeLabels .node-label').evaluateAll(es=>es.filter(e=>getComputedStyle(e).visibility==='visible'&&e.getBoundingClientRect().width>0).length);
  assert.ok(visibleAgents>=5,'Researcher emblems must be visibly rendered on the real map');
  await page.waitForTimeout(500);
@@ -40,7 +42,9 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
  await page.locator('#atlasCloseResearch').click();
  assert.equal(await page.locator('.atlas-research-panel').isVisible(),false);
  assert.equal(await page.locator('#chartFrame').isVisible(),true);
- await page.locator('#nodeLabels .node-label').filter({visible:true}).first().click();
+ const reachableAgent=await page.locator('#nodeLabels .node-label').evaluateAll(es=>es.findIndex(e=>{const r=e.getBoundingClientRect();return document.elementFromPoint(r.left+r.width/2,r.top+r.height/2)?.closest('.node-label')===e;}));
+ assert.ok(reachableAgent>=0,'At least one map researcher must be directly clickable beside the controls');
+ await page.locator('#nodeLabels .node-label').nth(reachableAgent).click();
  await page.locator('#detailPanel').waitFor({state:'visible'});
  await page.locator('#closeDetail').click();
  await page.waitForFunction(()=>document.body.dataset.readerView==='map');
