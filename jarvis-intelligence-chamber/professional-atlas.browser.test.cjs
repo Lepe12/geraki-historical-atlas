@@ -14,12 +14,13 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
  await page.goto('http://127.0.0.1:'+server.address().port+'/jarvis-intelligence-chamber/?skip=1');
  await page.waitForFunction(()=>document.body.dataset.currentResearchRun==='100');
 
- await page.waitForFunction(()=>document.body.dataset.proRelief==='ready');
+ await page.waitForFunction(()=>document.body.dataset.proRelief==='ready'&&document.body.dataset.proOcean==='ready');
  await page.locator('#atlasExplore').click();
  assert.equal(await page.locator('.pro-place-marker').count(),11);
  const projected=await page.evaluate(()=>window.NABOU_PRO_ATLAS.places.every(p=>{const point=window.NABOU_PRO_ATLAS.project(p.lon,p.lat),marker=document.querySelector('.pro-place-marker[data-place="'+p.id+'"]');return Math.abs(parseFloat(marker.style.left)-point.x)<.01&&Math.abs(parseFloat(marker.style.top)-point.y)<.01;}));
  assert.equal(projected,true,'Every place uses the original geographic projection');
  assert.match(await page.locator('.pro-relief').getAttribute('href'),/^data:image\/png;base64,/);
+ assert.match(await page.locator('.pro-ocean').getAttribute('href'),/^data:image\/png;base64,/,'Bathymetry texture must load from the bundled source');
  await page.getByLabel('Αναζήτηση τόπου',{exact:true}).fill('χανια');
  assert.equal(await page.locator('.pro-place-list button').count(),1);
  await page.locator('.pro-place-list button').click();

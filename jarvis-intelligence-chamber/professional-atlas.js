@@ -29,9 +29,11 @@
  if(brand){brand.querySelector('.atlas-n7').textContent='NABOU';brand.querySelector('.atlas-sub').textContent='N7 Historical Atlas';const ship=el('img');ship.src='./assets/nautical/img/ship.png';ship.alt='';ship.className='pro-brand-ship';brand.prepend(ship);}
  const nav=document.querySelector('#atlasResearch>.atlas-topnav');
  if(nav){nav.querySelector('[data-atlas-nav="research"]').textContent='Ιστορική Έρευνα';nav.querySelector('[data-atlas-nav="tools"]').textContent='Βιβλιοθήκη';}
+ const navIcons={map:'M2 4l6-2 8 3 6-2v17l-6 2-8-3-6 2zM8 2v17M16 5v17',research:'M12 5C8 2 4 2 1 3v17c4-1 7 0 11 2 4-2 7-3 11-2V3c-4-1-7-1-11 2zm0 0v17',sources:'M4 2h16v20H4zM7 6h10M7 10h10M7 14h7M7 18h8',agents:'M8 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM1 22v-3c0-7 14-7 14 0v3M17 4a4 4 0 0 1 0 8M19 16c3 1 4 3 4 6',tools:'M2 3h5v19H2zM10 3h5v19h-5zM18 3h4v19h-4zM2 7h5M10 7h5M18 7h4'};
+ if(nav)for(const b of nav.querySelectorAll('[data-atlas-nav]')){const icon=svg('svg',{viewBox:'0 0 24 24',width:24,height:24,'aria-hidden':'true',class:'pro-nav-icon',fill:'none',stroke:'currentColor','stroke-width':1.3,'stroke-linejoin':'round'});icon.append(svg('path',{d:navIcons[b.dataset.atlasNav]||navIcons.sources}));b.prepend(icon);}
  const tools=el('aside',undefined,'pro-map-tools');tools.id='proMapTools';tools.setAttribute('aria-label','Φίλτρα και τόποι χάρτη');
  const heading=el('div',undefined,'pro-tools-heading');heading.append(el('h2','Επίπεδα'),button('×',()=>{tools.classList.remove('pro-open');toggle.setAttribute('aria-expanded','false');},'pro-mobile-close'));tools.append(heading);
- function check(label,key,on){const box=el('label',undefined,'pro-check');const input=el('input');input.type='checkbox';input.checked=on;input.addEventListener('change',()=>{body.dataset[key]=String(input.checked);for(const p of places)if(p.object3d)p.object3d.hidden=key==='proPlaces'?!input.checked:p.object3d.hidden;});box.append(input,el('span',label));tools.append(box);return input;}
+ function check(label,key,on){const box=el('label',undefined,'pro-check');const input=el('input');input.type='checkbox';input.setAttribute('aria-label',label);input.checked=on;input.addEventListener('change',()=>{body.dataset[key]=String(input.checked);for(const p of places)if(p.object3d)p.object3d.hidden=key==='proPlaces'?!input.checked:p.object3d.hidden;});box.append(input,el('span',label));tools.append(box);return input;}
  check('Τόποι & λιμάνια','proPlaces',true);const laneInput=check('Ερευνητές','proLanes',false);check('Ναυτικές γραμμές','proRhumbs',false);
  window.addEventListener('jarvis:focus-agent',()=>{body.dataset.proLanes='true';laneInput.checked=true;});
  const period=el('section',undefined,'pro-period');period.append(el('h2','Χρονολόγηση'));const dateLabel=el('p');
@@ -51,12 +53,19 @@
  const terrain=$('chartPlane').querySelector('svg.chart');
  if(terrain){
   const defs=terrain.querySelector('defs'),clip=svg('clipPath',{id:'proLandClip'});clip.append(svg('use',{href:'#landP'}));defs.append(clip);
-  const gradient=svg('linearGradient',{id:'proSea',x1:'0',y1:'0',x2:'0',y2:'1'});gradient.append(svg('stop',{offset:'0%','stop-color':'#16434a'}),svg('stop',{offset:'100%','stop-color':'#092c34'}));defs.append(gradient);
+  const gradient=svg('linearGradient',{id:'proSea',x1:'0',y1:'0',x2:'0',y2:'1'});gradient.append(svg('stop',{offset:'0%','stop-color':'#0c3e49'}),svg('stop',{offset:'100%','stop-color':'#06242e'}));defs.append(gradient);
+  const ocean=svg('image',{x:0,y:0,width:C.W,height:C.H,class:'pro-ocean'});terrain.querySelector('.landbase').before(ocean);
+  fetch('./assets/nautical/terrain/professional-ocean.png').then(r=>{if(!r.ok)throw Error('ocean unavailable');return r.blob();}).then(blob=>new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(blob);})).then(data=>{ocean.setAttribute('href',data);body.dataset.proOcean='ready';}).catch(()=>{ocean.remove();body.dataset.proOcean='unavailable';});
   const relief=svg('image',{x:0,y:0,width:C.W,height:C.H,'clip-path':'url(#proLandClip)',class:'pro-relief'});terrain.querySelector('.coast').before(relief);
   // Inline the same-origin raster so the existing 3D SVG texture loader can reuse it.
   fetch('./assets/nautical/terrain/professional-relief.png').then(r=>{if(!r.ok)throw Error('terrain unavailable');return r.blob();}).then(blob=>new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(blob);})).then(data=>{relief.setAttribute('href',data);body.dataset.proRelief='ready';}).catch(()=>{relief.remove();body.dataset.proRelief='unavailable';});
+  const grid=svg('g',{class:'pro-map-grid'});
+  for(let lon=-15;lon<=40;lon+=5){const a=project(lon,28.4),b=project(lon,55.2);grid.append(svg('path',{d:`M${a.x},${a.y}L${b.x},${b.y}`}));}
+  for(let lat=30;lat<=55;lat+=5){const a=project(-20,lat),b=project(40,lat);grid.append(svg('path',{d:`M${a.x},${a.y}L${b.x},${b.y}`}));}terrain.querySelector('.coast').before(grid);
+  const noise=svg('filter',{id:'proSeaGrain',x:'0%',y:'0%',width:'100%',height:'100%'});noise.append(svg('feTurbulence',{type:'fractalNoise',baseFrequency:'.65',numOctaves:'3',seed:'1577',stitchTiles:'stitch'}));defs.append(noise);
+  const seaGrain=svg('rect',{x:0,y:0,width:C.W,height:C.H,filter:'url(#proSeaGrain)',class:'pro-sea-texture'});terrain.querySelector('.landbase').before(seaGrain);
   const labels=svg('g',{class:'pro-map-labels'});
-  for(const [text,lon,lat,sea] of [['Ευρώπη',4,48,false],['Βόρεια Αφρική',3,30.8,false],['Μικρά Ασία',31,38.5,false],['Μεσόγειος Θάλασσα',15,34.3,true]]){const pos=project(lon,lat),t=svg('text',{x:pos.x,y:pos.y,'text-anchor':'middle',class:sea?'pro-sea-label':'pro-land-label'});t.textContent=text;labels.append(t);}terrain.append(labels);
+  for(const [text,lon,lat,sea] of [['Ευρώπη',4,44.4,false],['Βόρεια Αφρική',3,33.2,false],['Μικρά Ασία',31,38.5,false],['Μεσόγειος Θάλασσα',15,35.7,true]]){const pos=project(lon,lat),t=svg('text',{x:pos.x,y:pos.y,'text-anchor':'middle',class:sea?'pro-sea-label':'pro-land-label'});if(sea){for(const [word,dy]of [['Μεσόγειος',0],['Θάλασσα',27]]){const line=svg('tspan',{x:pos.x,dy});line.textContent=word;t.append(line);}}else t.textContent=text;labels.append(t);}terrain.append(labels);
  }
  function view(){const m=/translate\(([-\d.]+)px,\s*([-\d.]+)px\)\s*scale\(([-\d.]+)\)/.exec(plane.style.transform||'');return m?{x:+m[1],y:+m[2],s:+m[3]}:{x:0,y:0,s:1};}
  function syncView(){const v=view();overlay.style.setProperty('--pro-inverse-scale',1/v.s);const host=$('chartView'),y=(host.clientHeight/2-v.y)/v.s;const lat=(2*Math.atan(Math.exp((C.my1-y/C.k)*Math.PI/180))-Math.PI/2)*180/Math.PI;const kmPerPixel=111.32*Math.cos(lat*Math.PI/180)/(C.k*v.s),raw=140*kmPerPixel,power=10**Math.floor(Math.log10(Math.max(1,raw))),nice=[10,5,2,1].map(n=>n*power).find(n=>n<=raw)||power;scaleLine.style.width=(nice/kmPerPixel)+'px';scaleLabel.textContent='0                     '+Math.round(nice).toLocaleString('el')+' χλμ.';}
@@ -77,5 +86,7 @@
  window.addEventListener('nabou:map3d',event=>{if(!event.detail?.on)return;for(const p of places){if(p.object3d)continue;const b=button(p.name,()=>select(p.id),'pro-3d-place');b.dataset.place=p.id;p.object3d=b;b.hidden=body.dataset.proPlaces!=='true';window.NABOU_MAP3D?.addObject(b,{lon:p.lon,lat:p.lat,z:1});}});
  import('./live-bridge.js').then(({connectResearchFeed})=>connectResearchFeed({onSnapshot:s=>{snapshot=s;renderPlace();},onReset:()=>{snapshot=null;renderPlace();}})).catch(()=>{snapshot=null;renderPlace();});
  select(selected.id,{focus:false});dateLabel.textContent=startYear+' – '+endYear;
+ // Use the existing wheel handler for the reference's slightly wider opening composition.
+ if(innerWidth>900)requestAnimationFrame(()=>requestAnimationFrame(()=>{if(window.NABOU_MAP3D?.enabled)return;const r=$('chartView').getBoundingClientRect();$('chartStage').dispatchEvent(new WheelEvent('wheel',{deltaY:90,clientX:r.left+r.width*.62,clientY:r.top+r.height*.5,bubbles:true,cancelable:true}));}));
  window.NABOU_PRO_ATLAS={places:places.map(({id,name,lon,lat})=>({id,name,lon,lat})),project,select,get selected(){return selected.id;}};
 })();

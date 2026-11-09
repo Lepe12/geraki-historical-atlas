@@ -79,3 +79,14 @@ make no automatic verification claim. The N7 button opens the existing assistant
 Verification: `node professional-atlas.browser.test.cjs`, `node atlas-pages.test.cjs`
 and `node workspace-layout.test.cjs` (Playwright). Tests isolate external requests
 and never dispatch production research.
+
+Reference-style revision (preview): the 2D surface now uses a separate 1800×1105
+16-bit elevation grid, resampled directly from the NOAA ETOPO1 2-arcminute source.
+Its provenance, encoding, source query and source-grid hash are recorded in
+`assets/nautical/terrain/mediterranean-elevation-2min.json`. Rebuild with
+`tools/resample_professional_elevation.py <downloaded.csv>`, then
+`tools/build_professional_relief.py`. Land colors, engraved elevation bands and
+paper grain are illustrative styling; sea shading follows actual bathymetry.
+Neither is historical territorial evidence. The original WebGL heightmap remains
+unchanged. Desktop opening composition uses the existing wheel handler with a small zoom-out
+gesture; all pan, zoom, clamps and geographic projections remain canonical.
