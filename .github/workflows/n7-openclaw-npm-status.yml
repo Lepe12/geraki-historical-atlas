@@ -57,6 +57,11 @@ jobs:
               except ftplib.error_perm as ex:
                   if str(ex).startswith('550'): return False
                   raise
+          def file_present(path):
+              try: return f.size(path) is not None
+              except ftplib.error_perm as ex:
+                  if str(ex).startswith('550'): return False
+                  raise
           def read_small(path,limit=50000):
               chunks=[]; size=0
               def feed(chunk):
@@ -80,12 +85,9 @@ jobs:
                   print('N7_NPM_OPENCLAW_VERSION='+str(package.get('version','unknown'))[:30])
                   print('N7_NPM_OPENCLAW_PACKAGE_PRESENT=true')
               else: print('N7_NPM_OPENCLAW_PACKAGE_PRESENT=false')
-              cli=read_small(node_modules+'/openclaw/openclaw.mjs',500)
-              print('N7_NPM_OPENCLAW_CLI_PRESENT='+str(cli is not None).lower())
-              hidden_lock=read_small(node_modules+'/.package-lock.json',400000)
-              print('N7_NPM_HIDDEN_LOCK_PRESENT='+str(hidden_lock is not None).lower())
-              package_lock=read_small(root+'/package-lock.json',400000)
-              print('N7_NPM_ROOT_LOCK_PRESENT='+str(package_lock is not None).lower())
+              print('N7_NPM_OPENCLAW_CLI_PRESENT='+str(file_present(node_modules+'/openclaw/openclaw.mjs')).lower())
+              print('N7_NPM_HIDDEN_LOCK_PRESENT='+str(file_present(node_modules+'/.package-lock.json')).lower())
+              print('N7_NPM_ROOT_LOCK_PRESENT='+str(file_present(root+'/package-lock.json')).lower())
               print('N7_NPM_PROCESS_RUNNING=not_observable_via_ftps')
               print('N7_NPM_INSTALL_SUCCESS=not_proven_by_file_presence')
           finally:
