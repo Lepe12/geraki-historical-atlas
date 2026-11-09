@@ -13,7 +13,7 @@ TARGET = '/n7-agent.piratecartography.com'
 TLS = 'linux3087.grserver.gr'
 HERE = Path(__file__).resolve().parent / 'passenger-bootstrap'
 OLD_APP_SHA256 = '29d7487e0dc1f43f8813fe8fb2df9f19965ca34208e895df9559f20518e28338'
-OLD_GATEWAY_BLOB_SHA1 = '2f460df27c7c132c3a9cb1ce9d0bce5e7d271d2d'
+OLD_GATEWAY_BLOB_SHA1 = '8a20b001844baf9a280f009a89fd8aad61180b0c'
 
 
 def git_blob_sha(data):
@@ -66,6 +66,10 @@ def main():
             raise RuntimeError('APP_JS_MISSING')
         desired=(HERE/'app.js').read_bytes()
         addition=(HERE/'gateway-supervisor.js').read_bytes()
+        diag_data=(HERE/'host-diagnostic.js').read_bytes()
+        existing_diag=read(ftp,'host-diagnostic.js')
+        if existing_diag is not None and existing_diag != diag_data:
+            raise RuntimeError('HOST_DIAGNOSTIC_FILE_CONFLICT')
         existing_extra=read(ftp,'gateway-supervisor.js')
         if existing_extra is not None and existing_extra != addition:
             if git_blob_sha(existing_extra) != OLD_GATEWAY_BLOB_SHA1:
@@ -75,6 +79,14 @@ def main():
             raise RuntimeError('APP_JS_CONFLICT_REFUSE_OVERWRITE')
         if read(ftp,'public/index.html') is None:
             raise RuntimeError('EXPECTED_PUBLIC_DOCROOT_MISSING')
+        if existing_diag is None:
+            tmp=upload_verified(ftp,'host-diagnostic.js',diag_data)
+            ftp.rename(tmp,'host-diagnostic.js')
+            if digest(read(ftp,'host-diagnostic.js') or b'') != digest(diag_data):
+                raise RuntimeError('HOST_DIAGNOSTIC_SHA_READBACK_FAILED')
+            print('N7_AGENT_HOST_DIAGNOSTIC_MODULE_INSTALLED=true')
+        else:
+            print('N7_AGENT_HOST_DIAGNOSTIC_MODULE_MATCHES=true')
         if existing_extra is None:
             tmp=upload_verified(ftp,'gateway-supervisor.js',addition)
             ftp.rename(tmp,'gateway-supervisor.js')
@@ -83,7 +95,7 @@ def main():
             print('N7_AGENT_SUPERVISOR_UPLOADED=true')
         elif existing_extra != addition:
             # Replacement is allowed only for the known earlier supervisor build.
-            backup='.n7-agent-gateway-supervisor.pre-sigkill.js'
+            backup='.n7-agent-gateway-supervisor.pre-host-diagnostic.js'
             saved=read(ftp,backup)
             if saved is None:
                 tmp=upload_verified(ftp,'supervisor-backup',existing_extra)
@@ -134,6 +146,7 @@ def main():
         print('N7_AGENT_SUPERVISOR_FILES_VERIFIED=true')
         print('N7_AGENT_LOOPBACK_PORT=19487')
         print('N7_AGENT_GATEWAY_AUTOSTART_DISABLED_AFTER_SIGKILL=true')
+        print('N7_AGENT_RESOURCE_DIAGNOSTIC_CAPTURE_REQUESTED=true')
         print('N7_EXISTING_N7_MODIFIED=false')
     finally:
         try: ftp.quit()

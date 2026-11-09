@@ -5,6 +5,8 @@ on:
       - 'tools/openclaw/deploy_agent_supervisor.py'
       - 'tools/openclaw/passenger-bootstrap/app.js'
       - 'tools/openclaw/passenger-bootstrap/gateway-supervisor.js'
+      - 'tools/openclaw/passenger-bootstrap/host-diagnostic.js'
+      - 'tools/openclaw/read_agent_host_limits.py'
       - '.github/workflows/n7-agent-loopback-gateway.yml'
   push:
     branches: [main]
@@ -12,6 +14,8 @@ on:
       - 'tools/openclaw/deploy_agent_supervisor.py'
       - 'tools/openclaw/passenger-bootstrap/app.js'
       - 'tools/openclaw/passenger-bootstrap/gateway-supervisor.js'
+      - 'tools/openclaw/passenger-bootstrap/host-diagnostic.js'
+      - 'tools/openclaw/read_agent_host_limits.py'
       - '.github/workflows/n7-agent-loopback-gateway.yml'
 permissions:
   contents: read
@@ -35,6 +39,18 @@ jobs:
         run: |
           node --check tools/openclaw/passenger-bootstrap/app.js
           node --check tools/openclaw/passenger-bootstrap/gateway-supervisor.js
+          node --check tools/openclaw/passenger-bootstrap/host-diagnostic.js
+          python3 -m py_compile tools/openclaw/read_agent_host_limits.py
+          node - <<'JS'
+          const fs=require('node:fs');
+          const diag=require('./tools/openclaw/passenger-bootstrap/host-diagnostic.js');
+          const s=diag.snapshot();
+          if(s.schemaVersion !== 1 || !s.memory || !s.processLimits) process.exit(1);
+          diag.save();
+          const d=JSON.parse(fs.readFileSync('./tools/openclaw/passenger-bootstrap/.n7-agent-state/host-limits.json'));
+          if(d.schemaVersion !== 1 || typeof d.memory.processRssMB !== 'number') process.exit(1);
+          console.log('N7_HOST_RESOURCE_PROBE_TEST=PASS');
+          JS
           python3 -m py_compile tools/openclaw/deploy_agent_supervisor.py
           node - <<'JS'
           const fs=require('node:fs');
@@ -76,6 +92,14 @@ jobs:
         with:
           sparse-checkout: |
             tools/openclaw/deploy_agent_supervisor.py
+            tools/openclaw/read_agent_host_limits.py
             tools/openclaw/passenger-bootstrap
-      - name: Safely deploy new agent loopback Gateway supervisor and request Passenger restart
+      - name: Safely deploy resource probe while keeping Gateway disabled
         run: python3 tools/openclaw/deploy_agent_supervisor.py
+      - name: Wake only N7-agent Passenger and read private cgroup metrics over FTPS
+        run: |
+          for i in 1 2 3 4; do
+            if python3 tools/openclaw/read_agent_host_limits.py; then exit 0; fi
+            sleep 3
+          done
+          exit 1
