@@ -186,7 +186,11 @@ class HandoffTests(unittest.TestCase):
         commit = text.split('- name: Commit situation board', 1)[1]
         self.assertLess(commit.index('research_continuation/auto_continue.json'), commit.index('git add'))
         self.assertIn('"auto_continue": false', commit)
-        self.assertNotIn('gh workflow run', text)
+        # The owner-only encrypted N7 handoff is intentionally dispatched here.
+        # It is not an automatic research continuation and is main-only.
+        self.assertIn('gh workflow run n7-private-corpus-synthesis.yml --ref main', text)
+        self.assertIn("github.ref == 'refs/heads/main' && startsWith(inputs.request_id, 'n7mission-')", text)
+        self.assertNotIn('gh workflow run research-semantic-reanalysis.yml', text)
         # Lane workers now hand off evidence; the hold marker must exist
         # before the single publisher exposes any corpus evidence to main.
         workers = text.split('  research-lanes:', 1)[1].split('  publish-lanes:', 1)[0]
