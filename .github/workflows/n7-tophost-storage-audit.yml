@@ -1,0 +1,53 @@
+name: N7 X8 VPS storage evidence from live Top.Host FTPS
+on:
+  pull_request:
+    paths:
+      - 'tools/openclaw/audit_tophost_vps_x8_disk.py'
+      - '.github/workflows/n7-tophost-storage-audit.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/openclaw/audit_tophost_vps_x8_disk.py'
+      - '.github/workflows/n7-tophost-storage-audit.yml'
+permissions:
+  contents: read
+jobs:
+  static-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/openclaw/audit_tophost_vps_x8_disk.py
+      - name: Syntax and read-only checks
+        run: |
+          python3 -m py_compile tools/openclaw/audit_tophost_vps_x8_disk.py
+          python3 - <<'PY'
+          import ast
+          from pathlib import Path
+          p=Path('tools/openclaw/audit_tophost_vps_x8_disk.py')
+          tree=ast.parse(p.read_text())
+          attrs={n.attr for n in ast.walk(tree) if isinstance(n,ast.Attribute)}
+          forbidden={'storbinary','storlines','delete','rename','mkd','rmd','sendcmd','system','popen','chmod','chown'}
+          assert not attrs.intersection(forbidden), attrs & forbidden
+          print('N7_READ_ONLY_DISK_AUDIT_STATIC=PASS')
+          PY
+  disk-audit:
+    if: github.event_name == 'push'
+    needs: static-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    environment: nabou-production
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/openclaw/audit_tophost_vps_x8_disk.py
+      - name: Scan read-only live FTPS directories for actual bytes
+        run: python3 -u tools/openclaw/audit_tophost_vps_x8_disk.py
