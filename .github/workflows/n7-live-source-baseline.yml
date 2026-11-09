@@ -7,6 +7,7 @@ on:
       - 'tools/test_capture_n7_live_source.py'
       - 'tools/stage_n7_live_source.py'
       - 'tools/test_stage_n7_live_source.py'
+      - 'config/n7-capture-recipient.pem'
       - '.github/workflows/n7-live-source-baseline.yml'
 permissions:
   contents: write # source-only capture branch; main and the live application are never written
@@ -24,6 +25,7 @@ jobs:
             tools/test_capture_n7_live_source.py
             tools/stage_n7_live_source.py
             tools/test_stage_n7_live_source.py
+            config/n7-capture-recipient.pem
       - name: Test source scope, secret refusal and concurrent-change detection
         run: |
           python3 tools/test_capture_n7_live_source.py
@@ -35,10 +37,8 @@ jobs:
           PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
           PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
         run: python3 tools/capture_n7_live_source.py --destination "$RUNNER_TEMP/n7-live-source"
-      - name: Stage source in an isolated private branch without artifact storage
-        env:
-          N7_REPOSITORY_PRIVATE: ${{ github.event.repository.private }}
-        run: python3 tools/stage_n7_live_source.py --capture "$RUNNER_TEMP/n7-live-source"
+      - name: Stage only encrypted source in an isolated branch without artifact storage
+        run: python3 tools/stage_n7_live_source.py --capture "$RUNNER_TEMP/n7-live-source" --recipient config/n7-capture-recipient.pem
       - uses: actions/upload-artifact@v4
         if: vars.N7_CAPTURE_ARTIFACTS == 'true'
         with:

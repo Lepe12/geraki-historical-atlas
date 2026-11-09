@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Stage credential-screened code in a private Git branch; never deploy it."""
+"""Stage authenticated ciphertext in a Git branch; never publish plaintext code."""
 import argparse
+import base64
 import hashlib
 import json
 import os
@@ -8,6 +9,7 @@ from pathlib import Path, PurePosixPath
 import re
 import subprocess
 import tempfile
+import zipfile
 
 
 def source_payload(directory):
@@ -41,12 +43,28 @@ def source_payload(directory):
     return payload
 
 
-def stage(repository, directory, branch, private):
-    if not private:
-        raise ValueError('Live code staging requires a private repository')
+def encrypted_payload(directory, recipient):
+    payload = source_payload(directory)
+    with tempfile.TemporaryDirectory() as temp:
+        archive = Path(temp) / 'source.zip'
+        with zipfile.ZipFile(archive, 'w', compression=zipfile.ZIP_DEFLATED) as bundle:
+            for name, data in payload.items():
+                bundle.writestr(zipfile.ZipInfo(name), data, compress_type=zipfile.ZIP_DEFLATED)
+        sealed = subprocess.check_output(['openssl', 'cms', '-encrypt', '-binary', '-aes-256-gcm',
+                                          '-outform', 'DER', '-in', str(archive), '-recip', str(recipient),
+                                          '-keyopt', 'rsa_padding_mode:oaep', '-keyopt', 'rsa_oaep_md:sha256',
+                                          '-keyopt', 'rsa_mgf1_md:sha256'])
+    receipt = {'schema': 'n7-encrypted-source/v1', 'encryption': 'CMS AES-256-GCM RSA-OAEP-SHA256',
+               'ciphertext_sha256': hashlib.sha256(sealed).hexdigest(),
+               'recipient_certificate_sha256': hashlib.sha256(recipient.read_bytes()).hexdigest()}
+    return {'capture.cms.b64': base64.b64encode(sealed) + b'\n',
+            'sealed-manifest.json': (json.dumps(receipt, indent=2) + '\n').encode()}
+
+
+def stage(repository, directory, branch, recipient):
     if not re.fullmatch(r'capture/n7-live-[0-9]+-[0-9]+', branch):
         raise ValueError('Unexpected capture branch')
-    payload = source_payload(directory)
+    payload = encrypted_payload(directory, recipient)
     env = dict(os.environ, GIT_AUTHOR_NAME='N7 source capture', GIT_COMMITTER_NAME='N7 source capture',
                GIT_AUTHOR_EMAIL='n7-source-capture@users.noreply.github.com',
                GIT_COMMITTER_EMAIL='n7-source-capture@users.noreply.github.com')
@@ -61,14 +79,15 @@ def stage(repository, directory, branch, private):
         tree = git('write-tree')
         commit = git('commit-tree', tree, '-m', 'Private read-only N7 source capture')
         git('update-ref', 'refs/heads/' + branch, commit, '0' * 40)
-    return commit, len(payload) - 1
+    return commit, len(payload)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--capture', type=Path, required=True)
+    parser.add_argument('--recipient', type=Path, required=True)
     args = parser.parse_args()
     branch = 'capture/n7-live-' + os.environ['GITHUB_RUN_ID'] + '-' + os.environ['GITHUB_RUN_ATTEMPT']
-    commit, count = stage(Path.cwd(), args.capture, branch, os.environ.get('N7_REPOSITORY_PRIVATE') == 'true')
+    commit, count = stage(Path.cwd(), args.capture, branch, args.recipient)
     subprocess.run(['git', 'push', 'origin', commit + ':refs/heads/' + branch], check=True)
-    print(f'N7_PRIVATE_SOURCE_STAGED branch={branch} commit={commit} files={count} production_writes=false')
+    print(f'N7_ENCRYPTED_SOURCE_STAGED branch={branch} commit={commit} files={count} production_writes=false')
