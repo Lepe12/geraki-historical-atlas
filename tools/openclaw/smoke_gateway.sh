@@ -53,3 +53,26 @@ print('OPENCLAW_GATEWAY_RPC_HEALTH=PASS')
 print('OPENCLAW_ISOLATED_RUNTIME_VERIFIED=true')
 print('OPENCLAW_TOPHOST_RUNTIME_VERIFIED=false')
 PY
+# Measure the real RSS and high-water RSS after the Gateway and its plugins settle.
+# This is a CI-only process. No Top.Host process is started.
+sleep 12
+if ! kill -0 "$pid" 2>/dev/null; then
+  echo 'OPENCLAW_GATEWAY_EXITED_BEFORE_MEMORY_SAMPLE'
+  exit 1
+fi
+python3 - "$pid" <<'PY'
+import pathlib, re, sys
+pid=int(sys.argv[1])
+lines=pathlib.Path(f'/proc/{pid}/status').read_text().splitlines()
+metrics={}
+for line in lines:
+    match=re.match(r'^(VmRSS|VmHWM|VmSize|Threads):\\s*(\\d+)',line)
+    if match: metrics[match.group(1)]=int(match.group(2))
+for key in ('VmRSS','VmHWM','VmSize','Threads'):
+    if key not in metrics: raise SystemExit('MISSING_PROC_MEMORY_METRIC_'+key)
+print('OPENCLAW_CI_GATEWAY_RSS_MB='+str(round(metrics['VmRSS']/1024)))
+print('OPENCLAW_CI_GATEWAY_PEAK_RSS_MB='+str(round(metrics['VmHWM']/1024)))
+print('OPENCLAW_CI_GATEWAY_VIRTUAL_MB='+str(round(metrics['VmSize']/1024)))
+print('OPENCLAW_CI_GATEWAY_THREADS='+str(metrics['Threads']))
+print('OPENCLAW_CI_MEMORY_IS_NOT_TOPHOST_QUOTA=true')
+PY
