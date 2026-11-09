@@ -15,7 +15,7 @@ import uuid
 
 TARGET = '/n7-agent.piratecartography.com'
 TLS = 'linux3087.grserver.gr'
-FILES = ('app.js', 'package.json')
+FILES = ('app.js', 'package.json', 'public/index.html')
 HERE = Path(__file__).resolve().parent / 'passenger-bootstrap'
 
 
@@ -62,13 +62,22 @@ def deploy(ftp):
         current=read_if_exists(ftp,name)
         if current is not None and current != new_data:
             raise RuntimeError('REFUSE_OVERWRITE_EXISTING_FILE_'+name)
+    # Keep the document root under a separate public/ subfolder.
+    try:
+        ftp.cwd(TARGET + '/public')
+    except ftplib.error_perm as exc:
+        if not str(exc).startswith('550'):
+            raise
+        ftp.mkd(TARGET + '/public')
+    ftp.cwd(TARGET)
     uploaded=[]
     try:
         for name, data in payload.items():
             if read_if_exists(ftp,name) == data:
                 print('N7_AGENT_BOOTSTRAP_ALREADY_MATCHES_'+name+'=true')
                 continue
-            temp='.n7-agent-upload-'+uuid.uuid4().hex[:12]+'-'+name
+            dirname, _, basename = name.rpartition('/')
+            temp = (dirname + '/' if dirname else '') + '.n7-agent-upload-' + uuid.uuid4().hex[:12] + '-' + basename
             ftp.storbinary('STOR '+temp, io.BytesIO(data),blocksize=65536)
             if digest(read_if_exists(ftp,temp) or b'') != digest(data):
                 raise RuntimeError('TEMPORARY_FILE_HASH_FAILED_'+name)
