@@ -4,6 +4,8 @@ on:
     paths:
       - 'tools/n7/modern-ui.js'
       - 'tools/n7/modern-ui.css'
+      - 'tools/n7/editor-diff.js'
+      - 'tools/n7/test_editor_diff.cjs'
       - 'tools/n7/deploy_modern_ui.py'
       - 'tools/n7/test_modern_ui_deploy.py'
       - 'tools/n7/test_modern_ui_browser.cjs'
@@ -42,8 +44,9 @@ jobs:
       - name: Validate UI syntax and fail-closed patch contracts
         run: |
           node --check tools/n7/modern-ui.js
+          node --check tools/n7/editor-diff.js
           python3 tools/n7/test_modern_ui_deploy.py
-          node --test tools/n7/test_chat_correction_confirm.cjs tools/n7/test_owner_chat_memory.cjs
+          node --test tools/n7/test_chat_correction_confirm.cjs tools/n7/test_owner_chat_memory.cjs tools/n7/test_editor_diff.cjs
       - name: Read actual public UI assets through existing FTPS connection; do not write
         env:
           N7_FIXTURE_DIR: ${{ runner.temp }}/n7-modern-public-assets
@@ -86,6 +89,7 @@ jobs:
           from pathlib import Path
           assert json.loads(Path('ops_ftps_requests/n7-modern-ui.json').read_text()) == {
             'confirmation':'N7-OWNER-MODERN-LIGHT-INTERFACE',
+            'release':'N7-EDITOR-COMPARISON-PRESENCE-V2',
             'target':'/bot.piratecartography.com/n7-app/public',
             'public_assets_only':True,
             'preserve_backend_models_conversations_and_memory':True,

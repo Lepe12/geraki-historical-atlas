@@ -9,6 +9,10 @@ ROOT='/bot.piratecartography.com/n7-app/public'
 BASE='https://bot.piratecartography.com'
 TLS='linux3087.grserver.gr'
 MARK='N7_MODERN_LIGHT_UI_V1'
+PREVIOUS_JS='00aed47aac991797c9f96bb646e855e04ab093f96f2c13a7c33ae4070cef92c4'
+PREVIOUS_CSS='519d51ef19962e9b3267d342da6769ba46da5125071bf223b23c5efab798fff6'
+
+def canonical(text):return (text.rstrip()+'\n').encode()
 
 def sha(data):return hashlib.sha256(data).hexdigest()
 def read(ftp,name):
@@ -25,11 +29,26 @@ def patch_assets(original):
         if marker not in app:raise RuntimeError('N7_REQUIRED_PREVIOUS_UI_MISSING')
     for name in ('loginform','application','new','conversations','taskview','messages','chat','message','send'):
         if not re.search(r'\bid=[\"\']'+re.escape(name)+r'[\"\']',html):raise RuntimeError('N7_UNEXPECTED_INDEX')
-    addon=(HERE/'modern-ui.js').read_text();theme=(HERE/'modern-ui.css').read_text()
+    addon=(HERE/'modern-ui.js').read_text();theme=(HERE/'modern-ui.css').read_text();editor=(HERE/'editor-diff.js').read_text()
     if MARK in app:
-        raise RuntimeError('N7_MODERN_ALREADY_PRESENT_INSPECT_BEFORE_UPDATE')
-    revised_app=(app+'\n'+addon+'\n').encode()
-    revised_css=(css+'\n'+theme+'\n').encode()
+        marker='// '+MARK
+        if app.count(marker)!=1:raise RuntimeError('N7_MODERN_AMBIGUOUS_SOURCE')
+        at=app.index(marker)
+        if sha(canonical(app[at:])) not in {PREVIOUS_JS,sha(canonical(addon))}:raise RuntimeError('N7_MODERN_UNREVIEWED_SOURCE')
+        app_prefix=app[:at]
+        diff_marker='// N7_EDITOR_DIFF_V1'
+        if diff_marker in app_prefix:
+            pos=app_prefix.index(diff_marker)
+            if app_prefix.count(diff_marker)!=1 or canonical(app_prefix[pos:])!=canonical(editor):raise RuntimeError('N7_EDITOR_UNREVIEWED_SOURCE')
+            app_prefix=app_prefix[:pos]
+        css_marker='/* N7_MODERN_LIGHT_STYLE_V1 */'
+        if css.count(css_marker)!=1:raise RuntimeError('N7_MODERN_AMBIGUOUS_STYLE')
+        at=css.index(css_marker)
+        if sha(canonical(css[at:])) not in {PREVIOUS_CSS,sha(canonical(theme))}:raise RuntimeError('N7_MODERN_UNREVIEWED_STYLE')
+        css_prefix=css[:at]
+    else:app_prefix=app+'\n';css_prefix=css+'\n'
+    revised_app=(app_prefix+editor+'\n'+addon+'\n').encode()
+    revised_css=(css_prefix+theme+'\n').encode()
     release=sha(revised_app+revised_css)[:12]
     for attr,name in [('src','app.js'),('href','style.css')]:
         pattern=r'('+attr+r'=[\"\'])(?:https://bot\.piratecartography\.com)?/'+re.escape(name)+r'(?:\?[^\"\']*)?([\"\'])'
