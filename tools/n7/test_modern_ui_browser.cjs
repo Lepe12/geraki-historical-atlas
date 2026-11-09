@@ -62,6 +62,11 @@ async function main(){
   await page.locator('#n7-writing-status:not([hidden])').waitFor();
   assert.match(await page.locator('#n7-writing-status').textContent(),/Το Ν7 γράφει/);
   assert.ok(await page.locator('.n7-writing-avatar canvas').isVisible());
+  const avatarPaint=await page.locator('.n7-writing-avatar').evaluate(e=>{const c=e.querySelector('canvas'),data=c.getContext('2d').getImageData(0,0,c.width,c.height).data;return {background:getComputedStyle(e).backgroundColor,cornerAlpha:data[3],visiblePixels:data.filter((v,i)=>i%4===3&&v>0).length};});
+  console.log('N7_AVATAR_PAINT',JSON.stringify(avatarPaint));
+  assert.equal(avatarPaint.background,'rgba(0, 0, 0, 0)','The writing avatar must have no dark tile');
+  assert.equal(avatarPaint.cornerAlpha,0,'The copied animation must have transparent outer pixels');
+  assert.ok(avatarPaint.visiblePixels>100,'The N7 character must stay visible');
   await page.waitForFunction(()=>{const c=document.querySelector('.n7-writing-avatar canvas');return c&&c.getContext('2d').getImageData(0,0,130,130).data.some((v,i)=>i%4===3&&v>0);});
   if(process.env.N7_SCREENSHOT_DIR){fs.mkdirSync(process.env.N7_SCREENSHOT_DIR,{recursive:true});await page.screenshot({path:path.join(process.env.N7_SCREENSHOT_DIR,'n7-writing.png'),fullPage:true});}
   await page.locator('.n7-answer-content').waitFor();

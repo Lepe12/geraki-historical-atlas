@@ -9,7 +9,7 @@ ROOT='/bot.piratecartography.com/n7-app/public'
 BASE='https://bot.piratecartography.com'
 TLS='linux3087.grserver.gr'
 MARK='N7_MODERN_LIGHT_UI_V1'
-PREVIOUS_JS='1feb557fbef1d923e57fd936e053d2b4b5b9b780ebad6e30fd8c0fd6d4385a2f'
+PREVIOUS_JS='892eebef10ee6d3e03eefcd38cff56c615f93c403ade07d3520a42b0e8fdff95'
 PREVIOUS_CSS='31419687b2d5774d2b67e38a5401b55cb376f8a83321315aa1bf475e1bb081aa'
 
 def canonical(text):return (text.rstrip()+'\n').encode()
