@@ -1,0 +1,96 @@
+name: N7 modern light interface — verify and deploy
+on:
+  pull_request:
+    paths:
+      - 'tools/n7/modern-ui.js'
+      - 'tools/n7/modern-ui.css'
+      - 'tools/n7/deploy_modern_ui.py'
+      - 'tools/n7/test_modern_ui_deploy.py'
+      - 'tools/n7/test_modern_ui_browser.cjs'
+      - '.github/workflows/n7-modern-ui.yml'
+      - 'ops_ftps_requests/n7-modern-ui.json'
+  push:
+    branches: [main]
+    paths:
+      - 'ops_ftps_requests/n7-modern-ui.json'
+permissions:
+  contents: read
+concurrency:
+  group: n7-modern-ui-deploy
+  cancel-in-progress: false
+jobs:
+  validate:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate UI syntax and fail-closed patch contracts
+        run: |
+          node --check tools/n7/modern-ui.js
+          python3 tools/n7/test_modern_ui_deploy.py
+          node --test tools/n7/test_chat_correction_confirm.cjs tools/n7/test_owner_chat_memory.cjs
+      - name: Read actual public UI assets through existing FTPS connection; do not write
+        env:
+          N7_FIXTURE_DIR: ${{ runner.temp }}/n7-modern-public-assets
+        run: python3 tools/n7/deploy_modern_ui.py
+      - name: Prepare browser test runtime
+        run: |
+          npm install --prefix "$RUNNER_TEMP/n7-browser" --ignore-scripts --no-audit --no-fund playwright@1.56.1
+          "$RUNNER_TEMP/n7-browser/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Browser checks against actual frontend with isolated API fixtures
+        env:
+          N7_FIXTURE_DIR: ${{ runner.temp }}/n7-modern-public-assets
+          NODE_PATH: ${{ runner.temp }}/n7-browser/node_modules
+          N7_SCREENSHOT_DIR: ${{ runner.temp }}/n7-modern-screenshots
+        run: node tools/n7/test_modern_ui_browser.cjs
+  deploy:
+    if: github.event_name == 'push'
+    needs: validate
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check owner-authorized public UI scope
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          assert json.loads(Path('ops_ftps_requests/n7-modern-ui.json').read_text()) == {
+            'confirmation':'N7-OWNER-MODERN-LIGHT-INTERFACE',
+            'target':'/bot.piratecartography.com/n7-app/public',
+            'public_assets_only':True,
+            'preserve_backend_models_conversations_and_memory':True,
+            'backup_and_rollback':True
+          }
+          PY
+      - name: Install three public UI assets, verify live hashes and privacy, rollback on failure
+        run: python3 tools/n7/deploy_modern_ui.py
