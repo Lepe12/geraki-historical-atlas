@@ -47,7 +47,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
  await page.getByLabel('Έως το έτος',{exact:true}).fill('1700');
  await page.getByLabel('Αναζήτηση τόπου',{exact:true}).fill('');
  await page.locator('#placeSearch').evaluate(e=>e.blur());
- const shots=process.env.NABOU_SCREENSHOT_DIR||'/workspace/work/reference-evidence';fs.mkdirSync(shots,{recursive:true});
+ const shots=process.env.NABOU_SCREENSHOT_DIR||path.join(__dirname,'screenshots');fs.mkdirSync(shots,{recursive:true});
  await page.setViewportSize({width:1672,height:941});await page.waitForTimeout(300);await page.screenshot({path:path.join(shots,'reference-desktop.png')});
  for(const width of [1440,1024,390,360]){
  await page.setViewportSize({width,height:844});
