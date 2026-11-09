@@ -62,6 +62,8 @@ function prepareIsolatedState() {
 }
 
 async function start() {
+  // Capture actual host constraints without running Gateway or exposing them over HTTP.
+  try { require('./host-diagnostic').save(); } catch { /* restrictions are a diagnostic result */ }
   if (process.env.N7_AGENT_OPENCLAW_DISABLED === '1') {
     launchStatus = 'disabled_by_environment';
     return;
