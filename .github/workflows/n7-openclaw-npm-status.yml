@@ -1,0 +1,96 @@
+name: N7 OpenClaw npm install status read-only
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/n7-openclaw-npm-status.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/n7-openclaw-npm-status.yml'
+permissions:
+  contents: read
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/workflows/n7-openclaw-npm-status.yml
+      - name: Audit no FTP/server writes
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          data=Path('.github/workflows/n7-openclaw-npm-status.yml').read_text()
+          probe=data.rsplit('      - name: Check ONLY isolated npm target files via existing FTPS',1)[1]
+          for forbidden in ('f.storbinary(', 'f.storlines(', 'f.mkd(', 'f.delete(', 'f.rename(', 'f.sendcmd(', 'subprocess.', 'os.system('):
+              assert forbidden not in probe, forbidden
+          print('N7_NPM_PROBE_READ_ONLY=PASS')
+          PY
+  probe:
+    if: github.event_name == 'push'
+    needs: syntax
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 6
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - name: Check ONLY isolated npm target files via existing FTPS
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import ftplib, io, json, os, ssl, socket
+          root = '/bot.piratecartography.com/n7-app/.openclaw-staging/runtime'
+          host=os.environ['PCT_FTPS_HOST']; port=int(os.getenv('PCT_FTPS_PORT','21'))
+          tls='linux3087.grserver.gr'
+          ips=lambda h:{r[4][0] for r in socket.getaddrinfo(h,port,type=socket.SOCK_STREAM)}
+          if not ips(host).intersection(ips(tls)): raise SystemExit('N7_FTPS_HOST_MISMATCH')
+          f=ftplib.FTP_TLS(timeout=30,context=ssl.create_default_context())
+          f.connect(host,port);f.host=tls
+          f.login(os.environ['PCT_FTPS_USER'],os.environ['PCT_FTPS_PASSWORD']);f.prot_p()
+          def exists_dir(path):
+              try: f.cwd(path); return True
+              except ftplib.error_perm as ex:
+                  if str(ex).startswith('550'): return False
+                  raise
+          def file_present(path):
+              try: return f.size(path) is not None
+              except ftplib.error_perm as ex:
+                  if str(ex).startswith('550'): return False
+                  raise
+          def read_small(path,limit=50000):
+              chunks=[]; size=0
+              def feed(chunk):
+                  nonlocal size
+                  size+=len(chunk)
+                  if size>limit: raise ValueError('FILE_TOO_LARGE')
+                  chunks.append(chunk)
+              try: f.retrbinary('RETR '+path,feed)
+              except ftplib.error_perm as ex:
+                  if str(ex).startswith('550'): return None
+                  raise
+              return b''.join(chunks)
+          try:
+              print('N7_NPM_TARGET_DIR=' + str(exists_dir(root)).lower())
+              node_modules=root+'/node_modules'
+              print('N7_NPM_NODE_MODULES_DIR=' + str(exists_dir(node_modules)).lower())
+              pkg=node_modules+'/openclaw/package.json'
+              info=read_small(pkg)
+              if info:
+                  package=json.loads(info)
+                  print('N7_NPM_OPENCLAW_VERSION='+str(package.get('version','unknown'))[:30])
+                  print('N7_NPM_OPENCLAW_PACKAGE_PRESENT=true')
+              else: print('N7_NPM_OPENCLAW_PACKAGE_PRESENT=false')
+              print('N7_NPM_OPENCLAW_CLI_PRESENT='+str(file_present(node_modules+'/openclaw/openclaw.mjs')).lower())
+              print('N7_NPM_HIDDEN_LOCK_PRESENT='+str(file_present(node_modules+'/.package-lock.json')).lower())
+              print('N7_NPM_ROOT_LOCK_PRESENT='+str(file_present(root+'/package-lock.json')).lower())
+              print('N7_NPM_PROCESS_RUNNING=not_observable_via_ftps')
+              print('N7_NPM_INSTALL_SUCCESS=not_proven_by_file_presence')
+          finally:
+              f.quit()
+          PY
