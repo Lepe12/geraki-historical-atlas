@@ -1,0 +1,35 @@
+name: N7 OpenClaw isolated real Gateway smoke
+on:
+  pull_request:
+    paths:
+      - 'tools/openclaw/smoke_gateway.sh'
+      - '.github/workflows/n7-openclaw-gateway-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/openclaw/smoke_gateway.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify pinned official package integrity against npm registry
+        shell: bash
+        run: |
+          actual="$(npm view openclaw@2026.11.2 dist.integrity)"
+          expected='sha512-SgBml4WLp8V1DdAYkrTPLzVdA/iYo3iuHCtm4788GjaG83QZdd1VeOTlue0HBJGdn3SbFE06b6uPs+AM5ShMgg=='
+          test "$actual" = "$expected"
+          echo 'OPENCLAW_NPM_INTEGRITY=PASS'
+      - name: Install official OpenClaw release in ephemeral isolated runner
+        shell: bash
+        run: |
+          npm install --prefix "$RUNNER_TEMP/n7-openclaw" --omit=dev --no-audit --no-fund --ignore-scripts openclaw@2026.11.2
+      - name: Start real OpenClaw loopback Gateway and require authenticated health response
+        shell: bash
+        run: bash tools/openclaw/smoke_gateway.sh "$RUNNER_TEMP/n7-openclaw"
