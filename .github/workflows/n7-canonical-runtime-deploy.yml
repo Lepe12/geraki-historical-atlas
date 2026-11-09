@@ -1,0 +1,73 @@
+name: N7 canonical runtime — guarded installation
+on:
+  pull_request:
+    paths:
+      - 'tools/n7/deploy_reconciled_runtime.py'
+      - 'tools/n7/reconciled-runtime-contract.json'
+      - 'tools/n7/runtime-release-info.js'
+      - 'tools/n7/test_reconciled_runtime_deploy.py'
+      - 'n7-distribution.json'
+      - '.github/workflows/n7-canonical-runtime-deploy.yml'
+      - 'ops_ftps_requests/n7-canonical-runtime.json'
+  push:
+    branches: [main]
+    paths:
+      - 'ops_ftps_requests/n7-canonical-runtime.json'
+permissions:
+  contents: read
+concurrency:
+  group: n7-canonical-runtime-production
+  cancel-in-progress: false
+jobs:
+  install:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            tools/library
+            tools/check_n7_distribution.py
+            n7-distribution.json
+            ops_ftps_requests/n7-canonical-runtime.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify immutable source proof and owner-authorized deployment scope
+        run: |
+          python3 tools/check_n7_distribution.py
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          distribution = json.loads(Path('n7-distribution.json').read_text())
+          contract = json.loads(Path('tools/n7/reconciled-runtime-contract.json').read_text())
+          request = json.loads(Path('ops_ftps_requests/n7-canonical-runtime.json').read_text())
+          assert request == {
+              'confirmation':'N7-OWNER-INSTALL-RECONCILED-RUNTIME',
+              'canonical_commit':distribution['commit'],
+              'target':'/bot.piratecartography.com/n7-app',
+              'release_id':contract['release_id'],
+              'preserve_private_data_and_configuration':True,
+              'retain_verified_backups_and_rollback':True
+          }
+          with open(os.environ['GITHUB_ENV'],'a') as environment:
+              environment.write('N7_CANONICAL_COMMIT='+distribution['commit']+'\n')
+          PY
+      - name: Test staged integrity, rollback, concurrent changes and dry-run scope
+        run: python3 tools/n7/test_reconciled_runtime_deploy.py
+      - name: Read-only preflight of every installed runtime file and private endpoint
+        run: python3 tools/n7/deploy_reconciled_runtime.py
+      - name: Install guarded delta, restart, verify active release and retain rollback
+        if: github.event_name == 'push'
+        env:
+          N7_DRY_RUN: '0'
+        run: python3 tools/n7/deploy_reconciled_runtime.py
