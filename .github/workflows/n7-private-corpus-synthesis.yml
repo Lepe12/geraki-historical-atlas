@@ -75,7 +75,7 @@ jobs:
       PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen3-8B-GGUF
       PCT_SEMANTIC_PARTIAL_ANSWER: '1'
       PCT_REVIEW_ALL_EXTRACTED: '1'
-      PCT_SEMANTIC_BUDGET_SECONDS: '1300'
+      PCT_SEMANTIC_BUDGET_SECONDS: '2700'
       PCT_SEMANTIC_CALLS_PER_PASS: '24'
       PCT_SEMANTIC_BATCHES: '6'
       PCT_PREFILTER: '1'
@@ -104,7 +104,7 @@ jobs:
         continue-on-error: true
         run: |
           set -euo pipefail
-          timeout 1800s python3 tools/semantic_research_answer.py --run-id "$SOURCE_RUN"
+          timeout 3000s python3 tools/semantic_research_answer.py --run-id "$SOURCE_RUN"
           test -s "evidence/runs/$SOURCE_RUN/research_answer/answer.json"
       - name: Keep a truthful failure receipt if the model could not produce an answer
         if: steps.analyze.outcome != 'success'
