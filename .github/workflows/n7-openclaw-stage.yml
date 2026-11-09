@@ -1,0 +1,47 @@
+name: N7 OpenClaw verified archive stage (no activation)
+on:
+  pull_request:
+    paths:
+      - 'tools/openclaw/**'
+      - '.github/workflows/n7-openclaw-stage.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/n7-openclaw-stage.yml'
+      - 'tools/openclaw/stage_openclaw.py'
+permissions:
+  contents: read
+concurrency:
+  group: n7-openclaw-stage
+  cancel-in-progress: false
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/openclaw
+      - name: Run isolated staging tests
+        run: python3 -m unittest discover -s tools/openclaw -p 'test_*.py' -v
+      - name: Verify script syntax
+        run: python3 -m py_compile tools/openclaw/stage_openclaw.py
+  stage:
+    if: github.event_name == 'push'
+    needs: check
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 25
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/openclaw
+      - name: Download official checksum-pinned release; upload only to isolated private app staging and readback
+        run: python3 tools/openclaw/stage_openclaw.py
