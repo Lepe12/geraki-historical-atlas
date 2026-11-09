@@ -10,6 +10,7 @@ from semantic_research_answer import collect, read
 def tokens(value):
     value=unicodedata.normalize("NFKD",str(value)).casefold()
     value="".join(c for c in value if not unicodedata.combining(c))
+    value=value.replace("ς","σ")
     return set(re.findall(r"[^\W_]{3,}",value,flags=re.UNICODE))
 
 def search(records,request,limit=20):
