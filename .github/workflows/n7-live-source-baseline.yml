@@ -5,9 +5,11 @@ on:
     paths:
       - 'tools/capture_n7_live_source.py'
       - 'tools/test_capture_n7_live_source.py'
+      - 'tools/stage_n7_live_source.py'
+      - 'tools/test_stage_n7_live_source.py'
       - '.github/workflows/n7-live-source-baseline.yml'
 permissions:
-  contents: read
+  contents: write # source-only capture branch; main and the live application are never written
 jobs:
   capture:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
@@ -20,8 +22,12 @@ jobs:
           sparse-checkout: |
             tools/capture_n7_live_source.py
             tools/test_capture_n7_live_source.py
+            tools/stage_n7_live_source.py
+            tools/test_stage_n7_live_source.py
       - name: Test source scope, secret refusal and concurrent-change detection
-        run: python3 tools/test_capture_n7_live_source.py
+        run: |
+          python3 tools/test_capture_n7_live_source.py
+          python3 tools/test_stage_n7_live_source.py
       - name: Capture and re-read application source without any server writes
         env:
           PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
@@ -29,7 +35,12 @@ jobs:
           PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
           PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
         run: python3 tools/capture_n7_live_source.py --destination "$RUNNER_TEMP/n7-live-source"
+      - name: Stage source in an isolated private branch without artifact storage
+        env:
+          N7_REPOSITORY_PRIVATE: ${{ github.event.repository.private }}
+        run: python3 tools/stage_n7_live_source.py --capture "$RUNNER_TEMP/n7-live-source"
       - uses: actions/upload-artifact@v4
+        if: vars.N7_CAPTURE_ARTIFACTS == 'true'
         with:
           name: n7-private-live-source-${{ github.run_id }}
           path: ${{ runner.temp }}/n7-live-source/
