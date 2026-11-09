@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # Isolated CI-only runtime proof. Never contacts or alters the Top.Host service.
-root="\${1:?npm installation root required}"
+if [[ $# -ne 1 ]]; then echo "EXPECTED_INSTALL_ROOT"; exit 2; fi
+root="$1"
 cli="$root/node_modules/openclaw/openclaw.mjs"
 test -f "$cli"
 node "$cli" --version
