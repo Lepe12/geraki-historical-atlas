@@ -6,6 +6,7 @@ on:
       - tools/n7/chat-correction-confirm.js
       - tools/n7/test_chat_correction_confirm.cjs
       - tools/n7/deploy_inline_correction.py
+      - tools/n7/test_inline_deploy_verification.py
       - .github/workflows/n7-inline-correction.yml
       - ops_ftps_requests/n7-inline-correction.json
   push:
@@ -46,6 +47,7 @@ jobs:
           node --check tools/n7/chat-correction-confirm.js
           node --test tools/n7/test_chat_correction_confirm.cjs
           python3 -m py_compile tools/n7/deploy_inline_correction.py
+          python3 tools/n7/test_inline_deploy_verification.py
       - name: Check exact live N7 frontend, no writes
         run: python3 tools/n7/deploy_inline_correction.py
 

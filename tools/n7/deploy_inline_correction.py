@@ -14,6 +14,7 @@ import socket
 import ssl
 import subprocess
 import tempfile
+import time
 import urllib.error
 import urllib.request
 
@@ -59,14 +60,22 @@ def connect():
     ftp.prot_p()
     return ftp
 def public_verify(expected):
-    request=urllib.request.Request(PUBLIC_URL+'/app.js',headers={
-        'Cache-Control':'no-cache','User-Agent':'N7-inline-correction-verify/1'})
-    with urllib.request.urlopen(request,timeout=15,context=ssl.create_default_context()) as response:
-        live=response.read(250000)
-        if response.status!=200 or digest(live)!=digest(expected):
+    # A proxy may retain the previous asset briefly after the atomic FTPS rename.
+    # Require an exact hash; a fresh URL and bounded retries do not weaken the gate.
+    for attempt in range(3):
+        request=urllib.request.Request(PUBLIC_URL+'/app.js?n7_verify='+secrets.token_hex(12),headers={
+            'Cache-Control':'no-cache, no-store','Pragma':'no-cache',
+            'User-Agent':'N7-inline-correction-verify/1'})
+        with urllib.request.urlopen(request,timeout=15,context=ssl.create_default_context()) as response:
+            live=response.read(len(expected)+1)
+            matched=response.status==200 and digest(live)==digest(expected)
+        if matched:
+            if MARK.encode() not in live or b'N7_NONBLOCKING_QUEUE_WATCH_v1' not in live:
+                raise RuntimeError('N7_PREVIOUS_UI_INTEGRATION_MISSING')
+            break
+        if attempt==2:
             raise RuntimeError('N7_PUBLIC_JS_MISMATCH')
-        if MARK.encode() not in live or b'N7_NONBLOCKING_QUEUE_WATCH_v1' not in live:
-            raise RuntimeError('N7_PREVIOUS_UI_INTEGRATION_MISSING')
+        time.sleep(2)
     for endpoint in ('/api/status','/health'):
         req=urllib.request.Request(PUBLIC_URL+endpoint,headers={'Cache-Control':'no-cache'})
         with urllib.request.urlopen(req,timeout=12,context=ssl.create_default_context()) as response:
