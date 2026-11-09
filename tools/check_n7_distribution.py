@@ -1,10 +1,54 @@
 #!/usr/bin/env python3
-"""Offline integrity check for the generated N7 distribution (not its origin)."""
+"""Verify distributed bytes against a pinned Git commit using its object proof."""
+import base64
 import hashlib
 import json
 from pathlib import Path, PurePosixPath
 import re
 import subprocess
+
+
+def git_hash(kind, data):
+    return hashlib.sha1(kind.encode() + b' ' + str(len(data)).encode() + b'\0' + data).hexdigest()
+
+
+def verify_proof(manifest, payload):
+    proof = manifest['git_proof']
+    commit = base64.b64decode(proof['commit'], validate=True)
+    if git_hash('commit', commit) != manifest['commit']:
+        raise ValueError('N7 Git commit proof mismatch')
+    header = commit.split(b'\n', 1)[0]
+    if not re.fullmatch(rb'tree [0-9a-f]{40}', header):
+        raise ValueError('Invalid Git commit tree')
+    trees = {}
+    for sha, encoded in proof['trees'].items():
+        data = base64.b64decode(encoded, validate=True)
+        if git_hash('tree', data) != sha:
+            raise ValueError('N7 Git tree proof mismatch')
+        entries = {}
+        cursor = 0
+        while cursor < len(data):
+            end = data.index(b'\0', cursor)
+            mode, name = data[cursor:end].split(b' ', 1)
+            cursor = end + 1
+            digest = data[cursor:cursor + 20]
+            if len(digest) != 20:
+                raise ValueError('Truncated Git tree')
+            entries[name.decode()] = (mode.decode(), digest.hex())
+            cursor += 20
+        trees[sha] = entries
+    root = header[5:].decode()
+    for name, data in payload.items():
+        tree = root
+        parts = PurePosixPath(name).parts
+        for index, part in enumerate(parts):
+            mode, sha = trees[tree][part]
+            if index < len(parts) - 1:
+                if mode != '40000':
+                    raise ValueError('Non-directory in N7 Git path')
+                tree = sha
+            elif mode not in ('100644', '100755') or git_hash('blob', data) != sha:
+                raise ValueError('N7 file differs from pinned Git commit: ' + name)
 
 
 def check(root):
@@ -17,6 +61,7 @@ def check(root):
     tracked = set(subprocess.check_output(['git', '-C', str(root), 'ls-files', 'tools/n7', 'tools/library'], text=True).splitlines())
     if not files or set(files) != tracked:
         raise ValueError('N7 generated source inventory differs from tracked files')
+    payload = {}
     for name, expected in files.items():
         path = PurePosixPath(name)
         if path.is_absolute() or '..' in path.parts or not name.startswith(('tools/n7/', 'tools/library/')):
@@ -24,6 +69,8 @@ def check(root):
         local = root / name
         if local.is_symlink() or hashlib.sha256(local.read_bytes()).hexdigest() != expected:
             raise ValueError('Edit N7 in independent-ai-bot, then regenerate: ' + name)
+        payload[name] = local.read_bytes()
+    verify_proof(manifest, payload)
     return manifest['commit'], len(files)
 
 

@@ -15,6 +15,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   propose:
+    if: github.event_name == 'workflow_dispatch' || vars.N7_SOURCE_SYNC_ENABLED == 'true'
     environment: nabou-production
     runs-on: ubuntu-latest
     timeout-minutes: 8
