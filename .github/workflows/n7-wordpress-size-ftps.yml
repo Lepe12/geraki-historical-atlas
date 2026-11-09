@@ -1,0 +1,51 @@
+name: N7 X8 actual WordPress files disk audit
+on:
+  pull_request:
+    paths:
+      - 'tools/openclaw/audit_wordpress_bytes_ftps.py'
+      - '.github/workflows/n7-wordpress-size-ftps.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/openclaw/audit_wordpress_bytes_ftps.py'
+      - '.github/workflows/n7-wordpress-size-ftps.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/openclaw/audit_wordpress_bytes_ftps.py
+      - name: Verify read-only FTPS script
+        run: |
+          python3 -m py_compile tools/openclaw/audit_wordpress_bytes_ftps.py
+          python3 - <<'PY'
+          import ast
+          from pathlib import Path
+          a=ast.parse(Path('tools/openclaw/audit_wordpress_bytes_ftps.py').read_text())
+          attrs={n.attr for n in ast.walk(a) if isinstance(n,ast.Attribute)}
+          assert not attrs.intersection({'storbinary','storlines','delete','rename','mkd','rmd','sendcmd','system','popen'})
+          print('WP_FTPS_READ_ONLY_SOURCE=PASS')
+          PY
+  audit:
+    if: github.event_name == 'push'
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 10
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/openclaw/audit_wordpress_bytes_ftps.py
+      - name: Count WordPress files using 3 read-only FTP sessions
+        run: python3 -u tools/openclaw/audit_wordpress_bytes_ftps.py
