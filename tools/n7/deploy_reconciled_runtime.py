@@ -1,0 +1,290 @@
+#!/usr/bin/env python3
+"""Guarded installation of a canonical N7 runtime using existing, hash-verified code.
+
+No private source is stored in GitHub logs/artifacts. Only server.js, the small
+public release-info module, the private release receipt and restart marker change.
+"""
+import ftplib
+import hashlib
+import io
+import json
+import os
+from pathlib import Path, PurePosixPath
+import re
+import secrets
+import socket
+import ssl
+import subprocess
+import tempfile
+import time
+import urllib.error
+import urllib.request
+
+ROOT = '/bot.piratecartography.com/n7-app'
+BASE = 'https://bot.piratecartography.com'
+TLS = 'linux3087.grserver.gr'
+HERE = Path(__file__).resolve().parent
+WRITABLE = {'server.js', 'n7-release-info.js', 'release-manifest.json'}
+LIMIT = 8 * 1024 * 1024
+
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def read(ftp, name, optional=False):
+    output = []
+    size = 0
+    def append(part):
+        nonlocal size
+        size += len(part)
+        if size > LIMIT:
+            raise RuntimeError('N7_REMOTE_SOURCE_TOO_LARGE')
+        output.append(part)
+    try:
+        ftp.retrbinary('RETR ' + ROOT + '/' + name, append)
+    except ftplib.error_perm as error:
+        if optional and str(error).startswith('550'):
+            return None
+        raise
+    return b''.join(output)
+
+
+def transform_server(original):
+    source = original.decode('utf8')
+    start = source.index("    if(req.method==='GET'&&/^\\/api\\/research\\/corpus")
+    end = source.index("      if(!originOK(req))return json(res,403,{error:'Invalid origin'});\n      try{return json(res,200,{lessons:ownerChatMemory.list()});}", start)
+    block = source[start:end]
+    source = source[:start] + source[end:]
+    replacements = [
+        ("    if(req.method==='GET'&&p==='/n7-mission-owner-ui.js')return serve(res,p);\n", ''),
+        ('    // Owner-reviewed writing knowledge: authenticated only, never silently derived from chats.', block + '\n    // Owner-reviewed writing knowledge: authenticated only, never silently derived from chats.'),
+        ("'/app.js': 'app.js','/n7-mission-owner-ui.js':'n7-mission-owner-ui.js',", "'/app.js': 'app.js', '/n7-mission-owner-ui.js':'n7-mission-owner-ui.js', '/n7-library-ui.js':'n7-library-ui.js', '/n7-pdf/pdf.js':'n7-pdf/pdf.js', '/n7-pdf/pdf.worker.js':'n7-pdf/pdf.worker.js',"),
+        ("        '/app.js', '/historical-library.js',", "        '/app.js', '/historical-library.js', '/n7-library-ui.js', '/n7-mission-owner-ui.js', '/n7-pdf/pdf.js', '/n7-pdf/pdf.worker.js',"),
+        ("        status: 'ok',", "        status: 'ok',\n        release: require('./n7-release-info').readReleaseInfo(__dirname),"),
+    ]
+    for old, new in replacements:
+        if source.count(old) != 1:
+            raise RuntimeError('N7_RELEASE_SOURCE_ANCHOR_CHANGED')
+        source = source.replace(old, new, 1)
+    return source.encode()
+
+
+def syntax(data):
+    with tempfile.NamedTemporaryFile(suffix='.js') as file:
+        file.write(data)
+        file.flush()
+        subprocess.run(['node', '--check', file.name], capture_output=True, check=True, timeout=20)
+
+
+def contract():
+    data = json.loads((HERE / 'reconciled-runtime-contract.json').read_text())
+    if data.get('schema') != 'n7-reconciled-deploy/v1' or data.get('target') != ROOT:
+        raise RuntimeError('N7_RELEASE_CONTRACT_INVALID')
+    digest = sha(json.dumps(data['files'], sort_keys=True, separators=(',', ':')).encode())
+    if digest != data.get('release_id'):
+        raise RuntimeError('N7_RELEASE_ID_INVALID')
+    for name, value in data['files'].items():
+        path = PurePosixPath(name)
+        if path.is_absolute() or any(p in ('.', '..') or p.startswith('.') for p in path.parts) or path.parts[0] in ('data', 'tmp', 'node_modules') or not re.fullmatch(r'[a-f0-9]{64}', value):
+            raise RuntimeError('N7_RELEASE_PATH_OR_HASH_INVALID')
+    return data
+
+
+def plan(ftp, release, canonical_commit, transformer=transform_server):
+    if not re.fullmatch(r'[a-f0-9]{40}', canonical_commit):
+        raise RuntimeError('N7_CANONICAL_COMMIT_REQUIRED')
+    originals = {}
+    for name, expected in release['files'].items():
+        current = read(ftp, name, optional=name == 'n7-release-info.js')
+        if name == 'server.js':
+            if current is None or sha(current) not in (expected, release['previous_server_sha256']):
+                raise RuntimeError('N7_UNREVIEWED_LIVE_SERVER')
+            originals[name] = current
+        elif name == 'n7-release-info.js':
+            if current is not None and sha(current) != expected:
+                raise RuntimeError('N7_UNREVIEWED_RELEASE_HELPER')
+            originals[name] = current
+        elif current is None or sha(current) != expected:
+            raise RuntimeError('N7_RUNTIME_DRIFT ' + name)
+    previous = originals['server.js']
+    server = previous if sha(previous) == release['files']['server.js'] else transformer(previous)
+    helper = (HERE / 'runtime-release-info.js').read_bytes()
+    if sha(server) != release['files']['server.js'] or sha(helper) != release['files']['n7-release-info.js']:
+        raise RuntimeError('N7_CANONICAL_RUNTIME_OUTPUT_MISMATCH')
+    syntax(server)
+    syntax(helper)
+    receipt = {'schema': 'n7-runtime-build/v1', 'release_id': release['release_id'],
+               'canonical_commit': canonical_commit, 'source_lock_verified': True,
+               'files': release['files'], 'deployment': 'verified-existing-files-and-guarded-delta'}
+    originals['release-manifest.json'] = read(ftp, 'release-manifest.json', optional=True)
+    payload = {'n7-release-info.js': helper,
+               'release-manifest.json': (json.dumps(receipt, indent=2) + '\n').encode(),
+               'server.js': server}
+    return payload, originals
+
+
+def restart(ftp):
+    ftp.storbinary('STOR ' + ROOT + '/tmp/restart.txt', io.BytesIO(b'n7-reconciled-runtime\n'))
+
+
+def install(ftp, payload, originals, verifier):
+    if set(payload) - WRITABLE or set(payload) != set(originals):
+        raise RuntimeError('N7_WRITE_SCOPE_INVALID')
+    lock = ROOT + '/.n7-runtime-deploy-lock'
+    ftp.mkd(lock)
+    tag = secrets.token_hex(10)
+    staged, backups, installed = {}, {}, []
+    changed = [name for name, data in payload.items() if originals[name] != data]
+    try:
+        if not changed:
+            verifier()
+            print('N7_RUNTIME_ALREADY_INSTALLED no_writes=true no_restart=true')
+            return
+        # Verify every stage before replacing any active path.
+        for name in changed:
+            stage = '.n7-runtime-stage-' + tag + '-' + name
+            staged[name] = stage
+            ftp.storbinary('STOR ' + ROOT + '/' + stage, io.BytesIO(payload[name]))
+            ftp.sendcmd('SITE CHMOD 644 ' + ROOT + '/' + stage)
+            if read(ftp, stage) != payload[name]:
+                raise RuntimeError('N7_STAGE_HASH_MISMATCH')
+        for name in payload:
+            if read(ftp, name, optional=True) != originals[name]:
+                raise RuntimeError('N7_CONCURRENT_RUNTIME_CHANGE')
+        # Dependency and receipt first; the verified server entry point last.
+        for name in changed:
+            if originals[name] is not None:
+                backup = '.n7-runtime-backup-' + tag + '-' + name
+                ftp.rename(ROOT + '/' + name, ROOT + '/' + backup)
+                backups[name] = backup
+                if read(ftp, backup) != originals[name]:
+                    raise RuntimeError('N7_BACKUP_HASH_MISMATCH')
+            try:
+                ftp.rename(ROOT + '/' + staged[name], ROOT + '/' + name)
+            except BaseException:
+                if name in backups:
+                    ftp.rename(ROOT + '/' + backups.pop(name), ROOT + '/' + name)
+                raise
+            staged.pop(name)
+            installed.append(name)
+            if read(ftp, name) != payload[name]:
+                raise RuntimeError('N7_ACTIVE_HASH_MISMATCH')
+        restart(ftp)
+        verifier()
+    except BaseException:
+        failures = []
+        pending = [name for name in backups if name not in installed]
+        for name in [*reversed(installed), *pending]:
+            try:
+                current = read(ftp, name, optional=True)
+                if (name in installed and current != payload[name]) or (name not in installed and current is not None):
+                    raise RuntimeError('concurrent_change_during_rollback')
+                if current is not None:
+                    ftp.delete(ROOT + '/' + name)
+                if name in backups:
+                    ftp.rename(ROOT + '/' + backups.pop(name), ROOT + '/' + name)
+                if read(ftp, name, optional=True) != originals[name]:
+                    raise RuntimeError('rollback_hash_mismatch')
+            except Exception:
+                failures.append(name)
+        if installed:
+            restart(ftp)
+        if failures:
+            print('N7_MANUAL_ROLLBACK_REQUIRED=' + ','.join(failures))
+        else:
+            print('N7_RUNTIME_ROLLBACK_VERIFIED=true')
+        raise
+    finally:
+        for stage in staged.values():
+            try:
+                ftp.delete(ROOT + '/' + stage)
+            except ftplib.all_errors:
+                pass
+        ftp.rmd(lock)
+    print('N7_RUNTIME_DEPLOYED files_changed=' + str(len(changed)) + ' data_paths_written=0 backups_retained=true')
+
+
+def request(path, method='GET'):
+    headers = {'Cache-Control': 'no-cache, no-store', 'Pragma': 'no-cache', 'User-Agent': 'N7-canonical-runtime-verify/1'}
+    return urllib.request.urlopen(urllib.request.Request(BASE + path, headers=headers, method=method),
+                                  context=ssl.create_default_context(), timeout=15)
+
+
+def verify(release, commit, ftp=None, active=True):
+    deadline = time.monotonic() + 110
+    while True:
+        try:
+            with request('/health?n7release=' + secrets.token_hex(8)) as response:
+                health = json.loads(response.read(20000))
+            valid = health.get('status') == 'ok' and health.get('modelConfigured') is True
+            if active:
+                valid = valid and health.get('release') == {'id': release['release_id'], 'canonical_commit': commit}
+            if valid:
+                break
+        except (OSError, ValueError):
+            pass
+        if time.monotonic() >= deadline:
+            raise RuntimeError('N7_ACTIVE_RELEASE_OR_MODEL_NOT_VERIFIED')
+        time.sleep(2)
+    for path, method in [('/api/conversations','GET'),('/api/n7/approved-lessons','GET'),
+                         ('/api/tasks','GET'),('/api/research/missions','POST'),
+                         ('/api/conversations/00000000-0000-4000-8000-000000000007/stream','POST')]:
+        try:
+            with request(path, method):
+                pass
+        except urllib.error.HTTPError as error:
+            if error.code == 401:
+                continue
+            raise
+        raise RuntimeError('N7_PRIVATE_ENDPOINT_EXPOSED')
+    with request('/api/status') as response:
+        status = json.loads(response.read(20000))
+    if status.get('authenticated') is not False or status.get('modelConfigured') is not True:
+        raise RuntimeError('N7_PUBLIC_AUTHENTICATION_STATUS_INVALID')
+    for name, expected in release['files'].items():
+        if ftp is not None and sha(read(ftp, name)) != expected:
+            raise RuntimeError('N7_FINAL_RUNTIME_DRIFT ' + name)
+        if name.startswith('public/'):
+            with request('/' + name[len('public/'):] + '?n7verify=' + secrets.token_hex(8)) as response:
+                if sha(response.read(LIMIT + 1)) != expected:
+                    raise RuntimeError('N7_PUBLIC_RUNTIME_HASH_MISMATCH ' + name)
+    print('N7_RUNTIME_VERIFIED active=' + str(active) + ' model_configured=true private_http=401 public_hashes=true')
+
+
+def connect():
+    host, port = os.environ['PCT_FTPS_HOST'], int(os.getenv('PCT_FTPS_PORT', '21'))
+    ips = lambda name: {item[4][0] for item in socket.getaddrinfo(name, port, type=socket.SOCK_STREAM)}
+    if not ips(host).intersection(ips(TLS)):
+        raise RuntimeError('N7_UNEXPECTED_FTPS_HOST')
+    ftp = ftplib.FTP_TLS(timeout=40, context=ssl.create_default_context())
+    ftp.connect(host, port)
+    ftp.host = TLS
+    ftp.login(os.environ['PCT_FTPS_USER'], os.environ['PCT_FTPS_PASSWORD'])
+    ftp.prot_p()
+    ftp.cwd(ROOT)
+    if ftp.pwd().rstrip('/') != ROOT:
+        raise RuntimeError('N7_UNEXPECTED_APP_ROOT')
+    return ftp
+
+
+def main():
+    release = contract()
+    commit = os.environ['N7_CANONICAL_COMMIT']
+    dry = os.getenv('N7_DRY_RUN', '1') != '0'
+    ftp = connect()
+    try:
+        payload, originals = plan(ftp, release, commit)
+        verify(release, commit, active=False)
+        print('N7_CANONICAL_PREFLIGHT_OK dry_run=' + str(dry) + ' runtime_files=' + str(len(release['files'])))
+        if not dry:
+            install(ftp, payload, originals, lambda: verify(release, commit, ftp=ftp))
+    finally:
+        try:
+            ftp.quit()
+        except ftplib.all_errors:
+            ftp.close()
+
+
+if __name__ == '__main__':
+    main()
