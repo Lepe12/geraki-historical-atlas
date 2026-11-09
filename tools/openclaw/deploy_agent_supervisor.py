@@ -13,6 +13,11 @@ TARGET = '/n7-agent.piratecartography.com'
 TLS = 'linux3087.grserver.gr'
 HERE = Path(__file__).resolve().parent / 'passenger-bootstrap'
 OLD_APP_SHA256 = '29d7487e0dc1f43f8813fe8fb2df9f19965ca34208e895df9559f20518e28338'
+OLD_GATEWAY_BLOB_SHA1 = '2f460df27c7c132c3a9cb1ce9d0bce5e7d271d2d'
+
+
+def git_blob_sha(data):
+    return hashlib.sha1(('blob '+str(len(data))+'\\0').replace('\\0', chr(0)).encode()+data).hexdigest()
 
 
 def digest(data):
@@ -63,7 +68,8 @@ def main():
         addition=(HERE/'gateway-supervisor.js').read_bytes()
         existing_extra=read(ftp,'gateway-supervisor.js')
         if existing_extra is not None and existing_extra != addition:
-            raise RuntimeError('SUPERVISOR_CONFLICT_REFUSE_OVERWRITE')
+            if git_blob_sha(existing_extra) != OLD_GATEWAY_BLOB_SHA1:
+                raise RuntimeError('SUPERVISOR_CONFLICT_REFUSE_OVERWRITE')
         # Refuse destructive changes if another actor changed the bootstrap.
         if digest(initial) not in (OLD_APP_SHA256,digest(desired)):
             raise RuntimeError('APP_JS_CONFLICT_REFUSE_OVERWRITE')
@@ -75,6 +81,24 @@ def main():
             if digest(read(ftp,'gateway-supervisor.js') or b'')!=digest(addition):
                 raise RuntimeError('SUPERVISOR_READBACK_FAILED')
             print('N7_AGENT_SUPERVISOR_UPLOADED=true')
+        elif existing_extra != addition:
+            # Replacement is allowed only for the known earlier supervisor build.
+            backup='.n7-agent-gateway-supervisor.pre-sigkill.js'
+            saved=read(ftp,backup)
+            if saved is None:
+                tmp=upload_verified(ftp,'supervisor-backup',existing_extra)
+                ftp.rename(tmp,backup)
+            elif saved != existing_extra:
+                raise RuntimeError('SUPERVISOR_BACKUP_CONFLICT')
+            tmp=upload_verified(ftp,'gateway-supervisor.js',addition)
+            ftp.delete('gateway-supervisor.js')
+            try: ftp.rename(tmp,'gateway-supervisor.js')
+            except BaseException:
+                ftp.storbinary('STOR gateway-supervisor.js',io.BytesIO(existing_extra))
+                raise
+            if digest(read(ftp,'gateway-supervisor.js') or b'') != digest(addition):
+                raise RuntimeError('SUPERVISOR_UPGRADE_READBACK_FAILED')
+            print('N7_AGENT_SUPERVISOR_SAFE_HOTFIX_APPLIED=true')
         else:
             print('N7_AGENT_SUPERVISOR_ALREADY_MATCHES=true')
         if initial != desired:
@@ -109,7 +133,7 @@ def main():
         print('N7_AGENT_PASSENGER_RESTART_REQUESTED=true')
         print('N7_AGENT_SUPERVISOR_FILES_VERIFIED=true')
         print('N7_AGENT_LOOPBACK_PORT=19487')
-        print('N7_AGENT_GATEWAY_START_PENDING_LIVE_HEALTH=true')
+        print('N7_AGENT_GATEWAY_AUTOSTART_DISABLED_AFTER_SIGKILL=true')
         print('N7_EXISTING_N7_MODIFIED=false')
     finally:
         try: ftp.quit()
