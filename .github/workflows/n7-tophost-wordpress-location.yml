@@ -1,0 +1,51 @@
+name: N7 X8 read-only WordPress path discovery
+on:
+  pull_request:
+    paths:
+      - 'tools/openclaw/probe_tophost_wordpress_location.py'
+      - '.github/workflows/n7-tophost-wordpress-location.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/openclaw/probe_tophost_wordpress_location.py'
+      - '.github/workflows/n7-tophost-wordpress-location.yml'
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/openclaw/probe_tophost_wordpress_location.py
+      - name: Syntax and read-only audit
+        run: |
+          python3 -m py_compile tools/openclaw/probe_tophost_wordpress_location.py
+          python3 - <<'PY'
+          import ast
+          from pathlib import Path
+          tree=ast.parse(Path('tools/openclaw/probe_tophost_wordpress_location.py').read_text())
+          attrs={node.attr for node in ast.walk(tree) if isinstance(node,ast.Attribute)}
+          assert not attrs.intersection({'storbinary','storlines','delete','rename','mkd','rmd','sendcmd','system','popen'})
+          print('N7_FTPS_WP_PATH_PROBE_READ_ONLY=PASS')
+          PY
+  inspect:
+    if: github.event_name == 'push'
+    needs: check
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 4
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/openclaw/probe_tophost_wordpress_location.py
+      - name: Identify WP document root paths over existing FTPS
+        run: python3 tools/openclaw/probe_tophost_wordpress_location.py
