@@ -32,6 +32,10 @@ class PatchTests(unittest.TestCase):
 
     def test_already_installed_is_not_duplicated(self):
         current=deploy.patch_assets(self.source())
-        with self.assertRaisesRegex(RuntimeError,'ALREADY_PRESENT'):deploy.patch_assets(current)
+        self.assertEqual(deploy.patch_assets(current),current)
+
+    def test_unreviewed_tail_is_not_replaced(self):
+        current=deploy.patch_assets(self.source());current['app.js']+=b'\n// concurrent feature\n'
+        with self.assertRaisesRegex(RuntimeError,'UNREVIEWED_SOURCE'):deploy.patch_assets(current)
 
 if __name__=='__main__':unittest.main()
