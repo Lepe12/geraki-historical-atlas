@@ -1,66 +1,14 @@
-name: N7-agent isolated Passenger bootstrap deployment
+name: N7-agent legacy Passenger bootstrap (retired)
 on:
-  pull_request:
-    paths:
-      - 'tools/openclaw/deploy_agent_bootstrap.py'
-      - 'tools/openclaw/passenger-bootstrap/**'
-      - '.github/workflows/n7-agent-passenger-bootstrap.yml'
-  push:
-    branches: [main]
-    paths:
-      - 'tools/openclaw/deploy_agent_bootstrap.py'
-      - 'tools/openclaw/passenger-bootstrap/**'
-      - '.github/workflows/n7-agent-passenger-bootstrap.yml'
+  workflow_dispatch:
 permissions:
   contents: read
-concurrency:
-  group: n7-agent-bootstrap-ftps
-  cancel-in-progress: false
 jobs:
-  check:
+  notice:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
     steps:
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            tools/openclaw/deploy_agent_bootstrap.py
-            tools/openclaw/passenger-bootstrap
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-      - name: Static checks
+      - name: Explain retired deployment
         run: |
-          node --check tools/openclaw/passenger-bootstrap/app.js
-          python3 -m py_compile tools/openclaw/deploy_agent_bootstrap.py
-          node -e "const p=require('./tools/openclaw/passenger-bootstrap/package.json'); if(p.name!=='n7-agent-passenger-bootstrap') process.exit(1);"
-      - name: Actual bootstrap HTTP health test in isolated runner
-        shell: bash
-        run: |
-          PORT=31088 node tools/openclaw/passenger-bootstrap/app.js &
-          pid=$!
-          trap 'kill "$pid" 2>/dev/null || true' EXIT
-          for x in {1..20}; do
-            if curl --fail --silent --max-time 2 http://127.0.0.1:31088/health > /tmp/n7-agent-health.json; then break; fi
-            sleep 1
-          done
-          node -e "const p=require('/tmp/n7-agent-health.json'); if(p.passengerResponsive!==true || p.openclawGatewayRunning!==false) process.exit(1); console.log('N7_AGENT_BOOTSTRAP_HTTP_SMOKE=PASS')"
-  deploy:
-    if: github.event_name == 'push'
-    needs: check
-    runs-on: ubuntu-latest
-    environment: nabou-production
-    timeout-minutes: 8
-    env:
-      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
-      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
-      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
-      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            tools/openclaw/deploy_agent_bootstrap.py
-            tools/openclaw/passenger-bootstrap
-      - name: Deploy ONLY isolated new subdomain files and verify FTPS readback
-        run: python3 tools/openclaw/deploy_agent_bootstrap.py
+          echo 'The initial N7-agent bootstrap deployer is retired.'
+          echo 'Use n7-agent-loopback-gateway.yml for the isolated Gateway app.'
+          echo 'No FTPS writes or production mutations occur from this workflow.'

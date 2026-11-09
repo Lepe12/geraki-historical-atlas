@@ -1,0 +1,81 @@
+name: N7 agent isolated OpenClaw loopback supervisor
+on:
+  pull_request:
+    paths:
+      - 'tools/openclaw/deploy_agent_supervisor.py'
+      - 'tools/openclaw/passenger-bootstrap/app.js'
+      - 'tools/openclaw/passenger-bootstrap/gateway-supervisor.js'
+      - '.github/workflows/n7-agent-loopback-gateway.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/openclaw/deploy_agent_supervisor.py'
+      - 'tools/openclaw/passenger-bootstrap/app.js'
+      - 'tools/openclaw/passenger-bootstrap/gateway-supervisor.js'
+      - '.github/workflows/n7-agent-loopback-gateway.yml'
+permissions:
+  contents: read
+concurrency:
+  group: n7-agent-loopback-deploy
+  cancel-in-progress: false
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/openclaw/deploy_agent_supervisor.py
+            tools/openclaw/passenger-bootstrap
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Static checks
+        run: |
+          node --check tools/openclaw/passenger-bootstrap/app.js
+          node --check tools/openclaw/passenger-bootstrap/gateway-supervisor.js
+          python3 -m py_compile tools/openclaw/deploy_agent_supervisor.py
+          node - <<'JS'
+          const fs=require('node:fs');
+          const src=fs.readFileSync('tools/openclaw/passenger-bootstrap/gateway-supervisor.js','utf8');
+          if(!src.includes('127.0.0.1') || !src.includes('OPENCLAW_STATE_DIR') || !src.includes('OPENCLAW_CONFIG_PATH')) process.exit(1);
+          if(src.includes('0.0.0.0')) process.exit(1);
+          console.log('N7_GATEWAY_LOCAL_ONLY_STATIC=PASS');
+          JS
+      - name: Actual Passenger-like HTTP health smoke with Gateway disabled
+        shell: bash
+        run: |
+          PORT=31088 N7_AGENT_OPENCLAW_DISABLED=1 node tools/openclaw/passenger-bootstrap/app.js &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          for x in {1..30}; do
+            if curl --fail --silent --max-time 2 http://127.0.0.1:31088/health > /tmp/n7-agent-health.json; then break; fi
+            sleep 1
+          done
+          node - <<'JS'
+          const d=require('/tmp/n7-agent-health.json');
+          if(d.passengerResponsive !== true) process.exit(1);
+          if(d.gatewayPortPubliclyExposed !== false || d.gatewaySocketListening !== false) process.exit(1);
+          if(d.gatewayLaunchState !== 'disabled_by_environment') process.exit(1);
+          console.log('N7_AGENT_SUPERVISOR_HTTP_SMOKE=PASS');
+          JS
+  deploy:
+    if: github.event_name == 'push'
+    needs: check
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 8
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/openclaw/deploy_agent_supervisor.py
+            tools/openclaw/passenger-bootstrap
+      - name: Safely deploy new agent loopback Gateway supervisor and request Passenger restart
+        run: python3 tools/openclaw/deploy_agent_supervisor.py
