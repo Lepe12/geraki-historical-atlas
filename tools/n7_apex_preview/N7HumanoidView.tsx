@@ -312,6 +312,157 @@ function ParticleReference({
   />;
 }
 
+function AssemblyCanvas({
+  replayKey,
+  onStats,
+  onAssemblyDone,
+}:{
+  replayKey:number;
+  onStats:(s:Stats)=>void;
+  onAssemblyDone:()=>void;
+}) {
+  const hostRef=useRef<HTMLDivElement>(null);
+
+  useEffect(()=>{
+    if(!hostRef.current) return;
+    const host=hostRef.current;
+    let disposed=false;
+    let raf=0;
+    let ro:ResizeObserver|null=null;
+    let start=0;
+    let finished=false;
+    let progress=0;
+
+    const canvas=document.createElement("canvas");
+    canvas.width=320;
+    canvas.height=480;
+    canvas.style.width="100%";
+    canvas.style.height="100%";
+    canvas.style.display="block";
+    const ctx=canvas.getContext("2d",{alpha:true});
+    if(!ctx) return;
+    host.replaceChildren(canvas);
+
+    const image=new Image();
+    image.decoding="async";
+    image.src=N7_HUMANOID_REFERENCE;
+
+    image.onload=()=>{
+      if(disposed) return;
+
+      const sample=document.createElement("canvas");
+      sample.width=320;
+      sample.height=480;
+      const sctx=sample.getContext("2d",{willReadFrequently:true});
+      if(!sctx) return;
+      sctx.drawImage(image,0,0,320,480);
+      const px=sctx.getImageData(0,0,320,480).data;
+
+      type P={fx:number;fy:number;r:number;g:number;b:number;delay:number;j:number};
+      const particles:P[]=[];
+
+      for(let y=0;y<480;y+=2){
+        for(let x=0;x<320;x+=2){
+          const i=(y*320+x)*4;
+          const r=px[i],g=px[i+1],b=px[i+2],a=px[i+3];
+          const lum=.2126*r+.7152*g+.0722*b;
+          const chroma=Math.max(r,g,b)-Math.min(r,g,b);
+          if(a<8 || (lum<7 && chroma<7)) continue;
+
+          let delay=(x/320)*.68;
+          if(y<168) delay+=.08;
+          if(y<168 && x>105 && x<215) delay+=.10;
+          const h=((x*73856093)^(y*19349663))>>>0;
+          particles.push({
+            fx:x+.5,fy:y+.5,r,g,b,
+            delay:Math.min(.84,delay),
+            j:((h%2001)-1000)/1000
+          });
+        }
+      }
+
+      const sx=15, sy=415;
+
+      const draw=(p:number)=>{
+        progress=p;
+        ctx.clearRect(0,0,320,480);
+        ctx.globalCompositeOperation="lighter";
+
+        if(p>=.999){
+          ctx.globalCompositeOperation="source-over";
+          ctx.drawImage(image,0,0,320,480);
+          onStats({particles:particles.length,sampleW:320,sampleH:480,renderMs:0,assembly:100});
+          return;
+        }
+
+        const t0=performance.now();
+        for(const q of particles){
+          const local=clamp01((p-q.delay)/.20);
+          if(local<=0) continue;
+
+          const e=smooth01(local);
+          let x:number,y:number,alpha:number;
+          if(local>=1){
+            x=q.fx; y=q.fy; alpha=1;
+          }else{
+            const cx=105 + q.fx*.28 + q.j*10;
+            const cy=38 - Math.max(0,160-q.fy)*.04 - Math.abs(q.j)*8;
+            const inv=1-e;
+            x=inv*inv*sx + 2*inv*e*cx + e*e*q.fx;
+            y=inv*inv*sy + 2*inv*e*cy + e*e*q.fy;
+            alpha=Math.min(1,local*3);
+          }
+
+          ctx.globalAlpha=alpha;
+          ctx.fillStyle="rgb("+q.r+","+q.g+","+q.b+")";
+          const size=local<1 ? 1.8 : 1.25;
+          ctx.fillRect(x-size/2,y-size/2,size,size);
+        }
+        ctx.globalAlpha=1;
+        ctx.globalCompositeOperation="source-over";
+        onStats({
+          particles:particles.length,
+          sampleW:320,
+          sampleH:480,
+          renderMs:Math.round((performance.now()-t0)*10)/10,
+          assembly:Math.round(p*100)
+        });
+      };
+
+      const tick=(now:number)=>{
+        if(disposed) return;
+        if(!start) start=now;
+        const raw=Math.min(1,(now-start)/6000);
+        draw(raw);
+        if(raw<1){
+          raf=requestAnimationFrame(tick);
+        }else if(!finished){
+          finished=true;
+          onAssemblyDone();
+        }
+      };
+
+      draw(0);
+      raf=requestAnimationFrame(tick);
+      ro=new ResizeObserver(()=>draw(progress));
+      ro.observe(host);
+    };
+
+    return()=>{
+      disposed=true;
+      cancelAnimationFrame(raf);
+      ro?.disconnect();
+      host.replaceChildren();
+    };
+  },[replayKey,onStats,onAssemblyDone]);
+
+  return <div
+    ref={hostRef}
+    aria-label="N7 guide particle-river assembly"
+    style={{position:"absolute",inset:0}}
+  />;
+}
+
 export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>void}) {
   const systemReduced=useMemo(()=>typeof window!=="undefined"&&window.matchMedia?.("(prefers-reduced-motion: reduce)").matches,[]);
   const [allowMotion,setAllowMotion]=useState(false);
@@ -328,6 +479,9 @@ export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>
   if(!open) return null;
 
   const startAssembly=()=>{
+    // Clicking Assembly is an explicit request to animate this session.
+    // Do not silently skip because the OS/browser reports reduced motion.
+    setAllowMotion(true);
     setAssemblyDone(false);
     setMode("assembly");
     setReplayKey(x=>x+1);
@@ -353,11 +507,17 @@ export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>
           style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"contain",opacity:mode==="compare"?.38:1}}
         />}
 
-        {(mode==="particle"||mode==="compare"||mode==="assembly")&&<ParticleReference
+        {(mode==="particle"||mode==="compare")&&<ParticleReference
           enabled
-          assembly={mode==="assembly"}
+          assembly={false}
           replayKey={replayKey}
-          reduced={reduced}
+          reduced={false}
+          onStats={setStats}
+          onAssemblyDone={handleAssemblyDone}
+        />}
+
+        {mode==="assembly"&&<AssemblyCanvas
+          replayKey={replayKey}
           onStats={setStats}
           onAssemblyDone={handleAssemblyDone}
         />}
@@ -395,8 +555,7 @@ export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>
 
     <div style={{position:"absolute",left:"50%",bottom:16,transform:"translateX(-50%)",zIndex:5,width:"min(980px,calc(100vw - 24px))"}}>
       {systemReduced&&!allowMotion&&<div style={{marginBottom:6,padding:"7px 10px",background:"#241b08dd",border:"1px solid #806421",borderRadius:8,fontSize:11,textAlign:"center"}}>
-        Reduced motion is enabled on this device, so the guide requires Assembly to skip animation.
-        <button type="button" onClick={()=>setAllowMotion(true)} style={{marginLeft:8,padding:"5px 8px",border:"1px solid #a47a26",borderRadius:5,background:"#38270b",color:"#fff0c4",cursor:"pointer"}}>Animate this session</button>
+        Reduced motion is enabled on this device. Pressing <b>Assembly</b> will explicitly play the animation for this session.
       </div>}
 
       <div style={{display:"flex",flexWrap:"wrap",gap:7,justifyContent:"center",padding:9,background:"#030c13df",border:"1px solid #204f60",borderRadius:10,backdropFilter:"blur(10px)"}}>
