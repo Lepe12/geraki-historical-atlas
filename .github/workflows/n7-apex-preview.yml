@@ -133,9 +133,10 @@ jobs:
             const dialog=p.getByRole('dialog',{name:'N7 Humanoid preview'});
             const dialogBox=await dialog.boundingBox();
             if(!dialogBox) throw Error('humanoid dialog has no bounds');
+            const visualStage=p.getByLabel('N7 humanoid visual stage');
             async function particleShot(name){
               const path=process.env.RUNNER_TEMP+'/n7-head-'+name+'.png';
-              await canvas.screenshot({path});
+              await visualStage.screenshot({path});
               return PNG.sync.read(fs.readFileSync(path));
             }
             function regionDiff(a,b,y0,y1){
