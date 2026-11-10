@@ -25,7 +25,7 @@ jobs:
   validate:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     environment: nabou-production
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
       PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
@@ -83,7 +83,7 @@ jobs:
     if: github.event_name == 'push'
     needs: validate
     environment: nabou-production
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 8
     env:
       PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
