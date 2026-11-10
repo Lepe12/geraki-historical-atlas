@@ -55,7 +55,7 @@ jobs:
         env:
           N7_FIXTURE_DIR: ${{ runner.temp }}/n7-modern-public-assets
         run: |
-          if rg -q '^def public_preview' tools/n7/deploy_reconciled_runtime.py; then
+          if grep -q '^def public_preview' tools/n7/deploy_reconciled_runtime.py; then
             python3 tools/check_n7_distribution.py
             export N7_CANONICAL_COMMIT="$(python3 -c 'import json; print(json.load(open("n7-distribution.json"))["commit"])')"
             export N7_PREVIEW_PUBLIC_DIR="$N7_FIXTURE_DIR"
