@@ -145,7 +145,7 @@ def main():
         shutil.copy2(part, out/"components"/part.name)
     shutil.copy2(overlay/"N7HumanoidIdle.ts",out/"components/N7HumanoidIdle.ts")
     (out/"public").mkdir(parents=True, exist_ok=True)
-    shutil.copy2(overlay/"assets/n7-humanoid-idle.webp", out/"public/n7-humanoid-idle.webp")
+    shutil.copy2(overlay/"assets/n7-humanoid-idle.webp", out/"public/n7-humanoid-idle-v2.webp")
 
     patch_exact(out/"app/page.tsx",'import ApexWorld from "@/components/ApexWorld";','import N7ApexStage from "@/components/N7ApexStage";')
     patch_exact(out/"app/page.tsx",'''<section style={{ position: "relative", height: "100vh", minHeight: 620 }}>
