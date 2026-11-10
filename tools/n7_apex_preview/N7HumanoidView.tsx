@@ -167,6 +167,7 @@ function ParticleReference({
       }
 
       const finalArray=new Float32Array(finals);
+      host.dataset.headParticles=String(headMask.reduce((a,b)=>a+b,0));
       const currentArray=new Float32Array(finalArray.length);
       const alphaArray=new Float32Array(finalArray.length/3);
       const colorArray=new Float32Array(colors);
@@ -285,6 +286,7 @@ function ParticleReference({
         const target=clamp01(((headTurnRef?.current ?? 0)+1)/2)*2-1;
         currentTurn+=(target-currentTurn)*.11;
         if(Math.abs(target-currentTurn)<.0005) currentTurn=target;
+        host.dataset.currentTurn=currentTurn.toFixed(3);
 
         const angle=currentTurn*0.28; // ~16 degrees max: intentionally conservative.
         const cs=Math.cos(angle), sn=Math.sin(angle);
