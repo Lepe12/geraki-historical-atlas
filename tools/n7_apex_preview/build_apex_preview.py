@@ -26,7 +26,7 @@ def main():
     run("git","checkout","--detach","FETCH_HEAD",cwd=out)
     head=subprocess.check_output(["git","rev-parse","HEAD"],cwd=out,text=True).strip()
     if head!=COMMIT: raise RuntimeError("wrong upstream commit")
-    overlay=pathlib.Path(__file__).with_name("apex-preview")
+    overlay=pathlib.Path(__file__).resolve().parent
     shutil.copy2(overlay/"N7Workspace.tsx",out/"components/N7Workspace.tsx")
     shutil.copy2(overlay/"N7ApexStage.tsx",out/"components/N7ApexStage.tsx")
 
