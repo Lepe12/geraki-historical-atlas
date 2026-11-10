@@ -10,6 +10,10 @@ on:
       - 'tools/n7/test_modern_ui_deploy.py'
       - 'tools/n7/test_modern_ui_browser.cjs'
       - 'tools/n7/test_chat_documents_browser.cjs'
+      - 'tools/n7/test_n7_voice_browser.cjs'
+      - 'tools/n7/voice-protocol.js'
+      - 'tools/n7/voice-bridge-ui.js'
+      - 'tools/n7/atlas-voice-link.js'
       - '.github/workflows/n7-modern-ui.yml'
       - 'ops_ftps_requests/n7-modern-ui.json'
   push:
@@ -42,6 +46,8 @@ jobs:
             tools/library
             tools/check_n7_distribution.py
             n7-distribution.json
+            jarvis-intelligence-chamber/assistant/assistant.js
+            jarvis-intelligence-chamber/assistant/assistant-intents.js
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -75,10 +81,13 @@ jobs:
         env:
           N7_FIXTURE_DIR: ${{ runner.temp }}/n7-modern-public-assets
           NODE_PATH: ${{ runner.temp }}/n7-browser/node_modules
+          N7_ASSISTANT_FIXTURE: ${{ github.workspace }}/jarvis-intelligence-chamber/assistant/assistant.js
+          N7_INTENTS_FIXTURE: ${{ github.workspace }}/jarvis-intelligence-chamber/assistant/assistant-intents.js
           N7_SCREENSHOT_DIR: ${{ runner.temp }}/n7-modern-screenshots
         run: |
           node tools/n7/test_modern_ui_browser.cjs
           node tools/n7/test_chat_documents_browser.cjs
+          node tools/n7/test_n7_voice_browser.cjs
   deploy:
     if: github.event_name == 'push'
     needs: validate
@@ -100,6 +109,8 @@ jobs:
             tools/library
             tools/check_n7_distribution.py
             n7-distribution.json
+            jarvis-intelligence-chamber/assistant/assistant.js
+            jarvis-intelligence-chamber/assistant/assistant-intents.js
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
