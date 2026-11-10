@@ -1,0 +1,77 @@
+name: N7 real private backup and isolated restore check
+on:
+  pull_request:
+    paths:
+      - 'tools/n7/ftps_private_restore.py'
+      - 'tools/n7/private_restore_reader.cjs'
+      - 'tools/n7/test_ftps_private_restore.py'
+      - '.github/workflows/n7-private-restore-check.yml'
+      - 'ops_ftps_requests/n7-private-restore-check.json'
+  push:
+    branches: [main]
+    paths: ['ops_ftps_requests/n7-private-restore-check.json']
+permissions:
+  contents: read
+concurrency:
+  group: n7-private-recovery-drill
+  cancel-in-progress: false
+jobs:
+  verify-and-restore:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    environment: nabou-production
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '1'
+      N7_RESTORE_DRY_RUN: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            tools/n7
+            tools/library
+            tools/check_n7_distribution.py
+            n7-distribution.json
+            ops_ftps_requests/n7-private-restore-check.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify source proof and explicit private-data scope
+        run: |
+          python3 tools/check_n7_distribution.py
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          distribution=json.loads(Path('n7-distribution.json').read_text())
+          request=json.loads(Path('ops_ftps_requests/n7-private-restore-check.json').read_text())
+          assert request=={
+            'confirmation':'N7-OWNER-REAL-PRIVATE-RESTORE-CHECK',
+            'source':'/bot.piratecartography.com/n7-app/data',
+            'backup_directory':'/bot.piratecartography.com/n7-app/.n7-private-backups',
+            'restore_in_new_isolated_directory':True,
+            'preserve_production_data':True,
+            'no_private_content_in_logs_repository_or_artifacts':True,
+            'retain_verified_private_backup':True
+          }
+          with open(os.environ['GITHUB_ENV'],'a') as f:
+            f.write('N7_CANONICAL_COMMIT='+distribution['commit']+'\n')
+          PY
+      - name: Verify restoration protocol and offline readers with isolated fixtures
+        run: |
+          python3 tools/n7/test_private_backup.py
+          python3 tools/n7/test_ftps_private_restore.py
+          node --check tools/n7/private_restore_reader.cjs
+      - name: Verify actual runtime code and private source inventory without writing
+        run: |
+          python3 tools/n7/deploy_reconciled_runtime.py
+          python3 tools/n7/ftps_private_restore.py
+      - name: Create private backup, read it back and restore into isolated space
+        if: github.event_name == 'push'
+        env:
+          N7_RESTORE_DRY_RUN: '0'
+        run: python3 tools/n7/ftps_private_restore.py
