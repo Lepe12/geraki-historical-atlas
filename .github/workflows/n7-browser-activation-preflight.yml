@@ -1,0 +1,64 @@
+name: N7 browser activation — inspect existing TopHost installation
+on:
+  pull_request:
+    paths: ['.github/workflows/n7-browser-activation-preflight.yml']
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: nabou-production
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - name: Read-only verified FTPS inspection (no content or credentials disclosed)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import ftplib,ssl,os,socket,json,hashlib,re
+          host=os.getenv('PCT_FTPS_HOST','')
+          user=os.getenv('PCT_FTPS_USER','')
+          password=os.getenv('PCT_FTPS_PASSWORD','')
+          port=int(os.getenv('PCT_FTPS_PORT','21'))
+          tls='linux3087.grserver.gr'
+          if not all((host,user,password)): raise SystemExit('FTPS_CREDENTIALS_MISSING')
+          ips=lambda h:{x[4][0] for x in socket.getaddrinfo(h,port,type=socket.SOCK_STREAM)}
+          if not (ips(host)&ips(tls)):raise SystemExit('FTPS_TARGET_NOT_APPROVED')
+          ftp=ftplib.FTP_TLS(timeout=25,context=ssl.create_default_context())
+          ftp.connect(host,port);ftp.host=tls
+          ftp.login(user,password);ftp.prot_p()
+          try:
+            for location in ('/bot.piratecartography.com','/bot.piratecartography.com/httpdocs','/bot.piratecartography.com/n7-app','/bot.piratecartography.com/n7-app/tmp'):
+              try:
+                ftp.cwd(location)
+                names={x.rsplit('/',1)[-1] for x in ftp.nlst()}
+                allowed=('server.js','app.js','index.js','passenger.js','.htaccess','package.json','browser.js','browser.py','node_modules','tmp','public','restart.txt','.env','python','venv','.venv')
+                result={'location':location,'present':sorted(names.intersection(allowed))}
+                for f in ('.htaccess','package.json','browser.js','browser.py'):
+                  if f not in names:continue
+                  blobs=[]
+                  ftp.retrbinary('RETR '+f,blobs.append)
+                  data=b''.join(blobs)
+                  result[f.replace('.','_')+'_size']=len(data)
+                  result[f.replace('.','_')+'_sha256']=hashlib.sha256(data).hexdigest()
+                  if f=='.htaccess':
+                    result['htaccess_directives']=sorted(set(x.decode('ascii') for x in re.findall(rb'(?mi)^\\s*(?:Passenger[A-Za-z]+|SetEnv)\\b',data)))
+                print('N7_BROWSER_HOST_PREFLIGHT '+json.dumps(result,sort_keys=True))
+              except ftplib.all_errors as e:
+                print('N7_BROWSER_HOST_PREFLIGHT '+json.dumps({'location':location,'accessible':False,'error':type(e).__name__}))
+          finally:ftp.quit()
+          PY
+      - name: Current production status (no authentication)
+        run: |
+          python3 - <<'PY'
+          import json,urllib.request,ssl
+          r=urllib.request.urlopen('https://bot.piratecartography.com/health',timeout=15,context=ssl.create_default_context())
+          j=json.load(r)
+          assert j.get('status')=='ok'
+          print('N7_BROWSER_CURRENT_CONFIG='+str(j.get('browserConfigured')))
+          print('N7_MODEL_CONFIGURED='+str(j.get('modelConfigured')))
+          PY
