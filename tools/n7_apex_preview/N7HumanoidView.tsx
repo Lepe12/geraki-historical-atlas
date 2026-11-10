@@ -11,15 +11,35 @@ type Stats = { particles:number; sampleW:number; sampleH:number; renderMs:number
 const VERT = `
   attribute vec3 color;
   attribute float alpha;
+  attribute float headMask;
+  attribute float headDepth;
   varying vec3 vColor;
   varying float vAlpha;
   uniform float uPointSize;
+  uniform float uHeadTurn;
 
   void main(){
-    vColor = color;
-    vAlpha = alpha;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
-    gl_PointSize = uPointSize;
+    vec3 pos=position;
+    vec3 shaded=color;
+
+    if(headMask>.5 && abs(uHeadTurn)>.0001){
+      float angle=uHeadTurn*.28;
+      float cs=cos(angle);
+      float sn=sin(angle);
+      float ox=pos.x;
+      pos.x=ox*cs + headDepth*sn;
+      pos.z=-ox*sn + headDepth*cs;
+
+      float farSide=max(0.0,sign(uHeadTurn)*ox/108.0);
+      float edge=max(0.0,(abs(ox)-72.0)/36.0)*abs(uHeadTurn);
+      float shade=1.0-farSide*.38;
+      shaded=clamp(color*shade + vec3(.03,.16,.22)*edge,0.0,1.0);
+    }
+
+    vColor=shaded;
+    vAlpha=alpha;
+    gl_Position=projectionMatrix*modelViewMatrix*vec4(pos,1.0);
+    gl_PointSize=uPointSize;
   }
 `;
 
@@ -115,7 +135,6 @@ function ParticleReference({
 
       const finals:number[]=[];
       const colors:number[]=[];
-      const baseColors:number[]=[];
       const headMask:number[]=[];
       const headDepth:number[]=[];
       const launchDelays:number[]=[];
@@ -138,7 +157,6 @@ function ParticleReference({
           const fy=sampleH/2-y-.5;
           finals.push(fx,fy,0);
           colors.push(r,g,b);
-          baseColors.push(r,g,b);
 
           // Guide Step 5: depth illusion only for the head. The body stays
           // fixed and the neutral front remains the untouched Stage-1 layout.
@@ -170,7 +188,6 @@ function ParticleReference({
       host.dataset.headParticles=String(headMask.reduce((a,b)=>a+b,0));
       const currentArray=new Float32Array(finalArray.length);
       const alphaArray=new Float32Array(finalArray.length/3);
-      const colorArray=new Float32Array(colors);
 
       const sourceX=-145;
       const sourceY=-175;
@@ -198,10 +215,10 @@ function ParticleReference({
       alphaAttr=new THREE.BufferAttribute(alphaArray,1);
       alphaAttr.setUsage(THREE.DynamicDrawUsage);
       geometry.setAttribute("position",positionAttr);
-      const colorAttr=new THREE.BufferAttribute(colorArray,3);
-      colorAttr.setUsage(THREE.DynamicDrawUsage);
-      geometry.setAttribute("color",colorAttr);
+      geometry.setAttribute("color",new THREE.Float32BufferAttribute(colors,3));
       geometry.setAttribute("alpha",alphaAttr);
+      geometry.setAttribute("headMask",new THREE.Float32BufferAttribute(headMask,1));
+      geometry.setAttribute("headDepth",new THREE.Float32BufferAttribute(headDepth,1));
 
       material=new THREE.ShaderMaterial({
         vertexShader:VERT,
@@ -210,7 +227,7 @@ function ParticleReference({
         transparent:true,
         depthWrite:false,
         blending:THREE.NormalBlending,
-        uniforms:{uPointSize:{value:2}},
+        uniforms:{uPointSize:{value:2},uHeadTurn:{value:0}},
       });
 
       scene.add(new THREE.Points(geometry,material));
@@ -229,7 +246,8 @@ function ParticleReference({
         const arr=positionAttr.array as Float32Array;
         const aa=alphaAttr.array as Float32Array;
 
-        if(!assembly || reduced || progress>=1){
+        if(!assembly) return;
+        if(reduced || progress>=1){
           arr.set(finalArray);
           aa.fill(1);
           positionAttr.needsUpdate=true;
@@ -280,46 +298,19 @@ function ParticleReference({
       };
 
       let currentTurn=0;
+      let lastTurnTime=performance.now();
 
       const applyHeadTurn=()=>{
-        if(assembly || !positionAttr) return;
-        const target=clamp01(((headTurnRef?.current ?? 0)+1)/2)*2-1;
-        currentTurn+=(target-currentTurn)*.11;
+        if(!material || assembly) return;
+        const target=Math.max(-1,Math.min(1,headTurnRef?.current ?? 0));
+        const now=performance.now();
+        const dt=Math.min(250,Math.max(0,now-lastTurnTime));
+        lastTurnTime=now;
+        const alpha=1-Math.exp(-dt/120);
+        currentTurn+=(target-currentTurn)*alpha;
         if(Math.abs(target-currentTurn)<.0005) currentTurn=target;
+        material.uniforms.uHeadTurn.value=currentTurn;
         host.dataset.currentTurn=currentTurn.toFixed(3);
-
-        const angle=currentTurn*0.28; // ~16 degrees max: intentionally conservative.
-        const cs=Math.cos(angle), sn=Math.sin(angle);
-        const arr=positionAttr.array as Float32Array;
-        const cc=colorAttr.array as Float32Array;
-
-        for(let n=0;n<headMask.length;n++){
-          const j=n*3;
-          const fx=finalArray[j], fy=finalArray[j+1];
-          if(!headMask[n]){
-            arr[j]=fx; arr[j+1]=fy; arr[j+2]=0;
-            cc[j]=baseColors[j]; cc[j+1]=baseColors[j+1]; cc[j+2]=baseColors[j+2];
-            continue;
-          }
-
-          const z=headDepth[n];
-          // Rotate each head sample around a neck-centered vertical axis.
-          const xr=fx*cs + z*sn;
-          const zr=-fx*sn + z*cs;
-          arr[j]=xr;
-          arr[j+1]=fy;
-          arr[j+2]=zr;
-
-          // Far side darkens; near silhouette gets a restrained cyan lift.
-          const far=currentTurn===0?0:Math.max(0,Math.sign(currentTurn)*fx/108);
-          const edge=Math.max(0,(Math.abs(fx)-72)/36)*Math.abs(currentTurn);
-          const shade=1-far*.38;
-          cc[j]=Math.min(1,baseColors[j]*shade + edge*.03);
-          cc[j+1]=Math.min(1,baseColors[j+1]*shade + edge*.16);
-          cc[j+2]=Math.min(1,baseColors[j+2]*shade + edge*.22);
-        }
-        positionAttr.needsUpdate=true;
-        colorAttr.needsUpdate=true;
       };
 
       const renderFrame=(progress:number)=>{
