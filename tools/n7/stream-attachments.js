@@ -2,6 +2,7 @@
 // N7_STREAM_ATTACHMENTS_V1 - genuine Groq SSE token streaming, private bounded attachments.
 const {createLibrary,RPC_ID}=require('./source-library'); // N7_PERSISTENT_LIBRARY_V1
 const documentReader=require('./document-reader'); // N7_PDF_ATTACHMENTS_V1
+const {appendExchange}=require('./conversation-store');
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),zlib=require('node:zlib');
 const MAX_BODY=9*1024*1024,MAX_FILE=5*1024*1024,MAX_TOTAL=6*1024*1024;
 const FILES=4,MAX_TEXT=26000;
@@ -113,7 +114,7 @@ function loadStored(dir,conversationId,meta){
   const buf=fs.readFileSync(file);
   const attachment=unpackAttachment({name:meta.name,base64:buf.toString('base64')});
   if(attachment.type==='application/pdf'){
-   try{const cache=file+'.text.json',st=fs.lstatSync(cache);if(st.isSymbolicLink()||st.size>250000)return null;const evidence=JSON.parse(fs.readFileSync(cache,'utf8'));attachment.text=pdfPrompt(evidence);}catch{attachment.text='[PDF μη αναγνωσμένο: λείπει η εξαγωγή κειμένου.]';}
+   try{const cache=file+'.text.json',st=fs.lstatSync(cache);if(st.isSymbolicLink()||st.size>250000)return null;const evidence=JSON.parse(fs.readFileSync(cache,'utf8'));attachment.pdfEvidence=evidence;attachment.text=pdfPrompt(evidence);}catch{attachment.text='[PDF μη αναγνωσμένο: λείπει η εξαγωγή κειμένου.]';}
   }
   return attachment;
  }catch{return null;}
@@ -217,7 +218,8 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
   // Write once before invoking model; stored images are private, never served publicly.
   let metadata;
   try{metadata=privateStore(DATA_DIR,id,attachments);}catch(e){return writeError(res,400,e.message);}
-  const history=[...item.messages,{role:'user',content,attachments:metadata}];
+  const userMessage={role:'user',content,attachments:metadata},exchangeId=crypto.randomUUID();
+  const history=[...item.messages,userMessage];
   // N7_STALL_RECOVERY_V1: bound research/prompt size and model call duration.
   // Never allow slow public sites or large bibliographies to starve the reply.
   // N7_RESEARCH_PROGRESS_STREAM_V1: acknowledge before slow web fetching.
@@ -348,23 +350,19 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
    if(libraryFooter){final+=libraryFooter;emit('delta',{text:libraryFooter});}
    const footer=publicSearch.sourceFooter(evidence);
    if(footer){final+=footer;emit('delta',{text:footer});}
+   const readFiles=attachments.length?attachments:history.slice(-24).filter(m=>m.role==='user').flatMap(m=>(m.attachments||[]).map(meta=>loadStored(DATA_DIR,id,meta)).filter(Boolean)).slice(-4);
+   const coverage=readFiles.filter(a=>a.pdfEvidence).map(a=>{const e=a.pdfEvidence;return a.name+': κείμενο από φυσικές σελίδες '+(e.pages.map(p=>p.page).join(', ')||'καμία')+' από '+e.totalPages+'.'+(e.emptyPages?.length?' Χωρίς αναγνώσιμο κείμενο: '+e.emptyPages.join(', ')+' — χρειάζεται OCR.':'')+(e.partial?' Μερική εξαγωγή· δεν διαβάστηκε ολόκληρο το PDF.':'');}).join('\n');
+   if(coverage){const note='\n\nΚάλυψη συνημμένων (εξαγωγή κειμένου):\n'+coverage;final+=note;emit('delta',{text:note});}
    if(!done&&!continuationFailure){
     const note='\n\n[Η απάντηση έφτασε στο όριο μήκους. Γράψε «συνέχισε» για τα υπόλοιπα.]';
     final+=note;emit('delta',{text:note});
    }
-   const fresh=load(),current=fresh.find(c=>c.id===id);
-   if(!current)throw Error('Η συνομιλία διαγράφηκε πριν ολοκληρωθεί η απάντηση');
-   current.messages=[...history,{role:'assistant',content:final,evidenceAudit:{library:libraryHits.map(p=>({ref:p.ref,id:p.id,page:p.page,textHash:p.textHash,sourceHash:p.sourceHash})),...provenance}}].slice(-100);
-   current.updated=new Date().toISOString();
-   if(current.title==='Νέα συνομιλία')current.title=content.slice(0,70);
-   save(fresh);
+   const current=appendExchange({dataDir:DATA_DIR,load,save,id,user:userMessage,exchangeId,assistant:{content:final,evidenceAudit:{library:libraryHits.map(p=>({ref:p.ref,id:p.id,page:p.page,textHash:p.textHash,sourceHash:p.sourceHash})),...provenance}}});
    emit('done',{conversation:{id:current.id,title:current.title}});
   }catch(e){
    if(final){
     // Do not lose a response after it started streaming.
-    const fresh=load(),current=fresh.find(c=>c.id===id);
-    if(current){current.messages=[...history,{role:'assistant',content:final+'\n\n[Μη ολοκληρωμένη απάντηση]'}].slice(-100);
-      current.updated=new Date().toISOString();try{save(fresh);}catch{}}
+    try{appendExchange({dataDir:DATA_DIR,load,save,id,user:userMessage,exchangeId,assistant:{content:final+'\n\n[Μη ολοκληρωμένη απάντηση]'}});}catch{}
    }
    emit('error',{error:'Η απάντηση διακόπηκε: '+String(e.message||e).slice(0,150)});
   }finally{if(started&&!res.writableEnded)res.end();}

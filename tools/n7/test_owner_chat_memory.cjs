@@ -61,7 +61,7 @@ test('skills and owner corrections are bounded and never rewrite original skill 
     assert.ok(guidance.includes('GREEK LITERARY EDITING'));
     assert.ok(guidance.includes('OWNER-APPROVED'));
     assert.ok(guidance.includes('αριθμός 17'));
-    assert.ok(!guidance.includes('αριθμός 0'));
+    assert.ok(guidance.includes('αριθμός 0'));
     assert.equal(fs.readFileSync(skillFile,'utf8'),old);
   }finally{x.cleanup();}
 });

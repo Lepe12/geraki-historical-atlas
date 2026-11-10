@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Guarded installation of a canonical N7 runtime using existing, hash-verified code.
 
-No private source is stored in GitHub logs/artifacts. Only server.js, the small
-public release-info module, the private release receipt and restart marker change.
+No private source is stored in GitHub logs/artifacts. Only approved backend modules,
+the release receipt and restart marker can change.
 """
 import ftplib
 import hashlib
@@ -24,7 +24,12 @@ ROOT = '/bot.piratecartography.com/n7-app'
 BASE = 'https://bot.piratecartography.com'
 TLS = 'linux3087.grserver.gr'
 HERE = Path(__file__).resolve().parent
-WRITABLE = {'server.js', 'n7-release-info.js', 'release-manifest.json'}
+PUBLIC_MODULES = {'conversation-store.js': 'conversation-store.js',
+                  'n7-stream-attachments.js': 'stream-attachments.js',
+                  'owner-chat-memory.js': 'owner-chat-memory.js',
+                  'source-library.js': 'source-library.js',
+                  'n7-release-info.js': 'runtime-release-info.js'}
+WRITABLE = {'server.js', 'release-manifest.json', *PUBLIC_MODULES}
 LIMIT = 8 * 1024 * 1024
 
 
@@ -52,21 +57,26 @@ def read(ftp, name, optional=False):
 
 def transform_server(original):
     source = original.decode('utf8')
-    start = source.index("    if(req.method==='GET'&&/^\\/api\\/research\\/corpus")
-    end = source.index("      if(!originOK(req))return json(res,403,{error:'Invalid origin'});\n      try{return json(res,200,{lessons:ownerChatMemory.list()});}", start)
-    block = source[start:end]
-    source = source[:start] + source[end:]
-    replacements = [
-        ("    if(req.method==='GET'&&p==='/n7-mission-owner-ui.js')return serve(res,p);\n", ''),
-        ('    // Owner-reviewed writing knowledge: authenticated only, never silently derived from chats.', block + '\n    // Owner-reviewed writing knowledge: authenticated only, never silently derived from chats.'),
-        ("'/app.js': 'app.js','/n7-mission-owner-ui.js':'n7-mission-owner-ui.js',", "'/app.js': 'app.js', '/n7-mission-owner-ui.js':'n7-mission-owner-ui.js', '/n7-library-ui.js':'n7-library-ui.js', '/n7-pdf/pdf.js':'n7-pdf/pdf.js', '/n7-pdf/pdf.worker.js':'n7-pdf/pdf.worker.js',"),
-        ("        '/app.js', '/historical-library.js',", "        '/app.js', '/historical-library.js', '/n7-library-ui.js', '/n7-mission-owner-ui.js', '/n7-pdf/pdf.js', '/n7-pdf/pdf.worker.js',"),
-        ("        status: 'ok',", "        status: 'ok',\n        release: require('./n7-release-info').readReleaseInfo(__dirname),"),
-    ]
-    for old, new in replacements:
-        if source.count(old) != 1:
-            raise RuntimeError('N7_RELEASE_SOURCE_ANCHOR_CHANGED')
-        source = source.replace(old, new, 1)
+    if "require('./n7-release-info')" not in source:
+        start = source.index("    if(req.method==='GET'&&/^\\/api\\/research\\/corpus")
+        end = source.index("      if(!originOK(req))return json(res,403,{error:'Invalid origin'});\n      try{return json(res,200,{lessons:ownerChatMemory.list()});}", start)
+        block = source[start:end]
+        source = source[:start] + source[end:]
+        replacements = [
+            ("    if(req.method==='GET'&&p==='/n7-mission-owner-ui.js')return serve(res,p);\n", ''),
+            ('    // Owner-reviewed writing knowledge: authenticated only, never silently derived from chats.', block + '\n    // Owner-reviewed writing knowledge: authenticated only, never silently derived from chats.'),
+            ("'/app.js': 'app.js','/n7-mission-owner-ui.js':'n7-mission-owner-ui.js',", "'/app.js': 'app.js', '/n7-mission-owner-ui.js':'n7-mission-owner-ui.js', '/n7-library-ui.js':'n7-library-ui.js', '/n7-pdf/pdf.js':'n7-pdf/pdf.js', '/n7-pdf/pdf.worker.js':'n7-pdf/pdf.worker.js',"),
+            ("        '/app.js', '/historical-library.js',", "        '/app.js', '/historical-library.js', '/n7-library-ui.js', '/n7-mission-owner-ui.js', '/n7-pdf/pdf.js', '/n7-pdf/pdf.worker.js',"),
+            ("        status: 'ok',", "        status: 'ok',\n        release: require('./n7-release-info').readReleaseInfo(__dirname),"),
+        ]
+        for old, new in replacements:
+            if source.count(old) != 1:
+                raise RuntimeError('N7_RELEASE_SOURCE_ANCHOR_CHANGED')
+            source = source.replace(old, new, 1)
+    for patch in json.loads((HERE / 'chat-storage-patch.json').read_text()):
+        if source.count(patch['old']) != 1:
+            raise RuntimeError('N7_CHAT_STORAGE_ANCHOR_CHANGED')
+        source = source.replace(patch['old'], patch['new'], 1)
     return source.encode()
 
 
@@ -95,32 +105,39 @@ def plan(ftp, release, canonical_commit, transformer=transform_server):
     if not re.fullmatch(r'[a-f0-9]{40}', canonical_commit):
         raise RuntimeError('N7_CANONICAL_COMMIT_REQUIRED')
     originals = {}
+    previous_files = release.get('previous_files', {})
     for name, expected in release['files'].items():
-        current = read(ftp, name, optional=name == 'n7-release-info.js')
-        if name == 'server.js':
-            if current is None or sha(current) not in (expected, release['previous_server_sha256']):
-                raise RuntimeError('N7_UNREVIEWED_LIVE_SERVER')
-            originals[name] = current
-        elif name == 'n7-release-info.js':
-            if current is not None and sha(current) != expected:
-                raise RuntimeError('N7_UNREVIEWED_RELEASE_HELPER')
+        mutable = name in WRITABLE
+        current = read(ftp, name, optional=mutable and name not in previous_files and name != 'server.js')
+        if mutable:
+            allowed = {expected, previous_files.get(name)} - {None}
+            if name == 'server.js':
+                allowed.add(release['previous_server_sha256'])
+            if current is not None and sha(current) not in allowed:
+                raise RuntimeError('N7_UNREVIEWED_LIVE_SERVER' if name == 'server.js' else 'N7_RUNTIME_DRIFT ' + name)
             originals[name] = current
         elif current is None or sha(current) != expected:
             raise RuntimeError('N7_RUNTIME_DRIFT ' + name)
     previous = originals['server.js']
     server = previous if sha(previous) == release['files']['server.js'] else transformer(previous)
-    helper = (HERE / 'runtime-release-info.js').read_bytes()
-    if sha(server) != release['files']['server.js'] or sha(helper) != release['files']['n7-release-info.js']:
+    payload = {}
+    for name, source in PUBLIC_MODULES.items():
+        if name not in release['files']:
+            continue
+        data = (HERE / source).read_bytes()
+        if sha(data) != release['files'][name]:
+            raise RuntimeError('N7_CANONICAL_RUNTIME_OUTPUT_MISMATCH')
+        syntax(data)
+        payload[name] = data
+    if sha(server) != release['files']['server.js']:
         raise RuntimeError('N7_CANONICAL_RUNTIME_OUTPUT_MISMATCH')
     syntax(server)
-    syntax(helper)
     receipt = {'schema': 'n7-runtime-build/v1', 'release_id': release['release_id'],
                'canonical_commit': canonical_commit, 'source_lock_verified': True,
                'files': release['files'], 'deployment': 'verified-existing-files-and-guarded-delta'}
     originals['release-manifest.json'] = read(ftp, 'release-manifest.json', optional=True)
-    payload = {'n7-release-info.js': helper,
-               'release-manifest.json': (json.dumps(receipt, indent=2) + '\n').encode(),
-               'server.js': server}
+    payload['release-manifest.json'] = (json.dumps(receipt, indent=2) + '\n').encode()
+    payload['server.js'] = server
     return payload, originals
 
 
