@@ -49,15 +49,17 @@ jobs:
           test -d out/_next
       - name: Browser-render built preview
         run: |
-          npm install --prefix "$RUNNER_TEMP/n7-apex-browser" --ignore-scripts --no-audit --no-fund playwright@1.56.1
-          "$RUNNER_TEMP/n7-apex-browser/node_modules/.bin/playwright" install --with-deps chromium
+          npm install --prefix "$RUNNER_TEMP/n7-apex-browser" --ignore-scripts --no-audit --no-fund playwright-core@1.56.1
+          CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          test -n "$CHROME_BIN"
+          echo "CHROME_BIN=$CHROME_BIN" >> "$GITHUB_ENV"
           mkdir -p "$RUNNER_TEMP/n7-apex-http/n7-apex"
           cp -a "$RUNNER_TEMP/n7-apex-src/out/." "$RUNNER_TEMP/n7-apex-http/n7-apex/"
           python3 -m http.server 4173 --directory "$RUNNER_TEMP/n7-apex-http" >"$RUNNER_TEMP/n7-apex-http.log" 2>&1 &
           NODE_PATH="$RUNNER_TEMP/n7-apex-browser/node_modules" node - <<'NODE'
-          const { chromium }=require('playwright');
+          const { chromium }=require('playwright-core');
           (async()=>{
-            const b=await chromium.launch({headless:true});
+            const b=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN,args:['--no-sandbox','--disable-dev-shm-usage']});
             const p=await b.newPage({viewport:{width:1440,height:900}});
             const errors=[]; const failed=[];
             p.on('pageerror',e=>errors.push(String(e)));
