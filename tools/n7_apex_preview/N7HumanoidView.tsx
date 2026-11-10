@@ -8,32 +8,11 @@ type Stats = { particles:number; sampleW:number; sampleH:number; renderMs:number
 
 const VERT = `
   attribute vec3 color;
-  attribute vec3 origin;
-  attribute float delay;
   varying vec3 vColor;
   uniform float uPointSize;
-  uniform float uProgress;
-  uniform float uAssembly;
-
   void main(){
     vColor = color;
-    vec3 p = position;
-
-    if(uAssembly > 0.5){
-      float local = clamp((uProgress - delay) / max(0.001, 1.0 - delay), 0.0, 1.0);
-      local = local * local * (3.0 - 2.0 * local);
-      p = mix(origin, position, local);
-
-      // Gentle outward arc from the chest source. The final point is always
-      // the exact source-image sample position when local reaches 1.
-      float arc = sin(local * 3.14159265);
-      float side = sign(position.x);
-      p.x += side * arc * (8.0 + abs(position.x) * 0.055);
-      p.y += arc * (10.0 + max(position.y, 0.0) * 0.025);
-      p.z += arc * 8.0;
-    }
-
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(p,1.0);
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
     gl_PointSize = uPointSize;
   }
 `;
@@ -49,6 +28,9 @@ const FRAG = `
     gl_FragColor = vec4(vColor, edge);
   }
 `;
+
+function clamp01(v:number){ return Math.max(0,Math.min(1,v)); }
+function smooth01(v:number){ const x=clamp01(v); return x*x*(3-2*x); }
 
 function ParticleReference({
   enabled,
@@ -74,10 +56,13 @@ function ParticleReference({
     let renderer:THREE.WebGLRenderer|null=null;
     let geometry:THREE.BufferGeometry|null=null;
     let material:THREE.ShaderMaterial|null=null;
+    let positionAttr:THREE.BufferAttribute|null=null;
     let ro:ResizeObserver|null=null;
     let raf=0;
     let start=0;
+    let lastFrame=0;
     let completed=false;
+    let currentProgress=assembly&&!reduced ? 0 : 1;
 
     const image=new Image();
     image.decoding="async";
@@ -99,12 +84,12 @@ function ParticleReference({
       ctx.drawImage(image,0,0,sampleW,sampleH);
       const pixels=ctx.getImageData(0,0,sampleW,sampleH).data;
 
-      const positions:number[]=[];
+      const finals:number[]=[];
       const colors:number[]=[];
       const origins:number[]=[];
       const delays:number[]=[];
 
-      // Exact Stage-1 sampling remains unchanged.
+      // Same image-driven Stage-1 sampling. No invented anatomy.
       for(let y=0;y<sampleH;y++){
         for(let x=0;x<sampleW;x++){
           const i=(y*sampleW+x)*4;
@@ -119,11 +104,10 @@ function ParticleReference({
 
           const px=x-sampleW/2+.5;
           const py=sampleH/2-y-.5;
-          positions.push(px,py,0);
+          finals.push(px,py,0);
           colors.push(r,g,b);
 
-          // Deterministic origin around the amber chest core.
-          // No randomness/flicker: each sample always has the same path.
+          // Deterministic chest-core origin for this exact source sample.
           const h=((x*73856093)^(y*19349663))>>>0;
           const angle=(h%10000)/10000*Math.PI*2;
           const radius=2+((h>>>8)%1000)/1000*10;
@@ -133,12 +117,21 @@ function ParticleReference({
             ((h>>>16)%1000)/1000*8-4
           );
 
-          // Build lower torso/shoulders first, then neck/head/hair.
-          // Distance from source adds a small secondary stagger.
+          // Lower torso/shoulders emerge first, then neck/head/hair.
           const vertical=clamp01((py+235)/470);
           const dist=Math.min(1,Math.hypot(px,py+88)/300);
           delays.push(Math.min(.58,vertical*.44+dist*.14));
         }
+      }
+
+      const finalArray=new Float32Array(finals);
+      const originArray=new Float32Array(origins);
+      const currentArray=new Float32Array(finalArray.length);
+
+      if(assembly&&!reduced){
+        currentArray.set(originArray);
+      }else{
+        currentArray.set(finalArray);
       }
 
       const scene=new THREE.Scene();
@@ -146,10 +139,10 @@ function ParticleReference({
       camera.position.z=10;
 
       geometry=new THREE.BufferGeometry();
-      geometry.setAttribute("position",new THREE.Float32BufferAttribute(positions,3));
+      positionAttr=new THREE.BufferAttribute(currentArray,3);
+      positionAttr.setUsage(THREE.DynamicDrawUsage);
+      geometry.setAttribute("position",positionAttr);
       geometry.setAttribute("color",new THREE.Float32BufferAttribute(colors,3));
-      geometry.setAttribute("origin",new THREE.Float32BufferAttribute(origins,3));
-      geometry.setAttribute("delay",new THREE.Float32BufferAttribute(delays,1));
 
       material=new THREE.ShaderMaterial({
         vertexShader:VERT,
@@ -158,11 +151,7 @@ function ParticleReference({
         transparent:true,
         depthWrite:false,
         blending:THREE.NormalBlending,
-        uniforms:{
-          uPointSize:{value:2},
-          uProgress:{value:assembly&& !reduced ? 0 : 1},
-          uAssembly:{value:assembly ? 1 : 0},
-        },
+        uniforms:{uPointSize:{value:2}},
       });
 
       scene.add(new THREE.Points(geometry,material));
@@ -174,18 +163,45 @@ function ParticleReference({
       renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
       host.replaceChildren(renderer.domElement);
 
+      const applyAssembly=(progress:number)=>{
+        currentProgress=progress;
+        if(!positionAttr) return;
+
+        const arr=positionAttr.array as Float32Array;
+        if(!assembly || reduced || progress>=1){
+          arr.set(finalArray);
+          positionAttr.needsUpdate=true;
+          return;
+        }
+
+        for(let n=0;n<delays.length;n++){
+          const j=n*3;
+          const local=smooth01((progress-delays[n])/Math.max(.001,1-delays[n]));
+          const arc=Math.sin(local*Math.PI);
+          const fx=finalArray[j], fy=finalArray[j+1], fz=finalArray[j+2];
+          const ox=originArray[j], oy=originArray[j+1], oz=originArray[j+2];
+          const side=fx===0 ? 0 : (fx>0 ? 1 : -1);
+
+          arr[j]=ox+(fx-ox)*local + side*arc*(8+Math.abs(fx)*.055);
+          arr[j+1]=oy+(fy-oy)*local + arc*(10+Math.max(fy,0)*.025);
+          arr[j+2]=oz+(fz-oz)*local + arc*8;
+        }
+        positionAttr.needsUpdate=true;
+      };
+
       const renderFrame=(progress:number)=>{
         if(!renderer||!material) return;
+        applyAssembly(progress);
+
         const rect=host.getBoundingClientRect();
         renderer.setSize(Math.max(1,rect.width),Math.max(1,rect.height),false);
         const displayScale=Math.min(rect.width/sampleW,rect.height/sampleH);
         material.uniforms.uPointSize.value=Math.max(1.15,displayScale*1.18);
-        material.uniforms.uProgress.value=progress;
 
         const t0=performance.now();
         renderer.render(scene,camera);
         onStats({
-          particles:positions.length/3,
+          particles:finalArray.length/3,
           sampleW,
           sampleH,
           renderMs:Math.round((performance.now()-t0)*10)/10,
@@ -196,10 +212,16 @@ function ParticleReference({
       const tick=(now:number)=>{
         if(disposed) return;
         if(!start) start=now;
+        if(now-lastFrame<28){
+          raf=requestAnimationFrame(tick);
+          return;
+        }
+        lastFrame=now;
+
         const duration=3200;
         const raw=reduced?1:Math.min(1,(now-start)/duration);
-        const eased=1-Math.pow(1-raw,3);
-        renderFrame(eased);
+        renderFrame(raw);
+
         if(raw<1){
           raf=requestAnimationFrame(tick);
         }else if(!completed){
@@ -209,15 +231,19 @@ function ParticleReference({
       };
 
       if(assembly){
-        raf=requestAnimationFrame(tick);
+        if(reduced){
+          renderFrame(1);
+          completed=true;
+          onAssemblyDone();
+        }else{
+          renderFrame(0);
+          raf=requestAnimationFrame(tick);
+        }
       }else{
         renderFrame(1);
       }
 
-      ro=new ResizeObserver(()=>{
-        const p=material?.uniforms.uProgress.value ?? 1;
-        renderFrame(p);
-      });
+      ro=new ResizeObserver(()=>renderFrame(currentProgress));
       ro.observe(host);
     };
 
@@ -234,8 +260,6 @@ function ParticleReference({
 
   return <div ref={hostRef} aria-label={assembly?"N7 assembling particle humanoid":"N7 image-sampled particle humanoid"} style={{position:"absolute",inset:0}}/>;
 }
-
-function clamp01(v:number){ return Math.max(0,Math.min(1,v)); }
 
 export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>void}) {
   const reduced=useMemo(()=>typeof window!=="undefined"&&window.matchMedia?.("(prefers-reduced-motion: reduce)").matches,[]);
@@ -260,7 +284,7 @@ export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>
     <header style={{position:"absolute",top:14,left:18,right:18,zIndex:5,display:"flex",justifyContent:"space-between",alignItems:"center",gap:12}}>
       <div>
         <strong style={{letterSpacing:4,color:"#62e8f7"}}>N7 · HUMANOID</strong>
-        <div style={{fontSize:11,opacity:.62}}>Guide Stage 2 · approved idle artwork → chest-core assembly → exact idle</div>
+        <div style={{fontSize:11,opacity:.62}}>Guide Stage 2 · approved idle artwork → visible particle assembly → exact idle</div>
       </div>
       <button type="button" onClick={onClose} style={{padding:"9px 13px",border:"1px solid #2c6c7e",background:"#091823",color:"#dffbff",borderRadius:7,cursor:"pointer"}}>Exit</button>
     </header>
@@ -286,16 +310,14 @@ export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>
           position:"absolute",
           left:"50%",
           top:"68.3%",
-          width:22,
-          height:22,
-          marginLeft:-11,
-          marginTop:-11,
+          width:14,
+          height:14,
+          marginLeft:-7,
+          marginTop:-7,
           borderRadius:"50%",
-          background:"radial-gradient(circle,#fff7c7 0 12%,#ffb000 30%,#ff7a00aa 48%,transparent 72%)",
-          boxShadow:"0 0 18px #ffad00,0 0 42px #ff7a0088",
-          opacity:assemblyDone ? .35 : 1,
-          transform:`scale(${assemblyDone ? .85 : 1})`,
-          transition:"opacity .45s ease, transform .45s ease",
+          background:"radial-gradient(circle,#fff7c7 0 10%,#ffb000 28%,#ff7a0088 46%,transparent 72%)",
+          boxShadow:"0 0 10px #ffad00,0 0 24px #ff7a0066",
+          opacity:assemblyDone ? .22 : .78,
           pointerEvents:"none"
         }}/>}
 
@@ -317,7 +339,7 @@ export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>
       </div>
       {details&&<div style={{marginTop:6,padding:9,background:"#02080dee",border:"1px solid #204856",borderRadius:8,fontSize:11,lineHeight:1.55}}>
         <b>Stage 2 diagnostics</b> · source sample {stats.sampleW||"—"}×{stats.sampleH||"—"} · particles {stats.particles||"loading"} · render {stats.renderMs||"—"} ms · assembly {stats.assembly}% · sRGB · tone mapping OFF · reduced motion {reduced?"ON":"OFF"}.
-        <br/>Assembly reuses the exact approved Stage-1 image samples. It changes particle position over time only; final positions and colors are unchanged.
+        <br/>Assembly now animates the Stage-1 position buffer directly. The shader is identical to the proven Stage-1 renderer; final positions and colors remain unchanged.
       </div>}
     </div>
   </section>;

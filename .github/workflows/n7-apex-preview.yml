@@ -51,7 +51,7 @@ jobs:
           test -d out/_next
       - name: Browser-render built preview
         run: |
-          npm install --prefix "$RUNNER_TEMP/n7-apex-browser" --ignore-scripts --no-audit --no-fund playwright-core@1.56.1
+          npm install --prefix "$RUNNER_TEMP/n7-apex-browser" --ignore-scripts --no-audit --no-fund playwright-core@1.56.1 pngjs@7.0.0
           CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
           test -n "$CHROME_BIN"
           echo "CHROME_BIN=$CHROME_BIN" >> "$GITHUB_ENV"
@@ -87,7 +87,21 @@ jobs:
             await p.getByRole('button',{name:'Assembly',exact:true}).click();
             await p.getByText(/ASSEMBLY/).waitFor({state:'visible'});
             await p.getByLabel('N7 amber assembly core').waitFor({state:'visible'});
-            await p.waitForTimeout(3500);
+            await p.waitForTimeout(1400);
+            const assemblyCanvas=p.getByRole('dialog',{name:'N7 Humanoid preview'}).locator('canvas');
+            const midShot=process.env.RUNNER_TEMP+'/n7-assembly-mid.png';
+            await assemblyCanvas.screenshot({path:midShot});
+            const {PNG}=require('pngjs');
+            const fs=require('fs');
+            const png=PNG.sync.read(fs.readFileSync(midShot));
+            let visible=0, cyan=0;
+            for(let i=0;i<png.data.length;i+=4){
+              const r=png.data[i],g=png.data[i+1],b=png.data[i+2],a=png.data[i+3];
+              if(a>24 && (r+g+b)>45) visible++;
+              if(a>24 && b>80 && g>70 && b>r*1.2) cyan++;
+            }
+            if(visible<700 || cyan<250) throw Error('assembly canvas is visually empty: visible='+visible+' cyan='+cyan);
+            await p.waitForTimeout(2200);
             await p.getByText(/ASSEMBLY · COMPLETE/).waitFor({state:'visible'});
             await p.getByRole('button',{name:'Replay Assembly',exact:true}).click();
             await p.waitForTimeout(250);
