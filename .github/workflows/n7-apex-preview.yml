@@ -80,8 +80,14 @@ jobs:
             await p.getByRole('button',{name:'Particles',exact:true}).click();
             const canvas=p.getByLabel('N7 image-sampled particle humanoid').locator('canvas');
             await canvas.waitFor({state:'visible'});
+            await p.waitForFunction(()=>{
+              const el=document.querySelector('[aria-label="N7 image-sampled particle humanoid"] canvas');
+              if(!(el instanceof HTMLCanvasElement)) return false;
+              const r=el.getBoundingClientRect();
+              return r.width>=200 && r.height>=300;
+            },null,{timeout:5000});
             const box=await canvas.boundingBox();
-            if(!box||box.width<200||box.height<300) throw Error('particle canvas has invalid size');
+            if(!box||box.width<200||box.height<300) throw Error('particle canvas has invalid size after resize: '+JSON.stringify(box));
             await p.getByRole('button',{name:'Compare',exact:true}).click();
             await p.getByText(/PARTICLE RECONSTRUCTION/).waitFor({state:'visible'});
 
