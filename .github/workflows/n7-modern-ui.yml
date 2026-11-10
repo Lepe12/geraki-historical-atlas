@@ -25,7 +25,7 @@ jobs:
   validate:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     environment: nabou-production
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
       PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
@@ -39,6 +39,9 @@ jobs:
           sparse-checkout: |
             tools/n7
             ops_ftps_requests
+            tools/library
+            tools/check_n7_distribution.py
+            n7-distribution.json
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -51,7 +54,15 @@ jobs:
       - name: Read actual public UI assets through existing FTPS connection; do not write
         env:
           N7_FIXTURE_DIR: ${{ runner.temp }}/n7-modern-public-assets
-        run: python3 tools/n7/deploy_modern_ui.py
+        run: |
+          if rg -q '^def public_preview' tools/n7/deploy_reconciled_runtime.py; then
+            python3 tools/check_n7_distribution.py
+            export N7_CANONICAL_COMMIT="$(python3 -c 'import json; print(json.load(open("n7-distribution.json"))["commit"])')"
+            export N7_PREVIEW_PUBLIC_DIR="$N7_FIXTURE_DIR"
+            python3 tools/n7/deploy_reconciled_runtime.py
+          else
+            python3 tools/n7/deploy_modern_ui.py
+          fi
       - name: Prepare browser test runtime
         run: |
           npm install --prefix "$RUNNER_TEMP/n7-browser" --ignore-scripts --no-audit --no-fund playwright@1.56.1 pdfjs-dist@5.6.205 @napi-rs/canvas@0.1.100
@@ -72,7 +83,7 @@ jobs:
     if: github.event_name == 'push'
     needs: validate
     environment: nabou-production
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 8
     env:
       PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
@@ -86,6 +97,9 @@ jobs:
           sparse-checkout: |
             tools/n7
             ops_ftps_requests
+            tools/library
+            tools/check_n7_distribution.py
+            n7-distribution.json
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
