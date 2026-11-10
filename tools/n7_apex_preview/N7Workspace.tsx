@@ -37,7 +37,12 @@ const buttonStyle: React.CSSProperties = {
   padding: "9px 12px", border: "1px solid #29677b", borderRadius: 7,
   color: "#cdf9ff", background: "#112d39", cursor: "pointer",
 };
-export default function N7Workspace({ onActivity }: { onActivity: (s: OrbState | null) => void }) {
+export default function N7Workspace({ onActivity, onTrace }: {
+  onActivity: (s: OrbState | null) => void;
+  onTrace: (t: { n: number; trace: Array<{ helper: string }> }) => void;
+}) {
+  const trace = (...helpers: string[]) =>
+    onTrace({ n: Date.now(), trace: helpers.map(helper => ({ helper })) });
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<Tab>("chat");
   const [online, setOnline] = useState<boolean | null>(null);
@@ -110,7 +115,7 @@ export default function N7Workspace({ onActivity }: { onActivity: (s: OrbState |
   }
   async function send() {
     if (!message.trim() || busy || !authenticated) return;
-    setBusy(true); setError(""); onActivity("thinking");
+    setBusy(true); setError(""); onActivity("thinking"); trace("orchestrator","memory","model_runtime");
     try {
       const id = conversationId || await newConversation();
       const result = await n7("/api/conversations/" + idPath(id) + "/chat", { message: message.trim() });
@@ -127,6 +132,7 @@ export default function N7Workspace({ onActivity }: { onActivity: (s: OrbState |
   async function submitTask() {
     if (!taskPrompt.trim() || busy || !authenticated) return;
     setBusy(true); setError(""); onActivity("thinking");
+    trace("orchestrator","task_runner",kind === "agent" ? "skills" : "model_runtime");
     try {
       await n7("/api/tasks", { prompt: taskPrompt.trim(), kind });
       const t = await n7("/api/tasks");
@@ -138,6 +144,7 @@ export default function N7Workspace({ onActivity }: { onActivity: (s: OrbState |
   async function submitMission() {
     if (missionTarget.trim().length < 3 || missionQuestion.trim().length < 12 || busy) return;
     setBusy(true); setError(""); onActivity("thinking");
+    trace("orchestrator","research_planner","historian","evidence_audit","source_library","mission_bridge");
     try {
       const m = await n7("/api/research/missions", {
         target: missionTarget.trim(), purpose: missionQuestion.trim(),

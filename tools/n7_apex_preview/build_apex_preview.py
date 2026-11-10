@@ -13,6 +13,116 @@ def patch_exact(path, old, new):
         raise RuntimeError(f"anchor mismatch in {path}: {old[:80]!r}")
     path.write_text(text.replace(old,new,1))
 
+
+def replace_between(path, start, end, replacement):
+    text=path.read_text()
+    a=text.find(start); b=text.find(end,a)
+    if a<0 or b<0 or text.find(start,a+1)>=0:
+        raise RuntimeError(f"section anchor mismatch in {path}: {start!r}")
+    path.write_text(text[:a]+replacement+text[b:])
+
+N7_GRAPH_ROSTER = """const ROSTER = [
+  ['orchestrator',     'Orchestrator',       'consultant', 250, 212, true,  18, 9],
+  ['memory',           'Memory',             'consultant', 452, 250, true, -18, 8],
+  ['research_planner', 'Research Plan',      'consultant', 296, 118, true, -22, 6.5],
+  ['historian',        'Historical Research','consultant', 182, 150, true,  24, 6.5],
+  ['evidence_audit',   'Evidence Audit',     'consultant', 436, 148, true, -20, 6.5],
+  ['editor',           'Greek Editor',       'consultant', 584, 208, true, -26, 6.5],
+  ['coding_agent',     'Coding Agent',       'doer',       158, 266, true,  22, 6.5],
+  ['task_runner',      'Task Runner',        'doer',       195, 298, true,  22, 6.5],
+  ['source_scout',     'Source Scout',       'doer',       232, 330, true,  20, 6.5],
+  ['web_research',     'Web Research',       'doer',       330, 374, true, -16, 6.5],
+  ['browser_reader',   'Browser Reader',     'doer',       426, 350, false,-18, 6.5],
+  ['pdf_reader',       'PDF Reader',         'doer',       502, 312, true, -22, 6.5],
+  ['library_ingest',   'Library Ingest',     'doer',       118, 356, true,  26, 6],
+  ['source_library',   'Source Library',     'tool',       256, 388, true,  20, 5.5],
+  ['conversation_store','Conversations',     'tool',       414, 392, true, -18, 5.5],
+  ['skills',           'Skills',             'tool',       560, 356, true, -24, 5.5],
+  ['mission_bridge',   'Mission Bridge',     'tool',       608, 286, true, -26, 5.5],
+  ['model_runtime',    'Model Runtime',      'tool',       582, 132, true,  24, 5.5],
+]
+"""
+
+N7_WORLD_ROSTER = """export const ROSTER: { key: string; name: string; color: string }[] = [
+  { key: "orchestrator",      name: "Orchestrator",        color: "#00e5ff" },
+  { key: "memory",            name: "Memory",              color: "#00e5ff" },
+  { key: "research_planner",  name: "Research Plan",       color: "#00e5ff" },
+  { key: "historian",         name: "Historical Research", color: "#00e5ff" },
+  { key: "evidence_audit",    name: "Evidence Audit",      color: "#00e5ff" },
+  { key: "editor",            name: "Greek Editor",        color: "#00e5ff" },
+  { key: "coding_agent",      name: "Coding Agent",        color: "#f5a623" },
+  { key: "task_runner",       name: "Task Runner",         color: "#f5a623" },
+  { key: "source_scout",      name: "Source Scout",        color: "#f5a623" },
+  { key: "web_research",      name: "Web Research",        color: "#f5a623" },
+  { key: "browser_reader",    name: "Browser Reader",      color: "#f5a623" },
+  { key: "pdf_reader",        name: "PDF Reader",          color: "#f5a623" },
+  { key: "library_ingest",    name: "Library Ingest",      color: "#f5a623" },
+  { key: "source_library",    name: "Source Library",      color: "#7f9bb3" },
+  { key: "conversation_store",name: "Conversations",       color: "#7f9bb3" },
+  { key: "skills",            name: "Skills",              color: "#7f9bb3" },
+  { key: "mission_bridge",    name: "Mission Bridge",      color: "#7f9bb3" },
+  { key: "model_runtime",     name: "Model Runtime",       color: "#7f9bb3" },
+];
+
+export const INFO: Record<string, AgentInfo> = {
+  orchestrator: { role: "Central agent orchestrator", status: "online",
+    caps: ["Routes bounded autonomous tasks", "Calls only approved workspace tools", "Loads reviewed skills when relevant"],
+    asks: ["Run this as an agent task", "Use the right N7 tools"] },
+  memory: { role: "Persistent owner memory", status: "online",
+    caps: ["Stores owner-approved writing guidance", "Keeps reviewed skill feedback", "Feeds approved context into later work"],
+    asks: ["Remember this correction", "Use my approved writing rules"] },
+  research_planner: { role: "Research mission controller", status: "online",
+    caps: ["Dispatches signed research missions", "Tracks mission state", "Separates operational completion from historical verification"],
+    asks: ["Start a research mission", "Show mission status"] },
+  historian: { role: "Historical research engine", status: "online",
+    caps: ["Queries the private historical library", "Builds source-attributed evidence sets", "Keeps unverified claims explicitly marked"],
+    asks: ["Research this person", "Find evidence for this event"] },
+  evidence_audit: { role: "Evidence quality gate", status: "integration",
+    caps: ["Audits claims against sources", "Flags unsupported statements", "Preserves source identity and evidence status"],
+    asks: ["Audit these claims", "Which claims lack evidence?"] },
+  editor: { role: "Greek prose editor", status: "online",
+    caps: ["Uses the reviewed Greek editing skill", "Preserves author voice and canon", "Applies owner-approved corrections"],
+    asks: ["Edit this chapter", "Keep my style while correcting it"] },
+  coding_agent: { role: "Verified coding agent", status: "integration",
+    caps: ["Runs bounded Qwen coding tasks", "Tests generated changes", "Can produce review-only GitHub pull requests"],
+    asks: ["Implement and test this change", "Prepare a draft PR"] },
+  task_runner: { role: "Durable task queue", status: "online",
+    caps: ["Queues analysis and agent jobs", "Persists task state", "Recovers bounded analysis jobs after restart"],
+    asks: ["Run this independently", "Show my active tasks"] },
+  source_scout: { role: "Source discovery worker", status: "integration",
+    caps: ["Discovers candidate historical sources", "Hands candidates to evidence workflows", "Does not treat metadata as proof"],
+    asks: ["Find candidate sources", "Scout references for this topic"] },
+  web_research: { role: "Public web research", status: "online",
+    caps: ["Runs bounded server-side web search", "Reads approved public historical pages", "Returns source URLs with retrieval status"],
+    asks: ["Search the web", "Check current public sources"] },
+  browser_reader: { role: "Read-only browser worker", status: "standby",
+    caps: ["Reads allowlisted HTTPS pages", "Rejects form submission and arbitrary host access", "Requires browser capability to be configured"],
+    asks: ["Open this approved page", "Read this public source"] },
+  pdf_reader: { role: "PDF document reader", status: "integration",
+    caps: ["Extracts page-bound PDF text", "Reports empty pages requiring OCR", "Preserves page numbers and partial-read status"],
+    asks: ["Read this PDF", "Show which pages need OCR"] },
+  library_ingest: { role: "Document ingestion worker", status: "online",
+    caps: ["Ingests source files in bounded batches", "Tracks progress and source hashes", "Feeds the persistent historical library"],
+    asks: ["Add this source", "Continue processing this book"] },
+  source_library: { role: "Persistent historical source store", status: "online",
+    caps: ["Stores source/page identity", "Searches imported material", "Returns evidence-linked excerpts"],
+    asks: ["Search my library", "Find this name in my sources"] },
+  conversation_store: { role: "Conversation persistence", status: "online",
+    caps: ["Stores private conversation history", "Restores conversations after restart", "Keeps chat state separate from source evidence"],
+    asks: ["Open an older conversation", "Continue this project"] },
+  skills: { role: "Reviewed skills registry", status: "online",
+    caps: ["Loads reviewed SKILL.md instructions", "Records owner feedback patterns", "Creates inactive improvement proposals for review"],
+    asks: ["Use the historical audit skill", "List available skills"] },
+  mission_bridge: { role: "Signed research bridge", status: "online",
+    caps: ["Authenticates mission dispatch", "Protects private research routes", "Links N7 chat to the research workflow"],
+    asks: ["Dispatch this mission", "Fetch its verified status"] },
+  model_runtime: { role: "Model provider runtime", status: "online",
+    caps: ["Runs the configured chat/model provider", "Supports tool-capable agent execution", "Exposes model availability through N7 status"],
+    asks: ["Use the configured model", "Check model availability"] },
+};
+
+"""
+
 def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("--out",required=True)
@@ -39,6 +149,18 @@ def main():
     patch_exact(out/"app/layout.tsx",'<html lang="en">','<html lang="el">')
     patch_exact(out/"components/ApexWorld.tsx",'export default function ApexWorld() {','export default function ApexWorld({ n7Activity = null }: { n7Activity?: OrbState | null }) {')
     patch_exact(out/"components/ApexWorld.tsx",'const orbState: OrbState = showState;','const orbState: OrbState = n7Activity ?? showState;')
+    # Preserve APEX hierarchy/geometry, replace only the business-specific roster with real N7 subsystems.
+    replace_between(out/"components/ReasoningWeb.jsx","const ROSTER = [","const META =",N7_GRAPH_ROSTER)
+    replace_between(out/"components/ApexWorld.tsx","export const ROSTER:","const STATUS_LINE",N7_WORLD_ROSTER)
+    patch_exact(out/"components/ApexWorld.tsx",
+      'export default function ApexWorld({ n7Activity = null }: { n7Activity?: OrbState | null }) {',
+      'export default function ApexWorld({ n7Activity = null, n7Trace = null }: { n7Activity?: OrbState | null; n7Trace?: unknown }) {')
+    patch_exact(out/"components/ApexWorld.tsx",
+      '          state={webState}\n          mode="full"',
+      '          state={webState}\n          trace={n7Trace}\n          mode="full"')
+    patch_exact(out/"components/ApexWorld.tsx",
+      'online: { color: "#34d399", text: "Online - Apex routes work to it automatically" },\n  standby: { color: "#c9a84c", text: "Standby - in active development" },\n  integration: { color: "#7f9bb3", text: "Integration - wired into the core" },',
+      'online: { color: "#34d399", text: "Live in the N7 runtime" },\n  standby: { color: "#c9a84c", text: "Available when the required host capability is configured" },\n  integration: { color: "#7f9bb3", text: "Verified subsystem or separate execution path" },')
     for old,new in [
       ("Online - Apex routes work to it automatically","Interface role — verify execution in N7 WORKSPACE"),
       ("Integration - wired into the core","Visual role — connector status not verified"),
