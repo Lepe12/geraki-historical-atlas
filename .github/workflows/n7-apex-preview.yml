@@ -29,6 +29,12 @@ jobs:
       N7_DRY_RUN: '1'
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7/apex-preview
+            tools/n7/build_apex_preview.py
+            tools/n7/deploy_apex_preview.py
+            ops_ftps_requests/n7-apex-preview.json
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -79,6 +85,12 @@ jobs:
       N7_DRY_RUN: '0'
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7/apex-preview
+            tools/n7/build_apex_preview.py
+            tools/n7/deploy_apex_preview.py
+            ops_ftps_requests/n7-apex-preview.json
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
