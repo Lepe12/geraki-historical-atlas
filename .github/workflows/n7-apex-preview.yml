@@ -51,19 +51,35 @@ jobs:
         run: |
           npm install --prefix "$RUNNER_TEMP/n7-apex-browser" --ignore-scripts --no-audit --no-fund playwright@1.56.1
           "$RUNNER_TEMP/n7-apex-browser/node_modules/.bin/playwright" install --with-deps chromium
-          python3 -m http.server 4173 --directory "$RUNNER_TEMP/n7-apex-src/out" >"$RUNNER_TEMP/n7-apex-http.log" 2>&1 &
+          mkdir -p "$RUNNER_TEMP/n7-apex-http/n7-apex"
+          cp -a "$RUNNER_TEMP/n7-apex-src/out/." "$RUNNER_TEMP/n7-apex-http/n7-apex/"
+          python3 -m http.server 4173 --directory "$RUNNER_TEMP/n7-apex-http" >"$RUNNER_TEMP/n7-apex-http.log" 2>&1 &
           NODE_PATH="$RUNNER_TEMP/n7-apex-browser/node_modules" node - <<'NODE'
           const { chromium }=require('playwright');
           (async()=>{
             const b=await chromium.launch({headless:true});
             const p=await b.newPage({viewport:{width:1440,height:900}});
-            const errors=[];p.on('pageerror',e=>errors.push(String(e)));
-            const r=await p.goto('http://127.0.0.1:4173/',{waitUntil:'networkidle'});
+            const errors=[]; const failed=[];
+            p.on('pageerror',e=>errors.push(String(e)));
+            p.on('requestfailed',r=>failed.push(r.url()+': '+(r.failure()?.errorText||'failed')));
+            const r=await p.goto('http://127.0.0.1:4173/n7-apex/',{waitUntil:'networkidle'});
             if(!r||!r.ok()) throw Error('preview HTTP failed');
             const text=await p.locator('body').innerText();
             if(!text.includes('N7')) throw Error('N7 branding missing');
+            const button=p.getByRole('button',{name:'HUMANOID'});
+            await button.waitFor({state:'visible'});
+            await button.click();
+            await p.getByRole('dialog',{name:'N7 Humanoid preview'}).waitFor({state:'visible'});
+            await p.locator('canvas').waitFor({state:'visible'});
+            await p.getByRole('button',{name:'Original'}).click();
+            await p.getByRole('img',{name:'Approved N7 idle reference'}).waitFor({state:'visible'});
+            await p.getByRole('button',{name:'Particles'}).click();
+            await p.locator('canvas').waitFor({state:'visible'});
+            await p.getByRole('button',{name:'Compare'}).click();
             if(errors.length) throw Error('browser errors: '+errors.join(' | '));
-            await p.screenshot({path:process.env.RUNNER_TEMP+'/n7-apex-preview.png',fullPage:true});
+            const critical=failed.filter(x=>x.includes('/n7-apex/_next/'));
+            if(critical.length) throw Error('N7 APEX asset load failures: '+critical.join(' | '));
+            await p.screenshot({path:process.env.RUNNER_TEMP+'/n7-humanoid-stage1.png',fullPage:true});
             await b.close();
           })().catch(e=>{console.error(e);process.exit(1)});
           NODE
