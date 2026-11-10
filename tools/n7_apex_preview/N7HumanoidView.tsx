@@ -75,6 +75,18 @@ function ParticleReference({
     let completed=false;
     let currentProgress=assembly&&!reduced ? 0 : 1;
 
+    const handlePointerMove=(e:PointerEvent)=>{
+      if(assembly || !headTurnRef) return;
+      const rect=host.getBoundingClientRect();
+      if(rect.width<=0) return;
+      const nx=(e.clientX-(rect.left+rect.width/2))/(rect.width*.42);
+      headTurnRef.current=Math.max(-1,Math.min(1,nx));
+    };
+    const handlePointerReset=()=>{ if(headTurnRef) headTurnRef.current=0; };
+    window.addEventListener("pointermove",handlePointerMove,{passive:true});
+    window.addEventListener("blur",handlePointerReset);
+    document.addEventListener("mouseleave",handlePointerReset);
+
     const image=new Image();
     image.decoding="async";
     image.src=N7_HUMANOID_REFERENCE;
@@ -370,6 +382,10 @@ function ParticleReference({
     return()=>{
       disposed=true;
       cancelAnimationFrame(raf);
+      window.removeEventListener("pointermove",handlePointerMove);
+      window.removeEventListener("blur",handlePointerReset);
+      document.removeEventListener("mouseleave",handlePointerReset);
+      if(headTurnRef) headTurnRef.current=0;
       ro?.disconnect();
       geometry?.dispose();
       material?.dispose();
@@ -760,13 +776,6 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
   const faceIgnited=mode==="assembly" && stats.assembly>=91;
 
   return <section role="dialog" aria-modal="true" aria-label="N7 Humanoid preview"
-    onPointerMove={(e)=>{
-      if(mode!=="particle"&&mode!=="compare") return;
-      const rect=e.currentTarget.getBoundingClientRect();
-      const x=(e.clientX-rect.left)/Math.max(1,rect.width);
-      headTurnRef.current=Math.max(-1,Math.min(1,(x-.5)*2));
-    }}
-    onPointerLeave={()=>{headTurnRef.current=0;}}
     style={{position:"fixed",inset:0,zIndex:120,background:"#000",color:"#e9fbff",fontFamily:"system-ui,sans-serif",overflow:"hidden"}}>
     <header style={{position:"absolute",top:14,left:18,right:18,zIndex:5,display:"flex",justifyContent:"space-between",alignItems:"center",gap:12}}>
       <div>
