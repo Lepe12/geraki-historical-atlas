@@ -51,7 +51,7 @@ jobs:
           distribution = json.loads(Path('n7-distribution.json').read_text())
           contract = json.loads(Path('tools/n7/reconciled-runtime-contract.json').read_text())
           request = json.loads(Path('ops_ftps_requests/n7-canonical-runtime.json').read_text())
-          assert request == {
+          expected = {
               'confirmation':'N7-OWNER-INSTALL-RECONCILED-RUNTIME',
               'canonical_commit':distribution['commit'],
               'target':'/bot.piratecartography.com/n7-app',
@@ -59,6 +59,10 @@ jobs:
               'preserve_private_data_and_configuration':True,
               'retain_verified_backups_and_rollback':True
           }
+          # A generated source-sync PR performs a read-only preflight before a
+          # separate owner deployment request is updated. Push must match exactly.
+          if os.environ['GITHUB_EVENT_NAME'] == 'push':
+              assert request == expected
           with open(os.environ['GITHUB_ENV'],'a') as environment:
               environment.write('N7_CANONICAL_COMMIT='+distribution['commit']+'\n')
           PY
