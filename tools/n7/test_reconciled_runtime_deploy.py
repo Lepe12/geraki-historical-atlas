@@ -139,6 +139,26 @@ class GuardedDeployTest(unittest.TestCase):
         self.assertEqual(self.ftp.events, [])
         self.assertFalse(self.ftp.lock)
 
+    def test_upgrade_accepts_only_exact_previous_modules_and_rejects_drift(self):
+        modules = {name: (deploy.HERE / source).read_bytes() for name, source in deploy.PUBLIC_MODULES.items()}
+        previous = {name: b'// previous approved ' + name.encode() for name in modules if name != 'conversation-store.js'}
+        for name, data in previous.items():
+            self.ftp.files[deploy.ROOT + '/' + name] = data
+        server = b'// new server'
+        release = {'release_id': 'a'*64, 'previous_server_sha256': deploy.sha(b'old server'),
+                   'previous_files': {name: deploy.sha(data) for name, data in previous.items()},
+                   'files': {'server.js': deploy.sha(server), **{name: deploy.sha(data) for name, data in modules.items()}}}
+        with patch.object(deploy, 'syntax'):
+            payload, originals = deploy.plan(self.ftp, release, 'b'*40, transformer=lambda _: server)
+        self.assertEqual(set(payload), deploy.WRITABLE)
+        self.assertIsNone(originals['conversation-store.js'])
+        self.assertEqual(list(payload)[0], 'conversation-store.js')
+        self.assertEqual(list(payload)[-1], 'server.js')
+        self.ftp.files[deploy.ROOT + '/source-library.js'] = b'local unapproved edit'
+        with patch.object(deploy, 'syntax'), self.assertRaisesRegex(RuntimeError, 'RUNTIME_DRIFT source-library.js'):
+            deploy.plan(self.ftp, release, 'b'*40, transformer=lambda _: server)
+        self.assertEqual(self.ftp.events, [])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,0 +1,10 @@
+[
+  {
+    "old": "      item.messages = [\n        ...history,\n        {\n          role: 'assistant',\n          content: reply\n        }\n      ].slice(-100);\n\n      item.updated =\n        new Date().toISOString();\n\n      if (item.title === '\u039d\u03ad\u03b1 \u03c3\u03c5\u03bd\u03bf\u03bc\u03b9\u03bb\u03af\u03b1') {\n        item.title = content.slice(0, 52);\n      }\n\n      save(all);\n\n",
+    "new": "      const stored=require('./conversation-store').appendExchange({dataDir:DATA_DIR,load,save,id:item.id,user:{content},assistant:{content:reply}});\n\n"
+  },
+  {
+    "old": "        reply,\n        conversation: item",
+    "new": "        reply,\n        conversation: stored"
+  }
+]

@@ -52,16 +52,17 @@ function createOwnerChatMemory(dataDir,skillDir){
     save(next);return true;
   }
   function context(history){
-    const recent=history.slice(-6).filter(x=>x&&x.role==='user')
-      .map(x=>String(x.content||'')).join(' ').slice(-10000);
-    if(!/(επιμέλει|διορθ|ορθογραφ|σύνταξ|συγγραφ|μυθιστόρη|λογοτεχν|κειμέν|απόσπασμ|ύφο|proofread|editing|manuscript)/iu.test(recent))
+    const users=history.filter(x=>x&&x.role==='user').slice(-6).map(x=>String(x.content||'').normalize('NFD').replace(/\p{M}/gu,'').toLowerCase().replace(/ς/g,'σ').slice(-10000));
+    const editing=/(επιμελ|διορθ|ορθογραφ|συνταξ|συγγραφ|μυθιστορ|λογοτεχν|κειμεν|αποσπασμ|υφο|κεφαλαι|προτασ|proofread|editing|manuscript|rewrite)/u;
+    const last=users.at(-1)||'';
+    if(!editing.test(last)&&!(/^(?:συνεχισε|ξανα|κανε το|κρατησε|το ιδιο|ετσι)/u.test(last)&&users.slice(0,-1).some(x=>editing.test(x))))
       return '';
     const skillFile=path.join(skillDir,'greek-prose-editor','SKILL.md');
     const st=fs.lstatSync(skillFile);
     if(!st.isFile()||st.isSymbolicLink()||st.size>16384)throw Error('Unsafe literary skill');
     const skill=fs.readFileSync(skillFile,'utf8');
     if(!skill.startsWith('---\nname: greek-prose-editor\n'))throw Error('Unrecognized literary skill');
-    const rules=list().slice(-15).map((x,i)=>String(i+1)+'. '+x.rule).join('\n');
+    const rules=list().map((x,i)=>String(i+1)+'. '+x.rule).join('\n');
     return '\n\n## GREEK LITERARY EDITING — APPROVED SKILL\n'+skill.slice(0,3000)+
       '\n\n## OWNER-APPROVED PERSISTENT WRITING GUIDANCE (not independently verified grammar facts)\n'+
       (rules||'Δεν έχουν αποθηκευτεί ακόμη εγκεκριμένοι κανόνες.')+
