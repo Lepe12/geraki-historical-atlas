@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import argparse, pathlib, shutil, subprocess
+import argparse, pathlib, shutil, subprocess, base64, hashlib
 
 UPSTREAM="https://github.com/RubenM1990/APEX-UI.git"
 COMMIT="a8732fad1078a809cadfa810cb0d89cf4445dbed"
@@ -145,7 +145,15 @@ def main():
         shutil.copy2(part, out/"components"/part.name)
     shutil.copy2(overlay/"N7HumanoidIdle.ts",out/"components/N7HumanoidIdle.ts")
     (out/"public").mkdir(parents=True, exist_ok=True)
-    shutil.copy2(overlay/"assets/n7-humanoid-idle.webp", out/"public/n7-humanoid-idle-v2.webp")
+    chunks = sorted((overlay/"assets_v3").glob("chunk*.b64"))
+    if len(chunks) != 15:
+        raise RuntimeError(f"expected 15 humanoid asset chunks, found {len(chunks)}")
+    encoded = "".join(p.read_text().strip() for p in chunks)
+    humanoid_bytes = base64.b64decode(encoded, validate=True)
+    humanoid_sha = hashlib.sha256(humanoid_bytes).hexdigest()
+    if humanoid_sha != "bdba288c56230908e1c6abd1a199e5a895159730faf27c672916b03d51a5c7e5":
+        raise RuntimeError(f"wrong N7 humanoid asset sha256: {humanoid_sha}")
+    (out/"public/n7-humanoid-idle-v3.webp").write_bytes(humanoid_bytes)
 
     patch_exact(out/"app/page.tsx",'import ApexWorld from "@/components/ApexWorld";','import N7ApexStage from "@/components/N7ApexStage";')
     patch_exact(out/"app/page.tsx",'''<section style={{ position: "relative", height: "100vh", minHeight: 620 }}>
