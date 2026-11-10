@@ -75,15 +75,22 @@ jobs:
             await button.click();
             await p.getByRole('dialog',{name:'N7 Humanoid preview'}).waitFor({state:'visible'});
             await p.getByRole('dialog',{name:'N7 Humanoid preview'}).locator('canvas').waitFor({state:'visible'});
-            await p.getByRole('button',{name:'Original'}).click();
-            await p.getByRole('img',{name:'Approved N7 idle reference'}).waitFor({state:'visible'});
-            await p.getByRole('button',{name:'Particles'}).click();
-            await p.getByRole('dialog',{name:'N7 Humanoid preview'}).locator('canvas').waitFor({state:'visible'});
-            await p.getByRole('button',{name:'Compare'}).click();
+            for(const state of ['Idle','Listening','Thinking','Speech','Strong speech']){
+              await p.getByRole('button',{name:state,exact:true}).click();
+              await p.waitForTimeout(220);
+              const status=await p.getByText(new RegExp('STATUS · '+state.toUpperCase())).count();
+              if(!status) throw Error('humanoid state did not render: '+state);
+            }
+            await p.getByRole('button',{name:'Assembly',exact:true}).click();
+            await p.waitForTimeout(500);
+            const box=await p.getByRole('dialog',{name:'N7 Humanoid preview'}).locator('canvas').boundingBox();
+            if(!box||box.width<200||box.height<200) throw Error('filament canvas has invalid size');
+            await p.mouse.move(box.x+box.width*.75,box.y+box.height*.35);
+            await p.waitForTimeout(180);
             if(errors.length) throw Error('browser errors: '+errors.join(' | '));
             const critical=failed.filter(x=>x.includes('/n7-apex/_next/'));
             if(critical.length) throw Error('N7 APEX asset load failures: '+critical.join(' | '));
-            await p.screenshot({path:process.env.RUNNER_TEMP+'/n7-humanoid-stage1.png',fullPage:true});
+            await p.screenshot({path:process.env.RUNNER_TEMP+'/n7-filament-humanoid.png',fullPage:true});
             await b.close();
           })().catch(e=>{console.error(e);process.exit(1)});
           NODE
