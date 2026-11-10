@@ -2,9 +2,9 @@ name: N7 APEX authentic preview — verify and deploy
 on:
   pull_request:
     paths:
-      - 'tools/n7/apex-preview/**'
-      - 'tools/n7/build_apex_preview.py'
-      - 'tools/n7/deploy_apex_preview.py'
+      - 'tools/n7_apex_preview/**'
+      - 'tools/n7_apex_preview/build_apex_preview.py'
+      - 'tools/n7_apex_preview/deploy_apex_preview.py'
       - '.github/workflows/n7-apex-preview.yml'
       - 'ops_ftps_requests/n7-apex-preview.json'
   push:
@@ -31,15 +31,15 @@ jobs:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
-            tools/n7/apex-preview
-            tools/n7/build_apex_preview.py
-            tools/n7/deploy_apex_preview.py
+            tools/n7_apex_preview
+            tools/n7_apex_preview/build_apex_preview.py
+            tools/n7_apex_preview/deploy_apex_preview.py
             ops_ftps_requests/n7-apex-preview.json
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - name: Reconstruct exact upstream APEX source with reviewed N7 overlay
-        run: python3 tools/n7/build_apex_preview.py --out "$RUNNER_TEMP/n7-apex-src"
+        run: python3 tools/n7_apex_preview/build_apex_preview.py --out "$RUNNER_TEMP/n7-apex-src"
       - name: Build static /n7-apex export
         run: |
           cd "$RUNNER_TEMP/n7-apex-src"
@@ -70,7 +70,7 @@ jobs:
       - name: Read-only Top.Host target preflight
         env:
           N7_APEX_OUT: ${{ runner.temp }}/n7-apex-src/out
-        run: python3 tools/n7/deploy_apex_preview.py
+        run: python3 tools/n7_apex_preview/deploy_apex_preview.py
   deploy:
     if: github.event_name == 'push'
     needs: validate
@@ -87,9 +87,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
-            tools/n7/apex-preview
-            tools/n7/build_apex_preview.py
-            tools/n7/deploy_apex_preview.py
+            tools/n7_apex_preview
+            tools/n7_apex_preview/build_apex_preview.py
+            tools/n7_apex_preview/deploy_apex_preview.py
             ops_ftps_requests/n7-apex-preview.json
       - uses: actions/setup-node@v4
         with:
@@ -109,11 +109,11 @@ jobs:
           PY
       - name: Reconstruct and build exact preview
         run: |
-          python3 tools/n7/build_apex_preview.py --out "$RUNNER_TEMP/n7-apex-src"
+          python3 tools/n7_apex_preview/build_apex_preview.py --out "$RUNNER_TEMP/n7-apex-src"
           cd "$RUNNER_TEMP/n7-apex-src"
           npm ci
           npm run build
       - name: Install isolated /n7-apex preview and verify live
         env:
           N7_APEX_OUT: ${{ runner.temp }}/n7-apex-src/out
-        run: python3 tools/n7/deploy_apex_preview.py
+        run: python3 tools/n7_apex_preview/deploy_apex_preview.py
