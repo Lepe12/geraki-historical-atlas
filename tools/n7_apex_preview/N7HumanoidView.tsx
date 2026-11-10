@@ -45,6 +45,7 @@ function ParticleReference({
   assembly,
   replayKey,
   reduced,
+  headTurnRef,
   onStats,
   onAssemblyDone,
 }:{
@@ -52,6 +53,7 @@ function ParticleReference({
   assembly:boolean;
   replayKey:number;
   reduced:boolean;
+  headTurnRef?:React.MutableRefObject<number>;
   onStats:(s:Stats)=>void;
   onAssemblyDone:()=>void;
 }) {
@@ -95,6 +97,9 @@ function ParticleReference({
 
       const finals:number[]=[];
       const colors:number[]=[];
+      const baseColors:number[]=[];
+      const headMask:number[]=[];
+      const headDepth:number[]=[];
       const launchDelays:number[]=[];
       const jitter:number[]=[];
 
@@ -115,6 +120,20 @@ function ParticleReference({
           const fy=sampleH/2-y-.5;
           finals.push(fx,fy,0);
           colors.push(r,g,b);
+          baseColors.push(r,g,b);
+
+          // Guide Step 5: depth illusion only for the head. The body stays
+          // fixed and the neutral front remains the untouched Stage-1 layout.
+          const isHead=fy>25 && Math.abs(fx)<108;
+          headMask.push(isHead?1:0);
+          if(isHead){
+            const nx=fx/100;
+            const ny=(fy-104)/120;
+            const inside=Math.max(0,1-nx*nx-ny*ny);
+            headDepth.push(Math.sqrt(inside)*42);
+          }else{
+            headDepth.push(0);
+          }
 
           // Guide Step 4: the body completes left-to-right.
           let delay=((fx+sampleW/2)/sampleW)*.66;
@@ -132,6 +151,7 @@ function ParticleReference({
       const finalArray=new Float32Array(finals);
       const currentArray=new Float32Array(finalArray.length);
       const alphaArray=new Float32Array(finalArray.length/3);
+      const colorArray=new Float32Array(colors);
 
       const sourceX=-145;
       const sourceY=-175;
@@ -159,7 +179,9 @@ function ParticleReference({
       alphaAttr=new THREE.BufferAttribute(alphaArray,1);
       alphaAttr.setUsage(THREE.DynamicDrawUsage);
       geometry.setAttribute("position",positionAttr);
-      geometry.setAttribute("color",new THREE.Float32BufferAttribute(colors,3));
+      const colorAttr=new THREE.BufferAttribute(colorArray,3);
+      colorAttr.setUsage(THREE.DynamicDrawUsage);
+      geometry.setAttribute("color",colorAttr);
       geometry.setAttribute("alpha",alphaAttr);
 
       material=new THREE.ShaderMaterial({
@@ -238,9 +260,52 @@ function ParticleReference({
         alphaAttr.needsUpdate=true;
       };
 
+      let currentTurn=0;
+
+      const applyHeadTurn=()=>{
+        if(assembly || !positionAttr) return;
+        const target=clamp01(((headTurnRef?.current ?? 0)+1)/2)*2-1;
+        currentTurn+=(target-currentTurn)*.11;
+        if(Math.abs(target-currentTurn)<.0005) currentTurn=target;
+
+        const angle=currentTurn*0.28; // ~16 degrees max: intentionally conservative.
+        const cs=Math.cos(angle), sn=Math.sin(angle);
+        const arr=positionAttr.array as Float32Array;
+        const cc=colorAttr.array as Float32Array;
+
+        for(let n=0;n<headMask.length;n++){
+          const j=n*3;
+          const fx=finalArray[j], fy=finalArray[j+1];
+          if(!headMask[n]){
+            arr[j]=fx; arr[j+1]=fy; arr[j+2]=0;
+            cc[j]=baseColors[j]; cc[j+1]=baseColors[j+1]; cc[j+2]=baseColors[j+2];
+            continue;
+          }
+
+          const z=headDepth[n];
+          // Rotate each head sample around a neck-centered vertical axis.
+          const xr=fx*cs + z*sn;
+          const zr=-fx*sn + z*cs;
+          arr[j]=xr;
+          arr[j+1]=fy;
+          arr[j+2]=zr;
+
+          // Far side darkens; near silhouette gets a restrained cyan lift.
+          const far=currentTurn===0?0:Math.max(0,Math.sign(currentTurn)*fx/108);
+          const edge=Math.max(0,(Math.abs(fx)-72)/36)*Math.abs(currentTurn);
+          const shade=1-far*.38;
+          cc[j]=Math.min(1,baseColors[j]*shade + edge*.03);
+          cc[j+1]=Math.min(1,baseColors[j+1]*shade + edge*.16);
+          cc[j+2]=Math.min(1,baseColors[j+2]*shade + edge*.22);
+        }
+        positionAttr.needsUpdate=true;
+        colorAttr.needsUpdate=true;
+      };
+
       const renderFrame=(progress:number)=>{
         if(!renderer||!material) return;
         applyAssembly(progress);
+        applyHeadTurn();
 
         const rect=host.getBoundingClientRect();
         renderer.setSize(Math.max(1,rect.width),Math.max(1,rect.height),false);
@@ -289,7 +354,13 @@ function ParticleReference({
           raf=requestAnimationFrame(tick);
         }
       }else{
-        renderFrame(1);
+        // Idle renderer stays alive so mouse-follow can glide continuously.
+        const idleTick=()=>{
+          if(disposed) return;
+          renderFrame(1);
+          raf=requestAnimationFrame(idleTick);
+        };
+        raf=requestAnimationFrame(idleTick);
       }
 
       ro=new ResizeObserver(()=>renderFrame(currentProgress));
@@ -305,7 +376,7 @@ function ParticleReference({
       renderer?.dispose();
       host.replaceChildren();
     };
-  },[enabled,assembly,replayKey,reduced,onStats,onAssemblyDone]);
+  },[enabled,assembly,replayKey,reduced,headTurnRef,onStats,onAssemblyDone]);
 
   return <div
     ref={hostRef}
@@ -659,6 +730,7 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
   const [replayKey,setReplayKey]=useState(0);
   const [assemblyDone,setAssemblyDone]=useState(false);
   const [stats,setStats]=useState<Stats>({particles:0,sampleW:0,sampleH:0,renderMs:0,assembly:100});
+  const headTurnRef=useRef(0);
 
   const handleAssemblyDone=useCallback(()=>setAssemblyDone(true),[]);
 
@@ -688,11 +760,18 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
   const faceIgnited=mode==="assembly" && stats.assembly>=91;
 
   return <section role="dialog" aria-modal="true" aria-label="N7 Humanoid preview"
+    onPointerMove={(e)=>{
+      if(mode!=="particle"&&mode!=="compare") return;
+      const rect=e.currentTarget.getBoundingClientRect();
+      const x=(e.clientX-rect.left)/Math.max(1,rect.width);
+      headTurnRef.current=Math.max(-1,Math.min(1,(x-.5)*2));
+    }}
+    onPointerLeave={()=>{headTurnRef.current=0;}}
     style={{position:"fixed",inset:0,zIndex:120,background:"#000",color:"#e9fbff",fontFamily:"system-ui,sans-serif",overflow:"hidden"}}>
     <header style={{position:"absolute",top:14,left:18,right:18,zIndex:5,display:"flex",justifyContent:"space-between",alignItems:"center",gap:12}}>
       <div>
         <strong style={{letterSpacing:4,color:"#62e8f7"}}>N7 · HUMANOID</strong>
-        <div style={{fontSize:11,opacity:.62}}>Guide Step 3 + 4 · face-bloom moods + real Thinking state + particle-river Assembly</div>
+        <div style={{fontSize:11,opacity:.62}}>Guide Step 3–5 · moods + Assembly + conservative mouse-follow head depth</div>
       </div>
       <button type="button" onClick={onClose} style={{padding:"9px 13px",border:"1px solid #2c6c7e",background:"#091823",color:"#dffbff",borderRadius:7,cursor:"pointer"}}>Exit</button>
     </header>
@@ -710,6 +789,7 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
           assembly={false}
           replayKey={replayKey}
           reduced={false}
+          headTurnRef={headTurnRef}
           onStats={setStats}
           onAssemblyDone={handleAssemblyDone}
         />}
@@ -752,6 +832,9 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
         {mode==="compare"&&<div style={{position:"absolute",top:10,left:10,padding:"5px 8px",background:"#03111dcc",border:"1px solid #285d70",borderRadius:5,fontSize:11}}>REFERENCE 38% + PARTICLE RECONSTRUCTION</div>}
         {(mode==="particle"||mode==="compare")&&<div aria-label="N7 mood status" style={{position:"absolute",top:10,right:10,padding:"5px 8px",background:"#03111dcc",border:"1px solid #285d70",borderRadius:5,fontSize:11}}>
           MOOD · {mood.toUpperCase()}{mood==="thinking"&&activity==="thinking"?" · LIVE N7 REQUEST":mood==="listening"||mood==="speaking"?" · PREVIEW":""}
+        </div>}
+        {(mode==="particle"||mode==="compare")&&<div aria-label="N7 head turn hint" style={{position:"absolute",bottom:10,left:"50%",transform:"translateX(-50%)",padding:"5px 8px",background:"#03111dcc",border:"1px solid #285d70",borderRadius:5,fontSize:10,opacity:.72,pointerEvents:"none"}}>
+          MOVE POINTER · HEAD FOLLOW
         </div>}
       </div>
     </div>
