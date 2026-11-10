@@ -14,6 +14,7 @@ class FTP:
         self.files = {deploy.ROOT + '/server.js': b'old server', deploy.ROOT + '/data/conversations.json': b'PRIVATE USER DATA'}
         self.events = []
         self.lock = False
+        self.directories = set()
         self.corrupt_stage = False
         self.fail_server_rename = False
         self.corrupt_backup = False
@@ -49,12 +50,20 @@ class FTP:
         del self.files[name]
 
     def mkd(self, name):
+        if not name.endswith('/.n7-runtime-deploy-lock'):
+            if name in self.directories:
+                raise ftplib.error_perm('550 Existing directory')
+            self.directories.add(name)
+            return
         if self.lock:
             raise ftplib.error_perm('550 Existing lock')
         self.lock = True
 
     def rmd(self, name):
-        self.lock = False
+        if name.endswith('/.n7-runtime-deploy-lock'):
+            self.lock = False
+        else:
+            self.directories.remove(name)
 
     def sendcmd(self, command):
         self.events.append(('chmod', command))
@@ -128,6 +137,57 @@ class GuardedDeployTest(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'WRITE_SCOPE'):
             deploy.install(self.ftp, {'data/conversations.json': b'changed'}, {'data/conversations.json': b'old'}, lambda: None)
 
+    def test_new_skill_directories_and_public_bundle_rollback_without_touching_data(self):
+        skill = 'skills/book-project-canon/SKILL.md'
+        self.payload = {skill: b'reviewed skill', 'public/app.js': b'new app', **self.payload}
+        self.originals = {skill: None, 'public/app.js': b'old app', **self.originals}
+        self.ftp.files[deploy.ROOT + '/public/app.js'] = b'old app'
+        def fail():
+            raise RuntimeError('synthetic verification failure')
+        with self.assertRaisesRegex(RuntimeError, 'verification failure'):
+            deploy.install(self.ftp, self.payload, self.originals, fail)
+        self.assertEqual(self.ftp.files[deploy.ROOT + '/public/app.js'], b'old app')
+        self.assertNotIn(deploy.ROOT + '/' + skill, self.ftp.files)
+        self.assertEqual(self.ftp.directories, set())
+        self.assert_original()
+
+    def test_preview_exports_only_hash_verified_public_bytes(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary)
+            release = {'files': {'server.js': deploy.sha(b'private server'),
+                                  'public/app.js': deploy.sha(b'approved public app')}}
+            deploy.public_preview(self.ftp, release, {'public/app.js': b'approved public app',
+                                                     'server.js': b'private server'}, target)
+            self.assertEqual((target / 'app.js').read_bytes(), b'approved public app')
+            self.assertFalse((target / 'server.js').exists())
+            self.assertEqual(self.ftp.events, [])
+
+    def test_preflight_accepts_only_reviewed_previous_public_hash_and_final_requires_target(self):
+        import io, json, urllib.error
+        old, target = b'installed public app', b'target public app'
+        release = {'release_id': 'a'*64, 'files': {'public/app.js': deploy.sha(target)},
+                   'previous_files': {'public/app.js': deploy.sha(old)}}
+        live = [old]
+        def request(path, method='GET'):
+            if path.startswith('/health'):
+                return io.BytesIO(json.dumps({'status':'ok','modelConfigured':True,
+                    'release':{'id':'a'*64,'canonical_commit':'b'*40}}).encode())
+            if path == '/api/status':
+                return io.BytesIO(json.dumps({'authenticated':False,'modelConfigured':True}).encode())
+            if path.startswith('/api/'):
+                raise urllib.error.HTTPError(path,401,'protected',None,None)
+            return io.BytesIO(live[0])
+        with patch.object(deploy,'request',side_effect=request):
+            deploy.verify(release,'b'*40,active=False)
+            with self.assertRaisesRegex(RuntimeError,'PUBLIC_RUNTIME_HASH_MISMATCH'):
+                deploy.verify(release,'b'*40,active=True)
+            live[0] = b'unapproved manual edit'
+            with self.assertRaisesRegex(RuntimeError,'PUBLIC_RUNTIME_HASH_MISMATCH'):
+                deploy.verify(release,'b'*40,active=False)
+            live[0] = target
+            deploy.verify(release,'b'*40,active=True)
+
     def test_dry_run_never_acquires_lock_stages_or_installs(self):
         with patch.dict(deploy.os.environ, {'N7_CANONICAL_COMMIT':'a'*40,'N7_DRY_RUN':'1'}), \
              patch.object(deploy,'contract',return_value={'files':{}}), \
@@ -150,7 +210,7 @@ class GuardedDeployTest(unittest.TestCase):
                    'files': {'server.js': deploy.sha(server), **{name: deploy.sha(data) for name, data in modules.items()}}}
         with patch.object(deploy, 'syntax'):
             payload, originals = deploy.plan(self.ftp, release, 'b'*40, transformer=lambda _: server)
-        self.assertEqual(set(payload), deploy.WRITABLE)
+        self.assertEqual(set(payload), deploy.WRITABLE - {'public/app.js'})
         self.assertIsNone(originals['conversation-store.js'])
         self.assertEqual(list(payload)[0], 'conversation-store.js')
         self.assertEqual(list(payload)[-1], 'server.js')

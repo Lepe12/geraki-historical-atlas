@@ -151,10 +151,7 @@ function createN7Relay({dataDir,authenticated,originOK,readBody,loadConversation
         const job={id:crypto.randomUUID(),conversationId:id,prompt,
           created:Date.now(),status:'queued',runId:null,lease:0};
         jobs.push(job);
-        c.messages=[...c.messages,{role:'user',content:prompt}].slice(-100);
-        c.updated=new Date().toISOString();
-        if(c.title==='Νέα συνομιλία')c.title=prompt.slice(0,52);
-        saveConversations(all);
+        require('./conversation-store').mutate({dataDir,load:loadConversations,save:saveConversations},rows=>{const current=rows.find(x=>x.id===id);if(!current)throw Error('Conversation removed');current.messages.push({role:'user',content:prompt});current.updated=new Date().toISOString();if(current.title==='Νέα συνομιλία')current.title=prompt.slice(0,52);});
         return {status:202,job_id:job.id,pending:true};
       });
       if(result.status===202){
@@ -215,8 +212,7 @@ function createN7Relay({dataDir,authenticated,originOK,readBody,loadConversation
         if(b.status==='done'){
           const all=loadConversations();const c=all.find(x=>x.id===j.conversationId);
           if(!c)return {status:404,error:'Conversation removed'};
-          c.messages=[...c.messages,{role:'assistant',content:answer}].slice(-100);
-          c.updated=new Date().toISOString();saveConversations(all);
+          require('./conversation-store').mutate({dataDir,load:loadConversations,save:saveConversations},rows=>{const current=rows.find(x=>x.id===j.conversationId);if(!current)throw Error('Conversation removed');current.messages.push({role:'assistant',content:answer});current.updated=new Date().toISOString();});
         }
         j.status=b.status;j.completed=Date.now();j.prompt='';
         return {status:200,ok:true};
