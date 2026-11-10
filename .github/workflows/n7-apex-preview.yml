@@ -72,11 +72,11 @@ jobs:
             await button.waitFor({state:'visible'});
             await button.click();
             await p.getByRole('dialog',{name:'N7 Humanoid preview'}).waitFor({state:'visible'});
-            await p.locator('canvas').waitFor({state:'visible'});
+            await p.getByRole('dialog',{name:'N7 Humanoid preview'}).locator('canvas').waitFor({state:'visible'});
             await p.getByRole('button',{name:'Original'}).click();
             await p.getByRole('img',{name:'Approved N7 idle reference'}).waitFor({state:'visible'});
             await p.getByRole('button',{name:'Particles'}).click();
-            await p.locator('canvas').waitFor({state:'visible'});
+            await p.getByRole('dialog',{name:'N7 Humanoid preview'}).locator('canvas').waitFor({state:'visible'});
             await p.getByRole('button',{name:'Compare'}).click();
             if(errors.length) throw Error('browser errors: '+errors.join(' | '));
             const critical=failed.filter(x=>x.includes('/n7-apex/_next/'));
