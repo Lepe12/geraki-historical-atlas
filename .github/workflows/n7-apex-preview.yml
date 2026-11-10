@@ -84,6 +84,15 @@ jobs:
             if(!box||box.width<200||box.height<300) throw Error('particle canvas has invalid size');
             await p.getByRole('button',{name:'Compare',exact:true}).click();
             await p.getByText(/PARTICLE RECONSTRUCTION/).waitFor({state:'visible'});
+            await p.getByRole('button',{name:'Assembly',exact:true}).click();
+            await p.getByText(/ASSEMBLY/).waitFor({state:'visible'});
+            await p.getByLabel('N7 amber assembly core').waitFor({state:'visible'});
+            await p.waitForTimeout(3500);
+            await p.getByText(/ASSEMBLY · COMPLETE/).waitFor({state:'visible'});
+            await p.getByRole('button',{name:'Replay Assembly',exact:true}).click();
+            await p.waitForTimeout(250);
+            await p.getByRole('button',{name:'Skip',exact:true}).click();
+            await p.getByRole('button',{name:'Particles',exact:true}).waitFor({state:'visible'});
             if(errors.length) throw Error('browser errors: '+errors.join(' | '));
             const critical=failed.filter(x=>x.includes('/n7-apex/_next/'));
             if(critical.length) throw Error('N7 APEX asset load failures: '+critical.join(' | '));
