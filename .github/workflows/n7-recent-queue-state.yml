@@ -1,0 +1,77 @@
+name: N7 recent private queue state (read only)
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/n7-recent-queue-state.yml
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - name: Read only queued job statuses, never text or job IDs
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import ftplib,ssl,socket,os,json,datetime
+          root='/bot.piratecartography.com/n7-app/data'
+          target='n7-private-queue.json'
+          tls='linux3087.grserver.gr'
+          host=os.environ['PCT_FTPS_HOST']
+          port=int(os.environ.get('PCT_FTPS_PORT','21'))
+          ips=lambda h:{r[4][0] for r in socket.getaddrinfo(h,port,type=socket.SOCK_STREAM)}
+          if not ips(host).intersection(ips(tls)):
+              raise SystemExit('N7_AUDIT_FTPS_TLS_MISMATCH')
+          ftp=ftplib.FTP_TLS(timeout=25,context=ssl.create_default_context())
+          try:
+              ftp.connect(host,port)
+              ftp.host=tls
+              ftp.login(os.environ['PCT_FTPS_USER'],os.environ['PCT_FTPS_PASSWORD'])
+              ftp.prot_p()
+              ftp.cwd(root)
+              raw=[]
+              try:
+                  ftp.retrbinary('RETR '+target,raw.append)
+              except ftplib.error_perm as e:
+                  if str(e).startswith('550 '):
+                      print('N7_QUEUE_FILE=NOT_FOUND_AT_EXPECTED_PATH')
+                      raise SystemExit(0)
+                  raise
+              obj=json.loads(b''.join(raw))
+              if not isinstance(obj,list):
+                  raise SystemExit('N7_UNEXPECTED_QUEUE_FORMAT')
+              allowed={'queued','processing','done','failed'}
+              counts={state:sum(1 for x in obj if isinstance(x,dict) and x.get('status')==state) for state in sorted(allowed)}
+              print('N7_QUEUE_COUNTS='+json.dumps(counts,sort_keys=True))
+              now=datetime.datetime.now(datetime.timezone.utc)
+              recent=[]
+              for job in obj:
+                  if not isinstance(job,dict) or not isinstance(job.get('created'),(int,float)):
+                      continue
+                  created=datetime.datetime.fromtimestamp(job['created']/1000,datetime.timezone.utc)
+                  if now-created<datetime.timedelta(minutes=25) and created<=now:
+                      recent.append((created,job.get('status','unknown'),bool(job.get('completed'))))
+              recent.sort(reverse=True)
+              # Print only timestamp, status and completion flag. Never log prompt, id, conversation, answer, run ID.
+              for stamp,status,completed in recent[:6]:
+                  print('N7_RECENT_QUEUE_STATUS='+json.dumps({
+                    'created_utc':stamp.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                    'status':status if status in allowed else 'unknown',
+                    'completion_time_recorded':completed
+                  }))
+              print('N7_PRIVATE_TEXT_INSPECTED=false')
+          finally:
+              try:ftp.quit()
+              except ftplib.all_errors:pass
+          PY
