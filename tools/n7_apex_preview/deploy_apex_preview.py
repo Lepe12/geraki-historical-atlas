@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""First-install deployer for isolated N7 APEX static preview."""
+"""Isolated N7 APEX static preview deployer with verified upgrade/rollback."""
 import ftplib, hashlib, io, json, os, pathlib, secrets, socket, ssl, urllib.request, urllib.error
 
 PARENT="/bot.piratecartography.com/n7-app/public"
@@ -95,31 +95,45 @@ def main():
     marker=json.dumps({"product":"N7-APEX-PREVIEW","release":release,"upstream":UPSTREAM},sort_keys=True).encode()+b"\n"
     payload.append((".n7-apex-release.json",marker))
 
-    ftp=connect(); stage=".n7-apex-stage-"+secrets.token_hex(6)
+    ftp=connect(); tag=secrets.token_hex(6); stage=".n7-apex-stage-"+tag; backup=".n7-apex-backup-"+tag
+    installed=False
     try:
         ftp.cwd(PARENT)
-        if exists_dir(ftp,TARGET):
+        existing=exists_dir(ftp,TARGET)
+        current=None
+        if existing:
             ftp.cwd(TARGET)
             try:
                 out=[]; ftp.retrbinary("RETR .n7-apex-release.json",out.append)
                 current=json.loads(b"".join(out))
             except Exception: raise RuntimeError("N7_APEX_EXISTING_TARGET_UNRECOGNIZED")
             finally: ftp.cwd(PARENT)
-            if current.get("release")!=release:
-                raise RuntimeError("N7_APEX_EXISTING_DIFFERENT_RELEASE_REQUIRES_REVIEWED_UPGRADE")
-            print("N7_APEX_PREFLIGHT_OK existing_same_release=true release="+release)
-            if not dry: verify_live(release)
-            return
-
-        print("N7_APEX_PREFLIGHT_OK new_target=true files="+str(len(payload))+" release="+release+" dry_run="+str(dry))
+            if current.get("product")!="N7-APEX-PREVIEW" or current.get("upstream")!=UPSTREAM:
+                raise RuntimeError("N7_APEX_EXISTING_TARGET_UNRECOGNIZED")
+            if current.get("release")==release:
+                print("N7_APEX_PREFLIGHT_OK existing_same_release=true release="+release)
+                if not dry: verify_live(release)
+                return
+        print("N7_APEX_PREFLIGHT_OK upgrade="+str(existing).lower()+" files="+str(len(payload))+" release="+release+" dry_run="+str(dry))
         if dry: return
         upload_tree(ftp,root,stage,payload)
-        ftp.rename(stage,TARGET)
-        stage=None
-        verify_live(release)
-        print("N7_APEX_DEPLOY_SUCCESS=true target=/n7-apex/ backendUntouched=true")
+        if existing:
+            ftp.rename(TARGET,backup)
+        try:
+            ftp.rename(stage,TARGET); stage=None; installed=True
+            verify_live(release)
+        except BaseException:
+            if installed and exists_dir(ftp,TARGET):
+                remove_tree(ftp,TARGET)
+            if existing and exists_dir(ftp,backup):
+                ftp.rename(backup,TARGET)
+                print("N7_APEX_ROLLBACK_RESTORED=true")
+            raise
+        if existing and exists_dir(ftp,backup):
+            remove_tree(ftp,backup)
+        print("N7_APEX_DEPLOY_SUCCESS=true target=/n7-apex/ backendUntouched=true upgraded="+str(existing).lower())
     except BaseException:
-        if stage:
+        if stage and exists_dir(ftp,stage):
             try: ftp.cwd(PARENT); remove_tree(ftp,stage)
             except BaseException: print("N7_APEX_STAGE_CLEANUP_INCOMPLETE=true")
         raise
