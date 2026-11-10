@@ -19,14 +19,46 @@
   new ResizeObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;window.dispatchEvent(new Event('resize'));});}).observe(slot);
  }
 
- /* parchment land: an SVG colour matrix on the existing relief raster */
+ /* aged parchment chart: the existing map layers restyled in place (no extra panel over the map).
+    - relief raster: luminance mapped to a sepia ink ramp, so hills read as shaded relief on paper
+    - paper: one generated grain/stain texture inside the chart SVG, multiplied into sea and land
+    - portolan rhumb lines (existing layer) shown by default; the Επίπεδα checkbox still toggles them */
  const chart=document.querySelector('#chartPlane svg.chart');
  if(chart&&!$('n7Parchment')){
-  const defs=chart.querySelector('defs')||chart.insertBefore(document.createElementNS('http://www.w3.org/2000/svg','defs'),chart.firstChild);
-  const f=document.createElementNS('http://www.w3.org/2000/svg','filter');f.id='n7Parchment';f.setAttribute('color-interpolation-filters','sRGB');
-  f.innerHTML='<feColorMatrix type="matrix" values="0.40 0.33 0.07 0 0.02  0.30 0.26 0.06 0 0.015  0.17 0.15 0.045 0 0.01  0 0 0 1 0"/><feComponentTransfer><feFuncR type="gamma" exponent="1.15"/><feFuncG type="gamma" exponent="1.25"/><feFuncB type="gamma" exponent="1.4"/></feComponentTransfer>';
+  const NS='http://www.w3.org/2000/svg';
+  const defs=chart.querySelector('defs')||chart.insertBefore(document.createElementNS(NS,'defs'),chart.firstChild);
+  const f=document.createElementNS(NS,'filter');f.id='n7Parchment';f.setAttribute('color-interpolation-filters','sRGB');
+  f.innerHTML='<feColorMatrix type="matrix" values="0.30 0.59 0.11 0 0  0.30 0.59 0.11 0 0  0.30 0.59 0.11 0 0  0 0 0 1 0"/>'+
+   '<feComponentTransfer><feFuncR type="table" tableValues="0.173 0.177 0.181 0.185 0.189 0.193 0.198 0.202 0.206 0.21 0.214 0.219 0.223 0.227 0.231 0.235 0.239 0.244 0.248 0.252 0.256 0.26 0.265 0.269 0.273 0.277 0.281 0.285 0.29 0.294 0.298 0.302 0.306 0.311 0.315 0.319 0.323 0.327 0.332 0.336 0.34 0.344 0.348 0.352 0.357 0.361 0.392 0.424 0.455 0.486 0.518 0.549 0.58 0.612 0.649 0.687 0.725 0.762 0.8 0.82 0.839 0.859 0.878 0.888 0.897 0.906 0.915 0.924 0.933 0.936 0.939 0.942 0.945 0.948 0.951 0.954 0.957 0.96 0.963 0.966 0.969 0.97 0.971 0.972 0.973 0.974 0.975 0.975 0.976 0.977 0.978 0.979 0.98 0.981 0.982 0.983 0.984 0.985 0.986 0.987 0.988"/><feFuncG type="table" tableValues="0.11 0.113 0.116 0.119 0.122 0.125 0.128 0.131 0.134 0.136 0.139 0.142 0.145 0.148 0.151 0.154 0.157 0.16 0.163 0.166 0.169 0.172 0.175 0.178 0.181 0.184 0.187 0.19 0.193 0.196 0.199 0.202 0.205 0.208 0.211 0.214 0.216 0.219 0.222 0.225 0.228 0.231 0.234 0.237 0.24 0.243 0.272 0.3 0.328 0.357 0.385 0.414 0.442 0.471 0.513 0.555 0.598 0.64 0.682 0.71 0.737 0.765 0.792 0.805 0.818 0.831 0.844 0.858 0.871 0.875 0.88 0.884 0.889 0.893 0.898 0.903 0.907 0.912 0.916 0.921 0.925 0.927 0.929 0.93 0.932 0.933 0.935 0.936 0.938 0.94 0.941 0.943 0.944 0.946 0.947 0.949 0.951 0.952 0.954 0.955 0.957"/><feFuncB type="table" tableValues="0.047 0.049 0.051 0.052 0.054 0.056 0.058 0.059 0.061 0.063 0.064 0.066 0.068 0.07 0.071 0.073 0.075 0.077 0.078 0.08 0.082 0.084 0.085 0.087 0.089 0.091 0.092 0.094 0.096 0.098 0.099 0.101 0.103 0.105 0.106 0.108 0.11 0.112 0.113 0.115 0.117 0.119 0.12 0.122 0.124 0.125 0.146 0.167 0.187 0.208 0.228 0.249 0.27 0.29 0.329 0.369 0.408 0.447 0.486 0.518 0.549 0.58 0.612 0.629 0.646 0.663 0.68 0.697 0.714 0.721 0.728 0.735 0.742 0.75 0.757 0.764 0.771 0.778 0.786 0.793 0.8 0.803 0.806 0.809 0.813 0.816 0.819 0.822 0.825 0.828 0.831 0.835 0.838 0.841 0.844 0.847 0.85 0.853 0.856 0.86 0.863"/></feComponentTransfer>';
   defs.append(f);
-  const sea=$('proSea');if(sea){const s=sea.querySelectorAll('stop');s[0]?.setAttribute('stop-color','#0f3d47');s[1]?.setAttribute('stop-color','#082a33');}
+  const sea=$('proSea');if(sea){const s=sea.querySelectorAll('stop');s[0]?.setAttribute('stop-color','#3a564e');s[1]?.setAttribute('stop-color','#223c38');}
+  const paper=document.createElementNS(NS,'image');paper.setAttribute('class','n7-paper');paper.setAttribute('aria-hidden','true');
+  const vb=(chart.getAttribute('viewBox')||'0 0 1800 1105').split(/\s+/).map(Number);
+  paper.setAttribute('x',vb[0]);paper.setAttribute('y',vb[1]);paper.setAttribute('width',vb[2]);paper.setAttribute('height',vb[3]);paper.setAttribute('preserveAspectRatio','none');
+  const coast=chart.querySelector('.coast');
+  const after=chart.querySelector('.layer-labels')||coast?.nextSibling;
+  (coast?.parentNode||chart).insertBefore(paper,after||null);
+  try{paper.setAttribute('href',paperTexture(1200,736));const sheen=paper.cloneNode();sheen.setAttribute('class','n7-paper n7-paper-sheen');paper.after(sheen);}catch{paper.remove();}
+  const greek=[['Αδριατική',15.4,43.1,36],['Τυρρηνικό Πέλαγος',12.4,39.7,0],['Ιόνιο Πέλαγος',18.6,37.4,0],['Αιγαίο',25.0,38.9,0],['Λιβυκό Πέλαγος',24.5,33.6,0]];
+  const a=atlas(),labels=chart.querySelector('.pro-map-labels');
+  if(a?.project&&labels)for(const [text,lon,lat,turn] of greek){const p=a.project(lon,lat),t=document.createElementNS(NS,'text');t.setAttribute('x',p.x);t.setAttribute('y',p.y);if(turn)t.setAttribute('transform','rotate('+turn+' '+p.x+' '+p.y+')');t.setAttribute('text-anchor','middle');t.setAttribute('class','pro-sea-label n7-sea-minor');t.textContent=text;labels.append(t);}
+  if(body.dataset.proRhumbs==='false'){body.dataset.proRhumbs='true';const box=[...document.querySelectorAll('#proMapTools .pro-check')].find(l=>/Ναυτικές γραμμές/.test(l.textContent))?.querySelector('input');if(box)box.checked=true;}
+ }
+ /* paper grain and foxing: a few octaves of smoothed noise, warm tones, generated once */
+ function paperTexture(w,h){
+  const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');
+  g.fillStyle='#f4e7c8';g.fillRect(0,0,w,h);
+  let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+  const octave=(cw,ch,alpha,dark,light)=>{const n=document.createElement('canvas');n.width=cw;n.height=ch;const x=n.getContext('2d'),d=x.createImageData(cw,ch);
+   for(let i=0;i<d.data.length;i+=4){const v=rnd(),col=v<.5?dark:light,k=Math.abs(v-.5)*2;d.data[i]=col[0];d.data[i+1]=col[1];d.data[i+2]=col[2];d.data[i+3]=Math.round(255*alpha*k);}
+   x.putImageData(d,0,0);g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';g.drawImage(n,0,0,w,h);};
+  octave(9,6,.55,[150,104,52],[255,246,220]);
+  octave(28,17,.38,[140,94,46],[255,244,214]);
+  octave(90,55,.22,[120,82,40],[255,248,226]);
+  octave(360,221,.16,[110,76,40],[255,250,232]);
+  const grain=g.getImageData(0,0,w,h);for(let i=0;i<grain.data.length;i+=4){const v=(rnd()-.5)*26;grain.data[i]+=v;grain.data[i+1]+=v;grain.data[i+2]+=v*.8;}g.putImageData(grain,0,0);
+  for(let i=0;i<14;i++){const x=rnd()*w,y=rnd()*h,r=20+rnd()*90,s=g.createRadialGradient(x,y,r*.2,x,y,r);s.addColorStop(0,'rgba(150,100,45,.10)');s.addColorStop(.8,'rgba(150,100,45,.16)');s.addColorStop(1,'rgba(150,100,45,0)');g.fillStyle=s;g.fillRect(x-r,y-r,2*r,2*r);}
+  return c.toDataURL('image/jpeg',.86);
  }
 
  /* compass rose, longitude axis and fullscreen — inside the map frame, at its edges */
@@ -36,7 +68,7 @@
    '<path d="M0-40 6-6 0 0Z" fill="#efe6cc"/><path d="M0-40-6-6 0 0Z" fill="#9c8a62"/><path d="M0 40-6 6 0 0Z" fill="#efe6cc"/><path d="M0 40 6 6 0 0Z" fill="#9c8a62"/>'+
    '<path d="M40 0 6 6 0 0Z" fill="#efe6cc"/><path d="M40 0 6-6 0 0Z" fill="#9c8a62"/><path d="M-40 0-6-6 0 0Z" fill="#efe6cc"/><path d="M-40 0-6 6 0 0Z" fill="#9c8a62"/>'+
    '<path d="M0-22 3-3 22 0 3 3 0 22-3 3-22 0-3-3Z" transform="rotate(45)" fill="#c9b98f" fill-opacity=".7"/><circle r="2.5" fill="#2b2418"/>'+
-   '<g font-family="Georgia,serif" font-size="11" fill="#f1ead7" text-anchor="middle"><text y="-43">N</text><text y="51">S</text><text x="-47" y="4">W</text><text x="47" y="4">E</text></g>';
+   '<g font-family="Georgia,serif" font-size="11" fill="#f1ead7" text-anchor="middle"><text y="-43">Β</text><text y="51">Ν</text><text x="-47" y="4">Δ</text><text x="47" y="4">Α</text></g>';
   view.append(rose);
   const axis=document.createElement('div');axis.className='n7-lon-axis';axis.setAttribute('aria-hidden','true');view.append(axis);
   const plane=$('chartPlane');
@@ -44,7 +76,7 @@
   let axisQueued=false;
   function drawAxis(){axisQueued=false;const a=atlas();if(!a||!plane)return;const v=transform(),w=view.clientWidth,out=[];
    const x0=a.project(0,36).x,x5=a.project(5,36).x,step=Math.abs((x5-x0)*v.s)<70?10:5;
-   for(let lon=-20;lon<=45;lon+=step){const x=a.project(lon,36).x*v.s+v.x;if(x<40||x>w-40)continue;const s=document.createElement('span');s.style.left=x+'px';s.textContent=Math.abs(lon)+'° '+(lon<0?'W':'E');out.push(s);}
+   for(let lon=-20;lon<=45;lon+=step){const x=a.project(lon,36).x*v.s+v.x;if(x<40||x>w-40)continue;const s=document.createElement('span');s.style.left=x+'px';s.textContent=Math.abs(lon)+'° '+(lon<0?'Δ':'Α');out.push(s);}
    axis.replaceChildren(...out);}
   // Coordinates readout: the pointer position (existing chamber.js handler); the map centre when the pointer is elsewhere.
   const coords=$('coordinates');let hovering=false;
