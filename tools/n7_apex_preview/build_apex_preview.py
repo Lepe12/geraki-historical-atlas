@@ -140,6 +140,9 @@ def main():
     shutil.copy2(overlay/"N7Workspace.tsx",out/"components/N7Workspace.tsx")
     shutil.copy2(overlay/"N7ApexStage.tsx",out/"components/N7ApexStage.tsx")
     shutil.copy2(overlay/"N7HumanoidView.tsx",out/"components/N7HumanoidView.tsx")
+    shutil.copy2(overlay/"N7HumanoidReference.ts",out/"components/N7HumanoidReference.ts")
+    for part in overlay.glob("N7HumanoidReferencePart*.ts"):
+        shutil.copy2(part, out/"components"/part.name)
     shutil.copy2(overlay/"N7HumanoidIdle.ts",out/"components/N7HumanoidIdle.ts")
 
     patch_exact(out/"app/page.tsx",'import ApexWorld from "@/components/ApexWorld";','import N7ApexStage from "@/components/N7ApexStage";')
