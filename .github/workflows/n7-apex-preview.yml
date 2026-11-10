@@ -156,11 +156,11 @@ jobs:
             const headCenter=await particleShot('center');
             await p.mouse.move(dialogBox.x+dialogBox.width*.88,dialogBox.y+dialogBox.height*.45);
             await p.waitForTimeout(250);
-            const targetValue=Number(await p.getByLabel('N7 image-sampled particle humanoid').getAttribute('data-head-target'));
+            const targetValue=Number(await p.getByLabel('N7 head-turn particle overlay').getAttribute('data-head-target'));
             if(!Number.isFinite(targetValue) || targetValue<.75) throw Error('Step 5 pointer input did not reach renderer: '+targetValue);
             await p.waitForTimeout(500);
-            const currentTurn=Number(await p.getByLabel('N7 image-sampled particle humanoid').getAttribute('data-current-turn'));
-            const headParticles=Number(await p.getByLabel('N7 image-sampled particle humanoid').getAttribute('data-head-particles'));
+            const currentTurn=Number(await p.getByLabel('N7 head-turn particle overlay').getAttribute('data-current-turn'));
+            const headParticles=Number(await p.getByLabel('N7 head-turn particle overlay').getAttribute('data-head-particles'));
             if(!Number.isFinite(headParticles) || headParticles<200) throw Error('Step 5 head mask is empty or too small: '+headParticles);
             if(!Number.isFinite(currentTurn) || currentTurn<.45) throw Error('Step 5 renderer is not approaching pointer target: '+JSON.stringify({targetValue,currentTurn,headParticles}));
             const headRight=await particleShot('right');
