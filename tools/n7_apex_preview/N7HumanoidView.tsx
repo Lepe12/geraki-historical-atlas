@@ -496,6 +496,150 @@ function MoodCanvas({mood}:{mood:Mood}) {
   />;
 }
 
+
+function HeadTurnOverlay() {
+  const hostRef=useRef<HTMLDivElement>(null);
+
+  useEffect(()=>{
+    if(!hostRef.current) return;
+    const host=hostRef.current;
+    let disposed=false;
+    let raf=0;
+    let target=0;
+    let current=0;
+    let last=performance.now();
+
+    const canvas=document.createElement("canvas");
+    canvas.width=320;
+    canvas.height=480;
+    canvas.style.width="100%";
+    canvas.style.height="100%";
+    canvas.style.display="block";
+    const ctx=canvas.getContext("2d",{alpha:true});
+    if(!ctx) return;
+    host.replaceChildren(canvas);
+
+    const image=new Image();
+    image.decoding="async";
+    image.src=N7_HUMANOID_REFERENCE;
+
+    const move=(e:MouseEvent|PointerEvent)=>{
+      const rect=host.getBoundingClientRect();
+      if(rect.width<=0) return;
+      const nx=(e.clientX-(rect.left+rect.width/2))/(rect.width*.42);
+      target=Math.max(-1,Math.min(1,nx));
+      host.dataset.headTarget=target.toFixed(3);
+    };
+    const reset=()=>{
+      target=0;
+      host.dataset.headTarget="0.000";
+    };
+    window.addEventListener("mousemove",move,{passive:true});
+    window.addEventListener("pointermove",move,{passive:true});
+    window.addEventListener("blur",reset);
+    document.addEventListener("mouseleave",reset);
+
+    image.onload=()=>{
+      if(disposed) return;
+      const sample=document.createElement("canvas");
+      sample.width=320; sample.height=480;
+      const sctx=sample.getContext("2d",{willReadFrequently:true});
+      if(!sctx) return;
+      sctx.drawImage(image,0,0,320,480);
+      const px=sctx.getImageData(0,0,320,480).data;
+
+      type HP={x:number;y:number;r:number;g:number;b:number;depth:number;edge:number};
+      const points:HP[]=[];
+      const mask=document.createElement("canvas");
+      mask.width=320; mask.height=480;
+      const mctx=mask.getContext("2d");
+      if(!mctx) return;
+      mctx.fillStyle="#000";
+
+      for(let y=18;y<220;y++){
+        for(let x=45;x<275;x++){
+          const i=(y*320+x)*4;
+          const r=px[i],g=px[i+1],b=px[i+2],a=px[i+3];
+          const lum=.2126*r+.7152*g+.0722*b;
+          const chroma=Math.max(r,g,b)-Math.min(r,g,b);
+          if(a<8 || (lum<7 && chroma<7)) continue;
+
+          // Exact silhouette mask from the approved artwork.
+          mctx.fillRect(x,y,1.5,1.5);
+
+          // Half-resolution moving samples keep the overlay light while the
+          // untouched Stage-1 renderer remains underneath.
+          if((x+y)%2!==0) continue;
+          const dx=(x-160)/105;
+          const dy=(y-135)/130;
+          const inside=Math.max(0,1-dx*dx-dy*dy);
+          const depth=Math.sqrt(inside)*38;
+          const edge=Math.max(0,(Math.abs(x-160)-70)/38);
+          points.push({x:x+.5,y:y+.5,r,g,b,depth,edge});
+        }
+      }
+
+      host.dataset.headParticles=String(points.length);
+
+      const draw=(now:number)=>{
+        if(disposed) return;
+        const dt=Math.min(250,Math.max(0,now-last));
+        last=now;
+        const alpha=1-Math.exp(-dt/115);
+        current+=(target-current)*alpha;
+        if(Math.abs(target-current)<.0005) current=target;
+        host.dataset.currentTurn=current.toFixed(3);
+
+        ctx.clearRect(0,0,320,480);
+        const amount=Math.abs(current);
+        if(amount>.001){
+          // Hide only the original head silhouette while the transported
+          // particle layer replaces it. At neutral this mask is absent.
+          ctx.globalAlpha=Math.min(.94,amount*1.35);
+          ctx.drawImage(mask,0,0);
+          ctx.globalAlpha=1;
+
+          const angle=current*.24; // ~13.7 degrees maximum.
+          const cs=Math.cos(angle), sn=Math.sin(angle);
+          for(const p of points){
+            const ox=p.x-160;
+            const tx=160 + ox*cs + p.depth*sn;
+            const far=current===0?0:Math.max(0,Math.sign(current)*ox/105);
+            const shade=1-far*.42;
+            const rim=p.edge*amount;
+            const rr=Math.min(255,p.r*shade + 8*rim);
+            const gg=Math.min(255,p.g*shade + 38*rim);
+            const bb=Math.min(255,p.b*shade + 58*rim);
+            ctx.fillStyle="rgb("+Math.round(rr)+","+Math.round(gg)+","+Math.round(bb)+")";
+            ctx.globalAlpha=.96;
+            ctx.fillRect(tx-.9,p.y-.9,1.8,1.8);
+          }
+          ctx.globalAlpha=1;
+        }
+        raf=requestAnimationFrame(draw);
+      };
+
+      raf=requestAnimationFrame(draw);
+    };
+
+    return()=>{
+      disposed=true;
+      cancelAnimationFrame(raf);
+      window.removeEventListener("mousemove",move);
+      window.removeEventListener("pointermove",move);
+      window.removeEventListener("blur",reset);
+      document.removeEventListener("mouseleave",reset);
+      host.replaceChildren();
+    };
+  },[]);
+
+  return <div
+    ref={hostRef}
+    aria-label="N7 head-turn particle overlay"
+    style={{position:"absolute",inset:0,pointerEvents:"none"}}
+  />;
+}
+
 function AssemblyCanvas({
   replayKey,
   onStats,
@@ -692,13 +836,13 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
     <header style={{position:"absolute",top:14,left:18,right:18,zIndex:5,display:"flex",justifyContent:"space-between",alignItems:"center",gap:12}}>
       <div>
         <strong style={{letterSpacing:4,color:"#62e8f7"}}>N7 · HUMANOID</strong>
-        <div style={{fontSize:11,opacity:.62}}>Guide Step 3 + 4 · face-bloom moods + real Thinking state + particle-river Assembly</div>
+        <div style={{fontSize:11,opacity:.62}}>Guide Step 3–5 · moods + Assembly + mouse-follow particle head turn</div>
       </div>
       <button type="button" onClick={onClose} style={{padding:"9px 13px",border:"1px solid #2c6c7e",background:"#091823",color:"#dffbff",borderRadius:7,cursor:"pointer"}}>Exit</button>
     </header>
 
     <div style={{position:"absolute",inset:"58px 0 104px",display:"grid",placeItems:"center"}}>
-      <div style={{position:"relative",height:"100%",aspectRatio:"2/3",maxWidth:"94vw",overflow:"hidden"}}>
+      <div aria-label="N7 humanoid visual stage" style={{position:"relative",height:"100%",aspectRatio:"2/3",maxWidth:"94vw",overflow:"hidden"}}>
         {(mode==="original"||mode==="compare")&&<img
           src={N7_HUMANOID_REFERENCE}
           alt="Approved N7 idle reference"
@@ -715,6 +859,8 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
         />}
 
         {(mode==="particle"||mode==="compare")&&<MoodCanvas mood={mood} />}
+
+        {(mode==="particle"||mode==="compare")&&<HeadTurnOverlay />}
 
         {mode==="assembly"&&<AssemblyCanvas
           replayKey={replayKey}
@@ -752,6 +898,9 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
         {mode==="compare"&&<div style={{position:"absolute",top:10,left:10,padding:"5px 8px",background:"#03111dcc",border:"1px solid #285d70",borderRadius:5,fontSize:11}}>REFERENCE 38% + PARTICLE RECONSTRUCTION</div>}
         {(mode==="particle"||mode==="compare")&&<div aria-label="N7 mood status" style={{position:"absolute",top:10,right:10,padding:"5px 8px",background:"#03111dcc",border:"1px solid #285d70",borderRadius:5,fontSize:11}}>
           MOOD · {mood.toUpperCase()}{mood==="thinking"&&activity==="thinking"?" · LIVE N7 REQUEST":mood==="listening"||mood==="speaking"?" · PREVIEW":""}
+        </div>}
+        {(mode==="particle"||mode==="compare")&&<div aria-label="N7 head turn hint" style={{position:"absolute",bottom:10,left:"50%",transform:"translateX(-50%)",padding:"5px 8px",background:"#03111dcc",border:"1px solid #285d70",borderRadius:5,fontSize:10,opacity:.72,pointerEvents:"none"}}>
+          MOVE POINTER · HEAD FOLLOW
         </div>}
       </div>
     </div>

@@ -80,8 +80,14 @@ jobs:
             await p.getByRole('button',{name:'Particles',exact:true}).click();
             const canvas=p.getByLabel('N7 image-sampled particle humanoid').locator('canvas');
             await canvas.waitFor({state:'visible'});
+            await p.waitForFunction(()=>{
+              const el=document.querySelector('[aria-label="N7 image-sampled particle humanoid"] canvas');
+              if(!(el instanceof HTMLCanvasElement)) return false;
+              const r=el.getBoundingClientRect();
+              return r.width>=200 && r.height>=300;
+            },null,{timeout:5000});
             const box=await canvas.boundingBox();
-            if(!box||box.width<200||box.height<300) throw Error('particle canvas has invalid size');
+            if(!box||box.width<200||box.height<300) throw Error('particle canvas has invalid size after resize: '+JSON.stringify(box));
             await p.getByRole('button',{name:'Compare',exact:true}).click();
             await p.getByText(/PARTICLE RECONSTRUCTION/).waitFor({state:'visible'});
 
@@ -121,6 +127,52 @@ jobs:
             if(diffPixels(listeningMood,thinkingMood)<120) throw Error('Thinking mood is not visibly distinct');
             if(diffPixels(thinkingMood,speakingMood)<120) throw Error('Speaking mood is not visibly distinct');
             await p.getByRole('button',{name:'Idle',exact:true}).click();
+
+            // Guide Step 5: mouse-follow must move only the head and return smoothly to neutral.
+            await p.getByRole('button',{name:'Particles',exact:true}).click();
+            const dialog=p.getByRole('dialog',{name:'N7 Humanoid preview'});
+            const dialogBox=await dialog.boundingBox();
+            if(!dialogBox) throw Error('humanoid dialog has no bounds');
+            const visualStage=p.getByLabel('N7 humanoid visual stage');
+            async function particleShot(name){
+              const path=process.env.RUNNER_TEMP+'/n7-head-'+name+'.png';
+              await visualStage.screenshot({path});
+              return PNG.sync.read(fs.readFileSync(path));
+            }
+            function regionDiff(a,b,y0,y1){
+              if(a.width!==b.width||a.height!==b.height) throw Error('head-turn canvas dimensions changed');
+              let diff=0;
+              const ys=Math.max(0,Math.floor(a.height*y0));
+              const ye=Math.min(a.height,Math.floor(a.height*y1));
+              for(let y=ys;y<ye;y++) for(let x=0;x<a.width;x++){
+                const i=(y*a.width+x)*4;
+                const d=Math.abs(a.data[i]-b.data[i])+Math.abs(a.data[i+1]-b.data[i+1])+Math.abs(a.data[i+2]-b.data[i+2])+Math.abs(a.data[i+3]-b.data[i+3]);
+                if(d>28) diff++;
+              }
+              return diff;
+            }
+            await p.mouse.move(dialogBox.x+dialogBox.width*.50,dialogBox.y+dialogBox.height*.45);
+            await p.waitForTimeout(550);
+            const headCenter=await particleShot('center');
+            await p.mouse.move(dialogBox.x+dialogBox.width*.88,dialogBox.y+dialogBox.height*.45);
+            await p.waitForTimeout(250);
+            const targetValue=Number(await p.getByLabel('N7 head-turn particle overlay').getAttribute('data-head-target'));
+            if(!Number.isFinite(targetValue) || targetValue<.75) throw Error('Step 5 pointer input did not reach renderer: '+targetValue);
+            await p.waitForTimeout(500);
+            const currentTurn=Number(await p.getByLabel('N7 head-turn particle overlay').getAttribute('data-current-turn'));
+            const headParticles=Number(await p.getByLabel('N7 head-turn particle overlay').getAttribute('data-head-particles'));
+            if(!Number.isFinite(headParticles) || headParticles<200) throw Error('Step 5 head mask is empty or too small: '+headParticles);
+            if(!Number.isFinite(currentTurn) || currentTurn<.45) throw Error('Step 5 renderer is not approaching pointer target: '+JSON.stringify({targetValue,currentTurn,headParticles}));
+            const headRight=await particleShot('right');
+            const headDelta=regionDiff(headCenter,headRight,0,.48);
+            const bodyDelta=regionDiff(headCenter,headRight,.58,1);
+            if(headDelta<180) throw Error('Step 5 head turn is not visibly changing the head: '+headDelta);
+            if(bodyDelta>headDelta*.35) throw Error('Step 5 head turn is moving too much of the body: '+JSON.stringify({headDelta,bodyDelta}));
+            await p.mouse.move(dialogBox.x+dialogBox.width*.50,dialogBox.y+dialogBox.height*.45);
+            await p.waitForTimeout(900);
+            const headReturn=await particleShot('return');
+            const returnDelta=regionDiff(headCenter,headReturn,0,.48);
+            if(returnDelta>headDelta*.45) throw Error('Step 5 head turn does not settle back toward neutral: '+JSON.stringify({headDelta,returnDelta}));
 
             // Reproduce the user's likely environment: OS/browser reduced-motion enabled.
             // Clicking Assembly is an explicit opt-in and must still animate.
