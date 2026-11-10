@@ -328,6 +328,9 @@ export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>
   if(!open) return null;
 
   const startAssembly=()=>{
+    // Clicking Assembly is an explicit request to animate this session.
+    // Do not silently skip because the OS/browser reports reduced motion.
+    setAllowMotion(true);
     setAssemblyDone(false);
     setMode("assembly");
     setReplayKey(x=>x+1);
@@ -395,8 +398,7 @@ export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>
 
     <div style={{position:"absolute",left:"50%",bottom:16,transform:"translateX(-50%)",zIndex:5,width:"min(980px,calc(100vw - 24px))"}}>
       {systemReduced&&!allowMotion&&<div style={{marginBottom:6,padding:"7px 10px",background:"#241b08dd",border:"1px solid #806421",borderRadius:8,fontSize:11,textAlign:"center"}}>
-        Reduced motion is enabled on this device, so the guide requires Assembly to skip animation.
-        <button type="button" onClick={()=>setAllowMotion(true)} style={{marginLeft:8,padding:"5px 8px",border:"1px solid #a47a26",borderRadius:5,background:"#38270b",color:"#fff0c4",cursor:"pointer"}}>Animate this session</button>
+        Reduced motion is enabled on this device. Pressing <b>Assembly</b> will explicitly play the animation for this session.
       </div>}
 
       <div style={{display:"flex",flexWrap:"wrap",gap:7,justifyContent:"center",padding:9,background:"#030c13df",border:"1px solid #204f60",borderRadius:10,backdropFilter:"blur(10px)"}}>
