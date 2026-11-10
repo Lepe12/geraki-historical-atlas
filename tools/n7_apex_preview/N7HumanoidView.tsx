@@ -383,13 +383,27 @@ function MoodCanvas({mood}:{mood:Mood}) {
           if(cyan){ g=Math.min(255,g*1.18+16); b=Math.min(255,b*1.25+24); r=Math.min(255,r*.92); }
           if(amber){ r*=.86; g*=.88; b*=.92; }
         }else if(state==="thinking"){
+          // Keep Thinking inside the existing N7 palette. The head becomes
+          // denser/brighter cyan-white; the existing amber samples receive
+          // only a restrained lift instead of a foreign yellow wash.
           if(head){
             const k=Math.max(0,1-dFace/145);
-            r=Math.min(255,r + 120*k);
-            g=Math.min(255,g + 58*k);
-            b=Math.max(0,b - 42*k);
+            if(cyan){
+              r=Math.min(255,r + 34*k);
+              g=Math.min(255,g + 72*k);
+              b=Math.min(255,b + 92*k);
+            }else{
+              r=Math.min(255,r + 22*k);
+              g=Math.min(255,g + 34*k);
+              b=Math.min(255,b + 42*k);
+            }
+            if(amber){
+              r=Math.min(255,r + 28*k);
+              g=Math.min(255,g + 12*k);
+              b=Math.min(255,b + 4*k);
+            }
           }else{
-            r*=.82; g*=.88; b*=.92;
+            r*=.90; g*=.94; b*=.97;
           }
         }else if(state==="speaking"){
           const pulse=.68+.32*Math.sin(now/115);
