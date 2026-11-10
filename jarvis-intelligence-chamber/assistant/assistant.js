@@ -1,23 +1,23 @@
 /* NABOU voice assistant (Greek). Loaded only when the user presses the small launcher.
-   Safety: it never submits the operator form and never calls the research API; "ψάξε" only
-   writes the words into the query box and filters what is already on the page. */
+   Map controls remain local. Explicitly connected voice questions use the authenticated N7 chat.
+   The research operator form is never submitted by voice. */
 import { parse, afterWake, matchPlace } from "./assistant-intents.js";
 
 const $ = (id) => document.getElementById(id);
 let ui = null, holo = null, holoP = null;
 
 const SAY = {
-  open: "Καλώς ήρθες στο Ναμπού! Εδώ εξερευνούμε την ιστορία της Μεσογείου μέσα από χάρτες, ιστορικές πηγές και τεκμήρια. Γράψε το ερώτημά σου για να ξεκινήσεις.",
+  open: "Καλώς ήρθες στο Ναμπού! Εδώ εξερευνούμε την ιστορία της Μεσογείου μέσα από χάρτες, ιστορικές πηγές και τεκμήρια. Πάτα «Σύνδεση με N7» για ερωτήσεις με τη μνήμη και τις πηγές σου.",
   close: "Επιστρέφω στη σφαίρα. Είμαι εδώ αν με χρειαστείς.",
   hello: "Γεια σου. Είμαι ο Ναμπού, ο βοηθός του χάρτη.",
-  who: "Είμαι ο Ναμπού, ο φωνητικός βοηθός του NABOU//X. Ψάχνω στις έρευνες και στα ευρήματα της σελίδας και σου δείχνω τόπους στον χάρτη.",
+  who: "Είμαι η φωνητική μορφή του N7 στον άτλαντα. Χειρίζομαι τον χάρτη και, όταν συνδεθείς, χρησιμοποιώ την ίδια συνομιλία, μνήμη έργου και βιβλιοθήκη του N7.",
   help: "Μπορείς να πεις: άνοιξε, κλείσε, γύρνα δεξιά ή αριστερά, ψάξε και μια λέξη, δείξε μου τον Λάντζα, δείξε την Κέρκυρα, τρισδιάστατο ή δισδιάστατο.",
   thanks: "Παρακαλώ.",
   unknown: "Συγγνώμη, δεν το κατάλαβα. Πες για παράδειγμα «ψάξε Μήλος» ή «δείξε μου τον Λάντζα».",
 };
 
 /* ---------- speech out ---------- */
-let voice = null, utterance = null, speechSession = 0;
+let voice = null, utterance = null, speechSession = 0, speakingOut = false;
 function pickVoice() {
   const all = (window.speechSynthesis && speechSynthesis.getVoices()) || [];
   const el = all.filter((v) => /^el(-|_|$)/i.test(v.lang));
@@ -28,14 +28,15 @@ function pickVoice() {
 }
 if (window.speechSynthesis) { pickVoice(); speechSynthesis.addEventListener?.("voiceschanged", pickVoice); }
 
-function say(text) {
+function say(text, spoken = text) {
   bubble(text, "nabou");
-  const session = ++speechSession;
-  const done = () => { if (session !== speechSession) return; utterance = null; holo?.speaking(false); ui?.root.classList.remove("speaking"); };
+  const session = ++speechSession; speakingOut = true;
+  try { rec?.abort(); } catch {}
+  const done = () => { if (session !== speechSession) return; speakingOut = false; utterance = null; holo?.speaking(false); ui?.root.classList.remove("speaking"); if (wakeOn && ui && !ui.root.hidden) setTimeout(() => { if (wakeOn && !speakingOut && !listening) startRec(true); },300); };
   holo?.speaking(true); ui?.root.classList.add("speaking");
   if (window.speechSynthesis && (voice || pickVoice())) {
     speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
+    const u = new SpeechSynthesisUtterance(spoken);
     u.lang = "el-GR"; u.voice = voice; u.rate = 0.96; u.pitch = 0.95;
     utterance = u;
     u.onend = done;
@@ -53,11 +54,13 @@ function say(text) {
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let rec = null, listening = false, wakeOn = false, armedUntil = 0;
 function startRec(continuous) {
+  if (speakingOut) stopSpeech();
   if (!SR) { setStatus("Αυτό το πρόγραμμα περιήγησης δεν έχει αναγνώριση ομιλίας· γράψε την εντολή στο πεδίο."); return; }
   try { rec?.abort(); } catch {}
   rec = new SR(); rec.lang = "el-GR"; rec.interimResults = true; rec.continuous = continuous; rec.maxAlternatives = 1;
   rec.onstart = () => { listening = true; ui.root.classList.add("listening"); setStatus(continuous ? "Περιμένω τη λέξη «Ναμπού»…" : "Σε ακούω…"); };
   rec.onresult = (e) => {
+    if (speakingOut) return; // Never send the assistant’s own spoken answer back to the model.
     for (let i = e.resultIndex; i < e.results.length; i++) {
       const r = e.results[i], text = r[0].transcript;
       ui.heard.textContent = text;
@@ -75,7 +78,7 @@ function startRec(continuous) {
   };
   rec.onend = () => {
     listening = false; ui.root.classList.remove("listening");
-    if (wakeOn && ui && !ui.root.hidden) setTimeout(() => wakeOn && startRec(true), 300);
+    if (wakeOn && !speakingOut && ui && !ui.root.hidden) setTimeout(() => { if (wakeOn && !speakingOut && !listening) startRec(true); }, 300);
   };
   try { rec.start(); } catch (err) { setStatus("Δεν ξεκίνησε η ακρόαση: " + err.message); }
 }
@@ -147,9 +150,28 @@ async function showLantzas() {
   say("Ορίστε η διαδρομή του Πέτρου Λάντζα, 1577: Κέρκυρα, Ραγούσα, Χάνδακας, Πόρτο Κάγιο.");
 }
 
+let n7Pending = false;
+async function askN7(text) {
+  const link = window.N7VoiceLink;
+  if (!link?.isConnected()) return say('Πάτησε «Σύνδεση με N7», συνδέσου στο παράθυρό του και διάλεξε συνομιλία ή έργο.');
+  n7Pending = true; ui.root.querySelector('.nxa-send').disabled = true; ui.root.querySelector('.nxa-cancel-n7').disabled = false;
+  setStatus('Το N7 ελέγχει τη μνήμη και τις πηγές και απαντά…');
+  try {
+    const result = await link.ask(text, {includeMap:ui.root.querySelector('.nxa-context-n7').checked});
+    if (ui.root.hidden) return;
+    if (result.queued) return say('Η ερώτηση μπήκε στην ιδιωτική ουρά του N7. Παρακολούθησε τη συνέχεια στο παράθυρό του.');
+    if (result.cancelled) { bubble(result.text, 'nabou'); setStatus('Η απάντηση διακόπηκε. Το διαθέσιμο κείμενο βρίσκεται στο N7.'); return; }
+    const spoken = result.text.replace(/https:\/\/\S+/g, 'σύνδεσμος πηγής').slice(0,3500);
+    say(result.text, spoken + (result.text.length > 3500 ? ' Η πλήρης απάντηση βρίσκεται στη συνομιλία.' : ''));
+  } catch (error) { if (!ui.root.hidden) say(error.message); }
+  finally { n7Pending = false; ui.root.querySelector('.nxa-send').disabled = false; ui.root.querySelector('.nxa-cancel-n7').disabled = true; }
+}
 async function handle(text) {
   bubble(text, "user");
+  if (/^(σταμάτα|σταματα|stop)$/iu.test(text.trim()) && n7Pending) { window.N7VoiceLink?.cancel(); stopSpeech(); return; }
   const it = parse(text);
+  if (window.N7VoiceLink?.isConnected() && ['unknown','search','hello','who','help','thanks'].includes(it.type)) return askN7(text);
+  if (it.type === 'unknown') return askN7(text);
   switch (it.type) {
     case "none": return;
     case "open": holo?.show(); morphLabel(true); return say(SAY.open);
@@ -182,7 +204,8 @@ function build() {
       <button type="button" class="nxa-x" aria-label="Κλείσιμο βοηθού">×</button></header>
     <div class="nxa-stage"><canvas class="nxa-canvas" aria-hidden="true"></canvas><button type="button" class="nxa-greet" aria-label="Άκου τον χαιρετισμό και τι είναι το Ναμπού" title="Πάτα για να ακούσεις τι είναι το Ναμπού"></button><p class="nxa-heard" aria-live="polite"></p></div>
     <div class="nxa-log" aria-live="polite"></div>
-    <form class="nxa-form"><input class="nxa-text" type="text" autocomplete="off" placeholder="Γράψε ή πες μια εντολή…" aria-label="Εντολή προς τον βοηθό"><button type="submit" class="nxa-send">Στείλε</button></form>
+    <div class="nxa-n7"><label><input type="checkbox" class="nxa-context-n7" checked> Με τον επιλεγμένο τόπο και την περίοδο</label><button type="button" class="nxa-connect-n7">Σύνδεση με N7</button><button type="button" class="nxa-disconnect-n7">Αποσύνδεση</button><button type="button" class="nxa-cancel-n7" disabled>Διακοπή απάντησης N7</button></div>
+    <form class="nxa-form"><input class="nxa-text" type="text" autocomplete="off" maxlength="6000" placeholder="Ρώτησε το N7 ή πες μια εντολή χάρτη…" aria-label="Εντολή προς τον βοηθό"><button type="submit" class="nxa-send">Στείλε</button></form>
     <div class="nxa-bar">
       <button type="button" class="nxa-mic" aria-label="Πάτα και μίλα" title="Πάτα και μίλα"><svg class="nxa-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM6 11a6 6 0 0 0 12 0M12 17v4"/></svg><span class="nxa-l">Μίλα</span></button>
       <button type="button" class="nxa-wake" aria-pressed="false" aria-label="Να ακούει πάντα" title="Ακούει συνεχώς· ξεκίνα την εντολή με «Ναμπού»"><svg class="nxa-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3l2-6 4 12 3-9 2 3h4"/></svg><span class="nxa-l">Ακούει</span></button>
@@ -193,6 +216,10 @@ function build() {
   document.body.appendChild(root);
   const q = (s) => root.querySelector(s);
   ui = { root, log: q(".nxa-log"), heard: q(".nxa-heard"), status: q(".nxa-status"), wake: q(".nxa-wake"), canvas: q(".nxa-canvas") };
+  q('.nxa-connect-n7').onclick = () => { if (window.N7VoiceLink) window.N7VoiceLink.connect(); else setStatus('Η σύνδεση N7 δεν έχει φορτώσει. Ανανέωσε τη σελίδα.'); };
+  q('.nxa-disconnect-n7').onclick = () => window.N7VoiceLink?.disconnect();
+  q('.nxa-cancel-n7').onclick = () => { window.N7VoiceLink?.cancel(); stopSpeech(); };
+  document.addEventListener('n7:voice-state', event => { q('.nxa-connect-n7').textContent = event.detail.state === 'connected' ? 'Άνοιγμα N7' : 'Σύνδεση με N7'; setStatus(event.detail.message); });
   q(".nxa-x").onclick = () => close();
   q(".nxa-greet").onclick = () => say(SAY.open);
   q(".nxa-stop").onclick = () => { stopSpeech(); setStatus("Η φωνή σταμάτησε."); };
@@ -207,9 +234,10 @@ function build() {
 }
 
 function stopSpeech() {
-  speechSession++; utterance = null;
+  speechSession++; speakingOut = false; utterance = null;
   window.speechSynthesis?.cancel();
   holo?.speaking(false); ui?.root.classList.remove("speaking");
+  if (wakeOn && ui && !ui.root.hidden && !listening) setTimeout(() => { if (wakeOn && !speakingOut && !listening) startRec(true); },300);
 }
 
 export function open() {
@@ -222,6 +250,7 @@ export function open() {
 }
 export function close() {
   if (!ui) return;
+  if (n7Pending) window.N7VoiceLink?.cancel();
   wakeOn = false; ui.wake.setAttribute("aria-pressed", "false");
   try { rec?.abort(); } catch {}
   stopSpeech();
