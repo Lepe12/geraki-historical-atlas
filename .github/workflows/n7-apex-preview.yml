@@ -1,0 +1,119 @@
+name: N7 APEX authentic preview — verify and deploy
+on:
+  pull_request:
+    paths:
+      - 'tools/n7_apex_preview/**'
+      - 'tools/n7_apex_preview/build_apex_preview.py'
+      - 'tools/n7_apex_preview/deploy_apex_preview.py'
+      - '.github/workflows/n7-apex-preview.yml'
+      - 'ops_ftps_requests/n7-apex-preview.json'
+  push:
+    branches: [main]
+    paths:
+      - 'ops_ftps_requests/n7-apex-preview.json'
+permissions:
+  contents: read
+concurrency:
+  group: n7-apex-preview-deploy
+  cancel-in-progress: true
+jobs:
+  validate:
+    environment: nabou-production
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7_apex_preview
+            tools/n7_apex_preview/build_apex_preview.py
+            tools/n7_apex_preview/deploy_apex_preview.py
+            ops_ftps_requests/n7-apex-preview.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Reconstruct exact upstream APEX source with reviewed N7 overlay
+        run: python3 tools/n7_apex_preview/build_apex_preview.py --out "$RUNNER_TEMP/n7-apex-src"
+      - name: Build static /n7-apex export
+        run: |
+          cd "$RUNNER_TEMP/n7-apex-src"
+          npm ci
+          npm run build
+          test -s out/index.html
+          test -d out/_next
+      - name: Browser-render built preview
+        run: |
+          npm install --prefix "$RUNNER_TEMP/n7-apex-browser" --ignore-scripts --no-audit --no-fund playwright@1.56.1
+          "$RUNNER_TEMP/n7-apex-browser/node_modules/.bin/playwright" install --with-deps chromium
+          python3 -m http.server 4173 --directory "$RUNNER_TEMP/n7-apex-src/out" >"$RUNNER_TEMP/n7-apex-http.log" 2>&1 &
+          NODE_PATH="$RUNNER_TEMP/n7-apex-browser/node_modules" node - <<'NODE'
+          const { chromium }=require('playwright');
+          (async()=>{
+            const b=await chromium.launch({headless:true});
+            const p=await b.newPage({viewport:{width:1440,height:900}});
+            const errors=[];p.on('pageerror',e=>errors.push(String(e)));
+            const r=await p.goto('http://127.0.0.1:4173/',{waitUntil:'networkidle'});
+            if(!r||!r.ok()) throw Error('preview HTTP failed');
+            const text=await p.locator('body').innerText();
+            if(!text.includes('N7')) throw Error('N7 branding missing');
+            if(errors.length) throw Error('browser errors: '+errors.join(' | '));
+            await p.screenshot({path:process.env.RUNNER_TEMP+'/n7-apex-preview.png',fullPage:true});
+            await b.close();
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - name: Read-only Top.Host target preflight
+        env:
+          N7_APEX_OUT: ${{ runner.temp }}/n7-apex-src/out
+        run: python3 tools/n7_apex_preview/deploy_apex_preview.py
+  deploy:
+    if: github.event_name == 'push'
+    needs: validate
+    environment: nabou-production
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7_apex_preview
+            tools/n7_apex_preview/build_apex_preview.py
+            tools/n7_apex_preview/deploy_apex_preview.py
+            ops_ftps_requests/n7-apex-preview.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify owner-authorized isolated preview scope
+        run: |
+          python3 - <<'PY'
+          import json
+          x=json.load(open('ops_ftps_requests/n7-apex-preview.json'))
+          assert x=={
+            'confirmation':'N7-OWNER-APEX-AUTHENTIC-PREVIEW',
+            'target':'/bot.piratecartography.com/n7-app/public/n7-apex',
+            'same_origin_api':True,
+            'preserve_existing_n7':True,
+            'first_install_only':True
+          }
+          PY
+      - name: Reconstruct and build exact preview
+        run: |
+          python3 tools/n7_apex_preview/build_apex_preview.py --out "$RUNNER_TEMP/n7-apex-src"
+          cd "$RUNNER_TEMP/n7-apex-src"
+          npm ci
+          npm run build
+      - name: Install isolated /n7-apex preview and verify live
+        env:
+          N7_APEX_OUT: ${{ runner.temp }}/n7-apex-src/out
+        run: python3 tools/n7_apex_preview/deploy_apex_preview.py
