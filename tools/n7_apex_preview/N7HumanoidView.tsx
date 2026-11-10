@@ -380,7 +380,7 @@ export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>
             width:34,height:34,marginLeft:-17,marginTop:-17,borderRadius:"50%",
             background:"radial-gradient(circle,#fff8d8 0 8%,#ffbd2e 24%,#ff7a0077 44%,transparent 72%)",
             boxShadow:"0 0 18px #ffb000,0 0 38px #ff7a0077",
-            opacity:assemblyDone?.35:Math.min(1,(stats.assembly-90)/7),
+            opacity:assemblyDone ? .35 : Math.min(1,(stats.assembly-90)/7),
             pointerEvents:"none"
           }}
         />}
