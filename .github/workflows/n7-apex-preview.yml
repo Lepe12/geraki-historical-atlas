@@ -148,7 +148,10 @@ jobs:
             await p.waitForTimeout(550);
             const headCenter=await particleShot('center');
             await p.mouse.move(dialogBox.x+dialogBox.width*.88,dialogBox.y+dialogBox.height*.45);
-            await p.waitForTimeout(700);
+            await p.waitForTimeout(250);
+            const targetValue=Number(await p.getByLabel('N7 image-sampled particle humanoid').getAttribute('data-head-target'));
+            if(!Number.isFinite(targetValue) || targetValue<.75) throw Error('Step 5 pointer input did not reach renderer: '+targetValue);
+            await p.waitForTimeout(500);
             const headRight=await particleShot('right');
             const headDelta=regionDiff(headCenter,headRight,0,.48);
             const bodyDelta=regionDiff(headCenter,headRight,.58,1);
