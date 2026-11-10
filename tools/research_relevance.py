@@ -270,7 +270,16 @@ def assess(record, ident):
     # a named person. Keep every discovery but prevent it outranking name hits.
     if focus['kind']=='person':
         if topical['category']=='POSSIBLE_TARGET':
-            status='REVIEW_REQUIRED';research_score=min(65,max(45,research_score));reasons.append('SURNAME_CONTEXT_REQUIRES_IDENTITY_REVIEW')
+            # A catalogue/wiki title that only differs by mechanical Latin spelling
+            # is worth acquiring; it is not yet a verified identity.
+            if (topical.get('reason')=='TRANSLITERATION_REQUIRES_IDENTITY_REVIEW'
+                    and topical.get('matched_field') in ('title','description','subject')
+                    and not OFF_TOPIC.search(title)
+                    and not (NOISE.search(title) and not (geographic and history))):
+                status='PRIORITY';research_score=max(research_score,60)
+                reasons.append('TRANSLITERATED_SUBJECT_NAME_ACQUISITION_NOT_VERIFICATION')
+            else:
+                status='REVIEW_REQUIRED';research_score=min(65,max(45,research_score));reasons.append('SURNAME_CONTEXT_REQUIRES_IDENTITY_REVIEW')
         elif not name_match:
             status='EXCLUDE_FROM_ACQUISITION';research_score=min(research_score,20)
             reasons.append('NO_TARGET_IDENTITY_MATCH')

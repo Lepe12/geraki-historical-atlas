@@ -2,7 +2,7 @@
 import json, os, runpy, tempfile, unittest
 from pathlib import Path
 from unittest.mock import patch
-from research_focus import decompose, focused_queries, topical_match
+from research_focus import decompose, focused_queries, topical_match, fold
 from research_relevance import identity, assess, rank
 from orchestrator.jarvis_specialist_plan import build
 
@@ -222,6 +222,27 @@ class ResearchFocusTests(unittest.TestCase):
         self.assertEqual(rows,[])
         self.assertIn('WEB_SEARCH_PROVIDER_NOT_CONFIGURED',detail)
         remote.assert_not_called()
+
+    def test_corsair_descriptor_peels_to_person_name_for_acquisition(self):
+        """Typed «…τον κερκυραίο κορσάρο» must become a person target, not prose."""
+        focus = decompose('πετρο λάνζτα τον κερκυραιο κορσάρο')
+        self.assertEqual(focus['kind'], 'person')
+        self.assertEqual(focus['entity'], 'πετρο λάνζτα')
+        self.assertEqual(focus['roles'], [])
+        self.assertTrue(any('κορσ' in fold(c) for c in focus.get('search_contexts', [])))
+        req = {'target': 'πετρο λάνζτα τον κερκυραιο κορσάρο', 'aliases': []}
+        for title in ['Πέτρος Λάντζας',
+                      'ΛΑΣΚΑΡΙΣ ΜΙΧΑΗΛ, Πέτρος Λάντζας: διοικητής της Πάργας']:
+            result = assess({'title': title}, identity(req, req))
+            self.assertEqual(result['status'], 'PRIORITY', (title, result))
+        # Latin catalogue spelling is acquired when supplied as an alias.
+        latin_req = {'target': req['target'], 'aliases': ['Petros Lantzas']}
+        self.assertEqual(
+            assess({'title': 'Petros Lantzas'}, identity(latin_req, latin_req))['status'],
+            'PRIORITY',
+        )
+        self.assertEqual(decompose('Henry Morgan corsair')['entity'], 'Henry Morgan')
+
 
 if __name__=='__main__':unittest.main()
 
