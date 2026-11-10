@@ -34,7 +34,7 @@ PUBLIC_MODULES = {'conversation-store.js': 'conversation-store.js',
                   'n7-release-info.js': 'runtime-release-info.js'}
 for _skill in ('book-project-canon', 'document-reading-plan', 'claim-evidence-ledger', 'editorial-preservation'):
     PUBLIC_MODULES['skills/' + _skill + '/SKILL.md'] = 'skills/' + _skill + '/SKILL.md'
-WRITABLE = {'server.js', 'public/app.js', 'release-manifest.json', *PUBLIC_MODULES}
+WRITABLE = {'server.js', 'public/app.js', 'public/index.html', 'release-manifest.json', *PUBLIC_MODULES}
 LIMIT = 8 * 1024 * 1024
 
 
@@ -161,6 +161,13 @@ def plan(ftp, release, canonical_commit, transformer=transform_server):
             raise RuntimeError('N7_PUBLIC_APP_OUTPUT_MISMATCH')
         syntax(app)
         payload['public/app.js'] = app
+    if 'public/index.html' in originals:
+        import runpy
+        versioner = runpy.run_path(str(HERE / 'asset_version.py'))
+        html = versioner['version_html'](originals['public/index.html'], payload['public/app.js'])
+        if sha(html) != release['files']['public/index.html']:
+            raise RuntimeError('N7_PUBLIC_HTML_OUTPUT_MISMATCH')
+        payload['public/index.html'] = html
     payload['release-manifest.json'] = (json.dumps(receipt, indent=2) + '\n').encode()
     payload['server.js'] = server
     return payload, originals

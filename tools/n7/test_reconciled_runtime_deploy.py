@@ -210,7 +210,7 @@ class GuardedDeployTest(unittest.TestCase):
                    'files': {'server.js': deploy.sha(server), **{name: deploy.sha(data) for name, data in modules.items()}}}
         with patch.object(deploy, 'syntax'):
             payload, originals = deploy.plan(self.ftp, release, 'b'*40, transformer=lambda _: server)
-        self.assertEqual(set(payload), deploy.WRITABLE - {'public/app.js'})
+        self.assertEqual(set(payload), deploy.WRITABLE - {'public/app.js', 'public/index.html'})
         self.assertIsNone(originals['conversation-store.js'])
         self.assertEqual(list(payload)[0], 'conversation-store.js')
         self.assertEqual(list(payload)[-1], 'server.js')
