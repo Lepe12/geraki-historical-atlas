@@ -41,6 +41,9 @@ jobs:
           sparse-checkout: |
             tools/n7
             ops_ftps_requests
+            tools/library
+            tools/check_n7_distribution.py
+            n7-distribution.json
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -51,8 +54,11 @@ jobs:
           node --check tools/n7/public-web-search.js
           node --test tools/n7/test_stream_attachments.cjs tools/n7/test_source_evidence.cjs
           python3 -m py_compile tools/n7/deploy_rich_chat.py
-      - name: Read real live N7 and ensure compatibility without writing
-        run: python3 tools/n7/deploy_rich_chat.py
+      - name: Verify reviewed canonical runtime upgrade without writing
+        run: |
+          python3 tools/check_n7_distribution.py
+          export N7_CANONICAL_COMMIT="$(python3 -c 'import json; print(json.load(open("n7-distribution.json"))["commit"])')"
+          python3 tools/n7/deploy_reconciled_runtime.py
 
   deploy:
     if: github.event_name == 'push'
@@ -72,6 +78,9 @@ jobs:
           sparse-checkout: |
             tools/n7
             ops_ftps_requests
+            tools/library
+            tools/check_n7_distribution.py
+            n7-distribution.json
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
