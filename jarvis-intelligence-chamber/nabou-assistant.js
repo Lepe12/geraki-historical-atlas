@@ -9,7 +9,7 @@
   b.innerHTML = '<svg viewBox="-12 -12 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="#e8bd68" stroke-width="1.1">' +
     '<circle r="9"/><ellipse rx="9" ry="3.2"/><ellipse rx="3.2" ry="9"/><ellipse rx="9" ry="3.2" transform="rotate(-23)"/><circle r="1.6" fill="#e8bd68"/></svg>';
   let mod = null, busy = false;
-  b.addEventListener("click", async () => {
+  async function toggleAssistant() {
     if (busy) return;
     if (mod && mod.isOpen()) { mod.close(); return; }
     busy = true;
@@ -21,6 +21,8 @@
       }
       mod.open();
     } finally { busy = false; }
-  });
+  }
+  b.addEventListener("click", toggleAssistant);
+  document.addEventListener("n7:open-voice", toggleAssistant);
   document.body.appendChild(b);
 })();

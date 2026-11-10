@@ -40,7 +40,14 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
  assert.equal(await page.locator('.pro-3d-place').count(),11);
  assert.ok(await page.locator('.map3d-gl canvas').evaluate(e=>e.width>100));
  await page.evaluate(()=>window.NABOU_MAP3D.set(false));
+ await page.getByRole('button',{name:'Άνοιγμα φωνής N7',exact:true}).click();
+ await page.locator('.nxa-connect-n7').waitFor({state:'visible'});
+ await page.locator('.nxa-x').click();
  await page.setViewportSize({width:390,height:844});
+ await page.getByRole('button',{name:'Άνοιγμα φωνής N7',exact:true}).click();
+ await page.locator('.nxa-connect-n7').waitFor({state:'visible'});
+ await page.locator('.nxa-x').click();
+
  await page.locator('.pro-tools-toggle').click();
  assert.equal(await page.locator('#proMapTools').isVisible(),true);
  await page.getByLabel('Αναζήτηση τόπου',{exact:true}).fill('venice');
@@ -49,6 +56,6 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
  assert.equal(await page.locator('#proPlaceInfo h2').innerText(),'Βενετία');
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
  assert.deepEqual(errors,[]);
- console.log('PASS relief, real place projection, Greek search, bounded dates, research handoff, WebGL place pins and mobile tools');
+ console.log('PASS visible desktop/mobile voice entry and real voice panel, relief, real place projection, Greek search, bounded dates, research handoff, WebGL place pins and mobile tools');
  }finally{await browser?.close();server.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
