@@ -11,35 +11,15 @@ type Stats = { particles:number; sampleW:number; sampleH:number; renderMs:number
 const VERT = `
   attribute vec3 color;
   attribute float alpha;
-  attribute float headMask;
-  attribute float headDepth;
   varying vec3 vColor;
   varying float vAlpha;
   uniform float uPointSize;
-  uniform float uHeadTurn;
 
   void main(){
-    vec3 pos=position;
-    vec3 shaded=color;
-
-    if(headMask>.5 && abs(uHeadTurn)>.0001){
-      float angle=uHeadTurn*.28;
-      float cs=cos(angle);
-      float sn=sin(angle);
-      float ox=pos.x;
-      pos.x=ox*cs + headDepth*sn;
-      pos.z=-ox*sn + headDepth*cs;
-
-      float farSide=max(0.0,sign(uHeadTurn)*ox/108.0);
-      float edge=max(0.0,(abs(ox)-72.0)/36.0)*abs(uHeadTurn);
-      float shade=1.0-farSide*.38;
-      shaded=clamp(color*shade + vec3(.03,.16,.22)*edge,0.0,1.0);
-    }
-
-    vColor=shaded;
-    vAlpha=alpha;
-    gl_Position=projectionMatrix*modelViewMatrix*vec4(pos,1.0);
-    gl_PointSize=uPointSize;
+    vColor = color;
+    vAlpha = alpha;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+    gl_PointSize = uPointSize;
   }
 `;
 
@@ -65,7 +45,6 @@ function ParticleReference({
   assembly,
   replayKey,
   reduced,
-  headTurnRef,
   onStats,
   onAssemblyDone,
 }:{
@@ -73,7 +52,6 @@ function ParticleReference({
   assembly:boolean;
   replayKey:number;
   reduced:boolean;
-  headTurnRef?:React.MutableRefObject<number>;
   onStats:(s:Stats)=>void;
   onAssemblyDone:()=>void;
 }) {
@@ -94,24 +72,6 @@ function ParticleReference({
     let lastFrame=0;
     let completed=false;
     let currentProgress=assembly&&!reduced ? 0 : 1;
-
-    const handlePointerMove=(e:PointerEvent|MouseEvent)=>{
-      if(assembly || !headTurnRef) return;
-      const rect=host.getBoundingClientRect();
-      if(rect.width<=0) return;
-      const nx=(e.clientX-(rect.left+rect.width/2))/(rect.width*.42);
-      const target=Math.max(-1,Math.min(1,nx));
-      headTurnRef.current=target;
-      host.dataset.headTarget=target.toFixed(3);
-    };
-    const handlePointerReset=()=>{
-      if(headTurnRef) headTurnRef.current=0;
-      host.dataset.headTarget="0.000";
-    };
-    window.addEventListener("pointermove",handlePointerMove,{passive:true});
-    window.addEventListener("mousemove",handlePointerMove,{passive:true});
-    window.addEventListener("blur",handlePointerReset);
-    document.addEventListener("mouseleave",handlePointerReset);
 
     const image=new Image();
     image.decoding="async";
@@ -135,8 +95,6 @@ function ParticleReference({
 
       const finals:number[]=[];
       const colors:number[]=[];
-      const headMask:number[]=[];
-      const headDepth:number[]=[];
       const launchDelays:number[]=[];
       const jitter:number[]=[];
 
@@ -158,19 +116,6 @@ function ParticleReference({
           finals.push(fx,fy,0);
           colors.push(r,g,b);
 
-          // Guide Step 5: depth illusion only for the head. The body stays
-          // fixed and the neutral front remains the untouched Stage-1 layout.
-          const isHead=fy>25 && Math.abs(fx)<108;
-          headMask.push(isHead?1:0);
-          if(isHead){
-            const nx=fx/100;
-            const ny=(fy-104)/120;
-            const inside=Math.max(0,1-nx*nx-ny*ny);
-            headDepth.push(Math.sqrt(inside)*42);
-          }else{
-            headDepth.push(0);
-          }
-
           // Guide Step 4: the body completes left-to-right.
           let delay=((fx+sampleW/2)/sampleW)*.66;
 
@@ -185,7 +130,6 @@ function ParticleReference({
       }
 
       const finalArray=new Float32Array(finals);
-      host.dataset.headParticles=String(headMask.reduce((a,b)=>a+b,0));
       const currentArray=new Float32Array(finalArray.length);
       const alphaArray=new Float32Array(finalArray.length/3);
 
@@ -217,8 +161,6 @@ function ParticleReference({
       geometry.setAttribute("position",positionAttr);
       geometry.setAttribute("color",new THREE.Float32BufferAttribute(colors,3));
       geometry.setAttribute("alpha",alphaAttr);
-      geometry.setAttribute("headMask",new THREE.Float32BufferAttribute(headMask,1));
-      geometry.setAttribute("headDepth",new THREE.Float32BufferAttribute(headDepth,1));
 
       material=new THREE.ShaderMaterial({
         vertexShader:VERT,
@@ -227,7 +169,7 @@ function ParticleReference({
         transparent:true,
         depthWrite:false,
         blending:THREE.NormalBlending,
-        uniforms:{uPointSize:{value:2},uHeadTurn:{value:0}},
+        uniforms:{uPointSize:{value:2}},
       });
 
       scene.add(new THREE.Points(geometry,material));
@@ -246,8 +188,7 @@ function ParticleReference({
         const arr=positionAttr.array as Float32Array;
         const aa=alphaAttr.array as Float32Array;
 
-        if(!assembly) return;
-        if(reduced || progress>=1){
+        if(!assembly || reduced || progress>=1){
           arr.set(finalArray);
           aa.fill(1);
           positionAttr.needsUpdate=true;
@@ -297,26 +238,9 @@ function ParticleReference({
         alphaAttr.needsUpdate=true;
       };
 
-      let currentTurn=0;
-      let lastTurnTime=performance.now();
-
-      const applyHeadTurn=()=>{
-        if(!material || assembly) return;
-        const target=Math.max(-1,Math.min(1,headTurnRef?.current ?? 0));
-        const now=performance.now();
-        const dt=Math.min(250,Math.max(0,now-lastTurnTime));
-        lastTurnTime=now;
-        const alpha=1-Math.exp(-dt/120);
-        currentTurn+=(target-currentTurn)*alpha;
-        if(Math.abs(target-currentTurn)<.0005) currentTurn=target;
-        material.uniforms.uHeadTurn.value=currentTurn;
-        host.dataset.currentTurn=currentTurn.toFixed(3);
-      };
-
       const renderFrame=(progress:number)=>{
         if(!renderer||!material) return;
         applyAssembly(progress);
-        applyHeadTurn();
 
         const rect=host.getBoundingClientRect();
         renderer.setSize(Math.max(1,rect.width),Math.max(1,rect.height),false);
@@ -365,13 +289,7 @@ function ParticleReference({
           raf=requestAnimationFrame(tick);
         }
       }else{
-        // Idle renderer stays alive so mouse-follow can glide continuously.
-        const idleTick=()=>{
-          if(disposed) return;
-          renderFrame(1);
-          raf=requestAnimationFrame(idleTick);
-        };
-        raf=requestAnimationFrame(idleTick);
+        renderFrame(1);
       }
 
       ro=new ResizeObserver(()=>renderFrame(currentProgress));
@@ -381,18 +299,13 @@ function ParticleReference({
     return()=>{
       disposed=true;
       cancelAnimationFrame(raf);
-      window.removeEventListener("pointermove",handlePointerMove);
-      window.removeEventListener("mousemove",handlePointerMove);
-      window.removeEventListener("blur",handlePointerReset);
-      document.removeEventListener("mouseleave",handlePointerReset);
-      if(headTurnRef) headTurnRef.current=0;
       ro?.disconnect();
       geometry?.dispose();
       material?.dispose();
       renderer?.dispose();
       host.replaceChildren();
     };
-  },[enabled,assembly,replayKey,reduced,headTurnRef,onStats,onAssemblyDone]);
+  },[enabled,assembly,replayKey,reduced,onStats,onAssemblyDone]);
 
   return <div
     ref={hostRef}
@@ -583,6 +496,150 @@ function MoodCanvas({mood}:{mood:Mood}) {
   />;
 }
 
+
+function HeadTurnOverlay() {
+  const hostRef=useRef<HTMLDivElement>(null);
+
+  useEffect(()=>{
+    if(!hostRef.current) return;
+    const host=hostRef.current;
+    let disposed=false;
+    let raf=0;
+    let target=0;
+    let current=0;
+    let last=performance.now();
+
+    const canvas=document.createElement("canvas");
+    canvas.width=320;
+    canvas.height=480;
+    canvas.style.width="100%";
+    canvas.style.height="100%";
+    canvas.style.display="block";
+    const ctx=canvas.getContext("2d",{alpha:true});
+    if(!ctx) return;
+    host.replaceChildren(canvas);
+
+    const image=new Image();
+    image.decoding="async";
+    image.src=N7_HUMANOID_REFERENCE;
+
+    const move=(e:MouseEvent|PointerEvent)=>{
+      const rect=host.getBoundingClientRect();
+      if(rect.width<=0) return;
+      const nx=(e.clientX-(rect.left+rect.width/2))/(rect.width*.42);
+      target=Math.max(-1,Math.min(1,nx));
+      host.dataset.headTarget=target.toFixed(3);
+    };
+    const reset=()=>{
+      target=0;
+      host.dataset.headTarget="0.000";
+    };
+    window.addEventListener("mousemove",move,{passive:true});
+    window.addEventListener("pointermove",move,{passive:true});
+    window.addEventListener("blur",reset);
+    document.addEventListener("mouseleave",reset);
+
+    image.onload=()=>{
+      if(disposed) return;
+      const sample=document.createElement("canvas");
+      sample.width=320; sample.height=480;
+      const sctx=sample.getContext("2d",{willReadFrequently:true});
+      if(!sctx) return;
+      sctx.drawImage(image,0,0,320,480);
+      const px=sctx.getImageData(0,0,320,480).data;
+
+      type HP={x:number;y:number;r:number;g:number;b:number;depth:number;edge:number};
+      const points:HP[]=[];
+      const mask=document.createElement("canvas");
+      mask.width=320; mask.height=480;
+      const mctx=mask.getContext("2d");
+      if(!mctx) return;
+      mctx.fillStyle="#000";
+
+      for(let y=18;y<220;y++){
+        for(let x=45;x<275;x++){
+          const i=(y*320+x)*4;
+          const r=px[i],g=px[i+1],b=px[i+2],a=px[i+3];
+          const lum=.2126*r+.7152*g+.0722*b;
+          const chroma=Math.max(r,g,b)-Math.min(r,g,b);
+          if(a<8 || (lum<7 && chroma<7)) continue;
+
+          // Exact silhouette mask from the approved artwork.
+          mctx.fillRect(x,y,1.5,1.5);
+
+          // Half-resolution moving samples keep the overlay light while the
+          // untouched Stage-1 renderer remains underneath.
+          if((x+y)%2!==0) continue;
+          const dx=(x-160)/105;
+          const dy=(y-135)/130;
+          const inside=Math.max(0,1-dx*dx-dy*dy);
+          const depth=Math.sqrt(inside)*38;
+          const edge=Math.max(0,(Math.abs(x-160)-70)/38);
+          points.push({x:x+.5,y:y+.5,r,g,b,depth,edge});
+        }
+      }
+
+      host.dataset.headParticles=String(points.length);
+
+      const draw=(now:number)=>{
+        if(disposed) return;
+        const dt=Math.min(250,Math.max(0,now-last));
+        last=now;
+        const alpha=1-Math.exp(-dt/115);
+        current+=(target-current)*alpha;
+        if(Math.abs(target-current)<.0005) current=target;
+        host.dataset.currentTurn=current.toFixed(3);
+
+        ctx.clearRect(0,0,320,480);
+        const amount=Math.abs(current);
+        if(amount>.001){
+          // Hide only the original head silhouette while the transported
+          // particle layer replaces it. At neutral this mask is absent.
+          ctx.globalAlpha=Math.min(.94,amount*1.35);
+          ctx.drawImage(mask,0,0);
+          ctx.globalAlpha=1;
+
+          const angle=current*.24; // ~13.7 degrees maximum.
+          const cs=Math.cos(angle), sn=Math.sin(angle);
+          for(const p of points){
+            const ox=p.x-160;
+            const tx=160 + ox*cs + p.depth*sn;
+            const far=current===0?0:Math.max(0,Math.sign(current)*ox/105);
+            const shade=1-far*.42;
+            const rim=p.edge*amount;
+            const rr=Math.min(255,p.r*shade + 8*rim);
+            const gg=Math.min(255,p.g*shade + 38*rim);
+            const bb=Math.min(255,p.b*shade + 58*rim);
+            ctx.fillStyle="rgb("+Math.round(rr)+","+Math.round(gg)+","+Math.round(bb)+")";
+            ctx.globalAlpha=.96;
+            ctx.fillRect(tx-.9,p.y-.9,1.8,1.8);
+          }
+          ctx.globalAlpha=1;
+        }
+        raf=requestAnimationFrame(draw);
+      };
+
+      raf=requestAnimationFrame(draw);
+    };
+
+    return()=>{
+      disposed=true;
+      cancelAnimationFrame(raf);
+      window.removeEventListener("mousemove",move);
+      window.removeEventListener("pointermove",move);
+      window.removeEventListener("blur",reset);
+      document.removeEventListener("mouseleave",reset);
+      host.replaceChildren();
+    };
+  },[]);
+
+  return <div
+    ref={hostRef}
+    aria-label="N7 head-turn particle overlay"
+    style={{position:"absolute",inset:0,pointerEvents:"none"}}
+  />;
+}
+
 function AssemblyCanvas({
   replayKey,
   onStats,
@@ -746,7 +803,6 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
   const [replayKey,setReplayKey]=useState(0);
   const [assemblyDone,setAssemblyDone]=useState(false);
   const [stats,setStats]=useState<Stats>({particles:0,sampleW:0,sampleH:0,renderMs:0,assembly:100});
-  const headTurnRef=useRef(0);
 
   const handleAssemblyDone=useCallback(()=>setAssemblyDone(true),[]);
 
@@ -780,7 +836,7 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
     <header style={{position:"absolute",top:14,left:18,right:18,zIndex:5,display:"flex",justifyContent:"space-between",alignItems:"center",gap:12}}>
       <div>
         <strong style={{letterSpacing:4,color:"#62e8f7"}}>N7 · HUMANOID</strong>
-        <div style={{fontSize:11,opacity:.62}}>Guide Step 3–5 · moods + Assembly + conservative mouse-follow head depth</div>
+        <div style={{fontSize:11,opacity:.62}}>Guide Step 3–5 · moods + Assembly + mouse-follow particle head turn</div>
       </div>
       <button type="button" onClick={onClose} style={{padding:"9px 13px",border:"1px solid #2c6c7e",background:"#091823",color:"#dffbff",borderRadius:7,cursor:"pointer"}}>Exit</button>
     </header>
@@ -798,12 +854,13 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
           assembly={false}
           replayKey={replayKey}
           reduced={false}
-          headTurnRef={headTurnRef}
           onStats={setStats}
           onAssemblyDone={handleAssemblyDone}
         />}
 
         {(mode==="particle"||mode==="compare")&&<MoodCanvas mood={mood} />}
+
+        {(mode==="particle"||mode==="compare")&&<HeadTurnOverlay />}
 
         {mode==="assembly"&&<AssemblyCanvas
           replayKey={replayKey}
