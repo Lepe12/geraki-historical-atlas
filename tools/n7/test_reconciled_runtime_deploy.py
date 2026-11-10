@@ -178,7 +178,7 @@ class GuardedDeployTest(unittest.TestCase):
             if path.startswith('/api/'):
                 raise urllib.error.HTTPError(path,401,'protected',None,None)
             return io.BytesIO(live[0])
-        with patch.object(deploy,'request',side_effect=request):
+        with patch.object(deploy,'request',side_effect=request), patch.object(deploy.time,'sleep'), patch.object(deploy.time,'monotonic',side_effect=iter(range(0,100000,100))):
             deploy.verify(release,'b'*40,active=False)
             with self.assertRaisesRegex(RuntimeError,'PUBLIC_RUNTIME_HASH_MISMATCH'):
                 deploy.verify(release,'b'*40,active=True)
@@ -187,6 +187,26 @@ class GuardedDeployTest(unittest.TestCase):
                 deploy.verify(release,'b'*40,active=False)
             live[0] = target
             deploy.verify(release,'b'*40,active=True)
+
+    def test_html_verification_uses_the_real_application_entry_route(self):
+        import io, json, urllib.error
+        seen=[]
+        def request(path, method='GET'):
+            seen.append(path)
+            if path.startswith('/health'):
+                return io.BytesIO(json.dumps({'status':'ok','modelConfigured':True,
+                    'release':{'id':'a'*64,'canonical_commit':'b'*40}}).encode())
+            if path == '/api/status':
+                return io.BytesIO(b'{"authenticated":false,"modelConfigured":true}')
+            if path.startswith('/api/'):
+                raise urllib.error.HTTPError(path,401,'protected',None,None)
+            if path.startswith('/?n7verify='):
+                return io.BytesIO(b'canonical current HTML')
+            return io.BytesIO(b'stale static index alias')
+        with patch.object(deploy,'request',side_effect=request):
+            deploy.verify({'release_id':'a'*64,'files':{'public/index.html':deploy.sha(b'canonical current HTML')}},'b'*40)
+        self.assertTrue(any(p.startswith('/?n7verify=') for p in seen))
+        self.assertFalse(any(p.startswith('/index.html') for p in seen))
 
     def test_dry_run_never_acquires_lock_stages_or_installs(self):
         with patch.dict(deploy.os.environ, {'N7_CANONICAL_COMMIT':'a'*40,'N7_DRY_RUN':'1'}), \

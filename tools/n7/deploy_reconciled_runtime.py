@@ -310,12 +310,21 @@ def verify(release, commit, ftp=None, active=True):
         if ftp is not None and sha(read(ftp, name)) != expected:
             raise RuntimeError('N7_FINAL_RUNTIME_DRIFT ' + name)
         if name.startswith('public/'):
-            with request('/' + name[len('public/'):] + '?n7verify=' + secrets.token_hex(8)) as response:
-                accepted = {expected}
-                if not active and name in WRITABLE:
-                    accepted.add(release.get('previous_files', {}).get(name))
-                if sha(response.read(LIMIT + 1)) not in accepted:
+            # Verify the actual application entry route; nginx may serve /index.html
+            # from a separately cached static-file location.
+            route = '/' if name == 'public/index.html' else '/' + name[len('public/'):]
+            accepted = {expected}
+            if not active and name in WRITABLE:
+                accepted.add(release.get('previous_files', {}).get(name))
+            public_deadline = time.monotonic() + 60
+            while True:
+                with request(route + '?n7verify=' + secrets.token_hex(8)) as response:
+                    valid_public = sha(response.read(LIMIT + 1)) in accepted
+                if valid_public:
+                    break
+                if time.monotonic() >= public_deadline:
                     raise RuntimeError('N7_PUBLIC_RUNTIME_HASH_MISMATCH ' + name)
+                time.sleep(2)
     print('N7_RUNTIME_VERIFIED active=' + str(active) + ' model_configured=true private_http=401 public_hashes=true')
 
 
