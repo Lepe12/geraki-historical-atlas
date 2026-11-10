@@ -109,19 +109,37 @@
  async function streamDocuments(url,payload,files){
   const attachments=await encodeFiles(files),controller=new AbortController(),conversation=active;
   activeStream=controller;stopReply.hidden=false;const timer=setTimeout(()=>controller.abort(),120000);
-  let bubble=null,buffer='',done=false,text='';
+  let bubble=null,buffer='',done=false,text='',exchangeId=null;
   const paint=()=>{if(active!==conversation)return;if(!bubble?.isConnected){bubble=make('div',null,'bubble assistant n7-stream-live');bubble.setAttribute('aria-live','polite');$('messages').append(bubble);}bubble.textContent=text;$('messages').scrollTop=$('messages').scrollHeight;};
   try{
    const response=await fetch(url.replace(/\/chat$/,'/stream'),{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,attachments}),signal:controller.signal});
    if(!response.ok){let detail='HTTP '+response.status;try{detail=(await response.json()).error||detail;}catch{}throw Error(detail);}if(!response.body)throw Error('Δεν άνοιξε η ροή απάντησης.');
    const reader=response.body.getReader(),decoder=new TextDecoder();
-   const event=line=>{if(!line.trim())return;const e=JSON.parse(line);if(e.type==='error')throw Error(e.error||'Η απάντηση διακόπηκε.');if(e.type==='status')report(e.message||'Το N7 επεξεργάζεται…');if(e.type==='delta'){text+=e.text||'';paint();report('Το N7 γράφει…');}if(e.type==='done')done=true;};
+   const event=line=>{if(!line.trim())return;const e=JSON.parse(line);if(e.type==='error')throw Error(e.error||'Η απάντηση διακόπηκε.');if(e.type==='status')report(e.message||'Το N7 επεξεργάζεται…');if(e.type==='delta'){text+=e.text||'';paint();report('Το N7 γράφει…');}if(e.type==='done'){done=true;exchangeId=e.exchangeId||null;}};
    try{while(true){const part=await reader.read();buffer+=decoder.decode(part.value||new Uint8Array(),{stream:!part.done});const lines=buffer.split('\n');buffer=lines.pop();for(const line of lines)event(line);if(part.done){if(buffer.trim())event(buffer);break;}if(buffer.length>500000)throw Error('Μη έγκυρη ροή απάντησης.');}}finally{reader.releaseLock();}
    if(!done)throw Error('Δεν επιβεβαιώθηκε η αποθήκευση της απάντησης. Τα συνημμένα διατηρούνται.');
   }catch(e){if(!controller.signal.aborted)throw e;report('Η απάντηση διακόπηκε. Το διαθέσιμο κείμενο διατηρείται.');await new Promise(resolve=>setTimeout(resolve,400));}
   finally{clearTimeout(timer);activeStream=null;stopReply.hidden=true;}
-  const result=await originalApi(url.replace(/\/chat$/,''));if(result.conversation?.messages?.some(m=>m.attachments?.length))documentChats.add(result.conversation.id);return result;
+  const result=await originalApi(url.replace(/\/chat$/,''));if(result.conversation?.messages?.some(m=>m.attachments?.length))documentChats.add(result.conversation.id);return {...result,streamedText:text,exchangeId,completed:done,cancelled:controller.signal.aborted};
  }
+ // Same authenticated transport and project context as typed chat; pending drafts/files stay untouched.
+ window.N7VoiceChat={send:async(conversationId,message)=>{
+  if(active!==conversationId||busy||$('send').disabled)throw Error('Το N7 απαντά ήδη ή η συνομιλία άλλαξε.');
+  busy=true;$('send').disabled=true;
+  try{
+   const before=await originalApi('/api/conversations/'+conversationId);
+   if(active!==conversationId)throw Error('Η συνομιλία άλλαξε.');
+   render([...before.conversation.messages,{role:'user',content:message}]);
+   const url='/api/conversations/'+conversationId+'/chat';
+   const result=streamAvailable?await streamDocuments(url,{message},[]):await originalApi(url,{method:'POST',body:JSON.stringify({message})});
+   if(result.pending&&result.job_id){watchQueuedAnswer(result.job_id,conversationId);return {queued:true};}
+   if(active===conversationId&&result.conversation){render(result.conversation.messages);$('currenttitle').textContent=result.conversation.title;await list();}
+   if(result.cancelled)return {text:result.streamedText||'Η απάντηση διακόπηκε.',cancelled:true,exchangeId:result.exchangeId};
+   if(typeof result.streamedText==='string'&&result.streamedText)return {text:result.streamedText,cancelled:result.cancelled,exchangeId:result.exchangeId};
+   if(typeof result.reply==='string'&&result.reply)return {text:result.reply};
+   throw Error('Η απάντηση δεν επιβεβαιώθηκε. Δες τη συνομιλία στο N7 πριν ξαναστείλεις.');
+  }finally{busy=false;$('send').disabled=false;}
+ }};
  composer.addEventListener('submit',()=>{if(attachment&&!$('message').value.trim())$('message').value='Διάβασε τα συνημμένα και βοήθησέ με να τα αναλύσω.';},true);
  const originalApi=api;originalApi('/api/status').then(s=>{streamAvailable=s.modelConfigured!==false;}).catch(()=>{});api=async function(url,opt={}){
   if(typeof url==='string'&&/\/api\/conversations\/[a-f0-9-]+\/chat$/.test(url)&&opt.method==='POST'){

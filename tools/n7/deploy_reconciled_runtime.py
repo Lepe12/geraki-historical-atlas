@@ -93,19 +93,17 @@ def transform_server(original):
 
 def transform_app(original):
     source = original.decode('utf8')
-    marker = '// N7_PROJECT_BOOK_WORKFLOWS_V1'
-    if source.count(marker) > 1:
-        raise RuntimeError('N7_PUBLIC_APP_WORKSPACE_MARKER_AMBIGUOUS')
-    # plan() already restricts input to the exact reviewed previous/current hash.
-    # Upgrade the existing workspace suffix, preserving all preceding app code.
-    if marker in source:
-        source = source[:source.index(marker)]
-    for patch in json.loads((HERE / 'ui-workflow-patch.json').read_text()):
-        if source.count(patch['old']) == 1:
-            source = source.replace(patch['old'], patch['new'], 1)
-        elif source.count(patch['new']) != 1:
-            raise RuntimeError('N7_PUBLIC_APP_ANCHOR_CHANGED')
-    return (source + (HERE / 'workspace-ui.js').read_text()).encode()
+    marker = '// N7_MODERN_LIGHT_UI_V1'
+    if source.count(marker) != 1 or source.count('// N7_PROJECT_BOOK_WORKFLOWS_V1') > 1:
+        raise RuntimeError('N7_PUBLIC_APP_ANCHOR_CHANGED')
+    # plan() restricts input to the reviewed previous/current SHA256. Replace only
+    # the canonical modern UI and its canonical workflow/voice suffixes.
+    prefix = source[:source.index(marker)]
+    tail = (HERE / 'modern-ui.js').read_text().rstrip() + '\n\n'
+    tail += (HERE / 'workspace-ui.js').read_text() + '\n'
+    tail += (HERE / 'voice-protocol.js').read_text() + '\n'
+    tail += (HERE / 'voice-bridge-ui.js').read_text()
+    return (prefix + tail).encode()
 
 
 def syntax(data):

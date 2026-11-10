@@ -382,7 +382,7 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
     final+=note;emit('delta',{text:note});
    }
    const current=appendExchange({dataDir:DATA_DIR,load,save,id,user:userMessage,exchangeId,assistant:{content:final,evidenceAudit:{library:libraryHits.map(p=>({ref:p.ref,id:p.id,page:p.page,textHash:p.textHash,sourceHash:p.sourceHash})),...provenance}}});
-   emit('done',{conversation:{id:current.id,title:current.title}});
+   emit('done',{conversation:{id:current.id,title:current.title},exchangeId});
   }catch(e){
    if(final||cancelled){
     // Do not lose a response after it started streaming.
