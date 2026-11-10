@@ -115,8 +115,9 @@ jobs:
             const shot60=process.env.RUNNER_TEMP+'/n7-assembly-60.png';
             await assemblyCanvas.screenshot({path:shot60});
             const m60=metrics(shot60);
-            if(m60.visible<m25.visible*1.45) throw Error('assembly did not materially grow from 25% to 60%: '+JSON.stringify({m25,m60}));
-            if(m60.width<m25.width*1.18) throw Error('left-to-right body build did not widen: '+JSON.stringify({m25,m60}));
+            if(m60.visible<900) throw Error('60% assembly is not visibly transporting matter: '+JSON.stringify(m60));
+            if(m60.width<m25.width*1.65) throw Error('left-to-right body build did not widen enough: '+JSON.stringify({m25,m60}));
+            if(m60.centroid<m25.centroid+70) throw Error('construction did not progress left-to-right: '+JSON.stringify({m25,m60}));
             if(m60.cyan<350) throw Error('60% assembly lacks cyan artwork particles: '+JSON.stringify(m60));
 
             await p.waitForTimeout(2700);
