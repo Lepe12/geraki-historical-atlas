@@ -119,13 +119,13 @@ function formatEvidenceAnswer(question,hits,catalog={},errors=[]){
 async function research(question,{key,fetcher=fetch,external=false}={}){
   const q=clean(question),names=queryTerms(q),warnings=[],gathered=[];
   const stages=[{agent:"TOPONYM_NORMALIZER",status:"DONE",variants:names.terms}];
-  for(const term of names.terms){
+  await Promise.all(names.terms.map(async term=>{
     try{
       const x=await privateLibrary(key,"search",{query:term},fetcher);
       if(x.schema!=="n7-library-read-v1"||!Array.isArray(x.matches))throw new Error("UNEXPECTED_LIBRARY_SCHEMA");
       gathered.push(...x.matches.slice(0,30));
     }catch(_){warnings.push("LIBRARY_QUERY_UNAVAILABLE");}
-  }
+  }));
   const selected=distinctEvidence(gathered,5);
   stages.push({agent:"LIBRARY_RETRIEVER",status:warnings.length?"PARTIAL":"DONE",matched_pages:gathered.length,selected_pages:selected.length});
   const assessment=evidenceSummary(selected);

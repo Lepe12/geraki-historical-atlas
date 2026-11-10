@@ -9,7 +9,7 @@ const dir=process.env.N7_FIXTURE_DIR;
 if(!dir)throw Error('N7_FIXTURE_DIR is required');
 const chats=[{id:'11111111-1111-4111-8111-111111111111',title:'Επιμέλεια κεφαλαίου',messages:[],updated:new Date().toISOString()},{id:'22222222-2222-4222-8222-222222222222',title:'Ιστορία της Νάξου',messages:[],updated:new Date().toISOString()}];
 const memory=[],requests=[],errors=[];let seq=3;
-let jobReads=0;
+let jobReads=0,fixtureModelConfigured=true;
 const missionId='n7mission-'+'a'.repeat(24);
 function json(res,code,data,cookie){res.writeHead(code,{'Content-Type':'application/json',...(cookie?{'Set-Cookie':cookie}:{})});res.end(JSON.stringify(data));}
 const app=http.createServer(async(req,res)=>{
@@ -17,16 +17,16 @@ const app=http.createServer(async(req,res)=>{
   const p=new URL(req.url,'http://local').pathname;let raw='';for await(const chunk of req)raw+=chunk;
   const b=raw?JSON.parse(raw):{};
   if(p==='/api/login')return json(res,b.password==='local-ui-test'?200:401,{ok:b.password==='local-ui-test'},b.password==='local-ui-test'?'sid=ui-test; HttpOnly; Path=/; SameSite=Strict':undefined);
-  if(p==='/api/status')return json(res,200,{authenticated:req.headers.cookie?.includes('sid=ui-test')||false,modelConfigured:true});
+  if(p==='/api/status')return json(res,200,{authenticated:req.headers.cookie?.includes('sid=ui-test')||false,modelConfigured:fixtureModelConfigured});
   if(p==='/api/logout')return json(res,200,{ok:true},'sid=; Path=/; Max-Age=0');
   if(p.startsWith('/api/')&&!req.headers.cookie?.includes('sid=ui-test'))return json(res,401,{error:'Authentication required'});
   if(p==='/api/conversations'){
    if(req.method==='POST'){const c={id:String(seq++).padStart(8,'0')+'-1111-4111-8111-111111111111',title:'Νέα συνομιλία',messages:[],updated:new Date().toISOString()};chats.unshift(c);return json(res,201,{id:c.id});}
    return json(res,200,{conversations:chats});
   }
-  const chat=p.match(/^\/api\/conversations\/([^/]+)(\/chat)?$/);
+  const chat=p.match(/^\/api\/conversations\/([^/]+)(\/(?:chat|stream))?$/);
   if(chat){const c=chats.find(x=>x.id===chat[1]);if(!c)return json(res,404,{error:'Not found'});
-   if(chat[2]){await new Promise(r=>setTimeout(r,800));if(b.message.includes('N7_TEST_FAILURE'))return json(res,502,{error:'Δοκιμαστική αποτυχία σύνδεσης'});requests.push(b.message);if(b.message.includes('N7_TEST_QUEUE')){c.messages.push({role:'user',content:b.message});return json(res,202,{pending:true,job_id:'44444444-4444-4444-8444-444444444444',dispatch:'immediate'});}const source=editor.input(b.message);let answer='Κράτησα τη φωνή και τον ρυθμό σου.\n\nΟ άνεμος έκοβε το πρόσωπο. Το πλοίο έγερνε, μα κρατούσε.\nΣτον ορίζοντα φάνηκε η Νάξος. Κανείς δεν μιλούσε.';if(source&&!b.message.includes('N7_TEST_NO_TAGS'))answer='⟦N7_EDIT⟧\n'+source.source.replace('μα κρατούσε','αλλά κρατούσε')+'\n⟦/N7_EDIT⟧\n⟦N7_NOTES⟧Άλλαξα έναν σύνδεσμο.⟦/N7_NOTES⟧';c.messages.push({role:'user',content:b.message},{role:'assistant',content:answer});c.title='Επιμέλεια κεφαλαίου';return json(res,200,{reply:answer,conversation:c});}
+   if(chat[2]){await new Promise(r=>setTimeout(r,800));if(b.message.includes('N7_TEST_FAILURE'))return json(res,502,{error:'Δοκιμαστική αποτυχία σύνδεσης'});requests.push(b.message);if(b.message.includes('N7_TEST_QUEUE')){c.messages.push({role:'user',content:b.message});return json(res,202,{pending:true,job_id:'44444444-4444-4444-8444-444444444444',dispatch:'immediate'});}const source=editor.input(b.message);let answer='Κράτησα τη φωνή και τον ρυθμό σου.\n\nΟ άνεμος έκοβε το πρόσωπο. Το πλοίο έγερνε, μα κρατούσε.\nΣτον ορίζοντα φάνηκε η Νάξος. Κανείς δεν μιλούσε.';if(source&&!b.message.includes('N7_TEST_NO_TAGS'))answer='⟦N7_EDIT⟧\n'+source.source.replace('μα κρατούσε','αλλά κρατούσε')+'\n⟦/N7_EDIT⟧\n⟦N7_NOTES⟧Άλλαξα έναν σύνδεσμο.⟦/N7_NOTES⟧';c.messages.push({role:'user',content:b.message},{role:'assistant',content:answer});c.title='Επιμέλεια κεφαλαίου';if(chat[2]==='/stream'){res.writeHead(200,{'Content-Type':'application/x-ndjson'});return res.end(JSON.stringify({type:'delta',text:answer})+'\n'+JSON.stringify({type:'done'})+'\n');}return json(res,200,{reply:answer,conversation:c});}
    return json(res,200,{conversation:c});
   }
   if(p==='/api/n7/approved-lessons'){
@@ -129,8 +129,8 @@ async function main(){
   assert.match(await page.locator('#message').inputValue(),/N7_TEST_FAILURE/);await page.locator('#message').fill('');
   await page.locator('#message').fill('Συνέχισε τη συζήτηση.');await page.locator('#send').click();await page.waitForFunction(()=>!document.getElementById('send').disabled);
   assert.ok(!(await page.locator('#notice').textContent()).includes('Δοκιμαστική αποτυχία'));
-  await page.locator('#message').fill('N7_TEST_QUEUE');await page.locator('#send').click();await page.waitForFunction(()=>document.getElementById('n7-writing-status').textContent.includes('Σε αναμονή μοντέλου'));
-  await page.evaluate(()=>api('/api/n7/job/44444444-4444-4444-8444-444444444444'));assert.match(await page.locator('#n7-writing-status').textContent(),/επεξεργάζεται/);
+  fixtureModelConfigured=false;await page.evaluate(()=>api('/api/status'));await page.locator('#message').fill('N7_TEST_QUEUE');await page.locator('#send').click();await page.waitForFunction(()=>document.getElementById('n7-writing-status').textContent.includes('Σε αναμονή μοντέλου'));
+  await page.waitForFunction(()=>!document.getElementById('send').disabled);await page.evaluate(()=>api('/api/n7/job/44444444-4444-4444-8444-444444444444'));assert.match(await page.locator('#n7-writing-status').textContent(),/επεξεργάζεται/);
   await page.evaluate(()=>api('/api/n7/job/44444444-4444-4444-8444-444444444444'));assert.ok(await page.locator('#n7-writing-status').isHidden());
   await page.getByRole('button',{name:'Ρυθμίσεις εμφάνισης',exact:true}).click();await page.getByLabel('Μέγεθος κειμένου',{exact:true}).selectOption('18');
   assert.equal(await page.evaluate(()=>localStorage.getItem('n7-font-size')),'18');await page.locator('.n7-preferences').getByRole('button',{name:'Κλείσιμο',exact:true}).click();
