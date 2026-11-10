@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { N7_HUMANOID_REFERENCE } from "./N7HumanoidReference";
 
@@ -245,6 +245,8 @@ export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>
   const [assemblyDone,setAssemblyDone]=useState(false);
   const [stats,setStats]=useState<Stats>({particles:0,sampleW:0,sampleH:0,renderMs:0,assembly:100});
 
+  const handleAssemblyDone=useCallback(()=>setAssemblyDone(true),[]);
+
   if(!open) return null;
 
   const startAssembly=()=>{
@@ -277,7 +279,7 @@ export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>
           replayKey={replayKey}
           reduced={reduced}
           onStats={setStats}
-          onAssemblyDone={()=>setAssemblyDone(true)}
+          onAssemblyDone={handleAssemblyDone}
         />}
 
         {mode==="assembly"&&<div aria-label="N7 amber assembly core" style={{
@@ -291,8 +293,8 @@ export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>
           borderRadius:"50%",
           background:"radial-gradient(circle,#fff7c7 0 12%,#ffb000 30%,#ff7a00aa 48%,transparent 72%)",
           boxShadow:"0 0 18px #ffad00,0 0 42px #ff7a0088",
-          opacity:assemblyDone?.35:1,
-          transform:`scale(${assemblyDone?.85:1})`,
+          opacity:assemblyDone ? .35 : 1,
+          transform:`scale(${assemblyDone ? .85 : 1})`,
           transition:"opacity .45s ease, transform .45s ease",
           pointerEvents:"none"
         }}/>}
