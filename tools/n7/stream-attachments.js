@@ -3,7 +3,7 @@
 const {createLibrary,RPC_ID}=require('./source-library'); // N7_PERSISTENT_LIBRARY_V1
 const documentReader=require('./document-reader'); // N7_PDF_ATTACHMENTS_V1
 const {appendExchange,beginExchange}=require('./conversation-store');
-const {createWorkflows}=require('./workspace-workflows');
+const {createWorkflows,recallContext}=require('./workspace-workflows');
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),zlib=require('node:zlib');
 const MAX_BODY=9*1024*1024,MAX_FILE=5*1024*1024,MAX_TOTAL=6*1024*1024;
 const FILES=4,MAX_TEXT=26000;
@@ -303,13 +303,17 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
      console.log('N7_VISION_GROUNDING attachments='+n7ImageCount+' forwarded='+sent);
    }
    await library.rememberWeb(evidence);
+   // Admit complete evidence blocks within their own budget; the footer uses only admitted sources.
+   const selected=[];for(const hit of libraryHits){const candidate={...hit,text:String(hit.text||'').slice(0,1000)};if(library.evidenceContext([...selected,candidate],content).length<=5500)selected.push(candidate);}
+   const omitted=libraryHits.length-selected.length;libraryHits=selected;
    const libraryContext=library.evidenceContext(libraryHits,content);
-   const projectContext=workflows.context(item.projectId);
-   const rawContext=archiveWarning+'\n'+projectContext+libraryContext+'\n\n'+publicSearch.contextForResearch(evidence);
-   // 13k characters max evidence budget: prevent context overflow and provider stalls.
-   const context=rawContext.length>13000
-     ?rawContext.slice(0,13000)+'\n[Η υπόλοιπη έρευνα παραλείφθηκε λόγω ορίου μήκους.]'
-     :rawContext;
+   const projectContext=workflows.context(item.projectId,content,3500);
+   const recalled=recallContext(history,content,1500);
+   const webBudget=Math.max(0,12900-projectContext.length-recalled.length-libraryContext.length-archiveWarning.slice(0,300).length);
+   const fullWeb=publicSearch.contextForResearch(evidence);
+   const webContext=fullWeb.slice(0,webBudget)+(fullWeb.length>webBudget?'\n[Web context bounded; do not claim to have read omitted results.]':'');
+   const context=archiveWarning.slice(0,300)+'\n'+projectContext+recalled+libraryContext+'\n\n'+webContext;
+   emit('status',{stage:'context',message:'Πηγές στο μοντέλο: '+libraryHits.length+' αποσπάσματα. Μνήμη έργου: '+(projectContext?'επιλεγμένες εγκεκριμένες καταχωρίσεις':'χωρίς συνδεδεμένο έργο')+'.'+(recalled?' Ανακτήθηκαν παλαιότερα μηνύματα.':'')+(omitted?' '+omitted+' επιπλέον αποσπάσματα έμειναν εκτός ορίου.':'')});
    if(context&&messages[0]?.role==='system')messages[0].content+='\n\n'+context;
   }catch(e){emit('error',{error:'Η προετοιμασία της έρευνας απέτυχε: '+String(e.message||e).slice(0,160)});res.off?.('close',disconnected);if(!res.writableEnded)res.end();return;}
   const url=BASE.replace(/\/$/,'')+'/chat/completions';

@@ -78,6 +78,10 @@ def transform_server(original):
             if source.count(old) != 1:
                 raise RuntimeError('N7_RELEASE_SOURCE_ANCHOR_CHANGED')
             source = source.replace(old, new, 1)
+    # Upgrade the exact previously reviewed project-guide wiring before applying current patches.
+    legacy_guide = "      const projectGuide=require('./workspace-workflows').projectContext(DATA_DIR,item.projectId);\n      const history = [\n        ...(projectGuide?[{role:'system',content:projectGuide}]:[]),\n        ...item.messages,"
+    if source.count(legacy_guide) == 1:
+        source = source.replace(legacy_guide, '      const history = [\n        ...item.messages,', 1)
     for file in ('chat-storage-patch.json', 'runtime-workflow-patch.json'):
         for patch in json.loads((HERE / file).read_text()):
             if source.count(patch['old']) == 1:
