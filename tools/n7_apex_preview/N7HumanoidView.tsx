@@ -8,10 +8,14 @@ type Stats = { particles:number; sampleW:number; sampleH:number; renderMs:number
 
 const VERT = `
   attribute vec3 color;
+  attribute float alpha;
   varying vec3 vColor;
+  varying float vAlpha;
   uniform float uPointSize;
+
   void main(){
     vColor = color;
+    vAlpha = alpha;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
     gl_PointSize = uPointSize;
   }
@@ -20,12 +24,14 @@ const VERT = `
 const FRAG = `
   precision mediump float;
   varying vec3 vColor;
+  varying float vAlpha;
+
   void main(){
     vec2 p = gl_PointCoord - vec2(.5);
     float d = length(p);
-    if(d > .56) discard;
-    float edge = 1.0 - smoothstep(.42,.56,d);
-    gl_FragColor = vec4(vColor, edge);
+    if(d > .56 || vAlpha < .01) discard;
+    float edge = 1.0 - smoothstep(.40,.56,d);
+    gl_FragColor = vec4(vColor, edge * vAlpha);
   }
 `;
 
@@ -57,6 +63,7 @@ function ParticleReference({
     let geometry:THREE.BufferGeometry|null=null;
     let material:THREE.ShaderMaterial|null=null;
     let positionAttr:THREE.BufferAttribute|null=null;
+    let alphaAttr:THREE.BufferAttribute|null=null;
     let ro:ResizeObserver|null=null;
     let raf=0;
     let start=0;
@@ -86,10 +93,10 @@ function ParticleReference({
 
       const finals:number[]=[];
       const colors:number[]=[];
-      const origins:number[]=[];
-      const delays:number[]=[];
+      const launchDelays:number[]=[];
+      const jitter:number[]=[];
 
-      // Same image-driven Stage-1 sampling. No invented anatomy.
+      // One point = one sampled artwork pixel/color.
       for(let y=0;y<sampleH;y++){
         for(let x=0;x<sampleW;x++){
           const i=(y*sampleW+x)*4;
@@ -102,36 +109,42 @@ function ParticleReference({
           if(a<.03) continue;
           if(lum<.025 && chroma<.025) continue;
 
-          const px=x-sampleW/2+.5;
-          const py=sampleH/2-y-.5;
-          finals.push(px,py,0);
+          const fx=x-sampleW/2+.5;
+          const fy=sampleH/2-y-.5;
+          finals.push(fx,fy,0);
           colors.push(r,g,b);
 
-          // Deterministic chest-core origin for this exact source sample.
-          const h=((x*73856093)^(y*19349663))>>>0;
-          const angle=(h%10000)/10000*Math.PI*2;
-          const radius=2+((h>>>8)%1000)/1000*10;
-          origins.push(
-            Math.cos(angle)*radius,
-            -88+Math.sin(angle)*radius,
-            ((h>>>16)%1000)/1000*8-4
-          );
+          // Guide Step 4: the body completes left-to-right.
+          let delay=((fx+sampleW/2)/sampleW)*.66;
 
-          // Lower torso/shoulders emerge first, then neck/head/hair.
-          const vertical=clamp01((py+235)/470);
-          const dist=Math.min(1,Math.hypot(px,py+88)/300);
-          delays.push(Math.min(.58,vertical*.44+dist*.14));
+          // The head dome closes late; the central face ignites last.
+          if(fy>72) delay+=.10;
+          if(fy>72 && Math.abs(fx)<72) delay+=.10;
+          launchDelays.push(Math.min(.82,delay));
+
+          const h=((x*73856093)^(y*19349663))>>>0;
+          jitter.push(((h%2001)-1000)/1000);
         }
       }
 
       const finalArray=new Float32Array(finals);
-      const originArray=new Float32Array(origins);
       const currentArray=new Float32Array(finalArray.length);
+      const alphaArray=new Float32Array(finalArray.length/3);
+
+      const sourceX=-145;
+      const sourceY=-175;
 
       if(assembly&&!reduced){
-        currentArray.set(originArray);
+        for(let n=0;n<alphaArray.length;n++){
+          const j=n*3;
+          currentArray[j]=sourceX;
+          currentArray[j+1]=sourceY;
+          currentArray[j+2]=0;
+          alphaArray[n]=0;
+        }
       }else{
         currentArray.set(finalArray);
+        alphaArray.fill(1);
       }
 
       const scene=new THREE.Scene();
@@ -141,8 +154,11 @@ function ParticleReference({
       geometry=new THREE.BufferGeometry();
       positionAttr=new THREE.BufferAttribute(currentArray,3);
       positionAttr.setUsage(THREE.DynamicDrawUsage);
+      alphaAttr=new THREE.BufferAttribute(alphaArray,1);
+      alphaAttr.setUsage(THREE.DynamicDrawUsage);
       geometry.setAttribute("position",positionAttr);
       geometry.setAttribute("color",new THREE.Float32BufferAttribute(colors,3));
+      geometry.setAttribute("alpha",alphaAttr);
 
       material=new THREE.ShaderMaterial({
         vertexShader:VERT,
@@ -165,28 +181,59 @@ function ParticleReference({
 
       const applyAssembly=(progress:number)=>{
         currentProgress=progress;
-        if(!positionAttr) return;
+        if(!positionAttr||!alphaAttr) return;
 
         const arr=positionAttr.array as Float32Array;
+        const aa=alphaAttr.array as Float32Array;
+
         if(!assembly || reduced || progress>=1){
           arr.set(finalArray);
+          aa.fill(1);
           positionAttr.needsUpdate=true;
+          alphaAttr.needsUpdate=true;
           return;
         }
 
-        for(let n=0;n<delays.length;n++){
+        for(let n=0;n<launchDelays.length;n++){
           const j=n*3;
-          const local=smooth01((progress-delays[n])/Math.max(.001,1-delays[n]));
-          const arc=Math.sin(local*Math.PI);
-          const fx=finalArray[j], fy=finalArray[j+1], fz=finalArray[j+2];
-          const ox=originArray[j], oy=originArray[j+1], oz=originArray[j+2];
-          const side=fx===0 ? 0 : (fx>0 ? 1 : -1);
+          const delay=launchDelays[n];
+          const local=clamp01((progress-delay)/.18);
+          const eased=smooth01(local);
 
-          arr[j]=ox+(fx-ox)*local + side*arc*(8+Math.abs(fx)*.055);
-          arr[j+1]=oy+(fy-oy)*local + arc*(10+Math.max(fy,0)*.025);
-          arr[j+2]=oz+(fz-oz)*local + arc*8;
+          if(local<=0){
+            arr[j]=sourceX;
+            arr[j+1]=sourceY;
+            arr[j+2]=0;
+            aa[n]=0;
+            continue;
+          }
+
+          const fx=finalArray[j];
+          const fy=finalArray[j+1];
+
+          if(local>=1){
+            arr[j]=fx;
+            arr[j+1]=fy;
+            arr[j+2]=0;
+            aa[n]=1;
+            continue;
+          }
+
+          // Guide: particles pour from one source, arc over in a river,
+          // then rain down into their exact final pixel positions.
+          const jv=jitter[n];
+          const cx=-35 + fx*.28 + jv*9;
+          const cy=218 + Math.max(0,fy)*.10 + Math.abs(jv)*10;
+
+          const inv=1-eased;
+          arr[j]=inv*inv*sourceX + 2*inv*eased*cx + eased*eased*fx;
+          arr[j+1]=inv*inv*sourceY + 2*inv*eased*cy + eased*eased*fy;
+          arr[j+2]=Math.sin(eased*Math.PI)*(5+jv*2);
+          aa[n]=Math.min(1,local*3);
         }
+
         positionAttr.needsUpdate=true;
+        alphaAttr.needsUpdate=true;
       };
 
       const renderFrame=(progress:number)=>{
@@ -196,7 +243,7 @@ function ParticleReference({
         const rect=host.getBoundingClientRect();
         renderer.setSize(Math.max(1,rect.width),Math.max(1,rect.height),false);
         const displayScale=Math.min(rect.width/sampleW,rect.height/sampleH);
-        material.uniforms.uPointSize.value=Math.max(1.15,displayScale*1.18);
+        material.uniforms.uPointSize.value=Math.max(1.35,displayScale*1.34);
 
         const t0=performance.now();
         renderer.render(scene,camera);
@@ -212,13 +259,13 @@ function ParticleReference({
       const tick=(now:number)=>{
         if(disposed) return;
         if(!start) start=now;
-        if(now-lastFrame<28){
+        if(now-lastFrame<24){
           raf=requestAnimationFrame(tick);
           return;
         }
         lastFrame=now;
 
-        const duration=3200;
+        const duration=6000;
         const raw=reduced?1:Math.min(1,(now-start)/duration);
         renderFrame(raw);
 
@@ -258,11 +305,18 @@ function ParticleReference({
     };
   },[enabled,assembly,replayKey,reduced,onStats,onAssemblyDone]);
 
-  return <div ref={hostRef} aria-label={assembly?"N7 assembling particle humanoid":"N7 image-sampled particle humanoid"} style={{position:"absolute",inset:0}}/>;
+  return <div
+    ref={hostRef}
+    aria-label={assembly?"N7 assembling particle humanoid":"N7 image-sampled particle humanoid"}
+    style={{position:"absolute",inset:0}}
+  />;
 }
 
 export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>void}) {
-  const reduced=useMemo(()=>typeof window!=="undefined"&&window.matchMedia?.("(prefers-reduced-motion: reduce)").matches,[]);
+  const systemReduced=useMemo(()=>typeof window!=="undefined"&&window.matchMedia?.("(prefers-reduced-motion: reduce)").matches,[]);
+  const [allowMotion,setAllowMotion]=useState(false);
+  const reduced=systemReduced&&!allowMotion;
+
   const [mode,setMode]=useState<ViewMode>("particle");
   const [details,setDetails]=useState(false);
   const [replayKey,setReplayKey]=useState(0);
@@ -279,12 +333,14 @@ export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>
     setReplayKey(x=>x+1);
   };
 
+  const faceIgnited=mode==="assembly" && stats.assembly>=91;
+
   return <section role="dialog" aria-modal="true" aria-label="N7 Humanoid preview"
     style={{position:"fixed",inset:0,zIndex:120,background:"#000",color:"#e9fbff",fontFamily:"system-ui,sans-serif",overflow:"hidden"}}>
     <header style={{position:"absolute",top:14,left:18,right:18,zIndex:5,display:"flex",justifyContent:"space-between",alignItems:"center",gap:12}}>
       <div>
         <strong style={{letterSpacing:4,color:"#62e8f7"}}>N7 · HUMANOID</strong>
-        <div style={{fontSize:11,opacity:.62}}>Guide Stage 2 · approved idle artwork → visible particle assembly → exact idle</div>
+        <div style={{fontSize:11,opacity:.62}}>Guide Step 4 · source → particle river → left-to-right build → face ignition → exact idle</div>
       </div>
       <button type="button" onClick={onClose} style={{padding:"9px 13px",border:"1px solid #2c6c7e",background:"#091823",color:"#dffbff",borderRadius:7,cursor:"pointer"}}>Exit</button>
     </header>
@@ -306,29 +362,43 @@ export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>
           onAssemblyDone={handleAssemblyDone}
         />}
 
-        {mode==="assembly"&&<div aria-label="N7 amber assembly core" style={{
-          position:"absolute",
-          left:"50%",
-          top:"68.3%",
-          width:14,
-          height:14,
-          marginLeft:-7,
-          marginTop:-7,
-          borderRadius:"50%",
-          background:"radial-gradient(circle,#fff7c7 0 10%,#ffb000 28%,#ff7a0088 46%,transparent 72%)",
-          boxShadow:"0 0 10px #ffad00,0 0 24px #ff7a0066",
-          opacity:assemblyDone ? .22 : .78,
-          pointerEvents:"none"
-        }}/>}
+        {mode==="assembly"&&!assemblyDone&&<div
+          aria-label="N7 visible assembly source"
+          style={{
+            position:"absolute",left:"4.7%",top:"86.5%",
+            width:20,height:20,marginLeft:-10,marginTop:-10,borderRadius:"50%",
+            background:"radial-gradient(circle,#fff7c7 0 10%,#ffb000 27%,#ff7a00aa 48%,transparent 72%)",
+            boxShadow:"0 0 18px #ffad00,0 0 42px #ff7a0088",
+            pointerEvents:"none"
+          }}
+        />}
+
+        {faceIgnited&&<div
+          aria-label="N7 face ignition"
+          style={{
+            position:"absolute",left:"50%",top:"30.1%",
+            width:34,height:34,marginLeft:-17,marginTop:-17,borderRadius:"50%",
+            background:"radial-gradient(circle,#fff8d8 0 8%,#ffbd2e 24%,#ff7a0077 44%,transparent 72%)",
+            boxShadow:"0 0 18px #ffb000,0 0 38px #ff7a0077",
+            opacity:assemblyDone ? .35 : Math.min(1,(stats.assembly-90)/7),
+            pointerEvents:"none"
+          }}
+        />}
 
         {mode==="assembly"&&<div style={{position:"absolute",top:10,left:10,padding:"5px 8px",background:"#03111dcc",border:"1px solid #285d70",borderRadius:5,fontSize:11}}>
           ASSEMBLY · {assemblyDone?"COMPLETE":`${stats.assembly}%`}
         </div>}
+
         {mode==="compare"&&<div style={{position:"absolute",top:10,left:10,padding:"5px 8px",background:"#03111dcc",border:"1px solid #285d70",borderRadius:5,fontSize:11}}>REFERENCE 38% + PARTICLE RECONSTRUCTION</div>}
       </div>
     </div>
 
-    <div style={{position:"absolute",left:"50%",bottom:16,transform:"translateX(-50%)",zIndex:5,width:"min(960px,calc(100vw - 24px))"}}>
+    <div style={{position:"absolute",left:"50%",bottom:16,transform:"translateX(-50%)",zIndex:5,width:"min(980px,calc(100vw - 24px))"}}>
+      {systemReduced&&!allowMotion&&<div style={{marginBottom:6,padding:"7px 10px",background:"#241b08dd",border:"1px solid #806421",borderRadius:8,fontSize:11,textAlign:"center"}}>
+        Reduced motion is enabled on this device, so the guide requires Assembly to skip animation.
+        <button type="button" onClick={()=>setAllowMotion(true)} style={{marginLeft:8,padding:"5px 8px",border:"1px solid #a47a26",borderRadius:5,background:"#38270b",color:"#fff0c4",cursor:"pointer"}}>Animate this session</button>
+      </div>}
+
       <div style={{display:"flex",flexWrap:"wrap",gap:7,justifyContent:"center",padding:9,background:"#030c13df",border:"1px solid #204f60",borderRadius:10,backdropFilter:"blur(10px)"}}>
         <button type="button" onClick={startAssembly} style={{padding:"8px 11px",border:"1px solid #8b5d20",borderRadius:6,color:"#fff0c4",background:mode==="assembly"?"#6d3e0c":"#171006",cursor:"pointer"}}>{mode==="assembly"?"Replay Assembly":"Assembly"}</button>
         {mode==="assembly"&&!assemblyDone&&<button type="button" onClick={()=>setMode("particle")} style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:"#07131b",cursor:"pointer"}}>Skip</button>}
@@ -337,9 +407,10 @@ export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>
         <button type="button" onClick={()=>setMode("compare")} style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:mode==="compare"?"#115068":"#07131b",cursor:"pointer"}}>Compare</button>
         <button type="button" onClick={()=>setDetails(x=>!x)} style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:"#07131b",cursor:"pointer"}}>Technical details</button>
       </div>
+
       {details&&<div style={{marginTop:6,padding:9,background:"#02080dee",border:"1px solid #204856",borderRadius:8,fontSize:11,lineHeight:1.55}}>
-        <b>Stage 2 diagnostics</b> · source sample {stats.sampleW||"—"}×{stats.sampleH||"—"} · particles {stats.particles||"loading"} · render {stats.renderMs||"—"} ms · assembly {stats.assembly}% · sRGB · tone mapping OFF · reduced motion {reduced?"ON":"OFF"}.
-        <br/>Assembly now animates the Stage-1 position buffer directly. The shader is identical to the proven Stage-1 renderer; final positions and colors remain unchanged.
+        <b>Step 4 diagnostics</b> · source sample {stats.sampleW||"—"}×{stats.sampleH||"—"} · particles {stats.particles||"loading"} · render {stats.renderMs||"—"} ms · assembly {stats.assembly}% · duration 6s · sRGB · tone mapping OFF · reduced motion {reduced?"ON":"OFF"}.
+        <br/>Every particle carries its sampled artwork color. Completion is left-to-right; head/face are delayed; the last frame uses the exact approved Stage-1 positions.
       </div>}
     </div>
   </section>;

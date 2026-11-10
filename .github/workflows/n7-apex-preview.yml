@@ -86,22 +86,42 @@ jobs:
             await p.getByText(/PARTICLE RECONSTRUCTION/).waitFor({state:'visible'});
             await p.getByRole('button',{name:'Assembly',exact:true}).click();
             await p.getByText(/ASSEMBLY/).waitFor({state:'visible'});
-            await p.getByLabel('N7 amber assembly core').waitFor({state:'visible'});
-            await p.waitForTimeout(1400);
+            await p.getByLabel('N7 visible assembly source').waitFor({state:'visible'});
             const assemblyCanvas=p.getByRole('dialog',{name:'N7 Humanoid preview'}).locator('canvas');
-            const midShot=process.env.RUNNER_TEMP+'/n7-assembly-mid.png';
-            await assemblyCanvas.screenshot({path:midShot});
             const {PNG}=require('pngjs');
             const fs=require('fs');
-            const png=PNG.sync.read(fs.readFileSync(midShot));
-            let visible=0, cyan=0;
-            for(let i=0;i<png.data.length;i+=4){
-              const r=png.data[i],g=png.data[i+1],b=png.data[i+2],a=png.data[i+3];
-              if(a>24 && (r+g+b)>45) visible++;
-              if(a>24 && b>80 && g>70 && b>r*1.2) cyan++;
+
+            function metrics(path){
+              const png=PNG.sync.read(fs.readFileSync(path));
+              let visible=0, cyan=0, minX=png.width, maxX=-1, sumX=0;
+              for(let y=0;y<png.height;y++) for(let x=0;x<png.width;x++){
+                const i=(y*png.width+x)*4;
+                const r=png.data[i],g=png.data[i+1],b=png.data[i+2],a=png.data[i+3];
+                if(a>24 && (r+g+b)>45){
+                  visible++; minX=Math.min(minX,x); maxX=Math.max(maxX,x); sumX+=x;
+                }
+                if(a>24 && b>80 && g>70 && b>r*1.2) cyan++;
+              }
+              return {visible,cyan,minX,maxX,width:maxX>=minX?maxX-minX+1:0,centroid:visible?sumX/visible:0};
             }
-            if(visible<700 || cyan<250) throw Error('assembly canvas is visually empty: visible='+visible+' cyan='+cyan);
-            await p.waitForTimeout(2200);
+
+            await p.waitForTimeout(1500);
+            const shot25=process.env.RUNNER_TEMP+'/n7-assembly-25.png';
+            await assemblyCanvas.screenshot({path:shot25});
+            const m25=metrics(shot25);
+            if(m25.visible<350 || m25.cyan<150) throw Error('25% assembly is not visibly transporting matter: '+JSON.stringify(m25));
+
+            await p.waitForTimeout(2100);
+            const shot60=process.env.RUNNER_TEMP+'/n7-assembly-60.png';
+            await assemblyCanvas.screenshot({path:shot60});
+            const m60=metrics(shot60);
+            if(m60.visible<900) throw Error('60% assembly is not visibly transporting matter: '+JSON.stringify(m60));
+            if(m60.width<m25.width*1.65) throw Error('left-to-right body build did not widen enough: '+JSON.stringify({m25,m60}));
+            if(m60.centroid<m25.centroid+70) throw Error('construction did not progress left-to-right: '+JSON.stringify({m25,m60}));
+            if(m60.cyan<350) throw Error('60% assembly lacks cyan artwork particles: '+JSON.stringify(m60));
+
+            await p.waitForTimeout(2700);
+            await p.getByLabel('N7 face ignition').waitFor({state:'visible'});
             await p.getByText(/ASSEMBLY · COMPLETE/).waitFor({state:'visible'});
             await p.getByRole('button',{name:'Replay Assembly',exact:true}).click();
             await p.waitForTimeout(250);
