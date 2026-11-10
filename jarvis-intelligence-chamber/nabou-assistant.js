@@ -24,5 +24,6 @@
   }
   b.addEventListener("click", toggleAssistant);
   document.addEventListener("n7:open-voice", toggleAssistant);
-  document.body.appendChild(b);
+  // The N7 atlas layout has its own assistant capsule (Φωνή dispatches n7:open-voice); the legacy launcher is not added there.
+  if (!document.getElementById("n7Assistant")) document.body.appendChild(b);
 })();

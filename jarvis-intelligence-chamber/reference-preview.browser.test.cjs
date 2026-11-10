@@ -59,6 +59,6 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
  await page.waitForFunction(()=>window.N7_READER&&document.body.dataset.readerView==='research');
  assert.match(await page.locator('#operatorQuery').inputValue(),/Κάντια, 1500–1700/);
  assert.equal(dispatched,false,'Opening research must not dispatch a job');
- assert.deepEqual(errors,[]);console.log('PASS faithful preview: artwork, responsive layout, search, layers, dates, zoom, source disclosure and real research handoff without dispatch');
+ assert.deepEqual(errors,[]);await page.unrouteAll({behavior:'ignoreErrors'});console.log('PASS faithful preview: artwork, responsive layout, search, layers, dates, zoom, source disclosure and real research handoff without dispatch');
  }finally{await browser?.close();server.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

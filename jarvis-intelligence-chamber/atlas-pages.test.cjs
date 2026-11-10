@@ -13,31 +13,35 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
  await page.route('**/*',r=>{const u=r.request().url();if(!u.startsWith('https://'))return r.continue();if(u.includes('raw.githubusercontent.com'))return r.fulfill({json:snapshot});if(u.includes('/status/'))return r.fulfill({json:{snapshot,events:[]}});return r.abort();});await page.routeWebSocket(/.*/,()=>{});
  await page.goto('http://127.0.0.1:'+server.address().port+'/jarvis-intelligence-chamber/');
  await page.waitForFunction(()=>document.body.dataset.currentResearchRun==='100');
- assert.equal(await page.locator('#atlasHome').isVisible(),true);
- await page.locator('#atlasExplore').hover();
- assert.equal(await page.locator('#atlasExplore').evaluate(e=>getComputedStyle(e).backdropFilter),'none');
- assert.equal(await page.locator('#atlasExplore').evaluate(e=>getComputedStyle(e).backgroundImage),'none');
- await page.locator('#atlasResearch [data-atlas-nav="map"]').hover();
- assert.equal(await page.locator('#atlasResearch [data-atlas-nav="map"]').evaluate(e=>getComputedStyle(e).backgroundImage),'none');
+ // N7 layout: the landing page is the framed map itself; no welcome card or poster is rendered.
+ assert.equal(await page.locator('body').getAttribute('data-atlas-landing'),'true');
+ assert.equal(await page.locator('#atlasExplore, .unified-welcome, .atlas-home-poster').count(),0);
+ assert.equal(await page.locator('#chartFrame').isVisible(),true);
+ assert.equal(await page.locator('.n7-nav [data-n7-nav="home"]').getAttribute('aria-current'),'page');
+ await page.locator('.n7-nav [data-atlas-nav="map"]').hover();
+ assert.equal(await page.locator('.n7-nav [data-atlas-nav="map"]').evaluate(e=>getComputedStyle(e).backgroundImage),'none');
  await page.screenshot({path:path.join(process.env.NABOU_SCREENSHOT_DIR||__dirname,'unified-home.png')});
- await page.locator('#atlasExplore').click();
+ await page.locator('.n7-nav [data-atlas-nav="map"]').click();
  await page.waitForFunction(()=>document.body.dataset.readerView==='map');
  assert.equal(await page.locator('#atlasHome').isVisible(),false);
  assert.equal(await page.locator('.atlas-research-panel').isVisible(),false);
  assert.equal(await page.locator('#chartFrame').isVisible(),true);
  assert.equal(await page.locator('#nodeLabels .node-label').count(),17);
  assert.equal(await page.locator('body').getAttribute('data-pro-lanes'),'false','Research layers start collapsed on the geographic atlas');
+ await page.locator('.n7-nav [data-n7-nav="layers"]').click();
  await page.getByRole('checkbox',{name:'Ερευνητές',exact:true}).check();
+ await page.locator('.n7-nav [data-n7-nav="layers"]').click();
  const visibleAgents=await page.locator('#nodeLabels .node-label').evaluateAll(es=>es.filter(e=>getComputedStyle(e).visibility==='visible'&&e.getBoundingClientRect().width>0).length);
  assert.ok(visibleAgents>=5,'Researcher emblems must be visibly rendered on the real map');
  await page.waitForTimeout(500);
- const bounds=await page.evaluate(()=>{const C=window.NABOU_CHART,plane=document.querySelector('#chartPlane'),p=plane.getBoundingClientRect(),frame=document.querySelector('#chartView').getBoundingClientRect();const scale=p.width/C.W,M=lat=>Math.log(Math.tan(Math.PI/4+lat*Math.PI/360))*180/Math.PI;return [[-5.5,36],[35.5,34]].map(([lon,lat])=>{const x=p.left+(lon-C.lon0)*C.k*scale,y=p.top+(C.my1-M(lat))*C.k*scale;return x>=frame.left-2&&x<=frame.right+2&&y>=frame.top-2&&y<=frame.bottom+2;});});
- assert.deepEqual(bounds,[true,true],'Gibraltar and the Levant must both be inside the chart');
+ const bounds=await page.evaluate(()=>{const C=window.NABOU_CHART,plane=document.querySelector('#chartPlane'),p=plane.getBoundingClientRect(),frame=document.querySelector('#chartView').getBoundingClientRect();const scale=p.width/C.W,M=lat=>Math.log(Math.tan(Math.PI/4+lat*Math.PI/360))*180/Math.PI;return window.NABOU_PRO_ATLAS.places.map(p=>[p.lon,p.lat]).map(([lon,lat])=>{const x=p.left+(lon-C.lon0)*C.k*scale,y=p.top+(C.my1-M(lat))*C.k*scale;return x>=frame.left-2&&x<=frame.right+2&&y>=frame.top-2&&y<=frame.bottom+2;});});
+ // N7 layout: the map sits in a framed centre panel (owner mockup, focus on the central/eastern Mediterranean);
+ assert.ok(bounds.length===11&&bounds.every(Boolean),'Every reference place, Barcelona to Alexandria, must be inside the opening chart');
  const transform=await page.locator('#chartPlane').getAttribute('style');
  await page.locator('#zoomIn').click();await page.waitForFunction(old=>document.querySelector('#chartPlane').getAttribute('style')!==old,transform,{timeout:10000});
  assert.notEqual(await page.locator('#chartPlane').getAttribute('style'),transform,'Zoom acts on the actual chart');
  await page.locator('#resetView').click();
- await page.locator('#atlasResearch [data-atlas-nav="research"]').click();
+ await page.locator('.n7-nav [data-atlas-nav="research"]').click();
  assert.equal(await page.locator('#researchOverview').isVisible(),true);
  await page.locator('#atlasCloseResearch').click();
  assert.equal(await page.locator('.atlas-research-panel').isVisible(),false);
@@ -63,16 +67,16 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
  await page.screenshot({path:path.join(shots,'restored-live-map-2d.png')});
  for(const width of [390,360]){
   await page.setViewportSize({width,height:844});
-  await page.locator('#atlasResearch [data-atlas-nav="sources"]').click();
+  await page.locator('.n7-nav [data-atlas-nav="sources"]').click();
   await page.locator('#readerSources').waitFor({state:'visible'});
-  await page.locator('#atlasResearch [data-atlas-nav="map"]').click();
+  await page.locator('.n7-nav [data-atlas-nav="map"]').click();
   assert.equal(await page.locator('.atlas-research-panel').isVisible(),false);
   assert.equal(await page.locator('#chartFrame').isVisible(),true);
   for(const id of ['zoomIn','zoomOut','resetView','map3dToggle'])assert.equal(await page.locator('#'+id).isVisible(),true);
-  await page.getByRole('button',{name:'N7 · Αρχική σελίδα',exact:true}).click();
-  assert.equal(await page.locator('#atlasHome').isVisible(),true);
-  await page.locator('#atlasExplore').click();
+  await page.locator('#n7Shell .n7-logo').click();
+  await page.waitForFunction(()=>document.body.dataset.atlasLanding==='true');
+  assert.equal(await page.locator('#chartFrame').isVisible(),true);
  }
- assert.deepEqual(errors,[]);console.log('PASS real chart navigation, Gibraltar–Levant bounds, emblems, zoom, actual WebGL 3D and mobile controls');
+ assert.deepEqual(errors,[]);console.log('PASS real chart navigation, all reference places in the framed map, emblems, zoom, actual WebGL 3D and mobile controls');
  }finally{await browser?.close();server.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
