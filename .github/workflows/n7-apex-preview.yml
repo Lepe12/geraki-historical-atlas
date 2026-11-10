@@ -158,6 +158,10 @@ jobs:
             const targetValue=Number(await p.getByLabel('N7 image-sampled particle humanoid').getAttribute('data-head-target'));
             if(!Number.isFinite(targetValue) || targetValue<.75) throw Error('Step 5 pointer input did not reach renderer: '+targetValue);
             await p.waitForTimeout(500);
+            const currentTurn=Number(await p.getByLabel('N7 image-sampled particle humanoid').getAttribute('data-current-turn'));
+            const headParticles=Number(await p.getByLabel('N7 image-sampled particle humanoid').getAttribute('data-head-particles'));
+            if(!Number.isFinite(headParticles) || headParticles<200) throw Error('Step 5 head mask is empty or too small: '+headParticles);
+            if(!Number.isFinite(currentTurn) || currentTurn<.45) throw Error('Step 5 renderer is not approaching pointer target: '+JSON.stringify({targetValue,currentTurn,headParticles}));
             const headRight=await particleShot('right');
             const headDelta=regionDiff(headCenter,headRight,0,.48);
             const bodyDelta=regionDiff(headCenter,headRight,.58,1);
