@@ -25,11 +25,16 @@ BASE = 'https://bot.piratecartography.com'
 TLS = 'linux3087.grserver.gr'
 HERE = Path(__file__).resolve().parent
 PUBLIC_MODULES = {'conversation-store.js': 'conversation-store.js',
+                  'workspace-workflows.js': 'workspace-workflows.js',
+                  'n7-queue-bridge.js': 'n7-queue-bridge.js',
+                  'historical-research.js': '../library/n7-historical-research.js',
                   'n7-stream-attachments.js': 'stream-attachments.js',
                   'owner-chat-memory.js': 'owner-chat-memory.js',
                   'source-library.js': 'source-library.js',
                   'n7-release-info.js': 'runtime-release-info.js'}
-WRITABLE = {'server.js', 'release-manifest.json', *PUBLIC_MODULES}
+for _skill in ('book-project-canon', 'document-reading-plan', 'claim-evidence-ledger', 'editorial-preservation'):
+    PUBLIC_MODULES['skills/' + _skill + '/SKILL.md'] = 'skills/' + _skill + '/SKILL.md'
+WRITABLE = {'server.js', 'public/app.js', 'release-manifest.json', *PUBLIC_MODULES}
 LIMIT = 8 * 1024 * 1024
 
 
@@ -73,11 +78,22 @@ def transform_server(original):
             if source.count(old) != 1:
                 raise RuntimeError('N7_RELEASE_SOURCE_ANCHOR_CHANGED')
             source = source.replace(old, new, 1)
-    for patch in json.loads((HERE / 'chat-storage-patch.json').read_text()):
-        if source.count(patch['old']) != 1:
-            raise RuntimeError('N7_CHAT_STORAGE_ANCHOR_CHANGED')
-        source = source.replace(patch['old'], patch['new'], 1)
+    for file in ('chat-storage-patch.json', 'runtime-workflow-patch.json'):
+        for patch in json.loads((HERE / file).read_text()):
+            if source.count(patch['old']) == 1:
+                source = source.replace(patch['old'], patch['new'], 1)
+            elif not patch['new'] or source.count(patch['new']) != 1:
+                raise RuntimeError('N7_RUNTIME_PATCH_ANCHOR_CHANGED')
     return source.encode()
+
+
+def transform_app(original):
+    source = original.decode('utf8')
+    for patch in json.loads((HERE / 'ui-workflow-patch.json').read_text()):
+        if source.count(patch['old']) != 1:
+            raise RuntimeError('N7_PUBLIC_APP_ANCHOR_CHANGED')
+        source = source.replace(patch['old'], patch['new'], 1)
+    return (source + (HERE / 'workspace-ui.js').read_text()).encode()
 
 
 def syntax(data):
@@ -127,7 +143,8 @@ def plan(ftp, release, canonical_commit, transformer=transform_server):
         data = (HERE / source).read_bytes()
         if sha(data) != release['files'][name]:
             raise RuntimeError('N7_CANONICAL_RUNTIME_OUTPUT_MISMATCH')
-        syntax(data)
+        if name.endswith('.js'):
+            syntax(data)
         payload[name] = data
     if sha(server) != release['files']['server.js']:
         raise RuntimeError('N7_CANONICAL_RUNTIME_OUTPUT_MISMATCH')
@@ -136,6 +153,14 @@ def plan(ftp, release, canonical_commit, transformer=transform_server):
                'canonical_commit': canonical_commit, 'source_lock_verified': True,
                'files': release['files'], 'deployment': 'verified-existing-files-and-guarded-delta'}
     originals['release-manifest.json'] = read(ftp, 'release-manifest.json', optional=True)
+    if 'public/app.js' in originals:
+        app = originals['public/app.js']
+        if sha(app) != release['files']['public/app.js']:
+            app = transform_app(app)
+        if sha(app) != release['files']['public/app.js']:
+            raise RuntimeError('N7_PUBLIC_APP_OUTPUT_MISMATCH')
+        syntax(app)
+        payload['public/app.js'] = app
     payload['release-manifest.json'] = (json.dumps(receipt, indent=2) + '\n').encode()
     payload['server.js'] = server
     return payload, originals
@@ -151,7 +176,7 @@ def install(ftp, payload, originals, verifier):
     lock = ROOT + '/.n7-runtime-deploy-lock'
     ftp.mkd(lock)
     tag = secrets.token_hex(10)
-    staged, backups, installed = {}, {}, []
+    staged, backups, installed, created_dirs = {}, {}, [], []
     changed = [name for name, data in payload.items() if originals[name] != data]
     try:
         if not changed:
@@ -160,7 +185,7 @@ def install(ftp, payload, originals, verifier):
             return
         # Verify every stage before replacing any active path.
         for name in changed:
-            stage = '.n7-runtime-stage-' + tag + '-' + name
+            stage = '.n7-runtime-stage-' + tag + '-' + name.replace('/', '__')
             staged[name] = stage
             ftp.storbinary('STOR ' + ROOT + '/' + stage, io.BytesIO(payload[name]))
             ftp.sendcmd('SITE CHMOD 644 ' + ROOT + '/' + stage)
@@ -169,10 +194,20 @@ def install(ftp, payload, originals, verifier):
         for name in payload:
             if read(ftp, name, optional=True) != originals[name]:
                 raise RuntimeError('N7_CONCURRENT_RUNTIME_CHANGE')
+        # Create only explicitly approved new skill directories, never private paths.
+        for name in changed:
+            if name.startswith('skills/'):
+                directory = ROOT + '/' + name.rsplit('/', 1)[0]
+                try:
+                    ftp.mkd(directory)
+                    created_dirs.append(directory)
+                except ftplib.error_perm as error:
+                    if not str(error).startswith('550'):
+                        raise
         # Dependency and receipt first; the verified server entry point last.
         for name in changed:
             if originals[name] is not None:
-                backup = '.n7-runtime-backup-' + tag + '-' + name
+                backup = '.n7-runtime-backup-' + tag + '-' + name.replace('/', '__')
                 ftp.rename(ROOT + '/' + name, ROOT + '/' + backup)
                 backups[name] = backup
                 if read(ftp, backup) != originals[name]:
@@ -205,6 +240,11 @@ def install(ftp, payload, originals, verifier):
                     raise RuntimeError('rollback_hash_mismatch')
             except Exception:
                 failures.append(name)
+        for directory in reversed(created_dirs):
+            try:
+                ftp.rmd(directory)
+            except ftplib.all_errors:
+                failures.append(directory)
         if installed:
             restart(ftp)
         if failures:
@@ -285,6 +325,28 @@ def connect():
     return ftp
 
 
+def public_preview(ftp, release, payload, destination):
+    target = Path(destination).resolve()
+    target.mkdir(parents=True, exist_ok=True)
+    for name, expected in release['files'].items():
+        if not name.startswith('public/'):
+            continue
+        relative = PurePosixPath(name[len('public/'):])
+        if relative.is_absolute() or any(p in ('.', '..') for p in relative.parts):
+            raise RuntimeError('N7_PREVIEW_PATH_INVALID')
+        data = payload.get(name)
+        if data is None:
+            data = read(ftp, name)
+        if sha(data) != expected:
+            raise RuntimeError('N7_PUBLIC_PREVIEW_HASH_MISMATCH')
+        local = target / str(relative)
+        if local.is_symlink() or any(p.is_symlink() for p in local.parents):
+            raise RuntimeError('N7_PREVIEW_SYMLINK')
+        local.parent.mkdir(parents=True, exist_ok=True)
+        local.write_bytes(data)
+    print('N7_PUBLIC_PREVIEW_VERIFIED source_hashes=true private_files_exported=0')
+
+
 def main():
     release = contract()
     commit = os.environ['N7_CANONICAL_COMMIT']
@@ -294,6 +356,11 @@ def main():
         payload, originals = plan(ftp, release, commit)
         verify(release, commit, active=False)
         print('N7_CANONICAL_PREFLIGHT_OK dry_run=' + str(dry) + ' runtime_files=' + str(len(release['files'])))
+        preview = os.getenv('N7_PREVIEW_PUBLIC_DIR')
+        if preview:
+            if not dry:
+                raise RuntimeError('N7_PUBLIC_PREVIEW_REQUIRES_DRY_RUN')
+            public_preview(ftp, release, payload, preview)
         if not dry:
             install(ftp, payload, originals, lambda: verify(release, commit, ftp=ftp))
     finally:

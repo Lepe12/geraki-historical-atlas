@@ -2,7 +2,8 @@
 // N7_STREAM_ATTACHMENTS_V1 - genuine Groq SSE token streaming, private bounded attachments.
 const {createLibrary,RPC_ID}=require('./source-library'); // N7_PERSISTENT_LIBRARY_V1
 const documentReader=require('./document-reader'); // N7_PDF_ATTACHMENTS_V1
-const {appendExchange}=require('./conversation-store');
+const {appendExchange,beginExchange}=require('./conversation-store');
+const {createWorkflows}=require('./workspace-workflows');
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),zlib=require('node:zlib');
 const MAX_BODY=9*1024*1024,MAX_FILE=5*1024*1024,MAX_TOTAL=6*1024*1024;
 const FILES=4,MAX_TEXT=26000;
@@ -184,7 +185,7 @@ async function readGroqStream(response,onDelta){
  return {text,reason};
 }
 function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publicSearch,fetcher=fetch,
-  researchDeadlineMs=8500,articleDeadlineMs=8500,modelDeadlineMs=25000}){
+  researchDeadlineMs=8500,articleDeadlineMs=8500,modelDeadlineMs=25000,archiveSearch=null}){
  const library=createLibrary(DATA_DIR,{ocr:async images=>{
   if(!API_KEY||!MODEL)throw Error('vision_model_unavailable');
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),55000);
@@ -198,9 +199,11 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
    return JSON.parse(content.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'')).pages;
   }finally{clearTimeout(timer);}
  }});
+ async function infer(messages,signal){const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),30000);const abort=()=>controller.abort();signal?.addEventListener('abort',abort,{once:true});if(signal?.aborted)abort();try{const response=await fetcher(BASE.replace(/\/$/,'')+'/chat/completions',{method:'POST',signal:controller.signal,headers:{Authorization:'Bearer '+API_KEY,'Content-Type':'application/json'},body:JSON.stringify({model:MODEL,messages,temperature:0.1,stream:false,max_completion_tokens:3500})});if(!response.ok)throw Error('model_http_'+response.status);const body=await response.json();if(body.choices?.[0]?.finish_reason==='length')throw Error('model_output_incomplete');return body.choices?.[0]?.message?.content||'';}finally{clearTimeout(timer);signal?.removeEventListener('abort',abort);}}
+ const workflows=createWorkflows({dataDir:DATA_DIR,load,save,library,infer});
  return async function handle(req,res,id){
   // This sentinel route inherits the existing stream endpoint's authentication/origin guard.
-  if(id===RPC_ID){try{const data=await library.rpc(await readJson(req));res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(data));}catch(e){writeError(res,400,String(e.message).slice(0,180));}return;}
+  if(id===RPC_ID){try{const input=await readJson(req);let data;if(input.op==='search_all'){const hits=await library.search(String(input.query||'').slice(0,2000));let archive=[];let warning='';if(archiveSearch)try{archive=await archiveSearch(String(input.query||'').slice(0,2000));}catch{warning='Η ιστορική βιβλιοθήκη δεν αποκρίθηκε.';}data={hits:[...hits.map(h=>({...h,origin:'Τα αρχεία μου'})),...archive],warning};}else data=/^(?:project_|book_|ocr_stage$)/u.test(input.op||'')?await workflows.rpc(input):await library.rpc(input);res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(data));}catch(e){writeError(res,400,String(e.message).slice(0,180));}return;}
 
   if(!API_KEY||!MODEL)return writeError(res,503,'Το μοντέλο δεν είναι συνδεδεμένο');
   let all,item,input,attachments;
@@ -220,10 +223,12 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
   try{metadata=privateStore(DATA_DIR,id,attachments);}catch(e){return writeError(res,400,e.message);}
   const userMessage={role:'user',content,attachments:metadata},exchangeId=crypto.randomUUID();
   const history=[...item.messages,userMessage];
+  try{beginExchange({dataDir:DATA_DIR,load,save},id,userMessage,exchangeId);}catch(e){return writeError(res,409,e.message);}
   // N7_STALL_RECOVERY_V1: bound research/prompt size and model call duration.
   // Never allow slow public sites or large bibliographies to starve the reply.
   // N7_RESEARCH_PROGRESS_STREAM_V1: acknowledge before slow web fetching.
-  let started=false,final='',done=false;
+  let started=false,final='',done=false,cancelled=false,activeController;
+  const disconnected=()=>{if(!res.writableEnded){cancelled=true;activeController?.abort();}};res.on?.('close',disconnected);
   const emit=(type,value)=>{
    if(res.destroyed||res.writableEnded)return;
    if(!started){
@@ -235,14 +240,30 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
    res.write(JSON.stringify({type,...value})+'\n');
   };
   emit('status',{stage:'research',message:'Ελέγχω πηγές και προετοιμάζω την ιστορική έρευνα…'});
-  let evidence=null,messages,libraryHits=[];
+  let evidence=null,messages,libraryHits=[],archiveWarning='';
   try{
+   const priorLibraryUser=history.filter(m=>m.role==='user').at(-2)?.content||'';
+   const libraryQuery=content.length<200&&/σελ(?:ίδα|ίδες|\.)|\bpage\b|συνέχισε/iu.test(content)?String(priorLibraryUser).slice(-800)+' '+content:content;
+   libraryHits=await library.search(libraryQuery,{limit:4});
+   const queryInstruction=content.split('Συνημμένο κείμενο:')[0];
+   const wantsExternal=/(?:ψάξε|αναζήτησε|έλεγξε|search|look up).{0,40}(?:διαδίκτυο|ίντερνετ|internet|\bweb\b|online)/iu.test(queryInstruction)&&!/(?:μην|χωρίς|όχι)\s+(?:ψάξεις|αναζητήσεις|χρησιμοποιήσεις|διαδίκτυο|internet|web)/iu.test(content);
+   // Private query expansion stays with the configured inference provider; no public search.
+   if(!libraryHits.length&&library.all().length&&/βιβλιοθ|βιβλιοθή|συνημ|έγγραφ|κειμεν|κείμεν/iu.test(content)){
+    try{const expanded=JSON.parse((await infer([{role:'system',content:'Return ONLY JSON {"terms":["up to four alternative search phrases"]}. Translate/expand the user query for historical private-library retrieval. No factual answer, no invented people, max four short phrases.'},{role:'user',content:queryInstruction.slice(0,1000)}])).replace(/^```(?:json)?\s*|\s*```$/g,''));
+     for(const term of Array.isArray(expanded.terms)?expanded.terms.slice(0,4):[])if(typeof term==='string'&&term.length<=150)for(const hit of await library.search(term,{limit:2}))if(!libraryHits.some(h=>h.id===hit.id&&h.page===hit.page))libraryHits.push(hit);
+     libraryHits=libraryHits.slice(0,4).map((h,i)=>({...h,ref:'L'+(i+1)}));
+    }catch{}
+   }
+   if(archiveSearch&&(/ιστορ|πηγ|βιβλιοθ|βιβλιοθή|κουρσ|πειρατ/iu.test(content)||libraryHits.length)){
+    try{const extra=await archiveSearch(queryInstruction);for(const h of extra.slice(0,3))libraryHits.push({...h,ref:'L'+(libraryHits.length+1)});}catch{archiveWarning='Η ιστορική βιβλιοθήκη δεν ήταν διαθέσιμη· η κάλυψη πηγών είναι μερική.';emit('status',{stage:'archive_unavailable',message:archiveWarning});}
+   }
+   const privateScope=!!item.projectId||attachments.length>0||history.slice(-24).some(m=>m.attachments?.length)||libraryHits.length>0||/βιβλιοθήκ|βιβλιοθηκ|συνημμέν|συνημμεν/iu.test(content);
    // Cap research phase even if a provider hangs, while preserving available sources.
    const researchTimeout=Symbol('research-timeout');
    let researchTimer;
    try{
     evidence=await Promise.race([
-      publicSearch.researchMessages(history),
+      privateScope&&!wantsExternal?Promise.resolve({searched:false,items:[],reason:'private_library_scope'}):publicSearch.researchMessages([{role:'user',content:queryInstruction.replace(/Συνημμένο κείμενο:[\s\S]*/u,'').slice(0,1500)}]),
       new Promise(resolve=>{researchTimer=setTimeout(()=>resolve(researchTimeout),researchDeadlineMs);})
     ]);
    }finally{clearTimeout(researchTimer);}
@@ -281,20 +302,18 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
      }
      console.log('N7_VISION_GROUNDING attachments='+n7ImageCount+' forwarded='+sent);
    }
-   const priorUser=history.filter(m=>m.role==='user').at(-2)?.content||'';
-   const libraryQuery=content.length<200&&/σελ(?:ίδα|ίδες|\.)|\bpage\b|συνέχισε/iu.test(content)?String(priorUser).slice(-800)+' '+content:content;
-   libraryHits=await library.search(libraryQuery,{limit:4});
    await library.rememberWeb(evidence);
    const libraryContext=library.evidenceContext(libraryHits,content);
-   const rawContext=libraryContext+'\n\n'+publicSearch.contextForResearch(evidence);
+   const projectContext=workflows.context(item.projectId);
+   const rawContext=archiveWarning+'\n'+projectContext+libraryContext+'\n\n'+publicSearch.contextForResearch(evidence);
    // 13k characters max evidence budget: prevent context overflow and provider stalls.
    const context=rawContext.length>13000
      ?rawContext.slice(0,13000)+'\n[Η υπόλοιπη έρευνα παραλείφθηκε λόγω ορίου μήκους.]'
      :rawContext;
    if(context&&messages[0]?.role==='system')messages[0].content+='\n\n'+context;
-  }catch(e){emit('error',{error:'Η προετοιμασία της έρευνας απέτυχε: '+String(e.message||e).slice(0,160)});if(!res.writableEnded)res.end();return;}
+  }catch(e){emit('error',{error:'Η προετοιμασία της έρευνας απέτυχε: '+String(e.message||e).slice(0,160)});res.off?.('close',disconnected);if(!res.writableEnded)res.end();return;}
   const url=BASE.replace(/\/$/,'')+'/chat/completions';
-  if(!/^https:\/\//.test(url)){emit('error',{error:'Μη έγκυρη διεύθυνση μοντέλου'});res.end();return;}
+  if(!/^https:\/\//.test(url)&&!/^http:\/\/(?:127\.0\.0\.1|localhost):\d+\//.test(url)){emit('error',{error:'Μη έγκυρη διεύθυνση μοντέλου'});res.end();return;}
 
   emit('status',{stage:'model',message:'Οι πηγές ελέγχθηκαν. Το N7 συντάσσει την απάντηση…'});
   try{
@@ -317,7 +336,8 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
        'Ολοκλήρωσε σε έως 700 λέξεις και συμπερίλαβε οποιαδήποτε ελλείπουσα βιβλιογραφία, '+
        'χρονολογική διασταύρωση και πηγές.'}
     ]:[...messages,answerGuide];
-    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),modelDeadlineMs);
+    if(cancelled)throw Error('Η απάντηση διακόπηκε από τον χρήστη');
+    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),modelDeadlineMs);activeController=controller;
     const request={model:MODEL,messages:ask,temperature:0.25,stream:true,
       max_completion_tokens:2400};
     if(BASE==='https://api.groq.com/openai/v1'&&MODEL==='qwen/qwen3.8-27b'){
@@ -332,7 +352,7 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
       completion=await readGroqStream(response,part=>{final+=part;emit('delta',{text:part})});
     }catch(err){
       if(!final)throw err;
-      continuationFailure=err.name==='AbortError'?'το χρονικό όριο':'πρόβλημα σύνδεσης με το μοντέλο';
+      continuationFailure=cancelled?'διακοπή από τον χρήστη':err.name==='AbortError'?'το χρονικό όριο':'πρόβλημα σύνδεσης με το μοντέλο';
       emit('status',{stage:'partial',message:'Η συνέχεια διακόπηκε· διατηρώ την ήδη παραχθείσα απάντηση.'});
       break;
     }finally{clearTimeout(timeout);}
@@ -360,12 +380,12 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
    const current=appendExchange({dataDir:DATA_DIR,load,save,id,user:userMessage,exchangeId,assistant:{content:final,evidenceAudit:{library:libraryHits.map(p=>({ref:p.ref,id:p.id,page:p.page,textHash:p.textHash,sourceHash:p.sourceHash})),...provenance}}});
    emit('done',{conversation:{id:current.id,title:current.title}});
   }catch(e){
-   if(final){
+   if(final||cancelled){
     // Do not lose a response after it started streaming.
-    try{appendExchange({dataDir:DATA_DIR,load,save,id,user:userMessage,exchangeId,assistant:{content:final+'\n\n[Μη ολοκληρωμένη απάντηση]'}});}catch{}
+    try{appendExchange({dataDir:DATA_DIR,load,save,id,user:userMessage,exchangeId,assistant:{content:(final||'Η απάντηση διακόπηκε από τον χρήστη.')+'\n\n[Μη ολοκληρωμένη απάντηση]'}});}catch{}
    }
    emit('error',{error:'Η απάντηση διακόπηκε: '+String(e.message||e).slice(0,150)});
-  }finally{if(started&&!res.writableEnded)res.end();}
+  }finally{res.off?.('close',disconnected);if(started&&!res.writableEnded)res.end();}
  };
 }
 function writeError(res,status,message){
