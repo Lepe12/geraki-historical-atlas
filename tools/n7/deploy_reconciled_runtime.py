@@ -78,6 +78,10 @@ def transform_server(original):
             if source.count(old) != 1:
                 raise RuntimeError('N7_RELEASE_SOURCE_ANCHOR_CHANGED')
             source = source.replace(old, new, 1)
+    # Upgrade the exact previously reviewed project-guide wiring before applying current patches.
+    legacy_guide = "      const projectGuide=require('./workspace-workflows').projectContext(DATA_DIR,item.projectId);\n      const history = [\n        ...(projectGuide?[{role:'system',content:projectGuide}]:[]),\n        ...item.messages,"
+    if source.count(legacy_guide) == 1:
+        source = source.replace(legacy_guide, '      const history = [\n        ...item.messages,', 1)
     for file in ('chat-storage-patch.json', 'runtime-workflow-patch.json'):
         for patch in json.loads((HERE / file).read_text()):
             if source.count(patch['old']) == 1:
@@ -89,10 +93,18 @@ def transform_server(original):
 
 def transform_app(original):
     source = original.decode('utf8')
+    marker = '// N7_PROJECT_BOOK_WORKFLOWS_V1'
+    if source.count(marker) > 1:
+        raise RuntimeError('N7_PUBLIC_APP_WORKSPACE_MARKER_AMBIGUOUS')
+    # plan() already restricts input to the exact reviewed previous/current hash.
+    # Upgrade the existing workspace suffix, preserving all preceding app code.
+    if marker in source:
+        source = source[:source.index(marker)]
     for patch in json.loads((HERE / 'ui-workflow-patch.json').read_text()):
-        if source.count(patch['old']) != 1:
+        if source.count(patch['old']) == 1:
+            source = source.replace(patch['old'], patch['new'], 1)
+        elif source.count(patch['new']) != 1:
             raise RuntimeError('N7_PUBLIC_APP_ANCHOR_CHANGED')
-        source = source.replace(patch['old'], patch['new'], 1)
     return (source + (HERE / 'workspace-ui.js').read_text()).encode()
 
 

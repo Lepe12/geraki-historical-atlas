@@ -13,10 +13,14 @@
   },
   {
     "old": " load,save,publicSearch:n7PublicSearch\n",
-    "new": " load,save,publicSearch:n7PublicSearch,\n archiveSearch:async query=>{const key=fs.readFileSync(path.join(__dirname,'.n7-library-bridge-key'));const report=await historicalResearch.research(query,{key,external:false});if(report.warnings.length&&!report.evidence.length)throw Error('archive_unavailable');return report.evidence.map(h=>({id:'archive:'+h.source_id,title:h.title,author:h.author||'',year:h.publication_year||'',kind:'archive',origin:'\u0399\u03c3\u03c4\u03bf\u03c1\u03b9\u03ba\u03ae \u03b2\u03b9\u03b2\u03bb\u03b9\u03bf\u03b8\u03ae\u03ba\u03b7',url:h.source_uri||'',page:h.scan_index,printedPage:h.printed_page||null,text:h.excerpt,textHash:crypto.createHash('sha256').update(h.excerpt||'').digest('hex'),pageHash:h.text_sha256||'',sourceHash:'',method:h.ocr_status||'archive_excerpt',reviewed:false,score:h.relevance_score||1}));}\n"
+    "new": " load,save,publicSearch:n7PublicSearch,\n archiveSearch:async query=>{const key=fs.readFileSync(path.join(__dirname,'.n7-library-bridge-key'));const report=await historicalResearch.research(query,{key,external:false});if(report.warnings.length&&!report.evidence.length)throw Error('archive_unavailable');return report.evidence.map(h=>({id:'archive:'+h.source_id,title:h.title,author:h.author||'',year:h.publication_year||'',kind:'archive',origin:'Ιστορική βιβλιοθήκη',url:h.source_uri||'',page:h.scan_index,printedPage:h.printed_page||null,text:h.excerpt,textHash:crypto.createHash('sha256').update(h.excerpt||'').digest('hex'),pageHash:h.text_sha256||'',sourceHash:'',method:h.ocr_status||'archive_excerpt',reviewed:false,score:h.relevance_score||1}));}\n"
   },
   {
     "old": "      const history = [\n        ...item.messages,",
-    "new": "      const projectGuide=require('./workspace-workflows').projectContext(DATA_DIR,item.projectId);\n      const history = [\n        ...(projectGuide?[{role:'system',content:projectGuide}]:[]),\n        ...item.messages,"
+    "new": "      const history = [\n        ...item.messages,\n        {role:'system',content:require('./workspace-workflows').projectContext(DATA_DIR,item.projectId,content)+require('./workspace-workflows').recallContext(item.messages,content)},"
+  },
+  {
+    "old": "    ...history.slice(-MAX_HISTORY).map(message => ({",
+    "new": "    ...history.filter(message=>message.role==='system'&&/^(?:\\nOWNER-APPROVED PROJECT: |\\nEARLIER USER MESSAGES)/.test(message.content||'')).slice(-1),\n    ...history.filter(message=>message.role!=='system').slice(-MAX_HISTORY).map(message => ({"
   }
 ]
