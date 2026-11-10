@@ -75,15 +75,21 @@ function ParticleReference({
     let completed=false;
     let currentProgress=assembly&&!reduced ? 0 : 1;
 
-    const handlePointerMove=(e:PointerEvent)=>{
+    const handlePointerMove=(e:PointerEvent|MouseEvent)=>{
       if(assembly || !headTurnRef) return;
       const rect=host.getBoundingClientRect();
       if(rect.width<=0) return;
       const nx=(e.clientX-(rect.left+rect.width/2))/(rect.width*.42);
-      headTurnRef.current=Math.max(-1,Math.min(1,nx));
+      const target=Math.max(-1,Math.min(1,nx));
+      headTurnRef.current=target;
+      host.dataset.headTarget=target.toFixed(3);
     };
-    const handlePointerReset=()=>{ if(headTurnRef) headTurnRef.current=0; };
+    const handlePointerReset=()=>{
+      if(headTurnRef) headTurnRef.current=0;
+      host.dataset.headTarget="0.000";
+    };
     window.addEventListener("pointermove",handlePointerMove,{passive:true});
+    window.addEventListener("mousemove",handlePointerMove,{passive:true});
     window.addEventListener("blur",handlePointerReset);
     document.addEventListener("mouseleave",handlePointerReset);
 
@@ -383,6 +389,7 @@ function ParticleReference({
       disposed=true;
       cancelAnimationFrame(raf);
       window.removeEventListener("pointermove",handlePointerMove);
+      window.removeEventListener("mousemove",handlePointerMove);
       window.removeEventListener("blur",handlePointerReset);
       document.removeEventListener("mouseleave",handlePointerReset);
       if(headTurnRef) headTurnRef.current=0;
