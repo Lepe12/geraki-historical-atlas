@@ -21,7 +21,7 @@ export default function N7ApexStage() {
           borderRadius:7,color:"#cdf9ff",background:"#112d39",cursor:"pointer",fontWeight:700,letterSpacing:1.5,
           boxShadow:"0 0 20px #00dafa38"}}>HUMANOID</button>
       <N7Workspace onActivity={setN7Activity} onTrace={setN7Trace} />
-      <N7HumanoidView open={humanoidOpen} onClose={()=>setHumanoidOpen(false)} />
+      <N7HumanoidView open={humanoidOpen} onClose={()=>setHumanoidOpen(false)} activity={n7Activity==="thinking"?"thinking":null} />
     </>
   );
 }

@@ -4,6 +4,8 @@ import * as THREE from "three";
 import { N7_HUMANOID_REFERENCE } from "./N7HumanoidReference";
 
 type ViewMode = "assembly" | "particle" | "original" | "compare";
+type Mood = "idle" | "listening" | "thinking" | "speaking";
+type N7Activity = "thinking" | "speaking" | null;
 type Stats = { particles:number; sampleW:number; sampleH:number; renderMs:number; assembly:number };
 
 const VERT = `
@@ -312,6 +314,174 @@ function ParticleReference({
   />;
 }
 
+
+function MoodCanvas({mood}:{mood:Mood}) {
+  const hostRef=useRef<HTMLDivElement>(null);
+  const targetMoodRef=useRef<Mood>(mood);
+  const previousMoodRef=useRef<Mood>(mood);
+  const transitionStartRef=useRef(0);
+
+  useEffect(()=>{
+    previousMoodRef.current=targetMoodRef.current;
+    targetMoodRef.current=mood;
+    transitionStartRef.current=performance.now();
+  },[mood]);
+
+  useEffect(()=>{
+    if(!hostRef.current) return;
+    const host=hostRef.current;
+    let disposed=false;
+    let raf=0;
+    let ro:ResizeObserver|null=null;
+
+    const canvas=document.createElement("canvas");
+    canvas.width=320;
+    canvas.height=480;
+    canvas.style.width="100%";
+    canvas.style.height="100%";
+    canvas.style.display="block";
+    const ctx=canvas.getContext("2d",{alpha:true});
+    if(!ctx) return;
+    host.replaceChildren(canvas);
+
+    const image=new Image();
+    image.decoding="async";
+    image.src=N7_HUMANOID_REFERENCE;
+
+    image.onload=()=>{
+      if(disposed) return;
+      const sample=document.createElement("canvas");
+      sample.width=320; sample.height=480;
+      const sctx=sample.getContext("2d",{willReadFrequently:true});
+      if(!sctx) return;
+      sctx.drawImage(image,0,0,320,480);
+      const px=sctx.getImageData(0,0,320,480).data;
+
+      type P={x:number;y:number;r:number;g:number;b:number};
+      const points:P[]=[];
+      for(let y=0;y<480;y+=2){
+        for(let x=0;x<320;x+=2){
+          const i=(y*320+x)*4;
+          const r=px[i],g=px[i+1],b=px[i+2],a=px[i+3];
+          const lum=.2126*r+.7152*g+.0722*b;
+          const chroma=Math.max(r,g,b)-Math.min(r,g,b);
+          if(a<8 || (lum<7 && chroma<7)) continue;
+          points.push({x:x+.5,y:y+.5,r,g,b});
+        }
+      }
+
+      const colorFor=(p:P,state:Mood,now:number)=>{
+        let r=p.r,g=p.g,b=p.b;
+        const dx=p.x-160, dy=p.y-150;
+        const dFace=Math.hypot(dx,dy);
+        const head=p.y<215;
+        const face=dFace<88;
+        const cyan=b>r*1.15 && g>r*1.05;
+        const amber=r>g*1.15 && g>b*1.2;
+
+        if(state==="listening"){
+          if(cyan){ g=Math.min(255,g*1.18+16); b=Math.min(255,b*1.25+24); r=Math.min(255,r*.92); }
+          if(amber){ r*=.86; g*=.88; b*=.92; }
+        }else if(state==="thinking"){
+          if(head){
+            const k=Math.max(0,1-dFace/145);
+            r=Math.min(255,r + 120*k);
+            g=Math.min(255,g + 58*k);
+            b=Math.max(0,b - 42*k);
+          }else{
+            r*=.82; g*=.88; b*=.92;
+          }
+        }else if(state==="speaking"){
+          const pulse=.68+.32*Math.sin(now/115);
+          if(face){
+            const k=Math.max(0,1-dFace/92)*pulse;
+            r=Math.min(255,r + 135*k);
+            g=Math.min(255,g + 70*k);
+            b=Math.max(0,b - 35*k);
+          }
+          if(cyan){ g=Math.min(255,g*1.08); b=Math.min(255,b*1.12); }
+        }
+        return [Math.round(r),Math.round(g),Math.round(b)] as const;
+      };
+
+      const draw=(now:number)=>{
+        if(disposed) return;
+        ctx.clearRect(0,0,320,480);
+
+        const prev=previousMoodRef.current;
+        const target=targetMoodRef.current;
+        const elapsed=Math.max(0,now-transitionStartRef.current);
+        const t=clamp01(elapsed/1000);
+        const radius=t*390;
+        const soft=28;
+
+        // Idle with no transition stays transparent so the proven Stage-1
+        // particle renderer remains the exact resting image.
+        const settledIdle=target==="idle" && t>=1;
+        if(!settledIdle){
+          for(const p of points){
+            const d=Math.hypot(p.x-160,p.y-150);
+            let mix=0;
+            if(t>=1) mix=1;
+            else mix=clamp01((radius-d+soft)/(soft*2));
+            mix=smooth01(mix);
+
+            const a=colorFor(p,prev,now);
+            const b=colorFor(p,target,now);
+            let rr=a[0]+(b[0]-a[0])*mix;
+            let gg=a[1]+(b[1]-a[1])*mix;
+            let bb=a[2]+(b[2]-a[2])*mix;
+
+            const rim=Math.max(0,1-Math.abs(d-radius)/16)*(t<1?1:0);
+            rr=Math.min(255,rr+35*rim);
+            gg=Math.min(255,gg+80*rim);
+            bb=Math.min(255,bb+115*rim);
+
+            ctx.fillStyle="rgb("+Math.round(rr)+","+Math.round(gg)+","+Math.round(bb)+")";
+            ctx.globalAlpha=.94;
+            ctx.fillRect(p.x-.7,p.y-.7,1.4,1.4);
+          }
+
+          // Listening adds quiet outward cyan rings around the head.
+          if(target==="listening" && t>.2){
+            ctx.globalAlpha=.34;
+            ctx.strokeStyle="rgb(90,230,255)";
+            ctx.lineWidth=1.2;
+            const phase=(now/900)%1;
+            for(let i=0;i<3;i++){
+              const q=(phase+i/3)%1;
+              ctx.beginPath();
+              ctx.arc(160,150,72+q*42,0,Math.PI*2);
+              ctx.stroke();
+            }
+          }
+        }
+
+        ctx.globalAlpha=1;
+        raf=requestAnimationFrame(draw);
+      };
+
+      transitionStartRef.current=performance.now();
+      raf=requestAnimationFrame(draw);
+      ro=new ResizeObserver(()=>{});
+      ro.observe(host);
+    };
+
+    return()=>{
+      disposed=true;
+      cancelAnimationFrame(raf);
+      ro?.disconnect();
+      host.replaceChildren();
+    };
+  },[]);
+
+  return <div
+    ref={hostRef}
+    aria-label="N7 mood particle overlay"
+    style={{position:"absolute",inset:0,pointerEvents:"none"}}
+  />;
+}
+
 function AssemblyCanvas({
   replayKey,
   onStats,
@@ -463,18 +633,32 @@ function AssemblyCanvas({
   />;
 }
 
-export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>void}) {
+export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onClose:()=>void;activity?:N7Activity}) {
   const systemReduced=useMemo(()=>typeof window!=="undefined"&&window.matchMedia?.("(prefers-reduced-motion: reduce)").matches,[]);
   const [allowMotion,setAllowMotion]=useState(false);
   const reduced=systemReduced&&!allowMotion;
 
   const [mode,setMode]=useState<ViewMode>("particle");
   const [details,setDetails]=useState(false);
+  const [mood,setMood]=useState<Mood>("idle");
+  const autoThinkingRef=useRef(false);
   const [replayKey,setReplayKey]=useState(0);
   const [assemblyDone,setAssemblyDone]=useState(false);
   const [stats,setStats]=useState<Stats>({particles:0,sampleW:0,sampleH:0,renderMs:0,assembly:100});
 
   const handleAssemblyDone=useCallback(()=>setAssemblyDone(true),[]);
+
+  useEffect(()=>{
+    if(!open) return;
+    if(activity==="thinking"){
+      autoThinkingRef.current=true;
+      setMood("thinking");
+      setMode("particle");
+    }else if(autoThinkingRef.current){
+      autoThinkingRef.current=false;
+      setMood("idle");
+    }
+  },[activity,open]);
 
   if(!open) return null;
 
@@ -494,7 +678,7 @@ export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>
     <header style={{position:"absolute",top:14,left:18,right:18,zIndex:5,display:"flex",justifyContent:"space-between",alignItems:"center",gap:12}}>
       <div>
         <strong style={{letterSpacing:4,color:"#62e8f7"}}>N7 · HUMANOID</strong>
-        <div style={{fontSize:11,opacity:.62}}>Guide Step 4 · source → particle river → left-to-right build → face ignition → exact idle</div>
+        <div style={{fontSize:11,opacity:.62}}>Guide Step 3 + 4 · face-bloom moods + real Thinking state + particle-river Assembly</div>
       </div>
       <button type="button" onClick={onClose} style={{padding:"9px 13px",border:"1px solid #2c6c7e",background:"#091823",color:"#dffbff",borderRadius:7,cursor:"pointer"}}>Exit</button>
     </header>
@@ -515,6 +699,8 @@ export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>
           onStats={setStats}
           onAssemblyDone={handleAssemblyDone}
         />}
+
+        {(mode==="particle"||mode==="compare")&&<MoodCanvas mood={mood} />}
 
         {mode==="assembly"&&<AssemblyCanvas
           replayKey={replayKey}
@@ -550,6 +736,9 @@ export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>
         </div>}
 
         {mode==="compare"&&<div style={{position:"absolute",top:10,left:10,padding:"5px 8px",background:"#03111dcc",border:"1px solid #285d70",borderRadius:5,fontSize:11}}>REFERENCE 38% + PARTICLE RECONSTRUCTION</div>}
+        {(mode==="particle"||mode==="compare")&&<div aria-label="N7 mood status" style={{position:"absolute",top:10,right:10,padding:"5px 8px",background:"#03111dcc",border:"1px solid #285d70",borderRadius:5,fontSize:11}}>
+          MOOD · {mood.toUpperCase()}{mood==="thinking"&&activity==="thinking"?" · LIVE N7 REQUEST":mood==="listening"||mood==="speaking"?" · PREVIEW":""}
+        </div>}
       </div>
     </div>
 
@@ -561,6 +750,12 @@ export default function N7HumanoidView({open,onClose}:{open:boolean;onClose:()=>
       <div style={{display:"flex",flexWrap:"wrap",gap:7,justifyContent:"center",padding:9,background:"#030c13df",border:"1px solid #204f60",borderRadius:10,backdropFilter:"blur(10px)"}}>
         <button type="button" onClick={startAssembly} style={{padding:"8px 11px",border:"1px solid #8b5d20",borderRadius:6,color:"#fff0c4",background:mode==="assembly"?"#6d3e0c":"#171006",cursor:"pointer"}}>{mode==="assembly"?"Replay Assembly":"Assembly"}</button>
         {mode==="assembly"&&!assemblyDone&&<button type="button" onClick={()=>setMode("particle")} style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:"#07131b",cursor:"pointer"}}>Skip</button>}
+        {(["idle","listening","thinking","speaking"] as Mood[]).map(s=><button key={s} type="button"
+          onClick={()=>{autoThinkingRef.current=false;setMood(s);setMode("particle");}}
+          aria-pressed={mood===s}
+          style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:mood===s?"#115068":"#07131b",cursor:"pointer"}}>
+          {s[0].toUpperCase()+s.slice(1)}
+        </button>)}
         <button type="button" onClick={()=>setMode("original")} style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:mode==="original"?"#115068":"#07131b",cursor:"pointer"}}>Original</button>
         <button type="button" onClick={()=>setMode("particle")} style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:mode==="particle"?"#115068":"#07131b",cursor:"pointer"}}>Particles</button>
         <button type="button" onClick={()=>setMode("compare")} style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:mode==="compare"?"#115068":"#07131b",cursor:"pointer"}}>Compare</button>
