@@ -13,6 +13,7 @@ const {replayPdf}=require("./pdf-evidence");
 const {createN7Gateway}=require("./n7-gateway");
 const {createN7Library}=require("./n7-library");
 const {createN7OAuth}=require("./n7-oauth");
+const {createLibraryReader}=require("./library-reader");
 
 const PORT=Number(process.env.PORT||process.env.PCT_COMMAND_CENTER_PORT||8787);
 const PREFIX=(process.env.PCT_COMMAND_CENTER_PREFIX||"/pct-api/live").replace(/\/$/,"");
@@ -381,14 +382,29 @@ async function publishSnapshots(){
 const oauth=createN7OAuth({json});
 const handleN7=createN7Gateway({json,operatorAuthorized,sessionAuthorized:oauth.sessionAuthorized,readBody,statusFor,githubWorkflowDispatch,githubCodingDispatch,githubPrivateDispatch,githubResearchDispatch,githubResearchStatus});
 const handleN7Library=createN7Library({json,readBody,operatorAuthorized,sessionAuthorized:oauth.sessionAuthorized});
+// One NABOU library: published sources + books added as PDF (+ the MariaDB historical library when installed).
+function historicalLibrarySearch(term){
+  const bin=process.env.PCT_PHP_BIN||"/opt/plesk/php/8.4/bin/php";
+  const script=process.env.PCT_N7_LIBRARY_CLI||path.resolve(__dirname,"../../tools/library/n7_library.php");
+  return new Promise((resolve,reject)=>execFile(bin,[script,"search",term],{timeout:8000,maxBuffer:300000,windowsHide:true},(error,stdout)=>{
+    if(error)return reject(error);
+    try{resolve(JSON.parse(stdout).matches||[]);}catch(_){reject(new Error("invalid_library_reply"));}
+  }));
+}
+const historicalLibraryInstalled=fs.existsSync(process.env.PCT_PHP_BIN||"/opt/plesk/php/8.4/bin/php")&&fs.existsSync(process.env.PCT_N7_LIBRARY_CLI||path.resolve(__dirname,"../../tools/library/n7_library.php"));
+const handleLibrary=createLibraryReader({json,readBody,readRawBody,operatorAuthorized,trustedWebOrigin,
+  sessionAuthorized:req=>sessionAuthorized(req)||oauth.sessionAuthorized(req),
+  readKnowledgeIndex,writeKnowledgeIndex,knowledgeRecordPath,atomicJson,uploadDir:KNOWLEDGE_UPLOAD_DIR,
+  replayPdf,fromReviewedKnowledge,syncLearningEvidence,historicalSearch:historicalLibraryInstalled?historicalLibrarySearch:null});
 const server=http.createServer(async(req,res)=>{
   try{
     const u=new URL(req.url,"http://localhost");const p=normalizePath(u.pathname);
     res.nabouCorsOrigin=ALLOWED_BROWSER_ORIGINS.has(String(req.headers.origin||""))?String(req.headers.origin):"https://lepe12.github.io";
-    if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":res.nabouCorsOrigin||"https://lepe12.github.io","access-control-allow-credentials":"true","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type,x-file-name,x-nabou-agent-room"});return res.end();}
+    if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":res.nabouCorsOrigin||"https://lepe12.github.io","access-control-allow-credentials":"true","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type,x-file-name,x-nabou-agent-room,x-book-title,x-book-author,x-book-year"});return res.end();}
     if(await oauth.handle(req,res,p))return;
     if(await handleN7(req,res,p))return;
     if(await handleN7Library(req,res,p,u))return;
+    if(await handleLibrary(req,res,p))return;
     if(req.method==="GET"&&p==="/health"){const b=await refreshBaseline();return json(res,200,{status:"PASS",service:"piratecartography-command-center-live",websocket:true,dispatch_configured:Boolean(GITHUB_DISPATCH_TOKEN),knowledge_memory:true,session_auth:true,revision:"no-session-dispatch-v1",baseline_run_id:b?.run_id||null});}
     if(req.method==="GET"&&p==="/session"){return json(res,200,{authenticated:sessionAuthorized(req)});}
     if(req.method==="POST"&&p==="/session"){

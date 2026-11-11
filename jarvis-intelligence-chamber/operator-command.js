@@ -101,6 +101,9 @@
     setState(input.value ? "Ερώτημα έτοιμο" : "ΕΤΟΙΜΟ");
     input.focus();
   });
+  const deepToggle = document.getElementById("researchDeep");
+  // Library first: the long run (20–90 minutes) starts only when the library is
+  // not enough, or when the owner clearly asks (toggle or words like «ψάξε και στο διαδίκτυο»).
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (button.disabled) return;
@@ -110,6 +113,36 @@
       input.focus();
       return;
     }
+    const library = window.NABOU_LIBRARY_FIRST;
+    if (library) {
+      button.disabled = true;
+      input.disabled = true;
+      setState("Ψάχνω πρώτα στη βιβλιοθήκη σου · λίγα δευτερόλεπτα", "is-pending");
+      let decision = null;
+      try {
+        decision = await library.consult(query, { deep: Boolean(deepToggle?.checked) });
+      } catch (err) {
+        console.error("[NABOU] Library search failed", err);
+      } finally {
+        button.disabled = false;
+        input.disabled = false;
+      }
+      if (!decision || decision.path === "ask") {
+        setState("Δεν ψάχτηκε η βιβλιοθήκη · η μεγάλη έρευνα δεν ξεκίνησε");
+        return;
+      }
+      if (decision.path === "library") {
+        setState("Απάντηση από τη βιβλιοθήκη · η μεγάλη έρευνα δεν ξεκίνησε");
+        return;
+      }
+    }
+    await startLongRun(query);
+  });
+  window.addEventListener("nabou:start-long-research", (e) => {
+    const query = String(e.detail?.query || input.value || "").trim();
+    if (query.length >= 3 && !button.disabled) startLongRun(query);
+  });
+  async function startLongRun(query) {
     button.disabled = true;
     input.disabled = true;
     previousRun = document.body.dataset.currentResearchRun || "";
@@ -150,5 +183,5 @@
       button.disabled = false;
       input.disabled = false;
     }
-  });
+  }
 })();

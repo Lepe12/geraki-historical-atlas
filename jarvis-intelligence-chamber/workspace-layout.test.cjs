@@ -20,9 +20,9 @@ async function navTo(page,view){
   const page=await browser.newPage({viewport:{width,height},reducedMotion:'reduce'});const errors=[];page.on('pageerror',e=>errors.push(e.message));
   const snapshot={schema:'pct-command-center-live-v1',run_id:'100',mission:{target:'Δοκιμή διεπαφής',status:'COMPLETED'},agents:[{id:'greek',status:'COMPLETED'}],claims:[],blockers:[{description:'Δοκιμαστικό εμπόδιο πρόσβασης'}],discoveries:[{title:'Δοκιμαστική ιστορική πηγή',query:'Ανύπαρκτο',lane:'greek',url:'https://example.org/source',topical_match:{category:'TARGET_MATCH'}}],events:[],safety:{automatic_verified:false}};
   let dispatched=false;
-  await page.route('**/*',r=>{if(!r.request().url().startsWith('https://'))return r.continue();const u=r.request().url();if(u.endsWith('/dispatch')){dispatched=true;return r.fulfill({status:503,json:{error:'test_unavailable'}});}if(u.includes('raw.githubusercontent.com'))return r.fulfill({json:snapshot});if(u.includes('/status/'))return r.fulfill({json:{snapshot,events:[]}});return r.abort();});
+  await page.route('**/*',r=>{if(!r.request().url().startsWith('https://'))return r.continue();const u=r.request().url();if(u.endsWith('/library/search'))return r.fulfill({json:{schema:'nabou-library-search-v1',hits:[],stores:{published:'OK',uploaded:'OK',historical:'NOT_CONFIGURED'}}});if(u.endsWith('/dispatch')){dispatched=true;return r.fulfill({status:503,json:{error:'test_unavailable'}});}if(u.includes('raw.githubusercontent.com'))return r.fulfill({json:snapshot});if(u.includes('/status/'))return r.fulfill({json:{snapshot,events:[]}});return r.abort();});
   await page.routeWebSocket(/.*/,()=>{});
-  await page.goto('http://127.0.0.1:'+server.address().port+'/jarvis-intelligence-chamber/?skip=1');
+  await page.goto('http://127.0.0.1:'+server.address().port+'/jarvis-intelligence-chamber/?skip=1&operator=1');
   await page.waitForFunction(()=>document.body.dataset.currentResearchRun==='100').catch(async e=>{console.error('BROWSER DIAGNOSTICS',errors,await page.locator('body').evaluate(e=>({...e.dataset})));throw e;});
   await page.waitForFunction(()=>/^[0-9]+ FPS$/.test(document.querySelector('#fps')?.textContent||''));
   assert.ok(await page.locator('#universe').evaluate(canvas=>canvas.width>100&&canvas.height>100),'The original renderer must own a real canvas');

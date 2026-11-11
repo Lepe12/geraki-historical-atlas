@@ -39,6 +39,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m py_compile tools/library/deploy_n7_mission_gateway.py
+          python3 -m py_compile server/command-center-live/patch_library_reader.py
           node --check server/command-center-live/app.js
           node --check server/command-center-live/n7-gateway.js
           node --test server/command-center-live/n7-gateway.test.js server/command-center-live/n7-mission.test.js
@@ -48,6 +49,9 @@ jobs:
           target=pathlib.Path("tools/library/deploy_n7_mission_gateway.py")
           spec=importlib.util.spec_from_file_location("deploy_n7",target)
           m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+          extra=pathlib.Path("server/command-center-live/patch_library_reader.py")
+          espec=importlib.util.spec_from_file_location("patch_library_reader",extra)
+          em=importlib.util.module_from_spec(espec);espec.loader.exec_module(em)
           files=["app.js","n7-gateway.js"]
           repo=pathlib.Path("server/command-center-live")
           local={name:(repo/name).read_bytes() for name in files}
@@ -56,10 +60,14 @@ jobs:
               base=subprocess.run(["git","show","origin/main:server/command-center-live/"+name],
                                   capture_output=True,check=True).stdout
               before[name]=base
-          output=m.patched(local,before)
+          def apply(local,live):
+              output=dict(m.patched(local,live))
+              output["app.js"]=em.patch_library_reader(output["app.js"],local["app.js"])
+              return output
+          output=apply(local,before)
           m.validate(output)
           assert output==local,"UNEXPECTED_OVERWRITE_OUTSIDE_MISSION_PATCH"
-          assert m.patched(local,output)==local,"PATCH_NOT_IDEMPOTENT"
+          assert apply(local,output)==local,"PATCH_NOT_IDEMPOTENT"
           print("N7_SAFE_GATEWAY_PATCH_MATCHES_REVIEWED_SOURCE")
           PY
 
@@ -85,4 +93,4 @@ jobs:
             tools/library
             server/command-center-live
       - name: Install guarded mission routes on the existing gateway
-        run: python3 tools/library/deploy_n7_mission_gateway.py
+        run: python3 server/command-center-live/patch_library_reader.py
