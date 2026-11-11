@@ -12,7 +12,7 @@ function metrics(png){let n=0,cyan=0,minX=png.width,maxX=-1,sumX=0;for(let y=0;y
   await p.goto(url,{waitUntil:'networkidle'});const h=p.locator(hostSelector);await p.waitForFunction(s=>document.querySelector(s)?.dataset.engine==='three-shared-scene',hostSelector);
   const pose=async(name)=>{const png=await h.evaluate(h=>[...h.querySelectorAll('canvas')].find(c=>c.style.display!=='none').toDataURL());fs.writeFileSync(path.join(out,name+'.png'),Buffer.from(png.split(',')[1],'base64'));return PNG.sync.read(Buffer.from(png.split(',')[1],'base64'));};
   const progress=async n=>p.waitForFunction(({s,n})=>Number(document.querySelector(s)?.dataset.assemblyProgress)>=n,{s:hostSelector,n});
-  const center=async()=>{const r=await h.boundingBox();await p.mouse.move(r.x+r.width/2,r.y+r.height*.3);await p.waitForFunction(s=>{const h=document.querySelector(s);return Number(h.dataset.currentTurn)===0&&Number(h.dataset.headTarget)===0;},hostSelector);await p.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));};
+  const center=async()=>{const r=await h.boundingBox();await p.mouse.move(r.x+r.width/2,r.y+r.height*.5);await p.waitForFunction(s=>{const h=document.querySelector(s);return Number(h.dataset.currentTurn)===0&&Number(h.dataset.headTarget)===0&&Number(h.dataset.currentPitch)===0&&Number(h.dataset.headPitchTarget)===0;},hostSelector);await p.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));};
   assert.equal(await p.getByRole('button',{name:'Technical details',exact:true}).getAttribute('aria-expanded'),'false');
   assert(Number(await h.getAttribute('data-assembly-progress'))<1,'Opening did not build the figure');
   console.log('Automatic assembly started');
