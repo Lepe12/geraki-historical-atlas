@@ -34,57 +34,115 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=GFS+Didot&family=Noto+Serif:wght@400;500;600&display=swap" />
     <link rel="stylesheet" href="./atlas-reading.css?v=20261106-live-map-3" />
   <link rel="stylesheet" href="./atlas-unified.css?v=20261106-home-1" />
-<link rel="stylesheet" href="./professional-atlas.css?v=pro-atlas-voice-2" />
+<link rel="stylesheet" href="./professional-atlas.css?v=n7-layout-1" />
+<link rel="stylesheet" href="./n7-layout.css?v=n7-no-pink-1" />
 </head>
-  <body class="nxs-active nx-mock nx-v2 atlas-ui atlas-reading" data-atlas-page="home">
+  <body class="nxs-active nx-mock nx-v2 atlas-ui atlas-reading n7-layout" data-atlas-page="home">
     <!-- Atlas page roots: only one of home/research is shown. Live map stays in #chartFrame. -->
-    <div id="atlasHome" class="atlas-page atlas-home-exact" data-atlas-state="home">
-      <div class="atlas-home-frame">
-      <img class="atlas-home-poster" src="./assets/atlas-home-hero.jpg" alt="Στα ίχνη της ιστορίας. N7 Ιστορικός Άτλας." width="1672" height="941" />
-      <div class="atlas-brand" aria-label="NABOU Ιστορικός Άτλας">
-        <span class="atlas-n7">N7</span>
-        <span class="atlas-sub">Ιστορικός Άτλας</span>
-      </div>
-      <nav class="atlas-topnav" aria-label="Κύρια πλοήγηση">
-        <button type="button" data-atlas-nav="map" aria-current="page">Χάρτης</button>
-        <button type="button" data-atlas-nav="research">Έρευνα</button>
-        <button type="button" data-atlas-nav="sources">Πηγές</button>
+    <!-- N7 atlas layout: the old poster/welcome card is no longer rendered. atlas-pages.js keeps an empty home root for its page state. -->
+    <div id="atlasHome" data-atlas-state="home" aria-hidden="true"></div>
+
+    <!-- ===== N7 atlas layout (owner mockup, 10 Nov 2026): top bar, left nav, framed map, place card, timeline. Nothing is drawn over the map. ===== -->
+    <div id="n7Shell" class="n7-shell" data-layers="closed" data-card="open" data-nav="open">
+      <header class="n7-top">
+        <button type="button" class="n7-logo" data-n7-nav="home" aria-label="N7 Historical Atlas · Αρχική">
+          <svg class="n7-wings" viewBox="0 0 64 32" aria-hidden="true"><path d="M31 22C24 12 14 7 2 6c6 3 9 6 11 9-4-1-7-1-10 0 6 2 10 4 13 7-3 0-5 1-7 2 8 0 15 0 22-2z"/><path d="M33 22c7-10 17-15 29-16-6 3-9 6-11 9 4-1 7-1 10 0-6 2-10 4-13 7 3 0 5 1 7 2-8 0-15 0-22-2z"/></svg>
+          <span class="n7-logo-mark">N7</span><span class="n7-logo-text">Historical Atlas</span>
+        </button>
+        <nav class="n7-topics" aria-label="Θεματικές ενότητες">
+          <button type="button" data-n7-topic="Πειρατεία στη Μεσόγειο">Πειρατεία</button>
+          <button type="button" data-n7-topic="Κουρσάροι και κούρσος στη Μεσόγειο">Κουρσάροι</button>
+          <button type="button" data-n7-topic="Ναυτικοί πόλεμοι στη Μεσόγειο">Ναυτικοί Πόλεμοι</button>
+          <button type="button" data-n7-topic="Ανατολική Μεσόγειος (16ος–17ος αι.)">Ανατολική Μεσόγειος (16ος–17ος αι.)</button>
+        </nav>
+        <div class="n7-search" role="search">
+          <svg class="n7-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+          <input id="n7Search" type="search" autocomplete="off" spellcheck="false" placeholder="Αναζήτηση σε χάρτη, πηγές, πρόσωπα…" aria-label="Αναζήτηση σε χάρτη, πηγές, πρόσωπα" aria-keyshortcuts="Control+K" aria-controls="n7SearchResults" aria-expanded="false" />
+          <kbd>Ctrl + K</kbd>
+          <div id="n7SearchResults" class="n7-pop" role="listbox" aria-label="Αποτελέσματα αναζήτησης" hidden></div>
+        </div>
+        <div class="n7-top-actions">
+          <button type="button" class="n7-icon-btn" data-n7-nav="activity" aria-label="Πορεία έρευνας" title="Πορεία έρευνας"><svg class="n7-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4z"/><path d="M10 21h4"/></svg></button>
+          <button type="button" class="n7-icon-btn" id="n7SavedBtn" aria-label="Αποθηκευμένοι τόποι" title="Αποθηκευμένοι τόποι" aria-haspopup="true" aria-expanded="false" aria-controls="n7SavedMenu"><svg class="n7-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button>
+          <button type="button" class="n7-icon-btn" data-atlas-nav="agents" aria-label="Ερευνητές" title="Ερευνητές"><svg class="n7-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><circle cx="12" cy="10" r="3.2"/><path d="M6 18.5c1.5-2.6 3.6-3.8 6-3.8s4.5 1.2 6 3.8"/></svg></button>
+          <div id="n7SavedMenu" class="n7-pop n7-saved" hidden></div>
+        </div>
+      </header>
+
+      <nav class="n7-nav" aria-label="Κύρια πλοήγηση">
+        <button type="button" data-n7-nav="home"><svg class="n7-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg><span>Αρχική</span></button>
+        <button type="button" data-atlas-nav="map"><svg class="n7-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5l6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg><span>Χάρτης</span></button>
+        <button type="button" data-n7-nav="layers" aria-controls="n7Layers" aria-expanded="false"><svg class="n7-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 4.5-9 4.5-9-4.5z"/><path d="M3 12l9 4.5 9-4.5"/><path d="M3 16.5l9 4.5 9-4.5"/></svg><span>Επίπεδα</span></button>
+        <button type="button" data-n7-nav="timeline"><svg class="n7-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="1.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4M7.5 13h2M11 13h2M14.5 13h2M7.5 16.5h2M11 16.5h2"/></svg><span>Χρονολόγιο</span></button>
+        <button type="button" data-atlas-nav="sources"><svg class="n7-ico" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5.5" rx="7.5" ry="2.5"/><path d="M4.5 5.5v13c0 1.4 3.4 2.5 7.5 2.5s7.5-1.1 7.5-2.5v-13M4.5 12c0 1.4 3.4 2.5 7.5 2.5s7.5-1.1 7.5-2.5"/></svg><span>Πηγές</span></button>
+        <button type="button" data-atlas-nav="research"><svg class="n7-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C9.5 4.6 6 4.3 2.5 5v13c3.5-.7 7-.4 9.5 1.5 2.5-1.9 6-2.2 9.5-1.5V5C18 4.3 14.5 4.6 12 6.5z"/><path d="M12 6.5v13"/></svg><span>Έρευνα</span></button>
+        <button type="button" data-nx-go="people"><svg class="n7-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="6" r="2.6"/><circle cx="5.5" cy="17" r="2.6"/><circle cx="18.5" cy="17" r="2.6"/><path d="M10.5 8.2L7 14.8M13.5 8.2l3.5 6.6M8.2 17h7.6"/></svg><span>Πρόσωπα</span></button>
+        <button type="button" data-nx-go="history"><svg class="n7-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4"/><path d="M5 4h12l-2.5 4L17 12H5"/></svg><span>Γεγονότα</span></button>
+        <button type="button" data-atlas-nav="tools"><svg class="n7-ico" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5.5" rx="7.5" ry="2.5"/><path d="M4.5 5.5v6c0 1.4 3.4 2.5 7.5 2.5s7.5-1.1 7.5-2.5v-6M4.5 11.5v6c0 1.4 3.4 2.5 7.5 2.5s7.5-1.1 7.5-2.5v-6"/></svg><span>Δεδομένα</span></button>
+        <a class="pro-assistant n7-nav-ai" href="https://bot.piratecartography.com/" target="_blank" rel="noopener noreferrer"><svg class="n7-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l1.8 6.2 6.2 1.8-6.2 1.8L12 18.5l-1.8-6.2-6.2-1.8 6.2-1.8z"/><path d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></svg><span>N7 AI</span></a>
+        <span class="n7-nav-spacer"></span>
+        <button type="button" data-nx-go="settings"><svg class="n7-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg><span>Ρυθμίσεις</span></button>
+        <button type="button" data-n7-nav="help" aria-haspopup="dialog"><svg class="n7-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.8-2.5 2.2-2.5 4"/><circle cx="12" cy="17.3" r=".6"/></svg><span>Βοήθεια</span></button>
+        <button type="button" class="n7-collapse" data-n7-nav="collapse" aria-label="Σύμπτυξη μενού" aria-expanded="true">«</button>
       </nav>
-      <div class="atlas-home-hero">
-        <h1>Στα ίχνη της ιστορίας.</h1>
-        <button type="button" class="atlas-explore" id="atlasExplore">Εξερεύνηση</button>
+
+      <aside id="n7Layers" class="n7-layers" aria-label="Επίπεδα χάρτη" hidden>
+        <div id="n7LayersBody"></div>
+      </aside>
+
+      <main id="n7MapSlot" class="n7-map-slot" aria-label="Χάρτης Μεσογείου"></main>
+
+      <aside id="proPlaceInfo" class="n7-place" aria-label="Επιλεγμένος τόπος"></aside>
+      <button type="button" id="n7CardTab" class="n7-card-tab" aria-controls="proPlaceInfo" aria-expanded="true" aria-label="Απόκρυψη κάρτας τόπου">›</button>
+
+      <div class="n7-bottom">
+      <section class="n7-timeline" id="n7Timeline" aria-label="Χρονολόγιο">
+        <button type="button" class="n7-play" id="n7Play" aria-label="Αναπαραγωγή χρονολογίου" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg></button>
+        <span class="n7-timeline-title">Χρονολόγιο <span class="n7-info" title="Περίοδος αναζήτησης για τις πηγές του επιλεγμένου τόπου · όχι αναπαράσταση πολιτικών συνόρων.">i</span></span>
+        <div class="n7-timeline-track">
+          <div class="n7-timeline-head">
+            <button type="button" id="n7Prev" aria-label="Προηγούμενα 25 έτη">‹</button>
+            <output id="n7TimelineLabel" aria-live="polite">1500 – 1700</output>
+            <button type="button" id="n7Next" aria-label="Επόμενα 25 έτη">›</button>
+          </div>
+          <div class="n7-range" id="n7TimelineRange"><i class="n7-range-fill" aria-hidden="true"></i></div>
+          <ol class="n7-ticks" aria-hidden="true"><li>1500</li><li>1525</li><li>1550</li><li>1575</li><li>1600</li><li>1625</li><li>1650</li><li>1675</li><li>1700</li></ol>
+        </div>
+      </section>
+
+      <section class="n7-modes" aria-label="Προβολή χρονολογίου">
+        <svg class="n7-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="1.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg>
+        <button type="button" aria-pressed="true" data-n7-mode="periods">Περίοδοι</button>
+        <button type="button" aria-pressed="false" data-n7-mode="events" disabled title="Δεν υπάρχουν ακόμη χρονολογημένα γεγονότα στον χάρτη"><svg class="n7-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4"/><path d="M5 4h12l-2.5 4L17 12H5"/></svg>Γεγονότα</button>
+        <button type="button" aria-pressed="false" data-n7-mode="powers" disabled title="Δεν υπάρχουν ακόμη τεκμηριωμένα όρια κυριαρχίας στον χάρτη"><svg class="n7-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16M5 20v-9h14v9M9 20v-5h6v5M4 11l8-7 8 7"/></svg>Κυριαρχίες</button>
+      </section>
+
       </div>
+
+      <div id="n7Assistant" class="n7-assistant">
+        <a class="pro-assistant n7-assistant-chat" href="https://bot.piratecartography.com/" target="_blank" rel="noopener noreferrer" aria-label="N7 AI · Ιστορικός Βοηθός (ανοίγει σε νέα καρτέλα)">
+          <img src="./assets/assistant/source/cartographer-gold.jpg" alt="" width="72" height="72" />
+          <span><strong>N7 AI</strong><small>Ιστορικός Βοηθός</small></span>
+          <i class="n7-online" aria-hidden="true"></i>
+        </a>
+        <button type="button" class="pro-voice" aria-label="Άνοιγμα φωνής N7">Φωνή</button>
       </div>
-      <img class="atlas-ship" src="./assets/nautical/img/ship.png" alt="" width="110" height="110" />
-      <div class="atlas-longitude" aria-hidden="true">
-        <span>10° E</span><span>15° E</span><span>20° E</span><span>25° E</span><span>30° E</span>
-      </div>
-      <svg class="atlas-compass-rose" viewBox="0 0 100 100" aria-hidden="true">
-        <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(244,239,228,.55)" stroke-width="1.2"/>
-        <circle cx="50" cy="50" r="34" fill="none" stroke="rgba(196,165,116,.45)" stroke-width="1"/>
-        <path d="M50 8 L56 50 L50 42 L44 50 Z" fill="#e8d7b0"/>
-        <path d="M50 92 L56 50 L50 58 L44 50 Z" fill="#6a4a2a"/>
-        <path d="M8 50 L50 44 L42 50 L50 56 Z" fill="#c4a574"/>
-        <path d="M92 50 L50 44 L58 50 L50 56 Z" fill="#c4a574"/>
-        <text x="50" y="18" text-anchor="middle" fill="#f4efe4" font-size="8" font-family="Georgia, serif">N</text>
-        <text x="50" y="94" text-anchor="middle" fill="#f4efe4" font-size="8" font-family="Georgia, serif">S</text>
-        <text x="12" y="53" text-anchor="middle" fill="#f4efe4" font-size="8" font-family="Georgia, serif">W</text>
-        <text x="88" y="53" text-anchor="middle" fill="#f4efe4" font-size="8" font-family="Georgia, serif">E</text>
-      </svg>
+
+      <dialog id="n7Help" class="n7-help" aria-labelledby="n7HelpTitle">
+        <h2 id="n7HelpTitle">Βοήθεια</h2>
+        <ul>
+          <li>Σύρετε τον χάρτη για μετακίνηση· ροδέλα ή + / − για μεγέθυνση.</li>
+          <li>Πατήστε έναν τόπο για να δείτε την κάρτα του δεξιά.</li>
+          <li><b>Ctrl + K</b>: αναζήτηση τόπου. Με Enter χωρίς τόπο, το κείμενο ετοιμάζεται ως ερώτημα στην Έρευνα (δεν στέλνεται μόνο του).</li>
+          <li>Το χρονολόγιο περιορίζει τις πηγές της κάρτας στα έτη που επιλέγετε.</li>
+          <li>«Φωνή» ανοίγει τον φωνητικό βοηθό N7.</li>
+        </ul>
+        <form method="dialog"><button type="submit">Κλείσιμο</button></form>
+      </dialog>
     </div>
 
+
     <div id="atlasResearch" class="atlas-page" data-atlas-state="research" hidden>
-      <div class="atlas-brand" aria-label="NABOU Ιστορικός Άτλας">
-        <span class="atlas-n7">N7</span>
-        <span class="atlas-sub">Ιστορικός Άτλας</span>
-      </div>
-      <nav class="atlas-topnav" aria-label="Κύρια πλοήγηση">
-        <button type="button" data-atlas-nav="map">Χάρτης</button>
-        <button type="button" data-atlas-nav="research" aria-current="page">Έρευνα</button>
-        <button type="button" data-atlas-nav="sources">Πηγές</button>
-        <button type="button" data-atlas-nav="agents">Ερευνητές</button>
-        <button type="button" data-atlas-nav="tools">Εργαλεία</button>
-      </nav>
       <aside class="atlas-research-panel" aria-label="Η έρευνά μου">
         <header class="atlas-panel-head">
           <p class="atlas-crumb">NABOU//X › Έρευνα › Η έρευνά μου</p>
@@ -583,7 +641,7 @@
     <script src="./research-narrative-map.js?v=narrative-4" defer></script>
     <script src="./gpu-field.js?v=portolan-1" defer></script>
     <script src="./map-3d.js?v=map3d-11" defer></script>
-    <script src="./nabou-assistant.js?v=n7-voice-2" defer></script>
+    <script src="./nabou-assistant.js?v=n7-layout-1" defer></script>
     <script src="./operator-command.js?v=dispatch-timeout-20261020" defer></script>
     <script type="module" src="./research-ui.js?v=narrative-4"></script>
     <script src="./learning-proposals.js?v=v2-pdf-1" defer></script>
@@ -596,7 +654,8 @@
     <script src="./atlas-pages.js?v=live-map-3" defer></script>
   <script src="./atlas-reading.js?v=20261106-unified-home-1" defer></script>
   <script src="./atlas-unified.js?v=20261106-home-1" defer></script>
-<script src="./professional-atlas.js?v=pro-atlas-voice-2" defer></script>
+<script src="./professional-atlas.js?v=n7-aged-map-1" defer></script>
+<script src="./n7-layout.js?v=n7-aged-map-1" defer></script>
 <script src="./reference-handoff.js" defer></script>
 <script src="../tools/n7/atlas-chat-handoff.js?v=unified-20261110-3"></script>
 <script src="../tools/n7/voice-protocol.js?v=n7-voice-1"></script>

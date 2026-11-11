@@ -3,20 +3,10 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict'),http
 const NAVMAP={universe:'map',findings:'research',agents:'agents'};
 // Το παλιό dock αντικαταστάθηκε από τη ράγα v2 (κινητό: κάτω μπάρα). Ίδιοι προορισμοί: χάρτης=universe, έρευνα=findings, ερευνητές=agents, εργαλεία→PDF=pdf.
 async function navTo(page,view){
-  async function openResearch(){
-    if(await page.locator('#atlasHome:not([hidden])').count()){
-      await page.locator('#atlasExplore').click();
-      await page.waitForFunction(()=>document.body.dataset.atlasPage==='research');
-    }
-  }
-  if(view==='universe'){
-    await page.locator('#atlasHome:not([hidden]) .atlas-topnav [data-atlas-nav="map"], #atlasResearch:not([hidden]) .atlas-topnav [data-atlas-nav="map"]').first().click();
-    await page.waitForFunction(()=>document.body.dataset.readerView==='map');
-    return;
-  }
-  await openResearch();
-  const key=view==='pdf'?'tools':(NAVMAP[view]||view);
-  await page.locator('#atlasResearch:not([hidden]) .atlas-topnav [data-atlas-nav="'+key+'"]').click();
+  // N7 layout: one navigation for every view (left column; Ερευνητές is the user icon in the top bar).
+  const key=view==='universe'?'map':view==='pdf'?'tools':(NAVMAP[view]||view);
+  await page.locator('#n7Shell [data-atlas-nav="'+key+'"]').click();
+  if(view==='universe')await page.waitForFunction(()=>document.body.dataset.readerView==='map');
 }
 (async()=>{const root=path.resolve(__dirname,'..');const server=http.createServer((req,res)=>{let file=path.join(root,new URL(req.url,'http://local').pathname);if(file.endsWith('/'))file+='index.html';try{res.setHeader('content-type',file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':file.endsWith('.json')?'application/json':'text/html');res.end(fs.readFileSync(file));}catch{res.writeHead(404);res.end();}});await new Promise(r=>server.listen(0,'127.0.0.1',r));let browser;try{
  browser=await chromium.launch({executablePath:process.env.JARVIS_BROWSER_EXECUTABLE||undefined,headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--enable-unsafe-swiftshader','--use-angle=swiftshader']});
@@ -29,7 +19,7 @@ async function navTo(page,view){
  const emit=s=>socket.send(JSON.stringify({schema:'pct-command-center-bootstrap-v1',snapshot:s,events:[]}));
  emit({...old,run_id:'300',request_id:'someone-else',mission:{target:'Ξένο αίτημα',status:'COMPLETED'}});await page.waitForTimeout(150);assert.ok(!(await page.locator('#researchOverview').textContent()).includes('Ξένο αίτημα'));
  current={...old,run_id:'200',request_id:'own-request',mission:{target:'Νέα έρευνα στη Μήλο',status:'RUNNING'},claims:[],agents:[{id:'greek',status:'RUNNING'}]};emit(current);await page.waitForFunction(()=>document.body.dataset.currentResearchRun==='200');assert.match(await page.locator('#researchOverview').textContent(),/σε εξέλιξη/);assert.match(await page.locator('#researchProgress').textContent(),/1 σε εξέλιξη/);assert.equal(await page.locator('#researchProgress').isVisible(),false);
- current={...current,mission:{...current.mission,status:'COMPLETED'},agents:[{id:'greek',status:'COMPLETED'}],discoveries:[{title:'Πηγή για τη Μήλο',lane:'greek',topical_match:{category:'TARGET_MATCH'},url:'https://example.org/source',repository:'Δοκιμαστικό αρχείο',printed_page:42,context_excerpt:'Απόσπασμα από την πηγή για τη Μήλο.'}]};emit(current);await page.waitForFunction(()=>document.querySelector('#researchOverview').textContent.includes('Υπάρχουν καταγεγραμμένες'));assert.match(await page.locator('#resultsList').textContent(),/Πηγή για τη Μήλο/);assert.ok(!(await page.locator('#resultsList').textContent()).includes('Παλιός ισχυρισμός'));assert.match(await page.locator('#researchProgress').textContent(),/1 \/ 1/);assert.equal(await page.locator('#researchProgress').isVisible(),false);await page.locator('#atlasResearch [data-atlas-nav="sources"]').click();await page.waitForFunction(()=>document.querySelector('#readerSources').textContent.includes('Πηγή για τη Μήλο'));assert.match(await page.locator('#readerSources').innerText(),/Έντυπη σελίδα 42/);assert.match(await page.locator('#readerSources').innerText(),/Απόσπασμα από την πηγή/);await navTo(page,'findings');
+ current={...current,mission:{...current.mission,status:'COMPLETED'},agents:[{id:'greek',status:'COMPLETED'}],discoveries:[{title:'Πηγή για τη Μήλο',lane:'greek',topical_match:{category:'TARGET_MATCH'},url:'https://example.org/source',repository:'Δοκιμαστικό αρχείο',printed_page:42,context_excerpt:'Απόσπασμα από την πηγή για τη Μήλο.'}]};emit(current);await page.waitForFunction(()=>document.querySelector('#researchOverview').textContent.includes('Υπάρχουν καταγεγραμμένες'));assert.match(await page.locator('#resultsList').textContent(),/Πηγή για τη Μήλο/);assert.ok(!(await page.locator('#resultsList').textContent()).includes('Παλιός ισχυρισμός'));assert.match(await page.locator('#researchProgress').textContent(),/1 \/ 1/);assert.equal(await page.locator('#researchProgress').isVisible(),false);await page.locator('#n7Shell [data-atlas-nav="sources"]').click();await page.waitForFunction(()=>document.querySelector('#readerSources').textContent.includes('Πηγή για τη Μήλο'));assert.match(await page.locator('#readerSources').innerText(),/Έντυπη σελίδα 42/);assert.match(await page.locator('#readerSources').innerText(),/Απόσπασμα από την πηγή/);await navTo(page,'findings');
  await page.locator('#readerHistoryOpen').click();await page.locator('#historySearch').fill('Λάντζα');await page.locator('[data-history-run="100"]').waitFor({state:'visible'});assert.equal(await page.locator('[data-history-run]').count(),1);await page.locator('[data-history-run="100"]').click();await page.waitForFunction(()=>document.querySelector('#researchOverview').textContent.includes('Βρες πηγές για τον Λάντζα'));assert.equal(new URL(page.url()).searchParams.get('run'),'100');assert.match(await page.locator('#resultsList').textContent(),/Παλιός ισχυρισμός/);
  await page.reload();await page.waitForFunction(()=>document.body.dataset.currentResearchRun==='100');await navTo(page,'findings');await page.locator('#readerHistoryOpen').click();assert.equal(await page.locator('[data-history-run="200"]').count(),1);
  if(width===390){await page.keyboard.press('Escape');assert.equal(await page.locator('#readerSources').isVisible(),false);await navTo(page,'universe');assert.equal(await page.locator('#chartFrame').isVisible(),true);assert.equal(await page.locator('#resultsDrawer').isVisible(),false);await navTo(page,'findings');}

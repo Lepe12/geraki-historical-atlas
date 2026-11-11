@@ -15,7 +15,11 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
  await page.waitForFunction(()=>document.body.dataset.currentResearchRun==='100');
 
  await page.waitForFunction(()=>document.body.dataset.proRelief==='ready');
- await page.locator('#atlasExplore').click();
+ assert.equal(await page.locator('#atlasExplore, .unified-welcome, .atlas-home-hero, .pro-tools-toggle, .pro-assistant-chat').count(),0,'Old welcome card and floating chrome are not rendered');
+ // Nothing positioned over the framed map except the map's own layers and controls.
+ const overMap=await page.evaluate(()=>{const slot=document.getElementById('n7MapSlot'),s=slot.getBoundingClientRect(),bad=[];for(const e of document.querySelectorAll('body *')){if(slot.contains(e)||e.contains(slot))continue;const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||!['fixed','absolute'].includes(cs.position))continue;const r=e.getBoundingClientRect();if(r.width<8||r.height<8||!e.innerText.trim()&&![...e.querySelectorAll('img,svg,canvas')].some(m=>m.getClientRects().length))continue;if(Math.min(r.right,s.right)-Math.max(r.left,s.left)>4&&Math.min(r.bottom,s.bottom)-Math.max(r.top,s.top)>4)bad.push(e.id||e.className);}return bad;});
+ assert.deepEqual(overMap,[],'No panel overlaps the map');
+ await page.locator('.n7-nav [data-n7-nav="layers"]').click();
  assert.equal(await page.locator('.pro-place-marker').count(),11);
  const projected=await page.evaluate(()=>window.NABOU_PRO_ATLAS.places.every(p=>{const point=window.NABOU_PRO_ATLAS.project(p.lon,p.lat),marker=document.querySelector('.pro-place-marker[data-place="'+p.id+'"]');return Math.abs(parseFloat(marker.style.left)-point.x)<.01&&Math.abs(parseFloat(marker.style.top)-point.y)<.01;}));
  assert.equal(projected,true,'Every place uses the original geographic projection');
@@ -24,14 +28,15 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
  assert.equal(await page.locator('.pro-place-list button').count(),1);
  await page.locator('.pro-place-list button').click();
  assert.equal(await page.evaluate(()=>window.NABOU_PRO_ATLAS.selected),'chania');
- assert.match(await page.locator('#proPlaceInfo').innerText(),/Απαιτούν χρονολογημένη πηγή/);
+ assert.match(await page.locator('#proPlaceInfo').innerText(),/χρονολογημένη πηγή/);
+ assert.match(await page.locator('#proPlaceInfo').innerText(),/Ιστορικές πηγές \(\d+\)/);
  await page.getByLabel('Από το έτος',{exact:true}).fill('1680');
  await page.getByLabel('Έως το έτος',{exact:true}).fill('1600');
  assert.equal(await page.getByLabel('Από το έτος',{exact:true}).inputValue(),'1600');
  await page.locator('.pro-research-place').click();
  assert.match(await page.locator('#operatorQuery').inputValue(),/Χανιά, 1600–1600/);
  assert.equal(await page.locator('body').getAttribute('data-reader-view'),'research');
- await page.locator('#atlasResearch [data-atlas-nav="map"]').click();
+ await page.locator('.n7-nav [data-atlas-nav="map"]').click();
  await page.getByLabel('Τόποι & λιμάνια',{exact:true}).uncheck();
  assert.equal(await page.locator('body').getAttribute('data-pro-places'),'false');
  await page.getByLabel('Τόποι & λιμάνια',{exact:true}).check();
@@ -48,7 +53,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
  await page.locator('.nxa-connect-n7').waitFor({state:'visible'});
  await page.locator('.nxa-x').click();
 
- await page.locator('.pro-tools-toggle').click();
+ if(!await page.locator('#proMapTools').isVisible())await page.locator('.n7-nav [data-n7-nav="layers"]').click();
  assert.equal(await page.locator('#proMapTools').isVisible(),true);
  await page.getByLabel('Αναζήτηση τόπου',{exact:true}).fill('venice');
  await page.locator('.pro-place-list button').click();

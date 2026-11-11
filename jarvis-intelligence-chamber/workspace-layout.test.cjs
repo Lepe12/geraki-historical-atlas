@@ -4,20 +4,10 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
 const NAVMAP={universe:'map',findings:'research',agents:'agents'};
 // Atlas UI: top text nav replaces the lab rail. PDF/tools opens via Εργαλεία.
 async function navTo(page,view){
-  async function openResearch(){
-    if(await page.locator('#atlasHome').isVisible()){
-      await page.locator('#atlasExplore').click();
-      await page.waitForFunction(()=>document.body.dataset.atlasPage==='research');
-    }
-  }
-  if(view==='universe'){
-    await page.locator('#atlasHome:not([hidden]) .atlas-topnav [data-atlas-nav="map"], #atlasResearch:not([hidden]) .atlas-topnav [data-atlas-nav="map"]').first().click();
-    await page.waitForFunction(()=>document.body.dataset.readerView==='map');
-    return;
-  }
-  await openResearch();
-  const key = view==='pdf' ? 'tools' : (NAVMAP[view] || view);
-  await page.locator('#atlasResearch:not([hidden]) .atlas-topnav [data-atlas-nav="'+key+'"]').click();
+  // N7 layout: one navigation for every view (left column; Ερευνητές is the user icon in the top bar).
+  const key=view==='universe'?'map':view==='pdf'?'tools':(NAVMAP[view]||view);
+  await page.locator('#n7Shell [data-atlas-nav="'+key+'"]').click();
+  if(view==='universe')await page.waitForFunction(()=>document.body.dataset.readerView==='map');
 }
 (async()=>{
  const root=path.resolve(__dirname,'..');
@@ -38,11 +28,12 @@ async function navTo(page,view){
   assert.ok(await page.locator('#universe').evaluate(canvas=>canvas.width>100&&canvas.height>100),'The original renderer must own a real canvas');
   assert.equal(await page.locator('#nodeLabels .node-label').count(),17,'All original research nodes must be rendered');
   assert.equal(await page.locator('body').getAttribute('data-atlas-landing'),'true');
-  assert.equal(await page.locator('#atlasResearch .atlas-topnav [data-atlas-nav]').count(),5,'Shared home and workspace navigation');
+  assert.equal(await page.locator('#n7Shell [data-atlas-nav]').count(),5,'Shared home and workspace navigation');
+  assert.equal(await page.locator('#atlasExplore, .unified-welcome, .atlas-home-hero').count(),0,'No welcome card over the map');
   assert.equal(await page.locator('#v2rail').isVisible(),false,'Lab rail must not show under atlas home');
   assert.equal(await page.locator('#topbar').isVisible(),false,'Lab topbar/clock must not show under atlas home');
   async function layout(panel){
-   const data=await page.evaluate(selector=>{const rect=s=>{const el=document.querySelector(s);return el&&el.getClientRects().length?el.getBoundingClientRect():{left:0,right:0,top:0,bottom:0,width:0,height:0};};const pageMode=document.body.dataset.atlasPage||'home';const nav=rect('.atlas-page:not([hidden]) .atlas-topnav');const composer=pageMode==='research'?rect('#operatorCommand'):{left:0,right:0,top:0,bottom:0,width:0,height:0};const panel=selector&&pageMode==='research'?rect(selector):null;const overlap=(a,b)=>!(a.width&&b.width)?0:Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left))*Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));return {overflow:document.documentElement.scrollWidth>innerWidth+1,navComposer:overlap(nav,composer),panelComposer:panel?overlap(panel,composer):0,panelNav:panel?overlap(panel,nav):0,inputSize:parseFloat(getComputedStyle(document.querySelector('#operatorQuery')).fontSize),pageMode};},panel);
+   const data=await page.evaluate(selector=>{const rect=s=>{const el=document.querySelector(s);return el&&el.getClientRects().length?el.getBoundingClientRect():{left:0,right:0,top:0,bottom:0,width:0,height:0};};const pageMode=document.body.dataset.atlasPage||'home';const nav=rect('.n7-nav');const composer=pageMode==='research'?rect('#operatorCommand'):{left:0,right:0,top:0,bottom:0,width:0,height:0};const panel=selector&&pageMode==='research'?rect(selector):null;const overlap=(a,b)=>!(a.width&&b.width)?0:Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left))*Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));return {overflow:document.documentElement.scrollWidth>innerWidth+1,navComposer:overlap(nav,composer),panelComposer:panel?overlap(panel,composer):0,panelNav:panel?overlap(panel,nav):0,inputSize:parseFloat(getComputedStyle(document.querySelector('#operatorQuery')).fontSize),pageMode};},panel);
    assert.equal(data.overflow,false);assert.equal(data.navComposer,0);
    // Atlas research: right panel sits above the bottom ask bar — allow zero vertical overlap only.
    if(width>=1181 && data.pageMode==='research' && panel==='.atlas-research-panel') assert.equal(data.panelComposer,0,'Το πάνελ δεν πρέπει να καλύπτει τη μπάρα ερωτήματος');
@@ -50,7 +41,7 @@ async function navTo(page,view){
    assert.ok(data.inputSize>=15);
   }
   await layout();
-  await page.locator('#atlasExplore').click();
+  await navTo(page,'findings');
   await page.waitForFunction(()=>document.body.dataset.atlasPage==='research');
   const initialHeight=await page.locator('#operatorQuery').evaluate(e=>e.offsetHeight);
   const queryStyle=await page.locator('#operatorQuery').evaluate(e=>({color:getComputedStyle(e).color,fill:getComputedStyle(e).webkitTextFillColor}));
@@ -62,10 +53,8 @@ async function navTo(page,view){
   assert.ok(await page.locator('#operatorQuery').evaluate(e=>e.offsetHeight)>=initialHeight,'Query field remains usable');
   await navTo(page,'findings');await layout('.atlas-research-panel');
   await navTo(page,'universe');
-  await page.locator('#atlasResearch .atlas-brand').click();
+  await page.locator('#n7Shell .n7-logo').click();
   await page.waitForFunction(()=>document.body.dataset.atlasLanding==='true');
-  await page.locator('#atlasExplore').click();
-  await page.waitForFunction(()=>document.body.dataset.atlasPage==='research');
   await navTo(page,'findings');
   await page.locator('#operatorQuery').fill('');await page.waitForTimeout(150);
   if(shotDir)await page.screenshot({path:path.join(shotDir,width+'-overview.png'),animations:'disabled'});
@@ -85,7 +74,7 @@ async function navTo(page,view){
     }
    }
    if(view==='findings'){
-    await page.locator('#atlasResearch [data-atlas-nav="sources"]').click();
+    await page.locator('#n7Shell [data-atlas-nav="sources"]').click();
     await page.locator('#readerSources').waitFor({state:'visible'});
     await page.locator('#readerSourceSearch').fill('Ανύπαρκτο');
     assert.equal(await page.locator('#readerSources li').count(),0);
@@ -93,7 +82,7 @@ async function navTo(page,view){
     await page.waitForFunction(()=>document.querySelector('#readerSources ol').textContent.includes('Δοκιμαστική ιστορική πηγή'));
     assert.match(await page.locator('#readerSources ol').innerText(),/Δοκιμαστική ιστορική πηγή/);
     await page.locator('#readerSourceSearch').fill('');
-    await page.locator('#atlasResearch [data-atlas-nav="research"]').click();
+    await page.locator('#n7Shell [data-atlas-nav="research"]').click();
     assert.equal(await page.locator('#researchOverview').isVisible(),true);
     assert.equal(await page.locator('#researchFindings').isVisible(),false,'Technical findings remain hidden in article view');
    }
