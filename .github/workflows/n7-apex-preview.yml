@@ -135,11 +135,16 @@ jobs:
             await p.mouse.move(headBox.x+headBox.width*.50,headBox.y+headBox.height*.34);
             await p.waitForTimeout(450);
             const neutralHeadPath=process.env.RUNNER_TEMP+'/n7-head-neutral.png';
-            await headHost.locator('canvas').screenshot({path:neutralHeadPath});
+            await rawCanvasPng(headHost.locator('canvas'),neutralHeadPath);
             await p.mouse.move(headBox.x+headBox.width*.88,headBox.y+headBox.height*.34);
             await p.waitForTimeout(750);
             const turnedHeadPath=process.env.RUNNER_TEMP+'/n7-head-turned.png';
-            await headHost.locator('canvas').screenshot({path:turnedHeadPath});
+            await rawCanvasPng(headHost.locator('canvas'),turnedHeadPath);
+            async function rawCanvasPng(locator,path){
+              const data=await locator.evaluate(c=>c.toDataURL('image/png'));
+              fs.writeFileSync(path,Buffer.from(data.split(',')[1],'base64'));
+            }
+
             function headVisiblePixels(path){
               const png=PNG.sync.read(fs.readFileSync(path));
               let visible=0;
@@ -179,9 +184,9 @@ jobs:
             const bgCanvas=backdrop.locator('canvas');
             const bg0=process.env.RUNNER_TEMP+'/n7-step6-bg0.png';
             const bg10=process.env.RUNNER_TEMP+'/n7-step6-bg10.png';
-            await bgCanvas.screenshot({path:bg0});
+            await rawCanvasPng(bgCanvas,bg0);
             await p.waitForTimeout(10000);
-            await bgCanvas.screenshot({path:bg10});
+            await rawCanvasPng(bgCanvas,bg10);
             const a0=PNG.sync.read(fs.readFileSync(bg0)), a1=PNG.sync.read(fs.readFileSync(bg10));
             let diff=0;
             for(let i=0;i<a0.data.length;i+=4){
@@ -218,13 +223,13 @@ jobs:
 
             await p.waitForTimeout(1500);
             const shot25=process.env.RUNNER_TEMP+'/n7-assembly-25.png';
-            await assemblyCanvas.screenshot({path:shot25});
+            await rawCanvasPng(assemblyCanvas,shot25);
             const m25=metrics(shot25);
             if(m25.visible<350 || m25.cyan<150) throw Error('25% assembly is not visibly transporting matter: '+JSON.stringify(m25));
 
             await p.waitForTimeout(2100);
             const shot60=process.env.RUNNER_TEMP+'/n7-assembly-60.png';
-            await assemblyCanvas.screenshot({path:shot60});
+            await rawCanvasPng(assemblyCanvas,shot60);
             const m60=metrics(shot60);
             if(m60.visible<900) throw Error('60% assembly is not visibly transporting matter: '+JSON.stringify(m60));
             if(m60.width<m25.width*1.65) throw Error('left-to-right body build did not widen enough: '+JSON.stringify({m25,m60}));
