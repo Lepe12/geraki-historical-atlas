@@ -304,6 +304,7 @@ function ParticleReference({
             const aa=alphaAttr.array as Float32Array;
             const amount=Math.abs(headTurnRef?.current ?? 0);
             const headAlpha=1-clamp01(amount*5);
+            host.dataset.headBaseAlpha=headAlpha.toFixed(3);
             for(const n of headIndices) aa[n]=headAlpha;
             alphaAttr.needsUpdate=true;
           }
