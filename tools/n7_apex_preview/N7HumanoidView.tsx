@@ -92,7 +92,7 @@ function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats
         if(disposed) return;
         const dt=Math.min(100,Math.max(0,now-last));
         last=now;
-        const ease=1-Math.exp(-dt/70);
+        const ease=1-Math.exp(-dt/58);
         current+=(target-current)*ease;
         if(target===0&&Math.abs(current)<.006) current=0;
 
