@@ -300,7 +300,6 @@ function ParticleReference({
           return;
         }
 
-        const angle=currentTurn*.31; // visible ~18° max: still an illusion, but clearly perceptible to the user.
         const sign=Math.sign(currentTurn)||1;
         for(let n=0;n<headWeights.length;n++){
           const j=n*3;
@@ -315,13 +314,12 @@ function ParticleReference({
             continue;
           }
 
-          const a=angle*w;
-          const cs=Math.cos(a), sn=Math.sin(a);
-          const z=headDepths[n];
-          // Step 5 preview release marker: screen-safe 2.5D yaw, visually verified.
-          // 2.5D yaw: preserve screen-space density/silhouette and use synthetic
-          // depth only for lateral parallax. Never push particles toward/through camera.
-          const tx=fx*cs+z*sn;
+          // Safe bounded 2.5D warp: never rotate the point cloud in 3D.
+          // Facial/upper-head particles slide a few pixels laterally, with the
+          // strongest movement near the centre of the face and zero at the neck.
+          const centreWeight=1-Math.min(1,Math.abs(fx)/112);
+          const offset=currentTurn*w*(7+5*centreWeight);
+          const tx=fx+offset;
           arr[j]=tx;
           arr[j+1]=fy;
           arr[j+2]=0;
