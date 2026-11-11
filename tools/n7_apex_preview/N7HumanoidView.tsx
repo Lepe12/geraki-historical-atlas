@@ -108,6 +108,7 @@ function ParticleReference({
       const headWeights:number[]=[];
       const headDepths:number[]=[];
       const headEdges:number[]=[];
+      const sourceYs:number[]=[];
 
       // One point = one sampled artwork pixel/color.
       for(let y=0;y<sampleH;y++){
@@ -139,6 +140,7 @@ function ParticleReference({
           headWeights.push(neckWeight);
           headDepths.push(inHead?Math.sqrt(dome)*58:0);
           headEdges.push(inHead?clamp01((Math.abs(hx)-.72)/.28):0);
+          sourceYs.push(y);
 
           // Guide Step 4: the body completes left-to-right.
           let delay=((fx+sampleW/2)/sampleW)*.66;
@@ -308,6 +310,8 @@ function ParticleReference({
           if(w<=0){
             arr[j]=fx; arr[j+1]=fy; arr[j+2]=0;
             cc[j]=br; cc[j+1]=bg; cc[j+2]=bb;
+            // True neck/body region begins below the guide's head cap.
+            if(sourceYs[n]>=205) neckShift=Math.max(neckShift,0);
             continue;
           }
 
@@ -322,7 +326,7 @@ function ParticleReference({
 
           const shift=Math.abs(tx-fx);
           maxShift=Math.max(maxShift,shift);
-          if(w<.18) neckShift=Math.max(neckShift,shift);
+          if(sourceYs[n]>=205) neckShift=Math.max(neckShift,shift);
 
           // Guide shading: far side darkens; only the near silhouette gets a restrained rim.
           const side=fx/112;
