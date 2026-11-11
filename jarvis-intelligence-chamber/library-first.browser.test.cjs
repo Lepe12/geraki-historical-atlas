@@ -52,7 +52,9 @@ const HITS=[{book:A,page:278,text:'Τον Μάρτιο του 1568 ο Πέτρο
   // 3. Library could not be consulted (not deployed yet): nothing starts by itself.
   {const {page,calls}=await open({library:'offline'});await ask(page,'Βρες στοιχεία για τον Πέτρο Λάντζα');await page.waitForTimeout(300);
    assert.equal(calls.dispatch,0,'never start the 20–90 minute run silently');assert.equal(await page.locator('#libraryAnswer').getAttribute('data-path'),'ask');
-   assert.match(await page.locator('#libraryAnswer').innerText(),/δεν ξεκίνησε μόνη της/);
+   assert.match(await page.locator('#libraryAnswer').innerText(),/Η βιβλιοθήκη για τη συγκεκριμένη έρευνα δεν διαθέτει στοιχεία/);
+   assert.match(await page.locator('#libraryAnswer .library-long').innerText(),/Έναρξη έρευνας σε βάθος/);
+   assert.match(await page.locator('#libraryAnswer .library-duration').innerText(),/διάρκεια 20–90 λεπτά/);
    await page.locator('#libraryAnswer .library-long').click();await page.waitForFunction(()=>document.body.dataset.dispatchRequest==='own');assert.equal(calls.dispatch,1);await page.close();}
   // 4. Explicit ask to search further: the long run starts at once, without a library round trip.
   {const {page,calls}=await open();await page.locator('#n7Shell [data-atlas-nav="research"]').click();await page.locator('#researchDeep').check();await page.locator('#operatorQuery').fill('Βρες στοιχεία για τον Πέτρο Λάντζα');await page.locator('#executeQuery').click();await page.waitForFunction(()=>document.body.dataset.dispatchRequest==='own');

@@ -221,7 +221,7 @@
   let lastQuery = "";
 
   const startLongButton = (label) => {
-    const b = el("button", { type: "button", class: "library-long", text: label || "Ψάξε και στο διαδίκτυο · συνήθως 20–90 λεπτά" });
+    const b = el("button", { type: "button", class: "library-long", text: label || "Έναρξη έρευνας σε βάθος" });
     b.addEventListener("click", () => {
       b.disabled = true;
       window.dispatchEvent(new CustomEvent("nabou:start-long-research", { detail: { query: lastQuery } }));
@@ -260,7 +260,7 @@
     card.hidden = false;
     card.dataset.path = kind;
     card.replaceChildren(
-      el("p", { class: "library-kicker", text: { searching: "Βιβλιοθήκη · λίγα δευτερόλεπτα", library: "Από τη βιβλιοθήκη σου", long: "Μεγάλη έρευνα στο διαδίκτυο", ask: "Η βιβλιοθήκη δεν απάντησε" }[kind] || "" }),
+      el("p", { class: "library-kicker", text: { searching: "Βιβλιοθήκη · λίγα δευτερόλεπτα", library: "Από τη βιβλιοθήκη σου", long: "Έρευνα σε βάθος", ask: "" }[kind] || "" }),
       el("h2", { text: title }),
       el("p", { class: "library-lead", text: lead }),
       ...extra.filter(Boolean),
@@ -297,13 +297,11 @@
           "Ξεκινά η μεγάλη έρευνα στο διαδίκτυο και στα αρχεία· συνήθως κρατάει 20–90 λεπτά. Η πρόοδος φαίνεται παρακάτω.",
         decision.partial ? storyNode(decision.partial) : null, details(decision, reply));
     } else {
-      const signIn = decision.reason === "LIBRARY_SIGN_IN_REQUIRED";
-      const go = el("button", { type: "button", class: "library-go-sources", text: signIn ? "Σύνδεση στη βιβλιοθήκη" : "Δες τη βιβλιοθήκη" });
-      go.addEventListener("click", () => window.N7_READER?.show?.("sources"));
       show("ask", "«" + label + "»",
-        (signIn ? "Για να ψάξω στα βιβλία σου χρειάζεται σύνδεση (στις Πηγές). " : "Δεν μπόρεσα να ψάξω στη βιβλιοθήκη τώρα· η βιβλιοθήκη στον διακομιστή δεν έχει ανέβει ακόμη ή δεν απαντά. ") +
-          "Η μεγάλη έρευνα δεν ξεκίνησε μόνη της. Αν θέλεις, ξεκίνα τη· κρατάει συνήθως 20–90 λεπτά.",
-        el("div", { class: "library-row" }, startLongButton("Ξεκίνα τη μεγάλη έρευνα · 20–90 λεπτά"), go), details(decision, reply));
+        "Η βιβλιοθήκη για τη συγκεκριμένη έρευνα δεν διαθέτει στοιχεία.",
+        el("div", { class: "library-row" }, startLongButton("Έναρξη έρευνας σε βάθος")),
+        el("p", { class: "library-duration", text: "διάρκεια 20–90 λεπτά" }),
+        details(decision, reply));
     }
     return decision;
   }
@@ -313,9 +311,9 @@
     if (!lead) return;
     if (ok) {
       card.dataset.path = "long";
-      card.querySelector(".library-kicker").textContent = "Μεγάλη έρευνα στο διαδίκτυο";
+      card.querySelector(".library-kicker").textContent = "Έρευνα σε βάθος";
       card.querySelectorAll(".library-long").forEach((b) => b.remove());
-      if (!/Ξεκινά η μεγάλη έρευνα/.test(lead.textContent)) lead.textContent += " Ξεκίνησε και η μεγάλη έρευνα στο διαδίκτυο· συνήθως κρατάει 20–90 λεπτά.";
+      if (!/έρευνα σε βάθος/.test(lead.textContent)) lead.textContent += " Ξεκίνησε η έρευνα σε βάθος, διάρκεια 20–90 λεπτά.";
     } else {
       card.querySelectorAll(".library-long").forEach((b) => (b.disabled = false));
     }
