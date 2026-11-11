@@ -27,3 +27,15 @@ Speech uses Web Speech APIs and the voices installed/provided by the user's brow
 The automation environment has no authenticated N7 session, physical user microphone or installed Greek speaker voice. Authenticated real-model audio conversation and sound heard on the owner's device must not be reported as verified by the lifecycle fixture. The implementation now provides the in-place login and voice controls needed to use that existing session directly.
 
 API references: [SpeechRecognition](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition), [speechSynthesis](https://developer.mozilla.org/en-US/docs/Web/API/Window/speechSynthesis), [SpeechSynthesisUtterance](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesisUtterance).
+
+## Published release — 2026-11-11
+
+- Code commit `d6fd0d2fb40129642d65e8d09f2b4ad218958c5b`.
+- [CI validation and deployment passed](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/43029121250), including the complete guide suite, voice lifecycle suite and independent 96-frame/eight-pose head and ten-second backdrop regression.
+- [CI evidence artifact](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/43029121250/artifacts/13860341825).
+- [Live preview](https://bot.piratecartography.com/n7-apex-step5/), release `5d9dd5d14aa786bd`.
+- Production remains `bbdc05016a211581`. Approved figure/background SHA256 checks remain identical after publication; see `n7-voice-evidence/live-release.json`.
+- Server rollback snapshot `/bot.piratecartography.com/n7-app/public/.n7-apex-backup-3132727401bf`.
+- The voice lifecycle fixture passed again using the **actual deployed frontend**, with browser-local API/device interception. These are recorded in `deployed-fixture-results.json`; they remain fixtures, not a live model answer or audible output.
+- Separate unmocked live capability probe confirms the voice UI, secure context and native API exposure; this headless device has no installed synthesis voices. Public real `/api/status` reports model/queue configured and `authenticated:false`. No authentication bypass or credentials entered.
+- PR #347 remains draft/open/unmerged. No production deployment performed.
