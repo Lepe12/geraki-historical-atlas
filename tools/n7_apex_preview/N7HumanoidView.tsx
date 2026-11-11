@@ -43,6 +43,7 @@ function smooth01(v:number){ const x=clamp01(v); return x*x*(3-2*x); }
 
 // Isolated Step 5 deploy marker: guide-native artwork-tile renderer.
 // Release candidate: stronger yaw + no head clearRect gaps.
+// Release candidate: soft silhouette falloff, no hard ellipse clip.
 function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats)=>void}) {
   const hostRef=useRef<HTMLDivElement>(null);
 
