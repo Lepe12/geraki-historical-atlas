@@ -108,6 +108,19 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
      return n?sum/n:NaN;
    };
    const centerY=headCenterY(reference);
+   // A rigid nod can reshape which bright pixels enter the clipped forehead
+   // ROI without translating that ROI's centroid. Track the artwork's amber
+   // face core instead for signed up/down motion; retain silhouette/size/jaw
+   // checks independently below.
+   const faceCoreY=px=>{
+     let ysum=0,n=0;
+     for(let y=85;y<205;y++)for(let x=105;x<215;x++){
+       const i=(y*320+x)*4,r=px[i],g=px[i+1],b=px[i+2];
+       if(r>90&&r>g*1.12&&g>b*1.15){ysum+=y;n++;}
+     }
+     assert(n>100,'Amber face feature disappeared');return ysum/n;
+   };
+   const neutralFaceY=faceCoreY(reference);
    // A vertical nod must not expand the head: compare the vertically sampled
    // distribution of bright face features, not just whether pitch state changed.
    const headSpread=px=>{
@@ -140,14 +153,14 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
      assert(body.max<=2,name+' fixed torso/neck changed');
      if(angle===0)assert.equal(difference(px,reference).count,0,'Pitch return neutral differs from approved artwork');
      save(name,await canvas.evaluate(c=>c.toDataURL()));
-     const visibleY=headCenterY(px),dy=visibleY-centerY;
+     const visibleY=headCenterY(px),dy=visibleY-centerY,faceDelta=faceCoreY(px)-neutralFaceY;
      const spread=headSpread(px),scaleRatio=spread/neutralSpread;
      const jawChangedPixels=jawChange(px);
      if(Math.abs(angle)===1)assert(jawChangedPixels>140,name+' lower jaw is visually frozen: '+jawChangedPixels+' changed pixels');
      assert(scaleRatio<1.12&&scaleRatio>.85,name+' head stretched or collapsed: '+scaleRatio.toFixed(3));
-     if(angle===1)assert(dy<-2.5,'Upward head nod is visually too small: '+dy.toFixed(2)+' px');
-     if(angle===-1)assert(dy>2.5,'Downward head nod is visually too small: '+dy.toFixed(2)+' px');
-     results.pitch.push({name,pitch:Number(await host.getAttribute('data-current-pitch')),visibleCentroidY:visibleY,verticalDeltaPx:dy,headScaleRatio:scaleRatio,jawChangedPixels,gaps,bodyMaxDifference:body.max});
+     if(angle===1)assert(faceDelta<-2.5,'Upward face-core motion is too small: '+faceDelta.toFixed(2)+' px');
+     if(angle===-1)assert(faceDelta>2.5,'Downward face-core motion is too small: '+faceDelta.toFixed(2)+' px');
+     results.pitch.push({name,pitch:Number(await host.getAttribute('data-current-pitch')),visibleCentroidY:visibleY,verticalDeltaPx:dy,faceCoreDeltaPx:faceDelta,headScaleRatio:scaleRatio,jawChangedPixels,gaps,bodyMaxDifference:body.max});
    }
    console.log('Vertical pitch: PASS. Observing backdrop for 10 seconds...');
   await p.getByRole('button',{name:'Technical details',exact:true}).click();
