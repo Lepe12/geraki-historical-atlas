@@ -167,7 +167,13 @@ jobs:
             }
 
             await p.mouse.move(stageBox.x+stageBox.width*.50,stageBox.y+stageBox.height*.34);
-            await p.waitForTimeout(550);
+            await p.waitForFunction(()=>{
+              const el=document.querySelector('[aria-label="N7 guide head-particle turn"]');
+              if(!(el instanceof HTMLElement)) return false;
+              const v=Number(el.dataset.currentTurn);
+              const t=Number(el.dataset.headTarget);
+              return Number.isFinite(v)&&Number.isFinite(t)&&Math.abs(v)<.01&&Math.abs(t)<.01;
+            },null,{timeout:3000});
             const centerTurn=await turnShot('center');
 
             await p.mouse.move(stageBox.x+stageBox.width*.90,stageBox.y+stageBox.height*.34);
