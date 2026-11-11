@@ -40,6 +40,138 @@ const FRAG = `
 function clamp01(v:number){ return Math.max(0,Math.min(1,v)); }
 function smooth01(v:number){ const x=clamp01(v); return x*x*(3-2*x); }
 
+
+function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats)=>void}) {
+  const hostRef=useRef<HTMLDivElement>(null);
+
+  useEffect(()=>{
+    if(!enabled||!hostRef.current) return;
+    const host=hostRef.current;
+    let disposed=false;
+    let raf=0;
+    let ro:ResizeObserver|null=null;
+    let target=0;
+    let current=0;
+    let last=performance.now();
+
+    const canvas=document.createElement("canvas");
+    canvas.width=320;
+    canvas.height=480;
+    canvas.style.width="100%";
+    canvas.style.height="100%";
+    canvas.style.display="block";
+    const ctx=canvas.getContext("2d",{alpha:true});
+    if(!ctx) return;
+    host.replaceChildren(canvas);
+
+    const image=new Image();
+    image.decoding="async";
+    image.src=N7_HUMANOID_REFERENCE;
+
+    const pointer=(e:PointerEvent)=>{
+      const rect=host.getBoundingClientRect();
+      if(rect.width<=0) return;
+      const raw=(e.clientX-(rect.left+rect.width/2))/(rect.width*.42);
+      target=Math.max(-1,Math.min(1,raw));
+      if(Math.abs(target)<.12) target=0;
+      host.dataset.headTarget=target.toFixed(3);
+    };
+    const clear=()=>{target=0;host.dataset.headTarget="0.000";};
+    window.addEventListener("pointermove",pointer,{passive:true});
+    window.addEventListener("blur",clear);
+    document.addEventListener("mouseleave",clear);
+
+    image.onload=()=>{
+      if(disposed) return;
+
+      const tile=6;
+      const cx=160, cy=106;
+      const rx=92, ry=102;
+
+      const draw=(now:number)=>{
+        if(disposed) return;
+        const dt=Math.min(100,Math.max(0,now-last));
+        last=now;
+        const ease=1-Math.exp(-dt/115);
+        current+=(target-current)*ease;
+        if(target===0&&Math.abs(current)<.004) current=0;
+
+        ctx.clearRect(0,0,320,480);
+        // Always begin from the untouched approved reference.
+        ctx.drawImage(image,0,0,320,480);
+
+        if(Math.abs(current)>.0005){
+          // Replace only the head region using artwork tiles from the SAME reference.
+          ctx.save();
+          ctx.beginPath();
+          ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
+          ctx.clip();
+          ctx.clearRect(cx-rx-4,cy-ry-4,rx*2+8,ry*2+8);
+
+          const angle=current*.18; // intentionally limited: convincing depth illusion only.
+          const sn=Math.sin(angle), cs=Math.cos(angle);
+          const sign=Math.sign(current)||1;
+
+          for(let sy=Math.max(0,Math.floor(cy-ry));sy<Math.min(205,Math.ceil(cy+ry));sy+=tile){
+            for(let sx=Math.max(0,Math.floor(cx-rx));sx<Math.min(320,Math.ceil(cx+rx));sx+=tile){
+              const mx=sx+tile/2, my=sy+tile/2;
+              const nx=(mx-cx)/rx, ny=(my-cy)/ry;
+              const r2=nx*nx+ny*ny;
+              if(r2>1) continue;
+
+              const depth=Math.sqrt(Math.max(0,1-r2))*34;
+              const turnX=(mx-cx)*cs+depth*sn;
+              const dx=cx+turnX-tile/2;
+              const dy=sy;
+
+              const far=Math.max(0,-sign*nx);
+              const near=Math.max(0,sign*nx);
+              const shade=1-Math.abs(current)*(.06+.30*far);
+              const scale=1+Math.abs(current)*.045;
+              const dw=tile*scale, dh=tile*scale;
+
+              ctx.globalAlpha=Math.max(.62,shade);
+              ctx.drawImage(image,sx,sy,tile,tile,dx-(dw-tile)/2,dy-(dh-tile)/2,dw,dh);
+
+              if(Math.abs(nx)>.76&&near>0){
+                ctx.globalAlpha=.08*Math.abs(current)*near;
+                ctx.fillStyle="#8cefff";
+                ctx.fillRect(dx,dy,dw,dh);
+              }
+            }
+          }
+          ctx.restore();
+          ctx.globalAlpha=1;
+        }
+
+        host.dataset.currentTurn=current.toFixed(3);
+        onStats({particles:0,sampleW:320,sampleH:480,renderMs:0,assembly:100});
+        raf=requestAnimationFrame(draw);
+      };
+
+      raf=requestAnimationFrame(draw);
+      ro=new ResizeObserver(()=>{});
+      ro.observe(host);
+    };
+
+    return()=>{
+      disposed=true;
+      cancelAnimationFrame(raf);
+      ro?.disconnect();
+      window.removeEventListener("pointermove",pointer);
+      window.removeEventListener("blur",clear);
+      document.removeEventListener("mouseleave",clear);
+      host.replaceChildren();
+    };
+  },[enabled,onStats]);
+
+  return <div
+    ref={hostRef}
+    aria-label="N7 guide artwork-tile humanoid"
+    style={{position:"absolute",inset:0}}
+  />;
+}
+
 function ParticleReference({
   enabled,
   assembly,
@@ -779,6 +911,7 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
   const [allowMotion,setAllowMotion]=useState(false);
   const reduced=systemReduced&&!allowMotion;
 
+  const isolatedStep5=N7_HUMANOID_REFERENCE.includes("/n7-apex-step5/");
   const [mode,setMode]=useState<ViewMode>("particle");
   const [details,setDetails]=useState(false);
   const [mood,setMood]=useState<Mood>("idle");
@@ -832,15 +965,18 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
           style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"contain",opacity:mode==="compare"?.38:1}}
         />}
 
-        {(mode==="particle"||mode==="compare")&&<ParticleReference
-          enabled
-          assembly={false}
-          replayKey={replayKey}
-          reduced={false}
-          headTurnEnabled={mood==="idle"}
-          onStats={setStats}
-          onAssemblyDone={handleAssemblyDone}
-        />}
+        {(mode==="particle"||mode==="compare")&&(isolatedStep5
+          ? <GuideHeadTileCanvas enabled={mood==="idle"} onStats={setStats} />
+          : <ParticleReference
+              enabled
+              assembly={false}
+              replayKey={replayKey}
+              reduced={false}
+              headTurnEnabled={mood==="idle"}
+              onStats={setStats}
+              onAssemblyDone={handleAssemblyDone}
+            />
+        )}
 
         {(mode==="particle"||mode==="compare")&&<MoodCanvas mood={mood} />}
         {mode==="particle"&&mood==="idle"&&<div aria-label="N7 Step 5 preview hint" style={{position:"absolute",bottom:10,left:"50%",transform:"translateX(-50%)",padding:"5px 8px",background:"#03111dcc",border:"1px solid #285d70",borderRadius:5,fontSize:10,opacity:.72,pointerEvents:"none"}}>
