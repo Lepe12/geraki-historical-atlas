@@ -8,11 +8,11 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict'),http
  const base={schema:'pct-command-center-live-v1',project:'piratecartography',agents:[],claims:[],blockers:[],events:[],safety:{automatic_verified:false}};
  const old={...base,run_id:'100',mission:{target:'Παλιά έρευνα για τον Λάντζα',purpose:'Παλιά έρευνα για τον Λάντζα',status:'PARTIAL'},discoveries:[{title:'Παλιό εύρημα',topical_match:{category:'TARGET_MATCH'}}]};
  const own={...base,run_id:'200',request_id:'own-req',mission:{target:QUESTION,purpose:QUESTION,status:'PARTIAL'},discoveries:[],research_answer:{greek_narrative:{schema:'pct-greek-narrative-v1',status:'NO_USABLE_EVIDENCE',title_el:QUESTION,paragraphs:[],sources:[],map_places:[]}}};
- let latest=old,dispatches=0,liveCalls=0;const runs=[{run_id:'100',target:old.mission.target,status:'PARTIAL',generated_utc:'2026-11-06T20:45:16Z'}];
+ let latest=old,dispatches=0,liveCalls=0,librarySearches=0;const runs=[{run_id:'100',target:old.mission.target,status:'PARTIAL',generated_utc:'2026-11-06T20:45:16Z'}];
  await ctx.route('**/*',route=>{const url=route.request().url();
   if(url.split('?')[0].endsWith('/command-center/live/index.json'))return route.fulfill({json:{schema:'nabou-research-history-v1',runs}});
   if(url.startsWith('http://127.0.0.1'))return route.continue();
-  if(url.startsWith('https://pct-live.piratecartography.com/')){if(url.endsWith('/dispatch')){dispatches++;return route.fulfill({status:202,json:{request_id:'own-req'}});}liveCalls++;return route.abort('accessdenied');}
+  if(url.startsWith('https://pct-live.piratecartography.com/')){if(url.endsWith('/library/search')){librarySearches++;return route.fulfill({json:{schema:'nabou-library-search-v1',hits:[],stores:{published:'OK',uploaded:'OK',historical:'NOT_CONFIGURED'}}});}if(url.endsWith('/dispatch')){dispatches++;return route.fulfill({status:202,json:{request_id:'own-req'}});}liveCalls++;return route.abort('accessdenied');}
   if(url.startsWith('https://raw.githubusercontent.com/'))return route.fulfill({json:url.includes('/runs/200.json')?own:url.includes('/runs/100.json')?old:latest});
   return route.abort();});
  await ctx.routeWebSocket(/.*/,ws=>ws.close());
@@ -24,7 +24,7 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict'),http
  assert.equal(await page.locator('#n7MapSlot').evaluate(e=>getComputedStyle(e).visibility),'visible');assert.ok(map.width>500,'map keeps a real width: '+map.width);assert.ok(panel.x>=map.x+map.width-2,'panel sits beside the map, not over it');
  // Enter alone never sends; only «Έναρξη έρευνας» does.
  await page.locator('#operatorQuery').fill(QUESTION);await page.locator('#operatorQuery').press('Enter');await page.waitForTimeout(200);assert.equal(dispatches,0,'Enter must not send');
- await page.locator('#executeQuery').click();await page.waitForFunction(()=>document.body.dataset.dispatchRequest==='own-req');assert.equal(dispatches,1);
+ await page.locator('#executeQuery').click();await page.waitForFunction(()=>document.body.dataset.dispatchRequest==='own-req');assert.equal(librarySearches,1,'the library is searched first');assert.equal(dispatches,1,'library not enough: the long run starts');
  await page.waitForFunction(q=>document.querySelector('#researchOverview .my-research h2')?.textContent===q,QUESTION);
  let text=await page.locator('#researchOverview').innerText();assert.match(text,/Τρέχει τώρα/);assert.match(text,/20–90 λεπτά/);assert.ok(!text.includes('Λάντζα'),'old global run is not shown as mine');assert.ok(!/δευτ\./.test(await page.locator('#commandState').innerText()),'no seconds counter');
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('nabou-my-research-v1')));assert.equal(saved.query,QUESTION);assert.equal(saved.request_id,'own-req');assert.ok(saved.started_at>0);
