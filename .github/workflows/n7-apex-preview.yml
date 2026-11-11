@@ -137,7 +137,7 @@ jobs:
             const headShift=Number(await headHost.getAttribute('data-head-max-shift'));
             const neckShift=Number(await headHost.getAttribute('data-neck-max-shift'));
             if(!Number.isFinite(turn)||turn<.45) throw Error('Step 5 head turn did not follow pointer: '+turn);
-            if(!Number.isFinite(headShift)||headShift<4) throw Error('Step 5 head particles did not move enough: '+headShift);
+            if(!Number.isFinite(headShift)||headShift<10) throw Error('Step 5 head particles are not visibly moving enough: '+headShift);
             if(!Number.isFinite(neckShift)||neckShift>.9) throw Error('Step 5 moved the fixed neck: '+neckShift);
             await p.mouse.move(headBox.x+headBox.width*.50,headBox.y+headBox.height*.34);
             await p.waitForTimeout(950);
