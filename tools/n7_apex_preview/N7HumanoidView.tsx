@@ -105,13 +105,8 @@ function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats
         if(Math.abs(current)>.0005){
           // Replace only the head region using artwork tiles from the SAME reference.
           ctx.save();
-          ctx.beginPath();
-          ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
-          ctx.clip();
-          // Keep the approved reference underneath. Do not clear the head region:
-          // the guide explicitly allows slightly enlarged tiles to close gaps, and
-          // retaining the reference underlay prevents black cuts/holes during motion.
-
+          // No hard geometric clip. The guide requires a profile line and a far-side
+          // shadow, not a cut edge. Each tile gets a soft elliptical falloff instead.
           const angle=current*.30; // stronger but still limited depth illusion.
           const sn=Math.sin(angle), cs=Math.cos(angle);
           const sign=Math.sign(current)||1;
@@ -130,17 +125,22 @@ function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats
 
               const far=Math.max(0,-sign*nx);
               const near=Math.max(0,sign*nx);
-              const shade=1-Math.abs(current)*(.06+.30*far);
-              const scale=1+Math.abs(current)*.12;
+              const edge=Math.max(0,Math.min(1,(1-r2)/.18));
+              const softEdge=edge*edge*(3-2*edge);
+              const shade=1-Math.abs(current)*(.06+.34*far);
+              const scale=1+Math.abs(current)*.14;
               const dw=tile*scale, dh=tile*scale;
 
-              ctx.globalAlpha=Math.max(.62,shade);
+              // Soft silhouette falloff: no hard cut at the head boundary.
+              ctx.globalAlpha=Math.max(.08,softEdge)*Math.max(.58,shade);
               ctx.drawImage(image,sx,sy,tile,tile,dx-(dw-tile)/2,dy-(dh-tile)/2,dw,dh);
 
-              if(Math.abs(nx)>.76&&near>0){
-                ctx.globalAlpha=.08*Math.abs(current)*near;
+              // Near-side profile line from the SAME silhouette, not a hard clip.
+              if(Math.abs(nx)>.72&&near>0&&softEdge<.65){
+                const rim=(1-softEdge)*near*Math.abs(current);
+                ctx.globalAlpha=.16*rim;
                 ctx.fillStyle="#8cefff";
-                ctx.fillRect(dx,dy,dw,dh);
+                ctx.fillRect(dx-1,dy-1,dw+2,dh+2);
               }
             }
           }
