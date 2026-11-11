@@ -108,6 +108,17 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
      return n?sum/n:NaN;
    };
    const centerY=headCenterY(reference);
+   // A vertical nod must not expand the head: compare the vertically sampled
+   // distribution of bright face features, not just whether pitch state changed.
+   const headSpread=px=>{
+     let sum=0,sumSq=0,n=0;
+     for(let y=18;y<174;y++)for(let x=88;x<232;x++){
+       const i=(y*320+x)*4;
+       if(px[i]+px[i+1]+px[i+2]>92){sum+=y;sumSq+=y*y;n++;}
+     }
+     return n?Math.sqrt(Math.max(0,sumSq/n-(sum/n)**2)):NaN;
+   };
+   const neutralSpread=headSpread(reference);
    results.pitch=[];
    for(const [name,angle] of [['up50',.5],['up100',1],['down50',-.5],['down100',-1],['pitch-neutral',0]]){
      await movePitch(angle);
@@ -119,9 +130,11 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
      if(angle===0)assert.equal(difference(px,reference).count,0,'Pitch return neutral differs from approved artwork');
      save(name,await canvas.evaluate(c=>c.toDataURL()));
      const visibleY=headCenterY(px),dy=visibleY-centerY;
+     const spread=headSpread(px),scaleRatio=spread/neutralSpread;
+     assert(scaleRatio<1.12&&scaleRatio>.85,name+' head stretched or collapsed: '+scaleRatio.toFixed(3));
      if(angle===1)assert(dy<-2.5,'Upward head nod is visually too small: '+dy.toFixed(2)+' px');
      if(angle===-1)assert(dy>2.5,'Downward head nod is visually too small: '+dy.toFixed(2)+' px');
-     results.pitch.push({name,pitch:Number(await host.getAttribute('data-current-pitch')),visibleCentroidY:visibleY,verticalDeltaPx:dy,gaps,bodyMaxDifference:body.max});
+     results.pitch.push({name,pitch:Number(await host.getAttribute('data-current-pitch')),visibleCentroidY:visibleY,verticalDeltaPx:dy,headScaleRatio:scaleRatio,gaps,bodyMaxDifference:body.max});
    }
    console.log('Vertical pitch: PASS. Observing backdrop for 10 seconds...');
   await p.getByRole('button',{name:'Technical details',exact:true}).click();
