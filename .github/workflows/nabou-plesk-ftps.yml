@@ -103,6 +103,7 @@ jobs:
           node --check server/command-center-live/pdf-evidence.js
           python3 -m py_compile server/command-center-live/pdf-evidence.py tools/gateway/deploy_ftps.py
           node server/command-center-live/self-test.js
+          node server/command-center-live/site-chat.test.js
           php -l tools/storage/historical_evidence.php
           php -l tools/storage/evidence_schema_request.php
           php -l tools/storage/pct_research_store.php
@@ -156,6 +157,7 @@ jobs:
           node --check server/command-center-live/pdf-evidence.js
           python3 -m py_compile server/command-center-live/pdf-evidence.py tools/gateway/deploy_ftps.py
           node server/command-center-live/self-test.js
+          node server/command-center-live/site-chat.test.js
       - name: Deploy backend files through verified FTPS and record outcome
         run: python3 tools/gateway/run_ftps_deployment.py
       - name: Verify actual production HTTP and OIDC after deployment

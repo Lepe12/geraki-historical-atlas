@@ -14,6 +14,8 @@ const {createN7Gateway}=require("./n7-gateway");
 const {createN7Library}=require("./n7-library");
 const {createN7OAuth}=require("./n7-oauth");
 const {createLibraryReader}=require("./library-reader");
+// Public site chat («Ρώτα τον Καπετάνιο»). Optional: if its files are missing, the rest of the service still starts.
+let siteChat=null;try{siteChat=require("./site-chat").createSiteChat();}catch(error){console.error("site-chat disabled:",error.message);}
 
 const PORT=Number(process.env.PORT||process.env.PCT_COMMAND_CENTER_PORT||8787);
 const PREFIX=(process.env.PCT_COMMAND_CENTER_PREFIX||"/pct-api/live").replace(/\/$/,"");
@@ -27,7 +29,7 @@ const OPERATOR_TOKEN=String(process.env.PCT_OPERATOR_TOKEN||"");
 const GITHUB_DISPATCH_TOKEN=String(process.env.PCT_GITHUB_DISPATCH_TOKEN||"");
 const CONTROLLED_WORKFLOW="jarvis-controlled-dispatch.yml";
 const N7_RESEARCH_WORKFLOW="n7-research-orchestrate.yml";
-const ALLOWED_BROWSER_ORIGINS=new Set(["https://lepe12.github.io","https://pct-live.piratecartography.com","https://bot.piratecartography.com"]);
+const ALLOWED_BROWSER_ORIGINS=new Set(["https://lepe12.github.io","https://pct-live.piratecartography.com","https://bot.piratecartography.com","https://www.piratecartography.com","https://piratecartography.com"]);
 const SESSION_COOKIE="naboux_session";
 const SESSION_MAX_AGE=30*24*60*60;
 const KNOWLEDGE_DIR=process.env.PCT_KNOWLEDGE_DIR||path.join(typeof __dirname==="string"?__dirname:".","knowledge-data");
@@ -401,6 +403,7 @@ const server=http.createServer(async(req,res)=>{
     const u=new URL(req.url,"http://localhost");const p=normalizePath(u.pathname);
     res.nabouCorsOrigin=ALLOWED_BROWSER_ORIGINS.has(String(req.headers.origin||""))?String(req.headers.origin):"https://lepe12.github.io";
     if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":res.nabouCorsOrigin||"https://lepe12.github.io","access-control-allow-credentials":"true","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type,x-file-name,x-nabou-agent-room,x-book-title,x-book-author,x-book-year"});return res.end();}
+    if(siteChat&&await siteChat.handle(req,res,p,{json,readBody}))return;
     if(await oauth.handle(req,res,p))return;
     if(await handleN7(req,res,p))return;
     if(await handleN7Library(req,res,p,u))return;
