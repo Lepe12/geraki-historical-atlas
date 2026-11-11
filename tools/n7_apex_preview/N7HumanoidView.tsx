@@ -550,7 +550,11 @@ function HeadTurnCanvas({headTurnRef}:{headTurnRef:React.MutableRefObject<number
       if(rect.width<=0) return;
       const nx=(e.clientX-(rect.left+rect.width/2))/(rect.width*.45);
       const raw=Math.max(-1,Math.min(1,nx));
-      target=Math.abs(raw)<.12 ? 0 : raw;
+      target=Math.abs(raw)<.22 ? 0 : raw;
+      if(target===0){
+        current=0;
+        headTurnRef.current=0;
+      }
       host.dataset.headTarget=target.toFixed(3);
     };
     const reset=()=>{ target=0; host.dataset.headTarget="0.000"; };
