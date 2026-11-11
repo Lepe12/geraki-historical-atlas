@@ -107,9 +107,11 @@ function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats
           ctx.beginPath();
           ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
           ctx.clip();
-          ctx.clearRect(cx-rx-4,cy-ry-4,rx*2+8,ry*2+8);
+          // Keep the approved reference underneath. Do not clear the head region:
+          // the guide explicitly allows slightly enlarged tiles to close gaps, and
+          // retaining the reference underlay prevents black cuts/holes during motion.
 
-          const angle=current*.18; // intentionally limited: convincing depth illusion only.
+          const angle=current*.30; // stronger but still limited depth illusion.
           const sn=Math.sin(angle), cs=Math.cos(angle);
           const sign=Math.sign(current)||1;
 
@@ -120,7 +122,7 @@ function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats
               const r2=nx*nx+ny*ny;
               if(r2>1) continue;
 
-              const depth=Math.sqrt(Math.max(0,1-r2))*34;
+              const depth=Math.sqrt(Math.max(0,1-r2))*46;
               const turnX=(mx-cx)*cs+depth*sn;
               const dx=cx+turnX-tile/2;
               const dy=sy;
@@ -128,7 +130,7 @@ function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats
               const far=Math.max(0,-sign*nx);
               const near=Math.max(0,sign*nx);
               const shade=1-Math.abs(current)*(.06+.30*far);
-              const scale=1+Math.abs(current)*.045;
+              const scale=1+Math.abs(current)*.12;
               const dw=tile*scale, dh=tile*scale;
 
               ctx.globalAlpha=Math.max(.62,shade);
@@ -146,7 +148,7 @@ function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats
         }
 
         host.dataset.currentTurn=current.toFixed(3);
-        host.dataset.headMaxShift=(Math.abs(current)*12).toFixed(3);
+        host.dataset.headMaxShift=(Math.abs(current)*24).toFixed(3);
         host.dataset.neckMaxShift="0.000";
         host.dataset.neutralError=current===0?"0.000":"0.001";
         onStats({particles:0,sampleW:320,sampleH:480,renderMs:0,assembly:100});
