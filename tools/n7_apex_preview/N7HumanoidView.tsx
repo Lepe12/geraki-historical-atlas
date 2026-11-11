@@ -570,8 +570,8 @@ function HeadTurnCanvas({headTurnRef}:{headTurnRef:React.MutableRefObject<number
       const points:HP[]=[];
 
       // Head only. Neck starts below this cap and never moves.
-      for(let y=18;y<205;y+=2){
-        for(let x=52;x<268;x+=2){
+      for(let y=18;y<205;y++){
+        for(let x=52;x<268;x++){
           const i=(y*320+x)*4;
           const r=px[i],g=px[i+1],b=px[i+2],a=px[i+3];
           const lum=.2126*r+.7152*g+.0722*b;
@@ -606,7 +606,7 @@ function HeadTurnCanvas({headTurnRef}:{headTurnRef:React.MutableRefObject<number
         if(amount>.002){
           const angle=current*.23; // conservative ~13 degrees
           const cs=Math.cos(angle), sn=Math.sin(angle);
-          const grow=1+amount*.22;
+          const grow=1+amount*.10;
 
           for(const p of points){
             const ox=p.x-160;
@@ -619,20 +619,20 @@ function HeadTurnCanvas({headTurnRef}:{headTurnRef:React.MutableRefObject<number
             if(far>.48) visibility=1-clamp01((far-.48)/.42)*.88;
             // Keep the turned surface slightly dimmer overall so the effect
             // reads as depth, not as a foreign glow. The far side falls further.
-            const baseDim=1-amount*.18;
-            const shade=baseDim*(1-far*.55);
+            const baseDim=1-amount*.30;
+            const shade=baseDim*(1-far*.58);
 
             // Only the near outer silhouette receives a restrained profile rim.
             const near=Math.max(0,-Math.sign(current)*ox/104);
             const rim=p.edge*Math.max(0,(near-.68)/.32)*amount;
 
-            const rr=Math.min(255,p.r*shade + 3*rim);
-            const gg=Math.min(255,p.g*shade + 18*rim);
-            const bb=Math.min(255,p.b*shade + 28*rim);
+            const rr=Math.min(255,p.r*shade + 2*rim);
+            const gg=Math.min(255,p.g*shade + 12*rim);
+            const bb=Math.min(255,p.b*shade + 20*rim);
 
             ctx.fillStyle="rgb("+Math.round(rr)+","+Math.round(gg)+","+Math.round(bb)+")";
             ctx.globalAlpha=Math.max(0,visibility);
-            const size=1.65*grow;
+            const size=1.10*grow;
             ctx.fillRect(tx-size/2,p.y-size/2,size,size);
           }
           ctx.globalAlpha=1;
