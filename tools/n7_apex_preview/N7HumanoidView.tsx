@@ -46,6 +46,7 @@ function smooth01(v:number){ const x=clamp01(v); return x*x*(3-2*x); }
 // Release candidate: soft silhouette falloff, no hard ellipse clip.
 // Release candidate: true artwork-silhouette mask, no ghost underlay.
 // Release candidate: full-frame source-tile reconstruction; no mask, clip, or underlay.
+// Rollback marker: rejected Step 6 removed; preserve approved Step 5.
 function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats)=>void}) {
   const hostRef=useRef<HTMLDivElement>(null);
 
