@@ -146,32 +146,44 @@ jobs:
             if(!stageBox) throw Error('humanoid visual stage has no bounds');
             if(!turnBox) throw Error('head-turn host has no bounds');
 
-            async function overlayShot(name){
-              const path=process.env.RUNNER_TEMP+'/n7-turn-overlay-'+name+'.png';
-              await turnCanvas.screenshot({path});
-              return PNG.sync.read(fs.readFileSync(path));
-            }
-            function visibleCount(img,y0,y1,x0=0,x1=1){
-              let n=0;
-              const ys=Math.floor(img.height*y0), ye=Math.floor(img.height*y1);
-              const xs=Math.floor(img.width*x0), xe=Math.floor(img.width*x1);
-              for(let y=ys;y<ye;y++) for(let x=xs;x<xe;x++){
-                const i=(y*img.width+x)*4;
-                const r=img.data[i],g=img.data[i+1],b=img.data[i+2],a=img.data[i+3];
-                if(a>24 && r+g+b>30) n++;
-              }
-              return n;
-            }
-            function avgLum(img,y0,y1,x0,x1){
-              let sum=0,n=0;
-              const ys=Math.floor(img.height*y0), ye=Math.floor(img.height*y1);
-              const xs=Math.floor(img.width*x0), xe=Math.floor(img.width*x1);
-              for(let y=ys;y<ye;y++) for(let x=xs;x<xe;x++){
-                const i=(y*img.width+x)*4;
-                const r=img.data[i],g=img.data[i+1],b=img.data[i+2],a=img.data[i+3];
-                if(a>24 && r+g+b>30){sum+=.2126*r+.7152*g+.0722*b;n++;}
-              }
-              return n?sum/n:0;
+            async function overlayMetrics(){
+              return await turnCanvas.evaluate((el)=>{
+                if(!(el instanceof HTMLCanvasElement)) throw new Error('turn canvas missing');
+                const ctx=el.getContext('2d',{willReadFrequently:true});
+                if(!ctx) throw new Error('turn canvas 2d context missing');
+                const img=ctx.getImageData(0,0,el.width,el.height);
+                function visible(y0,y1,x0=0,x1=1){
+                  let n=0;
+                  const ys=Math.floor(img.height*y0), ye=Math.floor(img.height*y1);
+                  const xs=Math.floor(img.width*x0), xe=Math.floor(img.width*x1);
+                  for(let y=ys;y<ye;y++) for(let x=xs;x<xe;x++){
+                    const i=(y*img.width+x)*4;
+                    const r=img.data[i],g=img.data[i+1],b=img.data[i+2],a=img.data[i+3];
+                    if(a>24 && r+g+b>30) n++;
+                  }
+                  return n;
+                }
+                function lum(y0,y1,x0,x1){
+                  let sum=0,n=0;
+                  const ys=Math.floor(img.height*y0), ye=Math.floor(img.height*y1);
+                  const xs=Math.floor(img.width*x0), xe=Math.floor(img.width*x1);
+                  for(let y=ys;y<ye;y++) for(let x=xs;x<xe;x++){
+                    const i=(y*img.width+x)*4;
+                    const r=img.data[i],g=img.data[i+1],b=img.data[i+2],a=img.data[i+3];
+                    if(a>24 && r+g+b>30){sum+=.2126*r+.7152*g+.0722*b;n++;}
+                  }
+                  return n?sum/n:0;
+                }
+                return {
+                  headVisible:visible(.03,.43,.15,.85),
+                  neckVisible:visible(.44,.58,.25,.75),
+                  shoulderVisible:visible(.58,.70,.10,.90),
+                  lowerVisible:visible(.70,1,0,1),
+                  headLum:lum(.05,.42,.20,.80),
+                  farLum:lum(.08,.40,.52,.82),
+                  totalVisible:visible(0,1,0,1)
+                };
+              });
             }
 
             await p.mouse.move(turnBox.x+turnBox.width*.50,turnBox.y+turnBox.height*.34);
@@ -194,23 +206,28 @@ jobs:
             if(!Number.isFinite(headParticles)||headParticles<500) throw Error('Step 5 has too few head dots: '+headParticles);
             if(!Number.isFinite(turnedBaseAlpha)||turnedBaseAlpha>.12) throw Error('Base head remains visible under turned head, causing double lighting: '+turnedBaseAlpha);
 
-            const turnedOverlay=await overlayShot('right');
-            const headVisible=visibleCount(turnedOverlay,.03,.43,.15,.85);
-            const neckVisible=visibleCount(turnedOverlay,.44,.58,.25,.75);
-            const shoulderVisible=visibleCount(turnedOverlay,.58,.70,.10,.90);
-            const lowerVisible=visibleCount(turnedOverlay,.70,1,0,1);
-            if(headVisible<500) throw Error('Step 5 head dots are not visibly rotating: '+headVisible);
-            if(neckVisible>80) throw Error('Step 5 draws into neck; neck must remain the fixed pivot: '+neckVisible);
-            if(shoulderVisible>40) throw Error('Step 5 draws into shoulders; only head dots may turn: '+shoulderVisible);
-            if(lowerVisible>20) throw Error('Step 5 draws into lower body: '+lowerVisible);
+            const turnedOverlay=await overlayMetrics();
+            if(turnedOverlay.headVisible<500) throw Error('Step 5 head dots are not visibly rotating: '+JSON.stringify(turnedOverlay));
+            if(turnedOverlay.neckVisible>80) throw Error('Step 5 draws into neck; neck must remain the fixed pivot: '+JSON.stringify(turnedOverlay));
+            if(turnedOverlay.shoulderVisible>40) throw Error('Step 5 draws into shoulders; only head dots may turn: '+JSON.stringify(turnedOverlay));
+            if(turnedOverlay.lowerVisible>20) throw Error('Step 5 draws into lower body: '+JSON.stringify(turnedOverlay));
 
             const approvedNeutral=PNG.sync.read(fs.readFileSync(approvedNeutralPath));
-            const neutralHeadLum=avgLum(approvedNeutral,.05,.42,.20,.80);
-            const turnedHeadLum=avgLum(turnedOverlay,.05,.42,.20,.80);
-            const neutralFarLum=avgLum(approvedNeutral,.08,.40,.52,.82);
-            const turnedFarLum=avgLum(turnedOverlay,.08,.40,.52,.82);
-            if(turnedHeadLum>neutralHeadLum*1.08) throw Error('Step 5 adds global head glow instead of profile lighting: '+JSON.stringify({neutralHeadLum,turnedHeadLum}));
-            if(turnedFarLum>neutralFarLum*.98) throw Error('Step 5 far side is not darkening: '+JSON.stringify({neutralFarLum,turnedFarLum}));
+            function approvedLum(img,y0,y1,x0,x1){
+              let sum=0,n=0;
+              const ys=Math.floor(img.height*y0), ye=Math.floor(img.height*y1);
+              const xs=Math.floor(img.width*x0), xe=Math.floor(img.width*x1);
+              for(let y=ys;y<ye;y++) for(let x=xs;x<xe;x++){
+                const i=(y*img.width+x)*4;
+                const r=img.data[i],g=img.data[i+1],b=img.data[i+2],a=img.data[i+3];
+                if(a>24 && r+g+b>30){sum+=.2126*r+.7152*g+.0722*b;n++;}
+              }
+              return n?sum/n:0;
+            }
+            const neutralHeadLum=approvedLum(approvedNeutral,.05,.42,.20,.80);
+            const neutralFarLum=approvedLum(approvedNeutral,.08,.40,.52,.82);
+            if(turnedOverlay.headLum>neutralHeadLum*1.08) throw Error('Step 5 adds global head glow instead of profile lighting: '+JSON.stringify({neutralHeadLum,turnedHeadLum:turnedOverlay.headLum}));
+            if(turnedOverlay.farLum>neutralFarLum*.98) throw Error('Step 5 far side is not darkening: '+JSON.stringify({neutralFarLum,turnedFarLum:turnedOverlay.farLum}));
 
             await p.mouse.move(turnBox.x+turnBox.width*.50,turnBox.y+turnBox.height*.34);
             await p.waitForTimeout(1400);
@@ -218,8 +235,8 @@ jobs:
             const returnBaseAlpha=Number(await baseHost.getAttribute('data-head-base-alpha'));
             if(!Number.isFinite(returnTurn)||Math.abs(returnTurn)>.02) throw Error('Step 5 did not return to neutral turn: '+returnTurn);
             if(!Number.isFinite(returnBaseAlpha)||returnBaseAlpha<.98) throw Error('Step 5 did not restore base head alpha: '+returnBaseAlpha);
-            const neutralOverlay=await overlayShot('neutral');
-            if(visibleCount(neutralOverlay,0,1)>40) throw Error('Step 5 overlay does not switch off completely at neutral');
+            const neutralOverlay=await overlayMetrics();
+            if(neutralOverlay.totalVisible>40) throw Error('Step 5 overlay does not switch off completely at neutral: '+JSON.stringify(neutralOverlay));
 
             // Reproduce the user's likely environment: OS/browser reduced-motion enabled.
             // Clicking Assembly is an explicit opt-in and must still animate.
