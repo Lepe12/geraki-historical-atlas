@@ -148,6 +148,8 @@ def main():
             "const [humanoidOpen,setHumanoidOpen]=useState(false);",
             "const [humanoidOpen,setHumanoidOpen]=useState(true);")
     shutil.copy2(overlay/"N7HumanoidView.tsx",out/"components/N7HumanoidView.tsx")
+    shutil.copy2(overlay/"N7Backdrop.tsx",out/"components/N7Backdrop.tsx")
+    (out/"components/N7BackdropReference.ts").write_text(f'export const N7_BACKDROP_REFERENCE = "{base_path}/n7-backdrop-v1.svg";\n')
     shutil.copy2(overlay/"N7HumanoidReference.ts",out/"components/N7HumanoidReference.ts")
     (out/"components/N7HumanoidReference.ts").write_text(f'export const N7_HUMANOID_REFERENCE = "{base_path}/n7-humanoid-idle-v3.webp";\n')
     for part in overlay.glob("N7HumanoidReferencePart*.ts"):
@@ -163,6 +165,7 @@ def main():
     if humanoid_sha != "bdba288c56230908e1c6abd1a199e5a895159730faf27c672916b03d51a5c7e5":
         raise RuntimeError(f"wrong N7 humanoid asset sha256: {humanoid_sha}")
     (out/"public/n7-humanoid-idle-v3.webp").write_bytes(humanoid_bytes)
+    shutil.copy2(overlay/"n7-backdrop-v1.svg",out/"public/n7-backdrop-v1.svg")
 
     patch_exact(out/"app/page.tsx",'import ApexWorld from "@/components/ApexWorld";','import N7ApexStage from "@/components/N7ApexStage";')
     patch_exact(out/"app/page.tsx",'''<section style={{ position: "relative", height: "100vh", minHeight: 620 }}>
