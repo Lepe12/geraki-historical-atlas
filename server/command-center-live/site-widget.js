@@ -4,7 +4,7 @@
 (function(){
 if(window.__pcCaptainLoaded||!document.body)return;window.__pcCaptainLoaded=true;
 var API="https://pct-live.piratecartography.com/site/ask";
-var AVATAR="https://pct-live.piratecartography.com/site/captain.jpg"; // N7 portrait (NABOU cartographer-gold), served by pct-live
+var AVATAR="https://pct-live.piratecartography.com/site/captain"; // N7 portrait (NABOU cartographer-gold), served by pct-live
 var CHIPS=["Ποιοι ήταν οι Μπαρμπαρόσα;","Τι ήταν η γαλέρα;","Ποια βιβλία έχει το site;"];
 var WHEEL='<svg viewBox="0 0 64 64" width="100%" height="100%" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><circle cx="32" cy="32" r="17"/><circle cx="32" cy="32" r="6"/>'+
  [0,45,90,135,180,225,270,315].map(function(a){return '<line x1="32" y1="32" x2="32" y2="3" transform="rotate('+a+' 32 32)"/>';}).join("")+

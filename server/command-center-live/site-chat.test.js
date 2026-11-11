@@ -40,9 +40,13 @@ const {createAsk}=require("./site-ask-core");
   clock+=10*60*1000+1;
   assert.equal((await call("POST","/site/ask",JSON.stringify({question:"γαλέρα"}),{"x-forwarded-for":"1.1.1.1"})).status,200);
   assert.equal((await call("POST","/site/ask","not json",{"x-forwarded-for":"3.3.3.3"})).status,400);
-  r=await call("GET","/site/captain.jpg");assert.equal(r.status,200);assert.equal(r.headers["content-type"],"image/jpeg");
+  for(const p of ["/site/captain","/site/captain.jpg"]){r=await call("GET",p);assert.equal(r.status,200);assert.equal(r.headers["content-type"],"image/jpeg");}
+  // Live image URLs must be extensionless (Plesk nginx serves *.jpg/*.js itself and returns 404).
+  assert.ok(j.links.filter(l=>l.image).every(l=>/\/site\/thumbs\/\d+$/.test(l.image)),"thumb URLs must be extensionless");
+  r=await call("GET","/site/widget");assert.equal(r.status,200);assert.match(r.headers["content-type"],/javascript/);
+  assert.ok(!/site\/captain\.jpg/.test(r.body.toString()),"widget must use the extensionless portrait URL");
   r=await call("GET","/site/widget.js");assert.equal(r.status,200);assert.match(r.body.toString(),/Ρώτα τον Καπετάνιο/);assert.match(r.body.toString(),/pct-live\.piratecartography\.com\/site\/ask/);
-  const someThumb=idx.items.find(x=>x.thumb);if(someThumb){r=await call("GET","/site/thumbs/"+someThumb.thumb);assert.equal(r.status,200);}
+  const someThumb=idx.items.find(x=>x.thumb);if(someThumb){r=await call("GET","/site/thumbs/"+someThumb.thumb);assert.equal(r.status,200);r=await call("GET","/site/thumbs/"+someThumb.thumb.split(".")[0]);assert.equal(r.status,200);assert.match(r.headers["content-type"],/^image\//);}
   assert.equal((await call("GET","/site/thumbs/999999999.jpg")).status,404);
   assert.equal((await call("GET","/site/thumbs/../../app.js")).status,404);
   app.close();
