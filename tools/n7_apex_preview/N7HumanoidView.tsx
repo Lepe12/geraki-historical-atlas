@@ -196,7 +196,8 @@ function ParticleReference({
         const arr=positionAttr.array as Float32Array;
         const aa=alphaAttr.array as Float32Array;
 
-        if(!assembly || reduced || progress>=1){
+        if(!assembly) return;
+        if(reduced || progress>=1){
           arr.set(finalArray);
           aa.fill(1);
           positionAttr.needsUpdate=true;
