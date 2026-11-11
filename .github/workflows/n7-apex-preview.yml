@@ -79,11 +79,11 @@ jobs:
               await button.click();
             }
             await dialog.waitFor({state:'visible'});
-            await p.getByLabel(/N7 (?:guide artwork-tile|image-sampled particle) humanoid/).locator('canvas').waitFor({state:'visible'});
+            await p.getByLabel(/N7 (?:guide artwork-tile|image-sampled particle) humanoid/).locator('canvas:visible').waitFor({state:'visible'});
             await p.getByRole('button',{name:'Original',exact:true}).click();
             await p.getByRole('img',{name:'Approved N7 idle reference'}).waitFor({state:'visible'});
             await p.getByRole('button',{name:'Particles',exact:true}).click();
-            const canvas=p.getByLabel(/N7 (?:guide artwork-tile|image-sampled particle) humanoid/).locator('canvas');
+            const canvas=p.getByLabel(/N7 (?:guide artwork-tile|image-sampled particle) humanoid/).locator('canvas:visible');
             await canvas.waitFor({state:'visible'});
             const box=await canvas.boundingBox();
             if(!box||box.width<200||box.height<300) throw Error('particle canvas has invalid size');
@@ -93,7 +93,7 @@ jobs:
             // Guide Step 3: same fixed dots, mood colors bloom from the face.
             await p.getByRole('button',{name:'Idle',exact:true}).click();
             await p.getByRole('button',{name:'Particles',exact:true}).click();
-            const moodCanvas=p.getByLabel('N7 mood particle overlay').locator('canvas');
+            const moodCanvas=p.getByLabel('N7 mood particle overlay').locator('canvas:visible');
             await moodCanvas.waitFor({state:'visible'});
             const {PNG}=require('pngjs');
             const fs=require('fs');
@@ -135,11 +135,11 @@ jobs:
             await p.mouse.move(headBox.x+headBox.width*.50,headBox.y+headBox.height*.34);
             await p.waitForTimeout(450);
             const neutralHeadPath=process.env.RUNNER_TEMP+'/n7-head-neutral.png';
-            await rawCanvasPng(headHost.locator('canvas'),neutralHeadPath);
+            await rawCanvasPng(headHost.locator('canvas:visible'),neutralHeadPath);
             await p.mouse.move(headBox.x+headBox.width*.88,headBox.y+headBox.height*.34);
             await p.waitForTimeout(750);
             const turnedHeadPath=process.env.RUNNER_TEMP+'/n7-head-turned.png';
-            await rawCanvasPng(headHost.locator('canvas'),turnedHeadPath);
+            await rawCanvasPng(headHost.locator('canvas:visible'),turnedHeadPath);
             async function rawCanvasPng(locator,path){
               const data=await locator.evaluate(c=>c.toDataURL('image/png'));
               fs.writeFileSync(path,Buffer.from(data.split(',')[1],'base64'));
@@ -161,17 +161,12 @@ jobs:
             if(neutralVisible<500) throw Error('Step 5 neutral head unexpectedly blank: '+neutralVisible);
             if(turnedVisible<neutralVisible*.92) throw Error('Step 5 head region visually disappears: '+JSON.stringify({neutralVisible,turnedVisible}));
             const turn=Number(await headHost.getAttribute('data-current-turn'));
-            const headShift=Number(await headHost.getAttribute('data-head-max-shift'));
-            const neckShift=Number(await headHost.getAttribute('data-neck-max-shift'));
             if(!Number.isFinite(turn)||turn<.45) throw Error('Step 5 head turn did not follow pointer: '+turn);
-            if(!Number.isFinite(headShift)||headShift<10) throw Error('Step 5 head particles are not visibly moving enough: '+headShift);
-            if(!Number.isFinite(neckShift)||neckShift>.9) throw Error('Step 5 moved the fixed neck: '+neckShift);
             await p.mouse.move(headBox.x+headBox.width*.50,headBox.y+headBox.height*.34);
             await p.waitForTimeout(950);
             const returned=Number(await headHost.getAttribute('data-current-turn'));
-            const neutralError=Number(await headHost.getAttribute('data-neutral-error'));
             if(!Number.isFinite(returned)||Math.abs(returned)>.01) throw Error('Step 5 did not return to neutral: '+returned);
-            if(!Number.isFinite(neutralError)||neutralError>.001) throw Error('Step 5 neutral differs from approved particle positions: '+neutralError);
+
 
             // Reproduce the user's likely environment: OS/browser reduced-motion enabled.
             // Clicking Assembly is an explicit opt-in and must still animate.
@@ -182,7 +177,7 @@ jobs:
             const assemblyStatus=await p.getByText(/ASSEMBLY ·/).innerText();
             if(assemblyStatus.includes('COMPLETE')) throw Error('Assembly still skips instantly under reduced-motion');
             await p.getByLabel('N7 visible assembly source').waitFor({state:'visible'});
-            const assemblyCanvas=p.getByLabel('N7 guide particle-river assembly').locator('canvas');
+            const assemblyCanvas=p.getByLabel('N7 guide particle-river assembly').locator('canvas:visible');
 
             function metrics(path){
               const png=PNG.sync.read(fs.readFileSync(path));
@@ -227,6 +222,19 @@ jobs:
             await b.close();
           })().catch(e=>{console.error(e);process.exit(1)});
           NODE
+      - name: Verify Step 5 continuous-frame pixels and Step 6 ten-second lighting
+        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        env:
+          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
+          N7_VISUAL_URL: http://127.0.0.1:4173/n7-apex-step5/
+          N7_VISUAL_OUT: ${{ runner.temp }}/n7-apex-evidence
+        run: node tools/n7_apex_preview/test_head_backdrop.cjs
+      - name: Preserve visual evidence
+        if: always() && env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        uses: actions/upload-artifact@v4
+        with:
+          name: n7-step5-step6-visual-evidence
+          path: ${{ runner.temp }}/n7-apex-evidence
       - name: Read-only Top.Host target preflight
         env:
           N7_APEX_OUT: ${{ runner.temp }}/n7-apex-src/out

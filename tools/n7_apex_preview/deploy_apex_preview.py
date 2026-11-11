@@ -130,7 +130,10 @@ def main():
                 print("N7_APEX_ROLLBACK_RESTORED=true")
             raise
         if existing and exists_dir(ftp,backup):
-            remove_tree(ftp,backup)
+            if TARGET=="n7-apex-step5":
+                print("N7_APEX_ROLLBACK_POINT="+PARENT+"/"+backup)
+            else:
+                remove_tree(ftp,backup)
         print("N7_APEX_DEPLOY_SUCCESS=true target=/"+TARGET+"/ backendUntouched=true upgraded="+str(existing).lower())
     except BaseException:
         if stage and exists_dir(ftp,stage):

@@ -14,7 +14,7 @@ export default function N7ApexStage() {
   return (
     <>
       <section style={{ position: "relative", height: "100vh", minHeight: 620 }}>
-        <ApexWorld n7Activity={n7Activity} n7Trace={n7Trace} />
+        {!humanoidOpen&&<ApexWorld n7Activity={n7Activity} n7Trace={n7Trace} />}
       </section>
       <button type="button" onClick={()=>setHumanoidOpen(true)}
         style={{position:"fixed",left:18,bottom:18,zIndex:79,padding:"9px 12px",border:"1px solid #29677b",

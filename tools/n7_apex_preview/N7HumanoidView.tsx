@@ -2,6 +2,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { N7_HUMANOID_REFERENCE } from "./N7HumanoidReference";
+import { createHeadSurface } from "./N7HeadSurface";
+import N7Backdrop from "./N7Backdrop";
 
 type ViewMode = "assembly" | "particle" | "original" | "compare";
 type Mood = "idle" | "listening" | "thinking" | "speaking";
@@ -41,207 +43,85 @@ function clamp01(v:number){ return Math.max(0,Math.min(1,v)); }
 function smooth01(v:number){ const x=clamp01(v); return x*x*(3-2*x); }
 
 
-// Isolated Step 5 deploy marker: guide-native artwork-tile renderer.
-// Release candidate: stronger yaw + no head clearRect gaps.
-// Release candidate: soft silhouette falloff, no hard ellipse clip.
-// Release candidate: true artwork-silhouette mask, no ghost underlay.
-// Release candidate: full-frame source-tile reconstruction; no mask, clip, or underlay.
-function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats)=>void}) {
+// Step 5: one continuous source-artwork surface, exact source frame at rest.
+function GuideHeadTileCanvas({enabled,reduced,onStats}:{enabled:boolean;reduced:boolean;onStats:(s:Stats)=>void}) {
   const hostRef=useRef<HTMLDivElement>(null);
-
   useEffect(()=>{
-    if(!enabled||!hostRef.current) return;
     const host=hostRef.current;
-    let disposed=false;
-    let raf=0;
-    let ro:ResizeObserver|null=null;
-    let target=0;
-    let current=0;
-    let last=performance.now();
-
+    if(!host) return;
+    let disposed=false,raf=0,target=0,current=0,last=0,lastStats=0;
+    let surface:ReturnType<typeof createHeadSurface>|undefined;
+    let wake=()=>{};
     const canvas=document.createElement("canvas");
-    canvas.width=320;
-    canvas.height=480;
-    canvas.style.width="100%";
-    canvas.style.height="100%";
-    canvas.style.display="block";
-    const ctx=canvas.getContext("2d",{alpha:true});
+    canvas.width=320;canvas.height=480;
+    Object.assign(canvas.style,{width:"100%",height:"100%",display:"block"});
+    const ctx=canvas.getContext("2d");
     if(!ctx) return;
     host.replaceChildren(canvas);
-
-    const image=new Image();
-    image.decoding="async";
-    image.src=N7_HUMANOID_REFERENCE;
-
+    const image=new Image();image.decoding="async";
     const pointer=(e:PointerEvent)=>{
+      if(!enabled||reduced) return;
       const rect=host.getBoundingClientRect();
-      if(rect.width<=0) return;
-      const raw=(e.clientX-(rect.left+rect.width/2))/(rect.width*.42);
-      target=Math.max(-1,Math.min(1,raw));
+      if(!rect.width) return;
+      target=Math.max(-1,Math.min(1,(e.clientX-rect.left-rect.width/2)/(rect.width*.42)));
       if(Math.abs(target)<.10) target=0;
-      host.dataset.headTarget=target.toFixed(3);
+      host.dataset.headTarget=target.toFixed(3);wake();
     };
-    const clear=()=>{target=0;host.dataset.headTarget="0.000";};
+    const clear=()=>{target=0;host.dataset.headTarget="0.000";wake();};
     window.addEventListener("pointermove",pointer,{passive:true});
-    window.addEventListener("blur",clear);
-    document.addEventListener("mouseleave",clear);
-
+    window.addEventListener("blur",clear);document.addEventListener("mouseleave",clear);
     image.onload=()=>{
       if(disposed) return;
-
-      const sample=document.createElement("canvas");
-      sample.width=320; sample.height=480;
-      const sctx=sample.getContext("2d",{willReadFrequently:true});
-      if(!sctx) return;
-      sctx.drawImage(image,0,0,320,480);
-      const px=sctx.getImageData(0,0,320,480).data;
-
-      type Tile={sx:number;sy:number;head:number;depth:number;edge:number;nx:number;ny:number};
-      const tiles:Tile[]=[];
-      const tile=4;
-      const cx=160;
-      const cy=108;
-      const rx=86;
-      const ry=98;
-      const neckY=205;
-
-      for(let sy=0;sy<480;sy+=tile){
-        for(let sx=0;sx<320;sx+=tile){
-          let visible=false;
-          for(let yy=sy;yy<Math.min(480,sy+tile)&&!visible;yy++){
-            for(let xx=sx;xx<Math.min(320,sx+tile);xx++){
-              const i=(yy*320+xx)*4;
-              const r=px[i],g=px[i+1],b=px[i+2],a=px[i+3];
-              const lum=.2126*r+.7152*g+.0722*b;
-              const chroma=Math.max(r,g,b)-Math.min(r,g,b);
-              if(a>8&&(lum>8||chroma>8)){ visible=true; break; }
-            }
-          }
-          if(!visible) continue;
-
-          const mx=sx+tile/2, my=sy+tile/2;
-          const nx=(mx-cx)/rx;
-          const ny=(my-cy)/ry;
-          const r2=nx*nx+ny*ny;
-
-          // Head influence comes from the rounded skull AND fades continuously
-          // into zero at the neck pivot. No geometric clipping or masking.
-          let head=0;
-          if(r2<1.18 && my<neckY){
-            const skull=Math.max(0,1-r2/1.18);
-            const neckFade=my<178?1:Math.max(0,(neckY-my)/(neckY-178));
-            head=Math.min(1,Math.pow(skull,.34))*neckFade;
-          }
-
-          const depth=head>0 ? Math.sqrt(Math.max(0,1-Math.min(1,r2)))*42 : 0;
-          const edge=head>0 ? Math.max(0,1-Math.abs(Math.sqrt(Math.max(0,r2))-.92)/.18) : 0;
-          tiles.push({sx,sy,head,depth,edge,nx,ny});
-        }
+      // Freeze the decoded reference once. Re-decoding/drawing lossy WebP after
+      // GPU use can choose a different accelerated color-rounding path in Chrome.
+      ctx.drawImage(image,0,0);
+      const referencePixels=ctx.getImageData(0,0,320,480);
+      ctx.putImageData(referencePixels,0,0);
+      try{surface=createHeadSurface(canvas);}catch(error){
+        host.dataset.renderError=String(error);
+        // The frozen approved reference remains usable without WebGL.
+        return;
       }
-
+      Object.assign(surface.canvas.style,{width:"100%",height:"100%",display:"none"});
+      host.append(surface.canvas);
+      host.dataset.renderer="shared-edge-texture-mesh";
       const draw=(now:number)=>{
+        raf=0;
         if(disposed) return;
-        const dt=Math.min(100,Math.max(0,now-last));
-        last=now;
-        const ease=1-Math.exp(-dt/42);
-        current+=(target-current)*ease;
-        if(target===0&&Math.abs(current)<.004) current=0;
-
-        ctx.clearRect(0,0,320,480);
-
+        const started=performance.now();
+        const dt=last?now-last:16.67;last=now;
+        current+=(target-current)*(1-Math.exp(-Math.min(100,dt)/42));
+        if(Math.abs(target-current)<.0001) current=target;
         if(current===0){
-          // The guide requires an untouched reference at rest.
-          ctx.globalAlpha=1;
-          ctx.globalCompositeOperation="source-over";
-          ctx.drawImage(image,0,0,320,480);
+          // The static reference is the sole visible surface at neutral.
+          // During motion it is hidden, never an underlay or a head overlay.
+          surface!.canvas.style.display="none";canvas.style.display="block";
         }else{
-          const angle=current*.34;
-          const sn=Math.sin(angle), cs=Math.cos(angle);
-          const sign=Math.sign(current)||1;
-          const amount=Math.abs(current);
-
-          // Rebuild the ENTIRE figure from the same source tiles every frame.
-          // Body tiles stay fixed; head tiles rotate around the neck. There is
-          // no reference underlay, no previous frame, no mask, and no clip.
-          for(const q of tiles){
-            const mx=q.sx+tile/2;
-            const my=q.sy+tile/2;
-
-            let dx=q.sx;
-            let dy=q.sy;
-            let alpha=1;
-            let scale=1;
-
-            if(q.head>0){
-              const localX=mx-cx;
-              const a=angle*q.head;
-              const c=Math.cos(a), sgn=Math.sin(a);
-              const turnedX=localX*c + q.depth*sgn;
-              dx=cx+turnedX-tile/2;
-
-              // Anchor rotation visually around the neck: upper head receives
-              // the full yaw, lower head smoothly tends to the original pose.
-              const pivotLift=(my-neckY)*(1-c)*.08*q.head;
-              dy=q.sy+pivotLift;
-
-              const far=Math.max(0,-sign*q.nx);
-              const near=Math.max(0,sign*q.nx);
-              alpha=Math.max(.26,1-amount*q.head*(.08+.50*far));
-              scale=1+amount*q.head*.16;
-
-              if(amount>.72 && far>.40){
-                // Clean far-side shadow: suppress detail instead of compressing it.
-                alpha*=Math.max(.18,1-(amount-.72)*1.65*far);
-              }
-
-              const dw=tile*scale, dh=tile*scale;
-              ctx.globalAlpha=alpha;
-              ctx.drawImage(image,q.sx,q.sy,tile,tile,dx-(dw-tile)/2,dy-(dh-tile)/2,dw,dh);
-
-              if(q.edge>.25&&near>0){
-                const rim=q.edge*near*amount*q.head;
-                ctx.globalAlpha=.13*rim;
-                ctx.fillStyle="#8cefff";
-                ctx.fillRect(dx-1,dy-1,dw+2,dh+2);
-              }
-              continue;
-            }
-
-            ctx.globalAlpha=1;
-            ctx.drawImage(image,q.sx,q.sy,tile,tile,dx,dy,tile,tile);
-          }
-          ctx.globalAlpha=1;
+          canvas.style.display="none";surface!.canvas.style.display="block";
+          surface!.draw(current); // Present directly: no GPU-to-2D copy each frame.
         }
-
-        host.dataset.currentTurn=current.toFixed(3);
-        host.dataset.headMaxShift=(Math.abs(current)*30).toFixed(3);
-        host.dataset.neckMaxShift="0.000";
-        host.dataset.neutralError=current===0?"0.000":"0.001";
-        onStats({particles:tiles.length,sampleW:320,sampleH:480,renderMs:0,assembly:100});
-        raf=requestAnimationFrame(draw);
+        const renderMs=performance.now()-started;
+        host.dataset.currentTurn=current.toFixed(4);
+        host.dataset.renderMs=renderMs.toFixed(3);
+        host.dataset.frameMs=dt.toFixed(3);
+        // Report stats at most twice a second; no React updates per frame.
+        if(now-lastStats>500){
+          lastStats=now;
+          onStats({particles:surface!.vertices,sampleW:320,sampleH:480,renderMs:+renderMs.toFixed(2),assembly:100});
+        }
+        if(current!==target) raf=requestAnimationFrame(draw);
       };
-
-      raf=requestAnimationFrame(draw);
-      ro=new ResizeObserver(()=>{});
-      ro.observe(host);
+      wake=()=>{if(!raf&&!disposed)raf=requestAnimationFrame(draw);};
+      wake();
     };
-
+    image.src=N7_HUMANOID_REFERENCE;
     return()=>{
-      disposed=true;
-      cancelAnimationFrame(raf);
-      ro?.disconnect();
-      window.removeEventListener("pointermove",pointer);
-      window.removeEventListener("blur",clear);
-      document.removeEventListener("mouseleave",clear);
-      host.replaceChildren();
+      disposed=true;cancelAnimationFrame(raf);surface?.dispose();
+      window.removeEventListener("pointermove",pointer);window.removeEventListener("blur",clear);
+      document.removeEventListener("mouseleave",clear);host.replaceChildren();
     };
-  },[enabled,onStats]);
-
-  return <div
-    ref={hostRef}
-    aria-label="N7 guide artwork-tile humanoid"
-    style={{position:"absolute",inset:0}}
-  />;
+  },[enabled,reduced,onStats]);
+  return <div ref={hostRef} aria-label="N7 guide artwork-tile humanoid" style={{position:"absolute",inset:0}} />;
 }
 
 function ParticleReference({
@@ -986,6 +866,7 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
   const isolatedStep5=N7_HUMANOID_REFERENCE.includes("/n7-apex-step5/");
   const [mode,setMode]=useState<ViewMode>("particle");
   const [details,setDetails]=useState(false);
+  const [effects,setEffects]=useState(true);
   const [mood,setMood]=useState<Mood>("idle");
   const autoThinkingRef=useRef(false);
   const [replayKey,setReplayKey]=useState(0);
@@ -1021,16 +902,17 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
 
   return <section role="dialog" aria-modal="true" aria-label="N7 Humanoid preview"
     style={{position:"fixed",inset:0,zIndex:120,background:"#000",color:"#e9fbff",fontFamily:"system-ui,sans-serif",overflow:"hidden"}}>
+    {isolatedStep5&&<N7Backdrop effects={effects} reduced={systemReduced} />}
     <header style={{position:"absolute",top:14,left:18,right:18,zIndex:5,display:"flex",justifyContent:"space-between",alignItems:"center",gap:12}}>
       <div>
         <strong style={{letterSpacing:4,color:"#62e8f7"}}>N7 · HUMANOID</strong>
-        <div style={{fontSize:11,opacity:.62}}>Guide Step 3–5 · moods + Assembly + native particle head turn around a fixed neck</div>
+        <div style={{fontSize:11,opacity:.62}}>Guide Steps 3–6 · moods · Assembly · head turn · living landscape</div>
       </div>
       <button type="button" onClick={onClose} style={{padding:"9px 13px",border:"1px solid #2c6c7e",background:"#091823",color:"#dffbff",borderRadius:7,cursor:"pointer"}}>Exit</button>
     </header>
 
     <div style={{position:"absolute",inset:"58px 0 104px",display:"grid",placeItems:"center"}}>
-      <div style={{position:"relative",height:"100%",aspectRatio:"2/3",maxWidth:"94vw",overflow:"hidden"}}>
+      <div style={{position:"relative",height:"100%",aspectRatio:"2/3",maxWidth:"94vw",overflow:"hidden",mixBlendMode:isolatedStep5?"screen":undefined}}>
         {(mode==="original"||mode==="compare")&&<img
           src={N7_HUMANOID_REFERENCE}
           alt="Approved N7 idle reference"
@@ -1038,7 +920,7 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
         />}
 
         {(mode==="particle"||mode==="compare")&&(isolatedStep5
-          ? <GuideHeadTileCanvas enabled={mood==="idle"} onStats={setStats} />
+          ? <GuideHeadTileCanvas enabled={mood==="idle"} reduced={systemReduced} onStats={setStats} />
           : <ParticleReference
               enabled
               assembly={false}
@@ -1112,6 +994,7 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
         <button type="button" onClick={()=>setMode("original")} style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:mode==="original"?"#115068":"#07131b",cursor:"pointer"}}>Original</button>
         <button type="button" onClick={()=>setMode("particle")} style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:mode==="particle"?"#115068":"#07131b",cursor:"pointer"}}>Particles</button>
         <button type="button" onClick={()=>setMode("compare")} style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:mode==="compare"?"#115068":"#07131b",cursor:"pointer"}}>Compare</button>
+        {isolatedStep5&&<button type="button" aria-pressed={effects} onClick={()=>setEffects(x=>!x)} style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:"#07131b",cursor:"pointer"}}>Effects {effects?"On":"Off"}</button>}
         <button type="button" onClick={()=>setDetails(x=>!x)} style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:"#07131b",cursor:"pointer"}}>Technical details</button>
       </div>
 
