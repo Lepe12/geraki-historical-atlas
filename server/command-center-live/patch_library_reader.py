@@ -23,7 +23,7 @@ def replace_exact(src: bytes, old: bytes, new: bytes) -> bytes:
     return src.replace(old, new)
 
 
-def patch_library_reader(live: bytes, canonical: bytes) -> bytes:
+def _patch_library_reader_core(live: bytes, canonical: bytes) -> bytes:
     marker = b'const {createLibraryReader}=require("./library-reader");'
     if marker in live:
         if live.count(marker) != 1:
@@ -58,6 +58,37 @@ def patch_library_reader(live: bytes, canonical: bytes) -> bytes:
     old = b"    if(await handleN7Library(req,res,p,u))return;\n"
     new = b"    if(await handleN7Library(req,res,p,u))return;\n    if(await handleLibrary(req,res,p))return;\n"
     return replace_exact(live, old, new)
+
+
+SITE_CHAT_REQUIRE = (
+    b'\n// Public site chat (\xc2\xab\xce\xa1\xcf\x8e\xcf\x84\xce\xb1 \xcf\x84\xce\xbf\xce\xbd \xce\x9a\xce\xb1\xcf\x80\xce\xb5\xcf\x84\xce\xac\xce\xbd\xce\xb9\xce\xbf\xc2\xbb). Optional: if its files are missing, the rest of the service still starts.\n'
+    b'let siteChat=null;try{siteChat=require("./site-chat").createSiteChat();}catch(error){console.error("site-chat disabled:",error.message);}'
+)
+SITE_CHAT_ROUTE = b"    if(siteChat&&await siteChat.handle(req,res,p,{json,readBody}))return;\n"
+OAUTH_ROUTE = b"    if(await oauth.handle(req,res,p))return;\n"
+ORIGINS_OLD = b'const ALLOWED_BROWSER_ORIGINS=new Set(["https://lepe12.github.io","https://pct-live.piratecartography.com","https://bot.piratecartography.com"]);'
+ORIGINS_NEW = b'const ALLOWED_BROWSER_ORIGINS=new Set(["https://lepe12.github.io","https://pct-live.piratecartography.com","https://bot.piratecartography.com","https://www.piratecartography.com","https://piratecartography.com"]);'
+
+
+def patch_site_chat(live: bytes, canonical: bytes) -> bytes:
+    """Additive, idempotent: public piratecartography.com site chat routes (/site/*) and its CORS origins."""
+    if b'require("./site-chat")' not in canonical:
+        return live
+    for part in (SITE_CHAT_REQUIRE, SITE_CHAT_ROUTE, ORIGINS_NEW):
+        if canonical.count(part) != 1:
+            raise RuntimeError("CANONICAL_SITE_CHAT_MISSING")
+    if b'require("./site-chat")' in live:
+        if SITE_CHAT_ROUTE not in live or ORIGINS_NEW not in live:
+            raise RuntimeError("GATEWAY_SITE_CHAT_INCOMPLETE")
+        return live
+    reader = b'const {createLibraryReader}=require("./library-reader");'
+    live = replace_exact(live, reader, reader + SITE_CHAT_REQUIRE)
+    live = replace_exact(live, ORIGINS_OLD, ORIGINS_NEW)
+    return add_exact(live, OAUTH_ROUTE, SITE_CHAT_ROUTE)
+
+
+def patch_library_reader(live: bytes, canonical: bytes) -> bytes:
+    return patch_site_chat(_patch_library_reader_core(live, canonical), canonical)
 
 
 def wrap_mission_patched(original_patched):
