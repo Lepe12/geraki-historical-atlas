@@ -48,9 +48,13 @@ export function createHeadSurface(image:HTMLCanvasElement) {
       vec2 p=source;
       p.x=160.+(source.x-160.)*cos(a)+depth*sin(a);
       p.y+=(source.y-205.)*(1.-cos(a))*.08*head;
-      // Visible vertical nod tapering to zero at the neck on one continuous mesh.
-      // Positive pitch raises the forehead; negative pitch lowers it.
-      p.y-=pitch*.19*head*max(0.,205.-source.y);
+      // Actual orthographic X-axis tilt of the rounded artwork surface.
+      // A rotation mixes its original vertical coordinate with its assigned
+      // skull depth. Unlike y-dependent translation it cannot stretch the
+      // forehead or enlarge the face. The soft neck weight keeps the body fixed.
+      float b=pitch*.34;
+      float rotatedY=205.+(source.y-205.)*cos(b)-depth*sin(b);
+      p.y+=head*(rotatedY-source.y);
       float chest=exp(-pow((source.y-320.)/94.,2.))*smoothstep(205.,250.,source.y)*(1.-smoothstep(420.,470.,source.y));
       p.x=160.+(p.x-160.)*(1.+breath*.006*chest);
       p.y-=breath*.9*chest;
