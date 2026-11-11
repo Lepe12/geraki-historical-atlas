@@ -127,6 +127,7 @@ jobs:
             if(diffPixels(listeningMood,thinkingMood)<120) throw Error('Thinking mood is not visibly distinct');
             if(diffPixels(thinkingMood,speakingMood)<120) throw Error('Speaking mood is not visibly distinct');
             await p.getByRole('button',{name:'Idle',exact:true}).click();
+            await p.waitForTimeout(1150);
 
             // Guide Step 5 exact regression: only head dots rotate around a fixed neck.
             // Neck, shoulders and body must remain stable. Lighting = far-side shadow
