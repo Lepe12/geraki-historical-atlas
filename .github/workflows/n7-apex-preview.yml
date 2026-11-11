@@ -142,7 +142,9 @@ jobs:
             const baseHost=p.getByLabel('N7 image-sampled particle humanoid');
             const stage=p.getByLabel('N7 humanoid visual stage');
             const stageBox=await stage.boundingBox();
+            const turnBox=await turnHost.boundingBox();
             if(!stageBox) throw Error('humanoid visual stage has no bounds');
+            if(!turnBox) throw Error('head-turn host has no bounds');
 
             async function overlayShot(name){
               const path=process.env.RUNNER_TEMP+'/n7-turn-overlay-'+name+'.png';
@@ -172,7 +174,7 @@ jobs:
               return n?sum/n:0;
             }
 
-            await p.mouse.move(stageBox.x+stageBox.width*.50,stageBox.y+stageBox.height*.34);
+            await p.mouse.move(turnBox.x+turnBox.width*.50,turnBox.y+turnBox.height*.34);
             await p.waitForTimeout(1400);
             const neutralTurn=Number(await turnHost.getAttribute('data-current-turn'));
             const neutralTarget=Number(await turnHost.getAttribute('data-head-target'));
@@ -181,7 +183,7 @@ jobs:
             if(!Number.isFinite(neutralTarget)||Math.abs(neutralTarget)>.02) throw Error('Neutral pointer target is not centered: '+neutralTarget);
             if(!Number.isFinite(neutralBaseAlpha)||neutralBaseAlpha<.98) throw Error('Neutral base head is not fully restored: '+neutralBaseAlpha);
 
-            await p.mouse.move(stageBox.x+stageBox.width*.90,stageBox.y+stageBox.height*.34);
+            await p.mouse.move(turnBox.x+turnBox.width*.90,turnBox.y+turnBox.height*.34);
             await p.waitForTimeout(700);
             const targetValue=Number(await turnHost.getAttribute('data-head-target'));
             const currentTurn=Number(await turnHost.getAttribute('data-current-turn'));
@@ -210,7 +212,7 @@ jobs:
             if(turnedHeadLum>neutralHeadLum*1.08) throw Error('Step 5 adds global head glow instead of profile lighting: '+JSON.stringify({neutralHeadLum,turnedHeadLum}));
             if(turnedFarLum>neutralFarLum*.98) throw Error('Step 5 far side is not darkening: '+JSON.stringify({neutralFarLum,turnedFarLum}));
 
-            await p.mouse.move(stageBox.x+stageBox.width*.50,stageBox.y+stageBox.height*.34);
+            await p.mouse.move(turnBox.x+turnBox.width*.50,turnBox.y+turnBox.height*.34);
             await p.waitForTimeout(1400);
             const returnTurn=Number(await turnHost.getAttribute('data-current-turn'));
             const returnBaseAlpha=Number(await baseHost.getAttribute('data-head-base-alpha'));
