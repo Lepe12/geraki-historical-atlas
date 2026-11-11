@@ -87,11 +87,23 @@ function createFeed({
     polling = false,
     lastSocketMessage = 0,
     revision = "";
-  let waitingRequest = "";
+  let waitingRequest = "",
+    waitingSince = 0,
+    waitingFallbackAt = 0,
+    pollEvery = 0;
   const startupPollMs = 2000;
+  // Fast start-up polling only for the first minutes; a research run takes 20–90 minutes,
+  // so after that the normal cadence is enough and spares the shared server.
+  const startupWindowMs = 3 * 60 * 1000;
+  // While waiting, the published GitHub snapshot is still checked (it carries request_id),
+  // at most this often, so a run appears even when the live server is unreachable.
+  const waitingFallbackMs = 60000;
+  const currentPollMs = () =>
+    waitingRequest && Date.now() - waitingSince < startupWindowMs ? startupPollMs : pollMs;
   const schedulePoll = () => {
     clearInterval(poll);
-    if (!closed) poll = setInterval(() => refresh(true), waitingRequest ? startupPollMs : pollMs);
+    pollEvery = currentPollMs();
+    if (!closed) poll = setInterval(() => refresh(true), pollEvery);
   };
   const completeWaiting = () => {
     waitingRequest = "";
@@ -185,6 +197,7 @@ function createFeed({
   }
   async function refresh(scheduled = false) {
     if (closed || polling) return;
+    if (scheduled && pollEvery !== currentPollMs()) schedulePoll();
     // Background tabs do not poll; a visible tab refreshes immediately.
     if (scheduled && pageHidden()) return;
     // A socket that delivered data within the last poll interval is alive and
@@ -210,7 +223,12 @@ function createFeed({
       polling = false;
       // The durable GitHub snapshot is only needed when the backend status
       // did not deliver a valid snapshot itself (offline, CORS, error).
-      if (!waitingRequest && !statusSnapshot) await fallback();
+      // While waiting for a request it is checked less often; acceptSnapshot
+      // only takes it when its request_id is the awaited one.
+      if (!statusSnapshot && (!waitingRequest || Date.now() - waitingFallbackAt >= waitingFallbackMs)) {
+        if (waitingRequest) waitingFallbackAt = Date.now();
+        await fallback();
+      }
     }
   }
   const onVisibility = () => {
@@ -288,6 +306,8 @@ function createFeed({
   };
   stop.waitForRequest = (id) => {
     waitingRequest = String(id || "");
+    waitingSince = Date.now();
+    waitingFallbackAt = 0;
     snapshot = null;
     revision = "";
     seen.clear();

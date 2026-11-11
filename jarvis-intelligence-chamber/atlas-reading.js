@@ -7,7 +7,7 @@
  const overview=$('researchOverview'),drawer=$('resultsDrawer');
  if(!overview||!drawer)return;
  const scroll=()=>drawer.querySelector('.v2-scroll')||drawer;
- let mode='research',detailReturn='map',snapshot=null,sourceRows=[],routing=false;
+ let researchFitted=false,mode='research',detailReturn='map',snapshot=null,sourceRows=[],routing=false;
  const shell=view=>document.querySelector('[data-nxs-view="'+view+'"]')?.click();
  const navState=()=>{
   document.querySelectorAll('[data-atlas-nav]').forEach(button=>{
@@ -90,6 +90,8 @@
     shell('findings');
     window.NABOU_ATLAS?.setPage('research',{openDrawer:true});
     scroll().scrollTop=0;
+    // The map stays beside «Η έρευνά μου»: refit it to the narrower frame.
+    if(!researchFitted||!['research','sources','history'].includes(previous)){researchFitted=true;requestAnimationFrame(()=>{window.dispatchEvent(new Event('resize'));if(!window.NABOU_MAP3D?.enabled)$('resetView')?.click();});}
    }
   }
   if(next==='history'){const history=$('researchHistory');if(history)history.open=true;scroll().scrollTop=0;}
@@ -188,7 +190,7 @@
   const form=$('operatorCommand'),text=String(event.detail?.state||'');
   const pending=form?.classList.contains('is-pending'),error=form?.classList.contains('is-error');
   notice.hidden=!pending&&!error;
-  notice.textContent=error?'Δεν ξεκίνησε η έρευνα. '+(/503/.test(text)?'Ο διακομιστής είναι προσωρινά μη διαθέσιμος. Δοκιμάστε ξανά.':/401|403/.test(text)?'Η σύνδεση με τον διακομιστή χρειάζεται έλεγχο.':'Δοκιμάστε ξανά σε λίγο.'):pending?(/Αποστολή/.test(text)?'Αποστολή ερωτήματος…':'Το αίτημα παραλήφθηκε. Αναμονή έναρξης έρευνας…'):'';
+  notice.textContent=error?'Δεν ξεκίνησε η έρευνα. '+(/503/.test(text)?'Ο διακομιστής είναι προσωρινά μη διαθέσιμος. Δοκιμάστε ξανά.':/401|403/.test(text)?'Η σύνδεση με τον διακομιστή χρειάζεται έλεγχο.':'Δοκιμάστε ξανά σε λίγο.'):pending?(/Αποστολή/.test(text)?'Αποστολή ερωτήματος…':'Το ερώτημά σου τρέχει. Τέτοιες έρευνες κρατάνε συνήθως 20–90 λεπτά· η πρόοδος φαίνεται στο «Η έρευνά μου».'):'';
  });
  const title=document.querySelector('title');
  const updateTitle=()=>{if(document.title.includes('NABOU//X'))document.title=document.title.replace('NABOU//X','N7');};
