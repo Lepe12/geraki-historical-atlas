@@ -78,6 +78,8 @@ function ParticleReference({
     let targetTurn=0;
     let currentTurn=0;
     let turnClock=performance.now();
+    let pointerMove:(e:PointerEvent)=>void=()=>{};
+    let clearTarget:()=>void=()=>{};
 
     const image=new Image();
     image.decoding="async";
@@ -203,7 +205,7 @@ function ParticleReference({
       renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
       host.replaceChildren(renderer.domElement);
 
-      const pointerMove=(e:PointerEvent)=>{
+      pointerMove=(e:PointerEvent)=>{
         if(!headTurnEnabled){ targetTurn=0; host.dataset.headTarget="0.000"; return; }
         const rect=host.getBoundingClientRect();
         if(rect.width<=0) return;
@@ -211,7 +213,7 @@ function ParticleReference({
         targetTurn=Math.abs(raw)<.18?0:raw;
         host.dataset.headTarget=targetTurn.toFixed(3);
       };
-      const clearTarget=()=>{ targetTurn=0; host.dataset.headTarget="0.000"; };
+      clearTarget=()=>{ targetTurn=0; host.dataset.headTarget="0.000"; };
       window.addEventListener("pointermove",pointerMove,{passive:true});
       window.addEventListener("blur",clearTarget);
       document.addEventListener("mouseleave",clearTarget);
