@@ -137,19 +137,21 @@ jobs:
             await p.waitForTimeout(750);
             const turnedHeadPath=process.env.RUNNER_TEMP+'/n7-head-turned.png';
             await headHost.locator('canvas').screenshot({path:turnedHeadPath});
-            function visiblePixels(path){
+            function headVisiblePixels(path){
               const png=PNG.sync.read(fs.readFileSync(path));
               let visible=0;
-              for(let i=0;i<png.data.length;i+=4){
+              const yMax=Math.floor(png.height*.46);
+              for(let y=0;y<yMax;y++) for(let x=0;x<png.width;x++){
+                const i=(y*png.width+x)*4;
                 const r=png.data[i],g=png.data[i+1],b=png.data[i+2],a=png.data[i+3];
                 if(a>24 && (r+g+b)>45) visible++;
               }
               return visible;
             }
-            const neutralVisible=visiblePixels(neutralHeadPath);
-            const turnedVisible=visiblePixels(turnedHeadPath);
-            if(neutralVisible<1500) throw Error('Step 5 neutral humanoid unexpectedly blank: '+neutralVisible);
-            if(turnedVisible<neutralVisible*.82) throw Error('Step 5 turn visually loses/disappears particles: '+JSON.stringify({neutralVisible,turnedVisible}));
+            const neutralVisible=headVisiblePixels(neutralHeadPath);
+            const turnedVisible=headVisiblePixels(turnedHeadPath);
+            if(neutralVisible<500) throw Error('Step 5 neutral head unexpectedly blank: '+neutralVisible);
+            if(turnedVisible<neutralVisible*.92) throw Error('Step 5 head region visually disappears: '+JSON.stringify({neutralVisible,turnedVisible}));
             const turn=Number(await headHost.getAttribute('data-current-turn'));
             const headShift=Number(await headHost.getAttribute('data-head-max-shift'));
             const neckShift=Number(await headHost.getAttribute('data-neck-max-shift'));
