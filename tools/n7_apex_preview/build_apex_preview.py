@@ -142,6 +142,7 @@ def main():
     shutil.copy2(overlay/"N7ApexStage.tsx",out/"components/N7ApexStage.tsx")
     # The isolated Step 5 route must present the humanoid immediately.
     # Production /n7-apex keeps the normal button-controlled workflow.
+    # isolated auto-open deployment marker
     if base_path.endswith("n7-apex-step5"):
         patch_exact(out/"components/N7ApexStage.tsx",
             "const [humanoidOpen,setHumanoidOpen]=useState(false);",
