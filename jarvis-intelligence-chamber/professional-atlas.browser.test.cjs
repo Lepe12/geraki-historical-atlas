@@ -19,7 +19,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
  // Nothing positioned over the framed map except the map's own layers and controls.
  const overMap=await page.evaluate(()=>{const slot=document.getElementById('n7MapSlot'),s=slot.getBoundingClientRect(),bad=[];for(const e of document.querySelectorAll('body *')){if(slot.contains(e)||e.contains(slot))continue;const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||!['fixed','absolute'].includes(cs.position))continue;const r=e.getBoundingClientRect();if(r.width<8||r.height<8||!e.innerText.trim()&&![...e.querySelectorAll('img,svg,canvas')].some(m=>m.getClientRects().length))continue;if(Math.min(r.right,s.right)-Math.max(r.left,s.left)>4&&Math.min(r.bottom,s.bottom)-Math.max(r.top,s.top)>4)bad.push(e.id||e.className);}return bad;});
  assert.deepEqual(overMap,[],'No panel overlaps the map');
- await page.locator('.n7-nav [data-n7-nav="layers"]').click();
+ await page.evaluate(()=>window.N7_LAYOUT.setLayers(true));
  assert.equal(await page.locator('.pro-place-marker').count(),11);
  const projected=await page.evaluate(()=>window.NABOU_PRO_ATLAS.places.every(p=>{const point=window.NABOU_PRO_ATLAS.project(p.lon,p.lat),marker=document.querySelector('.pro-place-marker[data-place="'+p.id+'"]');return Math.abs(parseFloat(marker.style.left)-point.x)<.01&&Math.abs(parseFloat(marker.style.top)-point.y)<.01;}));
  assert.equal(projected,true,'Every place uses the original geographic projection');
@@ -53,7 +53,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
  await page.locator('.nxa-connect-n7').waitFor({state:'visible'});
  await page.locator('.nxa-x').click();
 
- if(!await page.locator('#proMapTools').isVisible())await page.locator('.n7-nav [data-n7-nav="layers"]').click();
+ if(!await page.locator('#proMapTools').isVisible())await page.evaluate(()=>window.N7_LAYOUT.setLayers(true));
  assert.equal(await page.locator('#proMapTools').isVisible(),true);
  await page.getByLabel('Αναζήτηση τόπου',{exact:true}).fill('venice');
  await page.locator('.pro-place-list button').click();

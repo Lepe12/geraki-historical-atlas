@@ -28,11 +28,17 @@ const HITS=[{book:A,page:278,text:'Τον Μάρτιο του 1568 ο Πέτρο
  }
  const ask=async(page,q)=>{await page.locator('#n7Shell [data-atlas-nav="research"]').click();await page.locator('#operatorQuery').fill(q);await page.locator('#executeQuery').click();await page.waitForFunction(()=>{const c=document.querySelector('#libraryAnswer');return c&&!c.hidden&&c.dataset.path!=='searching';});};
  try{
-  // Reader nav: Χάρτης, Έρευνα, Πηγές; no operator screens.
+  // Reader nav: only Χάρτης, Έρευνα, Πηγές (plus the fold control). Δεδομένα / Ερευνητές stay operator-only.
   {const {page,errors}=await open();
    assert.equal(await page.locator('#n7Shell [data-atlas-nav="tools"]').isVisible(),false,'Δεδομένα is an operator screen');
    assert.equal(await page.locator('#n7Shell [data-atlas-nav="agents"]').isVisible(),false,'Ερευνητές is an operator screen');
    for(const n of ['map','research','sources'])assert.equal(await page.locator('#n7Shell [data-atlas-nav="'+n+'"]').first().isVisible(),true,n);
+   const visible=await page.locator('.n7-nav > button:visible:not(.n7-collapse), .n7-nav > a:visible').evaluateAll(es=>es.map(e=>(e.querySelector('span')||e).textContent.trim()));
+   assert.deepEqual(visible,['Χάρτης','Έρευνα','Πηγές']);
+   for(const label of ['Αρχική','Επίπεδα','Χρονολόγιο','Πρόσωπα','Γεγονότα','N7 AI','Ρυθμίσεις','Βοήθεια']){
+    assert.equal(await page.locator('.n7-nav').getByText(label,{exact:true}).isVisible(),false,label+' must not show in the left nav');
+   }
+   assert.equal(await page.locator('.n7-nav .n7-collapse').isVisible(),true,'sidebar fold control may stay');
    assert.deepEqual(errors,[]);await page.close();}
   {const {page}=await open({url:base+'&operator=1'});assert.equal(await page.locator('#n7Shell [data-atlas-nav="tools"]').isVisible(),true,'?operator=1 brings the operator screens back');await page.evaluate(()=>localStorage.removeItem('nabou-operator'));await page.close();}
   // 1. Library is enough: a short chronological story with a source under each fact, and no long run.
@@ -59,16 +65,28 @@ const HITS=[{book:A,page:278,text:'Τον Μάρτιο του 1568 ο Πέτρο
   // 4. Explicit ask to search further: the long run starts at once, without a library round trip.
   {const {page,calls}=await open();await page.locator('#n7Shell [data-atlas-nav="research"]').click();await page.locator('#researchDeep').check();await page.locator('#operatorQuery').fill('Βρες στοιχεία για τον Πέτρο Λάντζα');await page.locator('#executeQuery').click();await page.waitForFunction(()=>document.body.dataset.dispatchRequest==='own');
    assert.equal(calls.search,0);assert.equal(calls.dispatch,1);await page.close();}
-  // 4b. The top-bar field (Ctrl+K): a typed question + Enter opens «Η έρευνά μου» with that question and runs library first.
+  // 4b. The top-bar field (Ctrl+K) is the one question box: typing opens no second frame under it,
+  // and Enter opens «Η έρευνά μου» with the question as text (no second text box) and runs library first.
   {const {page,errors,calls}=await open();const q='Βρες στοιχεία για τον Πέτρο Λάντζα τον κουρσάρο';
-   await page.locator('#n7Search').fill(q);await page.locator('#n7Search').press('Enter');
+   await page.locator('#n7Search').fill(q);await page.waitForTimeout(150);
+   assert.equal(await page.locator('#n7SearchResults').isVisible(),false,'a question opens no second box under the field');
+   assert.equal(await page.locator('#n7Search').getAttribute('aria-expanded'),'false');
+   await page.locator('#n7Search').press('Enter');
    await page.waitForFunction(()=>{const c=document.querySelector('#libraryAnswer');return c&&!c.hidden&&c.dataset.path==='library';});
    assert.equal(await page.evaluate(()=>document.body.dataset.readerView),'research');
-   assert.equal(await page.locator('#operatorQuery').inputValue(),q,'the same question is in «Η έρευνά μου»');
+   assert.equal(await page.locator('#operatorQuery').inputValue(),q,'the same question goes through the «Η έρευνά μου» form');
+   assert.equal(await page.locator('#operatorQuery').isVisible(),false,'no second editable question box while the top field is the question');
+   assert.equal(await page.locator('#atlasAskSlot').isVisible(),false);
+   assert.equal(await page.locator('#n7AskedQuestion').evaluate(e=>e.textContent.replace(/\s+/g,' ').trim()),'Η ερώτησή σου «'+q+'»','the question shows as text in «Η έρευνά μου»');
+   assert.equal(await page.locator('textarea:visible, input[type=search]:visible, input[type=text]:visible').count(),1,'one question box on screen');
    assert.equal(calls.search,1);assert.equal(calls.dispatch,0,'library was enough: no long run');
    assert.equal(await page.locator('#n7Search').inputValue(),'');
    // One word that is a place still selects the place on the map and starts nothing.
-   await page.locator('#n7Shell [data-atlas-nav="map"]').click();await page.locator('#n7Search').fill('Κέρκυρα');await page.locator('#n7Search').press('Enter');
+   await page.locator('#n7Shell [data-atlas-nav="map"]').click();await page.locator('#n7Search').fill('Κέρκυρα');await page.waitForTimeout(150);
+   assert.equal(await page.locator('#n7SearchResults').isVisible(),true,'one word may list matching places');
+   assert.doesNotMatch(await page.locator('#n7SearchResults').innerText(),/Έρευνα:/,'no «Έρευνα: …» item');
+   assert.match(await page.locator('#n7SearchResults').innerText(),/Κέρκυρα/);
+   await page.locator('#n7Search').press('Enter');
    await page.waitForTimeout(200);assert.equal(await page.evaluate(()=>document.body.dataset.readerView),'map');assert.equal(calls.search,1);
    assert.deepEqual(errors,[]);await page.close();}
   // 5. Πηγές = the one library; adding a PDF adds a book (no approve/reject, no /knowledge upload).

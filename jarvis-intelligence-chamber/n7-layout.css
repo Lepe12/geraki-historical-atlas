@@ -60,6 +60,7 @@ body.n7-layout.atlas-ui #n7Shell .n7-pop p{margin:8px 10px;color:var(--n7-dim);f
 /* ---------- left navigation ---------- */
 body.n7-layout.atlas-ui #n7Shell .n7-nav{grid-area:nav;display:flex;flex-direction:column;gap:2px;padding:10px 6px;overflow:hidden auto;scrollbar-width:none}
 body.n7-layout.atlas-ui #n7Shell .n7-nav>button,body.n7-layout.atlas-ui #n7Shell .n7-nav>a{display:flex;align-items:center;gap:10px;width:100%;min-height:36px;padding:6px 10px;border:1px solid transparent;border-radius:8px;background:none;cursor:pointer;text-decoration:none;color:#d4e2ea;font-size:13px;white-space:nowrap;box-sizing:border-box;text-align:left}
+body.n7-layout.atlas-ui #n7Shell .n7-nav>[hidden]{display:none!important}
 body.n7-layout.atlas-ui #n7Shell .n7-nav>button:hover,body.n7-layout.atlas-ui #n7Shell .n7-nav>a:hover{background:#0e2238;color:#fff}
 body.n7-layout.atlas-ui #n7Shell .n7-nav>[aria-current=page],body.n7-layout.atlas-ui #n7Shell .n7-nav>[aria-expanded=true]:not(.n7-collapse){border-color:#45d3f2aa;background:linear-gradient(90deg,#0f3550,#0b2238);color:#fff;box-shadow:0 0 12px #1aa7d455,inset 0 0 10px #45d3f222}
 body.n7-layout.atlas-ui #n7Shell .n7-nav>[aria-current=page] .n7-ico{color:var(--n7-cyan)}
@@ -338,6 +339,13 @@ body.n7-layout.atlas-ui.atlas-reading #atlasResearch .my-research-details dt{col
 body.n7-layout.atlas-ui.atlas-reading #atlasResearch .my-research-details dd{margin:0;word-break:break-word}
 body.n7-layout.atlas-ui.atlas-reading #atlasResearch [data-my-research]{margin-top:4px;padding:5px 12px;border:1px solid #9c7f5088!important;border-radius:6px!important;background:#efe1bf!important;color:#4a3a20!important;font:13px 'Noto Serif',Georgia,serif!important;cursor:pointer;letter-spacing:0!important;text-transform:none!important}
 body.n7-layout.atlas-ui.atlas-reading #atlasResearch .my-research-reminder{margin:6px 0 12px;padding:8px 12px;border:1px solid #9c7f5055;border-radius:6px;background:#fff7;font:14px/1.5 'Noto Serif',Georgia,serif;color:#4a4232}
+
+/* one question box: after a question from the top field, «Η έρευνά μου» shows it as text, not as a second text box */
+body.n7-layout.atlas-ui.atlas-reading #atlasResearch .n7-asked-question{margin:8px 0 0!important;color:#2f2a20!important;font:16px/1.5 'Noto Serif',Georgia,serif!important;overflow-wrap:anywhere}
+body.n7-layout.atlas-ui.atlas-reading #atlasResearch .n7-asked-question span{display:block;margin-bottom:1px;font:600 12px 'Noto Serif',Georgia,serif!important;letter-spacing:.06em;text-transform:uppercase;color:#7a5a2c!important}
+body.n7-layout.atlas-ui.atlas-reading[data-n7-top-ask] #atlasResearch #atlasAskSlot{display:none!important}
+body.n7-layout.atlas-ui.atlas-reading[data-n7-top-ask]:is([data-reader-view=research],body.n7-layout.atlas-ui #n7Shell [data-reader-view=sources],body.n7-layout.atlas-ui #n7Shell [data-reader-view=history]) #atlasResearch .atlas-research-panel{inset:0!important}
+body.n7-layout.atlas-ui.atlas-reading[data-n7-top-ask]:is([data-reader-view=research],body.n7-layout.atlas-ui #n7Shell [data-reader-view=sources],body.n7-layout.atlas-ui #n7Shell [data-reader-view=history]) #atlasResearch #readerCommandNotice{bottom:8px!important}
 
 /* ---------- Δεδομένα (PDF): the same aged paper as «Η έρευνά μου», not a dark operator modal ---------- */
 body.n7-layout.atlas-ui.atlas-reading.atlas-pro #learningPanel:not(.hidden){background:linear-gradient(180deg,#f3e9d2,#e9dab8)!important;border:1px solid #9c7f5066!important;border-radius:10px!important;box-shadow:0 10px 30px #0007,inset 0 0 40px #9c7f5022!important;color:#3f3a2e!important;--p-text:#3f3a2e;--p-dim:#6f6450;--p-gold:#6c532f;--p-line:#9c7f5040}

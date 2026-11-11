@@ -42,7 +42,7 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict'),http
  latest={...old,run_id:'300',mission:{...old.mission,target:'Ξένη νεότερη έρευνα'}};await page.goto(url+'&view=research');
  await page.waitForFunction(()=>document.body.dataset.currentResearchRun==='200',null,{timeout:15000});assert.ok(!(await page.locator('#researchOverview').innerText()).includes('Ξένη νεότερη'));
  // A finished run without a story says so in Πρόσωπα instead of «not ready yet».
- await page.locator('#n7Shell [data-atlas-nav="map"]').click();await page.locator('#n7Shell [data-nx-go="people"]').first().click();
+ await page.locator('#n7Shell [data-atlas-nav="map"]').click();await page.locator('#n7Shell [data-nx-go="people"]').first().evaluate(e=>e.click());
  await page.waitForFunction(()=>!document.getElementById('narrativeStoryPanel')?.hidden);const story=await page.locator('#narrativeStoryPanel').innerText();assert.ok(!/δεν είναι ακόμη έτοιμη/.test(story),story);
  assert.deepEqual(errors,[]);assert.equal(dispatches,1);
  if(process.env.NABOU_SCREENSHOT_DIR){fs.mkdirSync(process.env.NABOU_SCREENSHOT_DIR,{recursive:true});await page.screenshot({path:path.join(process.env.NABOU_SCREENSHOT_DIR,'research-progress-people.png')});}
