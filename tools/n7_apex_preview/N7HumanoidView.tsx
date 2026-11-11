@@ -314,6 +314,7 @@ function ParticleReference({
             continue;
           }
 
+          // Isolated preview deploy marker: bounded head warp with head-region visibility gate.
           // Safe bounded 2.5D warp: never rotate the point cloud in 3D.
           // Facial/upper-head particles slide a few pixels laterally, with the
           // strongest movement near the centre of the face and zero at the neck.
