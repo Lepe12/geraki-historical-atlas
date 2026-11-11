@@ -1,7 +1,7 @@
 /* N7 atlas layout — owner mockup of 10 Nov 2026.
    Docks the real map (#chartFrame) into the framed centre cell and wires the new top bar, navigation,
-   timeline and place card to the existing atlas functions. No research is dispatched from here:
-   search and topics only prepare a query in the existing research form. */
+   timeline and place card to the existing atlas functions. The top search starts a research question through
+   the existing «Η έρευνά μου» form (library first); topics only prepare a query there. */
 (() => {
  'use strict';
  const $=id=>document.getElementById(id),body=document.body,shell=$('n7Shell');
@@ -129,16 +129,24 @@
  new MutationObserver(()=>requestAnimationFrame(markHome)).observe(body,{attributes:true,attributeFilter:['data-atlas-landing','data-reader-view','data-nxs-view','data-atlas-page']});
  markHome();setTimeout(markHome,300);
 
- /* ---- 4. search (Ctrl+K) and topics: places first, otherwise a prepared research question ---- */
+ /* ---- 4. top search (Ctrl+K): a place name selects the place; a question starts the research (library first).
+    Topics still only prepare a question in the research form. ---- */
  const search=$('n7Search'),results=$('n7SearchResults');
  function prepare(text){const q=$('operatorQuery');if(!q)return;q.value=text.slice(0,500);q.dispatchEvent(new Event('input',{bubbles:true}));reader()?.show('research');requestAnimationFrame(()=>q.focus({preventScroll:true}));}
+ /* The question goes through the same form and submit as «Η έρευνά μου» (operator-command.js → library first,
+    the long run only if the library is not enough). Nothing new is sent from here. */
+ function ask(text){const q=$('operatorQuery'),form=$('operatorCommand');if(!q||!form){prepare(text);return;}
+  q.value=text.slice(0,500);q.dispatchEvent(new Event('input',{bubbles:true}));reader()?.show('research',{focus:false});
+  if(typeof form.requestSubmit==='function')form.requestSubmit();else $('executeQuery')?.click();}
  const years=()=>{const r=[...document.querySelectorAll('#n7TimelineRange input')].map(i=>+i.value);return r.length===2?r[0]+'–'+r[1]:'1500–1700';};
  let options=[],active=-1;
  function closeResults(){results.hidden=true;search.setAttribute('aria-expanded','false');active=-1;}
- function choose(o){closeResults();if(o.place){toMap();atlas()?.select(o.place);search.value='';}else prepare(o.query);}
+ function choose(o){closeResults();if(o.place){toMap();atlas()?.select(o.place);search.value='';}else if(o.ask){search.value='';search.blur();ask(o.ask);}else prepare(o.query);}
  function renderResults(){
   const q=search.value.trim();options=[];
-  if(q){for(const p of (atlas()?.search(q)||[]).slice(0,8))options.push({label:p.name,hint:'Τόπος στον χάρτη',place:p.id});options.push({label:'«'+q+'»',hint:'Ετοιμάστε ερώτημα στην Έρευνα · δεν στέλνεται αυτόματα',query:q+' ('+years()+'). Δώσε πηγές και ξεχώρισε τα τεκμήρια από τις υποθέσεις.'});}
+  if(q){const places=(atlas()?.search(q)||[]).slice(0,8).map(p=>({label:p.name,hint:'Τόπος στον χάρτη',place:p.id}));const question={label:'Έρευνα: «'+q+'»',hint:q.length<3?'γράψε λίγο περισσότερο':'ξεκινά την έρευνα, πρώτα στη βιβλιοθήκη',ask:q};
+   // One word may be a place; a longer text is a question, so Enter starts the research.
+   options=/\s/.test(q)?[question,...places]:[...places,question];}
   results.replaceChildren(...options.map((o,i)=>{const b=document.createElement('button');b.type='button';b.setAttribute('role','option');b.setAttribute('aria-selected',String(i===active));b.append(o.label);const s=document.createElement('small');s.textContent=' · '+o.hint;b.append(s);b.addEventListener('mousedown',e=>e.preventDefault());b.addEventListener('click',()=>choose(o));return b;}));
   results.hidden=!options.length;search.setAttribute('aria-expanded',String(!!options.length));
  }
@@ -254,5 +262,5 @@
   window.addEventListener('resize',()=>requestAnimationFrame(place));
  }
 
- window.N7_LAYOUT={setLayers,prepare,closeDialogs};
+ window.N7_LAYOUT={setLayers,prepare,ask,closeDialogs};
 })();

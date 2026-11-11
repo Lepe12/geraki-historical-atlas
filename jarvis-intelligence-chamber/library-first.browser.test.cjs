@@ -59,6 +59,18 @@ const HITS=[{book:A,page:278,text:'Τον Μάρτιο του 1568 ο Πέτρο
   // 4. Explicit ask to search further: the long run starts at once, without a library round trip.
   {const {page,calls}=await open();await page.locator('#n7Shell [data-atlas-nav="research"]').click();await page.locator('#researchDeep').check();await page.locator('#operatorQuery').fill('Βρες στοιχεία για τον Πέτρο Λάντζα');await page.locator('#executeQuery').click();await page.waitForFunction(()=>document.body.dataset.dispatchRequest==='own');
    assert.equal(calls.search,0);assert.equal(calls.dispatch,1);await page.close();}
+  // 4b. The top-bar field (Ctrl+K): a typed question + Enter opens «Η έρευνά μου» with that question and runs library first.
+  {const {page,errors,calls}=await open();const q='Βρες στοιχεία για τον Πέτρο Λάντζα τον κουρσάρο';
+   await page.locator('#n7Search').fill(q);await page.locator('#n7Search').press('Enter');
+   await page.waitForFunction(()=>{const c=document.querySelector('#libraryAnswer');return c&&!c.hidden&&c.dataset.path==='library';});
+   assert.equal(await page.evaluate(()=>document.body.dataset.readerView),'research');
+   assert.equal(await page.locator('#operatorQuery').inputValue(),q,'the same question is in «Η έρευνά μου»');
+   assert.equal(calls.search,1);assert.equal(calls.dispatch,0,'library was enough: no long run');
+   assert.equal(await page.locator('#n7Search').inputValue(),'');
+   // One word that is a place still selects the place on the map and starts nothing.
+   await page.locator('#n7Shell [data-atlas-nav="map"]').click();await page.locator('#n7Search').fill('Κέρκυρα');await page.locator('#n7Search').press('Enter');
+   await page.waitForTimeout(200);assert.equal(await page.evaluate(()=>document.body.dataset.readerView),'map');assert.equal(calls.search,1);
+   assert.deepEqual(errors,[]);await page.close();}
   // 5. Πηγές = the one library; adding a PDF adds a book (no approve/reject, no /knowledge upload).
   {const {page,errors,calls}=await open();await page.locator('#n7Shell [data-atlas-nav="sources"]').click();await page.locator('#readerLibrary').waitFor({state:'visible'});
    assert.match(await page.locator('#readerLibrary').innerText(),/Δημοσιευμένες πηγές[\s\S]*Οι φουρτούνες του καπετάν-Πέτρου Λάντζα[\s\S]*24 σελίδες/);
@@ -74,6 +86,6 @@ const HITS=[{book:A,page:278,text:'Τον Μάρτιο του 1568 ο Πέτρο
   {const {page}=await open({library:'offline'});await page.locator('#n7Shell [data-atlas-nav="sources"]').click();await page.waitForFunction(()=>document.querySelector('#readerLibrary').dataset.state==='offline');
    assert.match(await page.locator('#readerLibrary .library-status').innerText(),/δεν έχει ανέβει ακόμη/);assert.equal(await page.locator('#libraryAdd').isDisabled(),true);
    assert.match(await page.locator('#readerLibrary').innerText(),/Λάσκαρις|Πάργας/,'published titles still listed from the public catalogue');await page.close();}
-  console.log('PASS one library in Πηγές, PDF upload adds a book, library-first answer skips the long run, honest fallback, explicit long run, reader nav without operator screens');
+  console.log('PASS one library in Πηγές, PDF upload adds a book, library-first answer skips the long run, honest fallback, explicit long run, reader nav without operator screens, top-bar question starts library-first research');
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
