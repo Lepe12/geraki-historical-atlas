@@ -140,6 +140,12 @@ def main():
     overlay=pathlib.Path(__file__).resolve().parent
     shutil.copy2(overlay/"N7Workspace.tsx",out/"components/N7Workspace.tsx")
     shutil.copy2(overlay/"N7ApexStage.tsx",out/"components/N7ApexStage.tsx")
+    # The isolated Step 5 route must present the humanoid immediately.
+    # Production /n7-apex keeps the normal button-controlled workflow.
+    if base_path.endswith("n7-apex-step5"):
+        patch_exact(out/"components/N7ApexStage.tsx",
+            "const [humanoidOpen,setHumanoidOpen]=useState(false);",
+            "const [humanoidOpen,setHumanoidOpen]=useState(true);")
     shutil.copy2(overlay/"N7HumanoidView.tsx",out/"components/N7HumanoidView.tsx")
     shutil.copy2(overlay/"N7HumanoidReference.ts",out/"components/N7HumanoidReference.ts")
     (out/"components/N7HumanoidReference.ts").write_text(f'export const N7_HUMANOID_REFERENCE = "{base_path}/n7-humanoid-idle-v3.webp";\n')
