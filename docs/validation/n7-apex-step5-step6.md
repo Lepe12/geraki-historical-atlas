@@ -51,3 +51,34 @@ The starting rollback commit is `e2bbcc901ba578e8f5d6c0e1eec31d55c1baca88`; its 
 Live verification must check the new release marker, fetch the new asset, inspect the rendered isolated page, and compare the production release marker with its pre-change copy. CI success alone is not production verification.
 
 The first push workflow (`43011832536`) was cancelled when the PR validation (`43011840510`) started: both used the same global concurrency group. Concurrency now includes event type and ref. New pushes still cancel stale runs for their own branch, while a read-only PR validation cannot cancel its deployment. This does not change runtime code.
+
+## Observed live result — 11 November 2026
+
+- Deployed code commit: `f1c1dbdc1cbf5f4b0868e6ccfcb83a18a7b30437` (renderer change in its parent `cbdbe4a90236c99d56fc00e03cc948c1fd72c72c`).
+- [Successful validation and deployment](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/43012670592).
+- Live release: `75325e3b83ceec0b`; [isolated preview](https://bot.piratecartography.com/n7-apex-step5/?v=75325e3b83ceec0b).
+- Backdrop downloaded from the live host matches SHA-256 `585e573b8f8701f12072e52404552b99dcbadc4a58f52d3cf4a1fbfbc5df5f18`.
+- Production release remained `bbdc05016a211581`, byte-identical to its pre-change marker.
+- Retained host rollback directory: `/bot.piratecartography.com/n7-app/public/.n7-apex-backup-5217d208bdba`.
+- All eight live poses passed. All 96 live motion frames had complete coverage; head visibility passed. Neutral/return and the fixed body/neck had **zero** measured channel differences against the frozen reference in this live run.
+- Effects Off was identical to the base image. Twelve highlights were detected with one analysis pass. The 5s/10s captures changed 80,073/80,345 channels. No browser errors; reduced motion, moods, Assembly, Replay and Skip passed.
+- Live software-rendered profile: mean frame interval 65.00 ms, p95 83.40 ms; median CPU submission 0.20 ms, p95 0.40 ms; 348 estimated missed 60 Hz opportunities over 120 intervals. CI's separate software profile measured 39.30 ms mean frame interval, p95 50.10 ms. Neither establishes stable 60 FPS.
+- Live `/api/status` returned 200 with `authenticated:false`. Real authenticated model replies, voice interruption and chat response latency remain unverified; they are not reported as passed.
+
+[Live machine-readable results](n7-apex-evidence/live-results.json) · [before metrics](n7-apex-evidence/before-results.json) · [complete CI image set](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/43012670592/artifacts/13850504099)
+
+Before below is a local reconstruction of the rollback source, at recorded turn −0.954. After is the actual live page at maximum left yaw −1.000. These are direct browser captures, not edited illustrations.
+
+![Before: old hair gaps](n7-apex-evidence/before.png)
+
+![After: live head turn and raster backdrop](n7-apex-evidence/after-live.png)
+
+## Changed files
+
+Runtime: `N7HumanoidView.tsx`, `N7HeadSurface.ts`, `N7Backdrop.tsx`, `N7ApexStage.tsx` in `tools/n7_apex_preview/`.
+Build/deployment: `tools/n7_apex_preview/build_apex_preview.py`, `tools/n7_apex_preview/deploy_apex_preview.py`, `.github/workflows/n7-apex-preview.yml`.
+Asset: `tools/n7_apex_preview/assets/n7-mountain-backdrop.webp` and its JSON metadata.
+Regression test: `tools/n7_apex_preview/test_head_backdrop.cjs`.
+Evidence/documentation: this report and `docs/validation/n7-apex-evidence/`.
+
+The evidence-only follow-up commit does not alter deployed code or trigger a new push deployment.
