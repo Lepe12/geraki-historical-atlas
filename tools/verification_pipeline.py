@@ -4,7 +4,7 @@ import json,os,pathlib,datetime,hashlib,sys
 sys.path.insert(0,str(pathlib.Path(__file__).parent))
 from request_context import load_request
 from evidence_model import normalize_date,toponym_identity
-from research_focus import decompose
+from research_focus import decompose, request_focus
 from research_relevance import candidate_research_value,evidence_confidence,retention_contract
 from exact_page_mapping import pages_for_hit
 from claim_evidence_matrix import build_lane as build_claim_evidence_matrix
@@ -88,7 +88,7 @@ def pdf_matches(file,line,end_line=None):
 for i,h in enumerate(events,1):
     src=h.get("file");related=pages_for_hit(pages,src,i-1,h.get("line"))+pdf_matches(src,h.get("line"),(h.get('locator') or {}).get('end_line'))
     topo=(toponym_identity(h.get("place_match"),ctx["target"],ctx["aliases"])
-          if decompose(ctx['target'],ctx['aliases'])['kind']!='person' else None)
+          if request_focus({**ctx,'target_context':req.get('target_context')})['kind']!='person' else None)
     dnorm=normalize_date(" / ".join(str(y) for y in h.get("years_in_scope",[])), h.get("date_role","UNRESOLVED"))
     candidate={
       "candidate_id":f"{LANE}-event-{i:04d}","lane":LANE,"source_file":src,
@@ -98,7 +98,7 @@ for i,h in enumerate(events,1):
       "extraction_method":h.get('extraction_method'),"extraction_uncertainties":h.get('uncertainties',[]),
       "date_basis":h.get('date_basis'),"date_evidence":h.get('date_evidence'),
       "identity_association":h.get('target_entity'),"reported_cited_pages":h.get('reported_cited_pages',[]),
-      "place":topo,"target_entity":{"kind":decompose(ctx["target"],ctx["aliases"])["kind"],"observed_name":h.get("place_match"),"identity_status":"UNVERIFIED"},"date":dnorm,"event_terms":h.get("event_terms",[]),
+      "place":topo,"target_entity":{"kind":request_focus({**ctx,"target_context":req.get("target_context")})["kind"],"observed_name":h.get("place_match"),"identity_status":"UNVERIFIED"},"date":dnorm,"event_terms":h.get("event_terms",[]),
       "event_type":"UNKNOWN","actor":"UNKNOWN","context_excerpt":h.get("context_excerpt"),
       "exact_page_candidates":[{"identifier":p.get("identifier"),"printed_page":p.get("printed_page"),"leaf":p.get("leaf"),"image_file":p.get("image_file"),"pdf_file":p.get("pdf_file"),"scan_index_0_based":p.get("scan_index_0_based")} for p in related],
       "original_quote":None,"controlled_transcription":None,"translation":None,
@@ -114,13 +114,13 @@ for i,h in enumerate(events,1):
 for j,h in enumerate(catalogue_leads,1):
     if h.get("status")!="CATALOGUE_METADATA_LEAD":continue
     topo=(toponym_identity(h.get("place_match"),ctx["target"],ctx["aliases"])
-          if decompose(ctx['target'],ctx['aliases'])['kind']!='person' else None)
+          if request_focus({**ctx,'target_context':req.get('target_context')})['kind']!='person' else None)
     dnorm=normalize_date(" / ".join(str(y) for y in h.get("years_in_scope",[])), h.get("date_role","UNRESOLVED"))
     candidate={
       "candidate_id":f"{LANE}-catalogue-{j:04d}","lane":LANE,
       "source_file":None,"source_type":"CATALOGUE_METADATA",
       "repository":h.get("repository"),"identifier":h.get("identifier"),"url":h.get("url"),"title":h.get("title"),
-      "evidence_state":"LOCATED","place":topo,"target_entity":{"kind":decompose(ctx["target"],ctx["aliases"])["kind"],"observed_name":h.get("place_match"),"identity_status":"UNVERIFIED"},"date":dnorm,"event_terms":h.get("event_terms",[]),
+      "evidence_state":"LOCATED","place":topo,"target_entity":{"kind":request_focus({**ctx,"target_context":req.get("target_context")})["kind"],"observed_name":h.get("place_match"),"identity_status":"UNVERIFIED"},"date":dnorm,"event_terms":h.get("event_terms",[]),
       "event_type":"UNKNOWN","actor":"UNKNOWN","context_excerpt":h.get("context_excerpt"),"exact_page_candidates":[],
       "original_quote":None,"controlled_transcription":None,"translation":None,
       "source_says":None,"researcher_inference":None,"original_inspected":False,

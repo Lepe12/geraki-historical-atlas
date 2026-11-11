@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import re
 from urllib.parse import urlsplit
-from research_focus import decompose
+from research_focus import decompose, request_focus
 
 def read(path):
     return json.loads(path.read_text()) if path.is_file() else {}
@@ -205,7 +205,7 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
     if not answer.get('evidence'):blockers.append('NO_REPLAYED_EVIDENCE')
     if not required<=completed:blockers.append('SEMANTIC_STAGES_INCOMPLETE')
     if answer.get('status')!='MODEL_ANSWER_PENDING_HUMAN_REVIEW':blockers.append('CITED_MODEL_ANSWER_INCOMPLETE')
-    request_kind=decompose(request['target'],request.get('aliases',[]))['kind'] if request.get('target') else 'UNKNOWN'
+    request_kind=request_focus(request)['kind'] if request.get('target') else 'UNKNOWN'
     if request_kind!='person' and not geographic.get('findings'):blockers.append('NO_SUPPORTED_PLACE_FINDINGS')
     supported=set((answer.get('review') or {}).get('supported_claim_ids',[]))
     cited={cid for section in answer.get('answer_sections',[]) for cid in section.get('claim_ids',[])}

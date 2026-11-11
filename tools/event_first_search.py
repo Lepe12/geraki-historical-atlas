@@ -3,13 +3,13 @@
 import json, pathlib, os, re, unicodedata
 from request_context import load_request
 from urllib.parse import urlsplit
-from research_focus import decompose
+from research_focus import decompose, request_focus
 from candidate_context import assess, catalogue_assess, variants, POLICY
 from section_extraction import build_findings, answer_report, render_answer
 
 rf, req, ctx = load_request()
 terms=variants(ctx['target'],ctx['aliases'])
-target_kind=decompose(ctx['target'],ctx['aliases'])['kind']
+target_kind=request_focus({**ctx,'target_context':req.get('target_context')})['kind']
 years=[int(y) for y in re.findall(r'\b(?:1[0-9]{3}|20[0-9]{2})\b',ctx['date_range'])]
 lo,hi=(min(years),max(years)) if years else (0,9999)
 hits=[]; context_leads=[]; catalogue_leads=[]

@@ -44,6 +44,34 @@ _GREEK_LATIN = dict(zip('αβγδεζηθικλμνξοπρστυφχψω',
 GIVEN_EQUIVALENTS = {fold(key): values for key,values in _GIVEN_EQUIVALENTS.items()}
 
 
+def fold_same_length(text):
+    """Accent/case fold that keeps one output character per input character,
+    so match offsets point straight back into the original text."""
+    out=[]
+    for char in str(text or ''):
+        base=unicodedata.normalize('NFD',char)[:1] or char
+        folded=base.casefold()
+        out.append(folded if len(folded)==1 else base.lower()[:1] or char)
+    return ''.join(out).replace('ς','σ')
+
+
+def find_term_spans(term, text):
+    """Spans of a requested name in text, ignoring accents and case.
+
+    «Κρεβελιε» (typed without accent) finds «Κρεβελιέ»; a one-word Greek
+    name also finds its inflected forms (Κίμωλο -> Κίμωλος).
+    """
+    folded=fold_same_length(text)
+    term=str(term or '').strip()
+    if not term:return []
+    words=_words(term)
+    if len(words)==1 and re.search(r'[α-ω]',fold(term)):
+        pattern=_token_pattern(term)
+    else:
+        pattern=r'(?<!\w)'+re.escape(fold_same_length(term))+r'(?!\w)'
+    return [(m.start(),m.end()) for m in re.finditer(pattern,folded)]
+
+
 def _words(text):
     return re.findall(r'[^\W\d_]+', str(text), re.UNICODE)
 
@@ -104,8 +132,41 @@ def _surname_orthography(latin):
     return list(dict.fromkeys([*forms,*more]))
 
 
-def decompose(target, aliases=(), purpose='', kind='unknown', regions=()):
-    """Split an explicit name + role + place clause, preserving original text."""
+def _extract_instruction(target):
+    """Strip an instruction sentence down to the thing asked about.
+
+    «Βρες στοιχεία για Κρεβελιέ τον κουρσάρο» must never become the entity
+    (run 42984961899 searched and matched the whole sentence). Returns
+    (entity, role_terms, kind_hint) or None when nothing was removed.
+    """
+    try:
+        from orchestrator.research_query import extract_research_focus
+    except ImportError:  # tools/orchestrator on sys.path directly
+        from research_query import extract_research_focus
+    try:
+        extracted=extract_research_focus(target)
+    except ValueError:
+        return None
+    if extracted['target']==str(target).strip():
+        return None
+    return extracted['target'],extracted['role_terms'],extracted['kind_hint']
+
+
+def decompose(target, aliases=(), purpose='', kind='unknown', regions=(), roles=()):
+    """Split an explicit name + role + place clause, preserving original text.
+
+    roles: request-level role terms (e.g. κουρσάρος) extracted from the
+    question; they make a bare surname a person and are search context only.
+    """
+    extracted=_extract_instruction(target)
+    if extracted:
+        target,extra_roles,hint=extracted
+        roles=[*roles,*extra_roles]
+        if kind in ('unknown','auto','all',None,'') and hint:
+            kind=hint
+    request_roles=[str(r).strip() for r in roles or () if str(r).strip()]
+    if request_roles and kind in ('unknown','auto','all',None,''):
+        kind='person'
     from research_topics import topic_focus
     topic = topic_focus(target, kind, regions)
     if topic:
@@ -134,10 +195,24 @@ def decompose(target, aliases=(), purpose='', kind='unknown', regions=()):
                     (len(words)==2 and all(re.fullmatch(r'[α-ω]+',fold(w)) for w in words))))
     if kind in ('unknown','auto','all') and name_like:
         kind='person'
-    return {'schema':'pct-research-focus-v1','kind':kind,'entity':person,
+    out={'schema':'pct-research-focus-v1','kind':kind,'entity':person,
             'names':list(dict.fromkeys(n for n in names if n)),
             'roles':list(dict.fromkeys(roles)),'places':list(dict.fromkeys(p for p in places if p)),
             'interpretation':'REQUEST_CONSTRAINTS_NOT_VERIFIED_FACTS'}
+    if request_roles:
+        # Soft: used for queries and acquisition context, never required on
+        # every catalogue title (a Wikipedia page titled only by the name counts).
+        out['search_contexts']=list(dict.fromkeys(request_roles))
+    return out
+
+
+def request_focus(request):
+    """decompose() for a resolved request, honouring its target_context."""
+    request=request or {}
+    context=request.get('target_context') if isinstance(request.get('target_context'),dict) else {}
+    return decompose(request.get('target',''),request.get('aliases',[]) or [],request.get('purpose',''),
+                     context.get('type') or 'unknown',context.get('region_terms') or [],
+                     context.get('role_terms') or [])
 
 
 def focused_queries(focus, qualifiers=(), include_hypotheses=False):
@@ -146,7 +221,7 @@ def focused_queries(focus, qualifiers=(), include_hypotheses=False):
         from research_topics import topic_queries
         return topic_queries(focus)
     queries=[]
-    contexts=[*focus.get('places',[]),*focus.get('roles',[])]
+    contexts=[*focus.get('places',[]),*focus.get('roles',[]),*focus.get('search_contexts',[])]
     batches=[]
     for name in (retrieval_names(focus) if include_hypotheses else focus['names']):
         queries=[]
@@ -180,6 +255,40 @@ def focused_queries(focus, qualifiers=(), include_hypotheses=False):
     return list(dict.fromkeys(q for group in zip_longest(*batches) for q in group if q))
 
 
+def single_name_hypotheses(name, kind='unknown'):
+    """Mechanical spellings for a one-word Greek name. Search aids only.
+
+    «Κίμωλο» (accusative after «για την») -> Κίμωλος, Kimolos;
+    «Κρεβελιέ» -> Krevelie, Crevelier, Creveliers (Greek -ιέ usually renders
+    a French -ier(s) surname). Never attested aliases, never written into
+    focus['names']; a source matched only through one stays provisional.
+    """
+    words=_words(name)
+    if len(words)!=1 or not re.search(r'[α-ω]',fold(name)):
+        return []
+    word=words[0];folded=fold(word)
+    greek=[]
+    if kind!='person' and folded.endswith('ο') and len(folded)>=4:
+        greek.append(word+'ς')
+    latin=[]
+    if kind!='place' and folded.endswith('ιε') and len(folded)>=5:
+        stem=_latin_token(word)[:-1]  # krevelie -> kreveli
+        for head in (['c'+stem[1:],stem] if stem.startswith('k') else [stem]):
+            latin.extend((head+'ers',head+'er'))
+    # Nominative first (Kimolos before Kimolo), then the literal form.
+    for form in [*greek,word]:
+        base=_latin_token(form)
+        latin.append(base)
+        if base.startswith('k') and len(base)>3:
+            latin.append('c'+base[1:])
+    out=[*greek,*(l[:1].upper()+l[1:] for l in latin)]
+    seen={fold(name)};result=[]
+    for item in out:
+        if fold(item) not in seen:
+            seen.add(fold(item));result.append(item)
+    return result
+
+
 def retrieval_names(focus):
     """Mechanical cross-script search hypotheses, never attested aliases.
 
@@ -188,7 +297,9 @@ def retrieval_names(focus):
     """
     names=list(focus['names'])
     for name in focus['names']:
-        if re.search(r'[α-ω]',fold(name)):
+        hypotheses=single_name_hypotheses(name,focus.get('kind','unknown'))
+        names.extend(hypotheses)
+        if re.search(r'[α-ω]',fold(name)) and not hypotheses:
             names.append(_latin_token(name))
     if focus.get('kind')=='person':
         extras=[]
@@ -223,7 +334,10 @@ def retrieval_names(focus):
             if len(extras)>=6:
                 break
         names.extend(extras)
-    return list(dict.fromkeys(names))
+    unique={}
+    for name in names:
+        unique.setdefault(fold(name),name)
+    return list(unique.values())
 
 
 def long_s_variant(term):
@@ -347,10 +461,21 @@ def _topical_match_segment(record, focus):
                 local_roles=[r for r in focus.get('roles',[]) if _token_match(local,r)]
                 if local_places or local_roles:
                     return {'category':'POSSIBLE_TARGET','reason':'SURNAME_WITH_REQUEST_CONTEXT','matched_name':name,'places':local_places,'roles':local_roles}
+        elif name and len(words)==1 and re.search(_token_pattern(name),text):
+            # One-word names (Κρεβελιέ, Κίμωλο) tolerate accents and Greek
+            # inflection: «Ούγος ντε Κρεβελιέ», «Κίμωλος» are the same name.
+            return {'category':'TARGET_MATCH','reason':'TARGET_NAME_IN_SOURCE','matched_name':name,'places':places,'roles':roles}
         elif name and re.search(r'(?<!\w)'+re.escape(fold(name))+r'(?!\w)',text):
             return {'category':'TARGET_MATCH','reason':'TARGET_PHRASE_IN_SOURCE','matched_name':name,'places':places,'roles':roles}
     # Cross-script full-name matches remain explicitly provisional. Mechanical
     # spelling is useful retrieval evidence, never proof of historical identity.
+    if focus['kind']!='topic':
+        for name in focus['names']:
+            for hypothesis in single_name_hypotheses(name,focus.get('kind','unknown')):
+                if re.search(r'[α-ω]',fold(hypothesis)):continue  # inflection already matched above
+                if re.search(r'(?<!\w)'+re.escape(fold(hypothesis))+r'(?!\w)',text):
+                    return {'category':'POSSIBLE_TARGET','reason':'TRANSLITERATION_REQUIRES_IDENTITY_REVIEW',
+                            'matched_name':hypothesis,'places':places,'roles':roles,'query_hypothesis':True}
     if focus['kind']=='person':
         for name in retrieval_names(focus):
             if name in focus['names']:continue

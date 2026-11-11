@@ -1,0 +1,47 @@
+name: Mount owned published-source library
+description: >
+  Privately check out Lepe12/nabou-owned-library into a runner-local path and
+  set PCT_OWNED_LIBRARY. No-op when the token secret is absent. Never uploads
+  library files as artifacts.
+inputs:
+  token:
+    description: PAT or fine-grained token that can read Lepe12/nabou-owned-library
+    required: false
+    default: ''
+  repository:
+    description: Private library repository (owner/name)
+    required: false
+    default: Lepe12/nabou-owned-library
+runs:
+  using: composite
+  steps:
+    - name: Skip when no private-library token
+      if: inputs.token == ''
+      shell: bash
+      run: |
+        echo "OWNED_LIBRARY_CHECKOUT=skipped (no token)"
+        echo "PCT_OWNED_LIBRARY_MOUNTED=0" >> "$GITHUB_ENV"
+    - name: Check out private owned library
+      if: inputs.token != ''
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ inputs.repository }}
+        token: ${{ inputs.token }}
+        path: ${{ runner.temp }}/bibliothiki-piges
+        fetch-depth: 1
+        # Library blobs stay on the runner disk only; do not publish them.
+    - name: Point PCT_OWNED_LIBRARY at the private checkout
+      if: inputs.token != ''
+      shell: bash
+      run: |
+        root="${{ runner.temp }}/bibliothiki-piges"
+        if [ ! -f "$root/KATALOGOS.md" ]; then
+          echo "OWNED_LIBRARY_CHECKOUT=missing_katalogos"
+          echo "PCT_OWNED_LIBRARY_MOUNTED=0" >> "$GITHUB_ENV"
+          exit 0
+        fi
+        # Count published pairs without printing filenames or contents.
+        pdf_count=$(find "$root" -maxdepth 1 -type f -name '*.pdf' | wc -l | tr -d ' ')
+        echo "OWNED_LIBRARY_CHECKOUT=mounted pdf_pairs=$pdf_count"
+        echo "PCT_OWNED_LIBRARY=$root" >> "$GITHUB_ENV"
+        echo "PCT_OWNED_LIBRARY_MOUNTED=1" >> "$GITHUB_ENV"

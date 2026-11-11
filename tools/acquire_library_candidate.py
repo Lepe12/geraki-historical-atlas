@@ -49,7 +49,16 @@ results=previous.get('results',[])
 try:
     from owned_source_library import inject_into_results, resolve_root
     if resolve_root() is not None:
-        inject_into_results(results, OUT, [ctx['target'], *ctx.get('aliases', []), ctx.get('purpose','')])
+        # Match on the requested name and its search variants. The full
+        # question («Βρες στοιχεία για …») is instruction, not a catalogue term.
+        owned_terms=list(dict.fromkeys([ctx['target'],*ctx.get('aliases',[]),*(req.get('search_name_variants') or [])]))
+        added=inject_into_results(results, OUT, owned_terms)
+        (OUT/'owned_library_hook.json').write_text(json.dumps({
+            'status':'OWNED_LIBRARY_SEARCHED','terms':owned_terms,'matched':len(added)},ensure_ascii=False)+'\n')
+    else:
+        (OUT/'owned_library_hook.json').write_text(json.dumps({
+            'status':'OWNED_LIBRARY_NOT_CONFIGURED_ON_RUNNER',
+            'note':'PCT_OWNED_LIBRARY is unset on this runner; the owner library was not searched.'})+'\n')
 except Exception as owned_exc:
     # Missing optional library must not abort web acquisition; record only.
     (OUT/'owned_library_hook.json').write_text(__import__('json').dumps({
@@ -174,6 +183,12 @@ for position,x in enumerate(items):
 
     except Exception as e:
         rec["status"]="ACQUISITION_ERROR";rec["error"]=f"{type(e).__name__}: {e}"
+    # A name-matched source whose page could not be fetched still carries the
+    # search excerpt: read that (labelled as excerpt) instead of nothing.
+    if not rec.get("files"):
+        from discovery_excerpt_acquisition import acquire_excerpt
+        excerpt=acquire_excerpt(rec,OUT)
+        if excerpt:rec=excerpt
     results[:]=[old for old in results if key(old)!=key(rec)]
     results.append(rec)
     checkpoint(items[position+1:]+deferred)

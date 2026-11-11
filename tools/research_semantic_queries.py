@@ -8,8 +8,8 @@ from pathlib import Path
 def expand(request,caller=None):
     sys.path.insert(0,str(Path(__file__).parent/'llm'))
     from llm_client import call
-    from research_focus import decompose
-    focus=decompose(request.get('target',''),request.get('aliases',[]))
+    from research_focus import request_focus
+    focus=request_focus(request)
     lanes={'greek','travellers','venetian','french','british','spanish_simancas','ottoman','italian_states','dutch','german','north_african'}
     from research_response_schema import query_expansion
     schema=query_expansion(lanes)

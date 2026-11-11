@@ -3,7 +3,7 @@
 import json,pathlib,re,datetime,unicodedata,sys
 sys.path.insert(0,str(pathlib.Path(__file__).parent))
 from request_context import load_request
-from research_focus import decompose
+from research_focus import decompose, request_focus, find_term_spans
 from candidate_context import variants
 rf,req,ctx=load_request()
 root=pathlib.Path("library_acquisition");out=pathlib.Path("citation_chase_hits");out.mkdir(exist_ok=True)
@@ -23,7 +23,7 @@ def norm(s):
     return re.sub(r"[ \t]+"," ",s)
 def line_no(text,pos):return text.count("\n",0,pos)+1
 hits=[]
-target_group="PLACE" if decompose(ctx["target"],ctx["aliases"])["kind"]=="place" else "TARGET_ENTITY"
+target_group="PLACE" if request_focus({**ctx,"target_context":req.get("target_context")})["kind"]=="place" else "TARGET_ENTITY"
 terms=[(target_group,t) for t in place]+[("REQUEST_LEAD",t) for t in lead_values]
 for p in sorted(root.glob("*")):
     if not p.is_file() or p.name=="acquisition_report.json" or p.suffix.lower() not in (".txt",".xml",".html",".htm"):continue
@@ -31,10 +31,10 @@ for p in sorted(root.glob("*")):
     except Exception:continue
     text=norm(raw)
     for group,term in terms:
-        pat=r"(?<!\w)"+re.escape(term)+r"(?!\w)"
-        for m in re.finditer(pat,text,re.I):
-            a=max(0,m.start()-350);b=min(len(text),m.end()+500)
-            hits.append({"file":p.name,"group":group,"term":term,"matched":m.group(0),"line":line_no(text,m.start()),"context":text[a:b].replace("\n"," ")})
+        # Accent/case-insensitive: a request typed «Κρεβελιε» must find «Κρεβελιέ».
+        for start,end in find_term_spans(term,text):
+            a=max(0,start-350);b=min(len(text),end+500)
+            hits.append({"file":p.name,"group":group,"term":term,"matched":text[start:end],"line":line_no(text,start),"context":text[a:b].replace("\n"," ")})
 report={"schema":"pct-ocr-citation-hit-v2","generated_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),"request_file":rf.name,"target":ctx["target"],"aliases":ctx["aliases"],"terms":terms,"hit_count":len(hits),"hits":hits,"warning":"OCR hits are discovery leads, not verified quotations or page citations. Exact-page original inspection remains required."}
 (out/"ocr_hits.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
 priority=[h for h in hits if h["group"] in ("PLACE","TARGET_ENTITY")]
