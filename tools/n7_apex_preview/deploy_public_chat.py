@@ -22,7 +22,7 @@ def syntax(data):
     with tempfile.NamedTemporaryFile(suffix='.cjs') as f:
         f.write(data);f.flush();p=subprocess.run(['node','--check',f.name],capture_output=True,timeout=20)
         if p.returncode:raise RuntimeError('INVALID_NODE_SYNTAX')
-def verify():
+def verify(real_model=True):
     for attempt in range(12):
         try:
             with urllib.request.urlopen(BASE+'/api/n7-apex/status',timeout=12) as r:s=json.load(r)
@@ -30,10 +30,11 @@ def verify():
         except (OSError,ValueError):pass
         time.sleep(2)
     else:raise RuntimeError('PUBLIC_CHAT_NOT_READY')
-    smoke=urllib.request.Request(BASE+'/api/n7-apex/chat',data=json.dumps({'messages':[{'role':'user','content':'Απάντησε μόνο με τη λέξη ΕΤΟΙΜΟ.'}]}).encode(),headers={'Content-Type':'application/json','Origin':BASE})
-    with urllib.request.urlopen(smoke,timeout=55) as r:answer=json.load(r)
-    if not isinstance(answer.get('reply'),str) or not answer['reply'].strip():raise RuntimeError('PUBLIC_MODEL_NO_REPLY')
-    print('APEX_PUBLIC_REAL_MODEL_REPLY_VERIFIED=true')
+    if real_model:
+        smoke=urllib.request.Request(BASE+'/api/n7-apex/chat',data=json.dumps({'messages':[{'role':'user','content':'Απάντησε μόνο με τη λέξη ΕΤΟΙΜΟ.'}]}).encode(),headers={'Content-Type':'application/json','Origin':BASE})
+        with urllib.request.urlopen(smoke,timeout=55) as r:answer=json.load(r)
+        if not isinstance(answer.get('reply'),str) or not answer['reply'].strip():raise RuntimeError('PUBLIC_MODEL_NO_REPLY')
+        print('APEX_PUBLIC_REAL_MODEL_REPLY_VERIFIED=true')
     for path in ['/api/conversations','/api/tasks']:
         try:
             urllib.request.urlopen(BASE+path,timeout=12)
@@ -64,6 +65,14 @@ def main():
         ftp.cwd(ROOT);old=read(ftp,'server.js');server=patch(old);syntax(server)
         print('APEX_PUBLIC_CHAT_PREFLIGHT '+json.dumps({'dry_run':dry,'server_changed':server!=old,'private_data_read':False,'owner_auth_unchanged':True}))
         if dry:return
+        try:installed_module=read(ftp,'n7-apex-public-chat.cjs')
+        except Exception as e:
+            if not str(e).startswith('550'):raise
+            installed_module=None
+        if server==old and installed_module==module:
+            verify(real_model=False)
+            print('APEX_PUBLIC_CHAT_ALREADY_INSTALLED no_writes=true no_restart=true')
+            return
         if read(ftp,'server.js')!=old:raise RuntimeError('CONCURRENT_SERVER_WRITE')
         install(ftp,'n7-apex-public-chat.cjs',module,done)
         install(ftp,'server.js',server,done,expected=old)

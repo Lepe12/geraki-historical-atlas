@@ -65,7 +65,7 @@ export default function N7GuideView({open,onClose,activity,onWorkspace}:{open:bo
     }
   }} role="dialog" aria-modal="true" aria-label="N7 Humanoid preview" className="n7-guide-view">
     <style>{`
-      .n7-guide-view{position:fixed;inset:0;z-index:120;background:#000;color:#e9fbff;font-family:system-ui,sans-serif;display:flex;flex-direction:column;overflow:hidden}
+      .n7-guide-view{position:fixed;inset:0;height:100dvh;max-height:100dvh;z-index:120;background:#000;color:#e9fbff;font-family:system-ui,sans-serif;display:flex;flex-direction:column;overflow:hidden}
       .n7-guide-view button{padding:8px 11px;border:1px solid #28667a;border-radius:6px;color:#defaff;background:#07131b;cursor:pointer;font-size:12px}
       .n7-guide-view button[aria-pressed=true]{background:#115068}.n7-guide-view button:disabled{opacity:.45;cursor:default}
       .n7-guide-header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;gap:12px;z-index:5;flex:none}
@@ -75,7 +75,7 @@ export default function N7GuideView({open,onClose,activity,onWorkspace}:{open:bo
       .n7-guide-figure{position:relative;height:100%;aspect-ratio:2/3;max-width:100%;mix-blend-mode:screen}
       .n7-guide-controls{flex:none;z-index:5;display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;padding:12px;background:#030c13e8}
       .n7-guide-details{padding:12px;background:#02080de8;border:1px solid #204856;border-radius:8px;overflow:auto;font-size:12px;line-height:1.6;min-height:0}
-      @media(max-width:700px){.n7-guide-main[data-details=true]{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) 115px}.n7-guide-controls{padding:8px;gap:4px}.n7-guide-view button{padding:6px 8px;font-size:11px}}
+      @media(max-width:700px), (max-width:1000px) and (max-height:500px){.n7-guide-main[data-details=true]{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) 115px}.n7-guide-controls{padding:8px;gap:4px;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;min-height:42px}.n7-guide-controls>*{flex-shrink:0}.n7-guide-view button{padding:6px 8px;font-size:11px}}
     `}</style>
     <N7Backdrop ref={backdrop} effects={effects} reduced={reduced}/>
     <div ref={waveRef} aria-label="N7 completion shockwave" data-progress="-1" style={{display:"none",position:"fixed",pointerEvents:"none",border:"2px solid #ffe0a6",boxShadow:"0 0 12px #63ddff88",borderRadius:"50%",zIndex:3}}/>

@@ -14,6 +14,8 @@ export default function N7ApexStage() {
   const [workspaceRequest,setWorkspaceRequest]=useState(0);
   const [n7Trace, setN7Trace] = useState<N7Trace | null>(null);
   const [humanoidOpen,setHumanoidOpen]=useState(false);
+  const mobileGuide=()=>isolatedGuide&&window.matchMedia("(max-width:700px), (max-width:1000px) and (max-height:500px)").matches;
+  const openConversation=()=>{if(mobileGuide()){window.dispatchEvent(new Event("n7:open-voice"));return;}setHumanoidOpen(false);setWorkspaceRequest(x=>x+1);};
   return (
     <>
       <div inert={humanoidOpen} aria-hidden={humanoidOpen?true:undefined}>
@@ -24,9 +26,9 @@ export default function N7ApexStage() {
         style={{position:"fixed",left:18,bottom:18,zIndex:79,padding:"9px 12px",border:"1px solid #29677b",
           borderRadius:7,color:"#cdf9ff",background:"#112d39",cursor:"pointer",fontWeight:700,letterSpacing:1.5,
           boxShadow:"0 0 20px #00dafa38"}}>HUMANOID</button>
-      <N7Workspace guideOpen={humanoidOpen&&isolatedGuide} openSignal={workspaceRequest} onActivity={setN7Activity} onTrace={setN7Trace} />
+      <N7Workspace onOpenFigure={()=>setHumanoidOpen(true)} guideOpen={humanoidOpen&&isolatedGuide} openSignal={workspaceRequest} onActivity={setN7Activity} onTrace={setN7Trace} />
       </div>
-      <N7HumanoidView onWorkspace={()=>{setHumanoidOpen(false);setWorkspaceRequest(x=>x+1);}} open={humanoidOpen} onClose={()=>{setHumanoidOpen(false);if(isolatedGuide)setWorkspaceRequest(x=>x+1);}} activity={n7Activity==="thinking"||n7Activity==="listening"||n7Activity==="speaking"?n7Activity:null} />
+      <N7HumanoidView onWorkspace={openConversation} open={humanoidOpen} onClose={()=>{setHumanoidOpen(false);if(isolatedGuide)setWorkspaceRequest(x=>x+1);}} activity={n7Activity==="thinking"||n7Activity==="listening"||n7Activity==="speaking"?n7Activity:null} />
     </>
   );
 }

@@ -243,6 +243,13 @@ jobs:
           N7_VISUAL_URL: http://127.0.0.1:4173/n7-apex-step5/
           N7_PASSWORDLESS_OUT: ${{ runner.temp }}/n7-apex-evidence/passwordless
         run: node tools/n7_apex_preview/test_passwordless.cjs
+      - name: Keep mobile conversation beside the visible humanoid
+        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        env:
+          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
+          N7_VISUAL_URL: http://127.0.0.1:4173/n7-apex-step5/
+          N7_MOBILE_OUT: ${{ runner.temp }}/n7-apex-evidence/mobile
+        run: node tools/n7_apex_preview/test_mobile_conversation.cjs
       - name: Verify microphone and spoken reply lifecycle
         if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
         env:

@@ -40,7 +40,8 @@ const buttonStyle: React.CSSProperties = {
   padding: "9px 12px", border: "1px solid #29677b", borderRadius: 7,
   color: "#cdf9ff", background: "#112d39", cursor: "pointer",
 };
-export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOpen=false }: {
+export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOpen=false, onOpenFigure }: {
+  onOpenFigure?:()=>void;
   guideOpen?:boolean;
   openSignal?:number;
   onActivity: (s: OrbState | "listening" | null) => void;
@@ -66,6 +67,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   const readAnswer=(id:string,messages:Msg[])=>{const replies=messages.filter(m=>m.role==="assistant");if(replies.length>(heard.current[id]||0)){heard.current[id]=replies.length;voiceRef.current.speak(replies.at(-1)!.content);}};
   const readAnswerRef=useRef(readAnswer);readAnswerRef.current=readAnswer;
   const [voiceOpen,setVoiceOpen]=useState(false),[voiceHost,setVoiceHost]=useState<HTMLElement|null>(null);
+  useEffect(()=>{const show=()=>setVoiceOpen(true);window.addEventListener("n7:open-voice",show);return()=>window.removeEventListener("n7:open-voice",show);},[]);
   const [loginBusy,setLoginBusy]=useState(false);
   useEffect(()=>{setVoiceHost(guideOpen?document.getElementById("n7-guide-voice"):null);if(!guideOpen)voiceRef.current.suspend();},[guideOpen]);
   const [taskPrompt, setTaskPrompt] = useState("");
@@ -253,11 +255,11 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   </div>;
   return (
     <>
-      {guideOpen&&voiceHost&&createPortal(<div style={{position:"relative",zIndex:5,padding:"6px 12px",background:"#04121beb",flex:"none",maxHeight:"38vh",overflow:"auto"}}>
+      {guideOpen&&voiceHost&&createPortal(<div style={{position:"relative",zIndex:5,padding:"6px 12px",background:"#04121beb",flex:"none",maxHeight:"38dvh",overflow:"auto"}}>
         <button type="button" aria-expanded={voiceOpen} onClick={()=>{setVoiceOpen(x=>!x);if(voiceOpen)voice.suspend();}}>Φωνητική συνομιλία</button>
         {voiceOpen&&voiceControls}
       </div>,voiceHost)}
-      <button type="button" onClick={() => setOpen(x => !x)}
+      <button type="button" onClick={() => {if(onOpenFigure&&N7_HUMANOID_REFERENCE.includes("/n7-apex-step5/")&&window.matchMedia("(max-width:700px), (max-width:1000px) and (max-height:500px)").matches){setVoiceOpen(true);onOpenFigure();return;}setOpen(x => !x);}}
         aria-expanded={open} aria-controls="n7-workspace"
         style={{ position:"fixed",right:18,bottom:18,zIndex:80,...buttonStyle,
           boxShadow:"0 0 22px #00dafa45",fontWeight:700,letterSpacing:2 }}>
