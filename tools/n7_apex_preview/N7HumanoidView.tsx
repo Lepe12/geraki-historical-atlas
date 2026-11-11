@@ -133,7 +133,8 @@ function ParticleReference({
           const hy=(y+.5-110)/108;
           const dome=Math.max(0,1-hx*hx-hy*hy);
           const inHead=y<205 && y>4 && Math.abs(x+.5-sampleW/2)<122;
-          const neckWeight=inHead?smooth01(clamp01((205-y)/30)):0;
+          const neckBase=inHead?smooth01(clamp01((202-y)/38)):0;
+          const neckWeight=neckBase*neckBase;
           headWeights.push(neckWeight);
           headDepths.push(inHead?Math.sqrt(dome)*58:0);
           headEdges.push(inHead?clamp01((Math.abs(hx)-.72)/.28):0);
