@@ -2,7 +2,7 @@ import * as THREE from "three";
 
 // Adjacent artwork tiles share destination edges. No luminance culling, alpha
 // shadow, underlay or silhouette mask. This uses the already-installed engine.
-export type GuideFrame={turn:number;breath?:number;assembly?:number;baseMood?:number;states?:number[];ages?:number[];ignition?:number;time?:number};
+export type GuideFrame={turn:number;pitch?:number;breath?:number;assembly?:number;baseMood?:number;states?:number[];ages?:number[];ignition?:number;time?:number};
 export function createHeadSurface(image:HTMLCanvasElement) {
   const renderer=new THREE.WebGLRenderer({alpha:false,antialias:false,depth:false,preserveDrawingBuffer:true});
   renderer.setSize(320,480,false);renderer.setPixelRatio(1);
@@ -27,12 +27,13 @@ export function createHeadSurface(image:HTMLCanvasElement) {
   geometry.setAttribute("source",new THREE.Float32BufferAttribute(sources,2));
   geometry.setIndex(indices);
   const material=new THREE.ShaderMaterial({
-    uniforms:{turn:{value:0},artwork:{value:texture},breath:{value:0},opacity:{value:1},
+    uniforms:{turn:{value:0},pitch:{value:0},artwork:{value:texture},breath:{value:0},opacity:{value:1},
       baseMood:{value:0},states:{value:[0,0,0,0]},ages:{value:[0,0,0,0]},count:{value:0},ignition:{value:0},time:{value:0}},
     depthTest:false,depthWrite:false,side:THREE.DoubleSide,toneMapped:false,transparent:true,
     vertexShader:`
     attribute vec2 source;
     uniform float turn;
+    uniform float pitch;
     uniform float breath;
     varying vec2 texUV;
     varying float shade;
@@ -47,6 +48,8 @@ export function createHeadSurface(image:HTMLCanvasElement) {
       vec2 p=source;
       p.x=160.+(source.x-160.)*cos(a)+depth*sin(a);
       p.y+=(source.y-205.)*(1.-cos(a))*.08*head;
+      float b=pitch*.20*head;
+      p.y+=(source.y-205.)*(cos(b)-1.)+depth*sin(b)*.60;
       float chest=exp(-pow((source.y-320.)/94.,2.))*smoothstep(205.,250.,source.y)*(1.-smoothstep(420.,470.,source.y));
       p.x=160.+(p.x-160.)*(1.+breath*.006*chest);
       p.y-=breath*.9*chest;
@@ -171,6 +174,7 @@ export function createHeadSurface(image:HTMLCanvasElement) {
     const blend=Math.max(0,Math.min(1,(p-.96)/.04));
     mesh.visible=p>=.96;particles.visible=p<1;glow.visible=p<1;
     material.uniforms.turn.value=frame.turn;
+    material.uniforms.pitch.value=frame.pitch||0;
     material.uniforms.breath.value=frame.breath||0;
     material.uniforms.opacity.value=blend;
     material.uniforms.baseMood.value=frame.baseMood||0;
