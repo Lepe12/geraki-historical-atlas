@@ -66,8 +66,11 @@ export function createHeadSurface(image:HTMLCanvasElement) {
       float farSide=max(0.,-sign(turn)*n.x);
       float nearSide=max(0.,sign(turn)*n.x);
       float amount=abs(turn);
-      shade=max(.26,1.-amount*head*(.08+.50*farSide));
-      shade*=1.-max(0.,amount-.72)*1.65*farSide*head;
+      // Darken the far side without erasing the lower face at hard yaw.
+      // Full-jaw rotation exposes more textured pixels than the previous
+      // fading skull mask; shadow must not suppress those artwork details.
+      shade=max(.58,1.-amount*head*(.03+.22*farSide));
+      shade*=1.-max(0.,amount-.82)*.55*farSide*head;
       float edge=max(0.,1.-abs(sqrt(r2)-.92)/.18);
       rim=edge*nearSide*amount*head*.10;
       texUV=source/vec2(320.,480.);
