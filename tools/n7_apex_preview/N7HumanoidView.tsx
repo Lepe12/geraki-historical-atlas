@@ -91,6 +91,38 @@ function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats
       const cx=160, cy=106;
       const rx=92, ry=102;
 
+      // Build a mask from the REAL artwork silhouette, not a geometric ellipse.
+      // This lets us remove only the original head surface during a turn,
+      // preventing ghost trails while preserving the natural outline.
+      const src=document.createElement("canvas");
+      src.width=320; src.height=480;
+      const sctx=src.getContext("2d",{willReadFrequently:true});
+      if(!sctx) return;
+      sctx.drawImage(image,0,0,320,480);
+      const spx=sctx.getImageData(0,0,320,480).data;
+
+      const headMask=document.createElement("canvas");
+      headMask.width=320; headMask.height=480;
+      const mctx=headMask.getContext("2d");
+      if(!mctx) return;
+      mctx.fillStyle="rgba(255,255,255,1)";
+      for(let y=0;y<205;y++){
+        const neckFade=y<188?1:Math.max(0,(205-y)/17);
+        if(neckFade<=0) continue;
+        mctx.globalAlpha=neckFade;
+        for(let x=0;x<320;x++){
+          const i=(y*320+x)*4;
+          const r=spx[i],g=spx[i+1],b=spx[i+2],a=spx[i+3];
+          const lum=.2126*r+.7152*g+.0722*b;
+          const chroma=Math.max(r,g,b)-Math.min(r,g,b);
+          if(a>10 && (lum>10 || chroma>12)){
+            // Slight dilation closes tiny sampling seams without inventing shape.
+            mctx.fillRect(x-1,y-1,3,3);
+          }
+        }
+      }
+      mctx.globalAlpha=1;
+
       const draw=(now:number)=>{
         if(disposed) return;
         const dt=Math.min(100,Math.max(0,now-last));
@@ -104,10 +136,17 @@ function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats
         ctx.drawImage(image,0,0,320,480);
 
         if(Math.abs(current)>.0005){
-          // Replace only the head region using artwork tiles from the SAME reference.
+          // Remove only the original head artwork using its true silhouette.
+          // This prevents double-image trails while avoiding a hard cut boundary.
           ctx.save();
-          // No hard geometric clip. The guide requires a profile line and a far-side
-          // shadow, not a cut edge. Each tile gets a soft elliptical falloff instead.
+          ctx.globalCompositeOperation="destination-out";
+          ctx.globalAlpha=Math.min(1,Math.abs(current)*1.35);
+          ctx.drawImage(headMask,0,0);
+          ctx.restore();
+          ctx.globalCompositeOperation="source-over";
+          ctx.globalAlpha=1;
+
+          ctx.save();
           const angle=current*.30; // stronger but still limited depth illusion.
           const sn=Math.sin(angle), cs=Math.cos(angle);
           const sign=Math.sign(current)||1;
