@@ -12,7 +12,7 @@
 ## Code
 | Part | File |
 |---|---|
-| Name focus, decision and story (shared, no network) | `tools/n7/library-first-core.js` |
+| Name focus, decision and story (shared, no network) | `jarvis-intelligence-chamber/library-first-core.js` |
 | pct-live routes `/library/status`, `/library/books` (GET/POST), `/library/search` | `server/command-center-live/library-reader.js`, wired in `app.js` |
 | Chamber: Πηγές library, upload, library-first card, operator-only nav | `jarvis-intelligence-chamber/library-first.js`, `library-first.css` |
 | Long run only after the library decision | `jarvis-intelligence-chamber/operator-command.js` |
@@ -22,7 +22,7 @@ Private page text is served only to a signed-in owner (`naboux_session` cookie f
 
 ## What still needs «ανέβασέ το»
 Merging only updates the chamber on GitHub Pages. Until pct-live is updated, every question shows «Η βιβλιοθήκη δεν απάντησε» with a button for the long run.
-1. Deploy to the pct-live gateway (`/piratecartography-gateway/server/command-center-live`): `app.js`, the new `library-reader.js`, and `../../tools/n7/library-first-core.js` (plus `../../jarvis-intelligence-chamber/data/published-library.json` for the titles). The existing `n7-mission-production.yml` push job only applies its own anchor patches and does **not** install these routes.
+1. Deploy to the pct-live gateway (`/piratecartography-gateway/server/command-center-live`): `app.js`, `library-reader.js`, `library-first-core.js` and `published-library.json` (same folder, via `NABOU Plesk FTPS deployment`, payload `backend`). `n7-mission-production.yml` applies the library routes in `app.js` through `server/command-center-live/patch_library_reader.py`; it still does not upload the new library files, so the FTPS backend deploy is required.
 2. Put the published-source `.txt` files (from `nabou-owned-library`, one beside each PDF) in a private folder on the server and set `PCT_OWNED_LIBRARY_DIR` to it. Without it, the published sources are listed but not searched (`stores.published = NOT_CONFIGURED`).
 3. The MariaDB historical library is searched automatically when `tools/library/n7_library.php` and the PHP binary are on the host.
 4. The owner signs in once per browser in Πηγές with the operator key (it is sent once to `POST /session` and never stored by the page).

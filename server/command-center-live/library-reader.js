@@ -22,7 +22,15 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
-const core = require("../../tools/n7/library-first-core.js");
+function loadCore(){
+  const candidates=[
+    path.resolve(__dirname,"library-first-core.js"),
+    path.resolve(__dirname,"../../jarvis-intelligence-chamber/library-first-core.js"),
+  ];
+  for(const file of candidates){if(fs.existsSync(file))return require(file);}
+  throw new Error("library_first_core_missing");
+}
+const core = loadCore();
 
 const MAX_HITS = 40;
 const PASSAGE_CHARS = 900;
@@ -64,7 +72,10 @@ function publishedPages(text) {
 }
 
 /** Catalogue of the published folder. Titles come from an optional catalog.json; else the file name. */
-const DEFAULT_CATALOG = path.resolve(__dirname, "../../jarvis-intelligence-chamber/data/published-library.json");
+const DEFAULT_CATALOG = [
+  path.resolve(__dirname, "published-library.json"),
+  path.resolve(__dirname, "../../jarvis-intelligence-chamber/data/published-library.json"),
+].find((file) => fs.existsSync(file)) || path.resolve(__dirname, "../../jarvis-intelligence-chamber/data/published-library.json");
 function readPublishedCatalog(dir, catalogFile = DEFAULT_CATALOG) {
   if (!dir || !fs.existsSync(dir)) return [];
   let meta = {};

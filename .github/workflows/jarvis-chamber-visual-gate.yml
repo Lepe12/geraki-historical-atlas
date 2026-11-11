@@ -4,13 +4,13 @@ on:
     branches: [main]
     paths:
       - 'jarvis-intelligence-chamber/**'
-      - 'tools/n7/library-first-core*.js'
+      - 'jarvis-intelligence-chamber/library-first-core*.js'
       - '.github/workflows/jarvis-chamber-visual-gate.yml'
   push:
     branches: [main]
     paths:
       - 'jarvis-intelligence-chamber/**'
-      - 'tools/n7/library-first-core*.js'
+      - 'jarvis-intelligence-chamber/library-first-core*.js'
       - '.github/workflows/jarvis-chamber-visual-gate.yml'
   workflow_dispatch:
 permissions:
@@ -40,7 +40,7 @@ jobs:
           node --check jarvis-intelligence-chamber/gpu-field.js
           node --check jarvis-intelligence-chamber/atlas-pages.js
           node --check jarvis-intelligence-chamber/library-first.js
-          node --check tools/n7/library-first-core.js
+          node --check jarvis-intelligence-chamber/library-first-core.js
           node --check jarvis-intelligence-chamber/atlas-reading.js
           node --check jarvis-intelligence-chamber/professional-atlas.js
           node --check jarvis-intelligence-chamber/n7-layout.js
@@ -61,7 +61,7 @@ jobs:
       - name: Verify source content search and research state
         env:
           NABOU_REQUIRE_PDF_ATTESTATION: '1'
-        run: node --test jarvis-intelligence-chamber/source-search.test.cjs jarvis-intelligence-chamber/learning-review.test.cjs jarvis-intelligence-chamber/live-bridge.test.cjs jarvis-intelligence-chamber/research-export.test.cjs jarvis-intelligence-chamber/assistant/assistant-intents.test.mjs tools/n7/library-first-core.test.js
+        run: node --test jarvis-intelligence-chamber/source-search.test.cjs jarvis-intelligence-chamber/learning-review.test.cjs jarvis-intelligence-chamber/live-bridge.test.cjs jarvis-intelligence-chamber/research-export.test.cjs jarvis-intelligence-chamber/assistant/assistant-intents.test.mjs jarvis-intelligence-chamber/library-first-core.test.js
       - name: Install browser
         run: |
           npm install --no-save playwright@1.56.1

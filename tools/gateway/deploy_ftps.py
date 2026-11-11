@@ -19,7 +19,7 @@ import uuid
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = Path("server/command-center-live")
-FILES = ("historical-evidence.js", "pdf-evidence.py", "pdf-evidence.js", "n7-gateway.js", "n7-oauth.js", "n7-library.js", "n7-library-bridge.js", "public/n7-test.html", "public/agents.html", "app.js")
+FILES = ("historical-evidence.js", "pdf-evidence.py", "pdf-evidence.js", "n7-gateway.js", "n7-oauth.js", "n7-library.js", "n7-library-bridge.js", "public/n7-test.html", "public/agents.html", "app.js", "library-reader.js", "library-first-core.js", "published-library.json")
 REMOTE = (os.getenv("PCT_FTPS_APP_ROOT") or "/").rstrip("/") or "/"
 HOST = os.environ["PCT_FTPS_HOST"]
 USER = os.environ["PCT_FTPS_USER"]
