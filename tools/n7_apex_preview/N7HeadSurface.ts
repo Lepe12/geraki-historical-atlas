@@ -58,7 +58,9 @@ export function createHeadSurface(image:HTMLCanvasElement) {
       // attachment weight alone blends the motion into the stationary body.
       // Source tiles, image scale and UV stay unchanged.
       float b=pitch*.34*head;
-      p.y=205.+(source.y-205.)*cos(b)-depth*sin(b)
+      // Rotate the whole face about its skull center; blend only at the
+      // cervical attachment. This carries the chin with the upper face.
+      p.y=108.+(source.y-108.)*cos(b)-depth*sin(b)
           +(source.y-205.)*(1.-cos(a))*.08*head;
       float chest=exp(-pow((source.y-320.)/94.,2.))*smoothstep(205.,250.,source.y)*(1.-smoothstep(420.,470.,source.y));
       p.x=160.+(p.x-160.)*(1.+breath*.006*chest);
