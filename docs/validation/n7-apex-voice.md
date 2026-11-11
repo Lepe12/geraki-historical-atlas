@@ -43,3 +43,7 @@ API references: [SpeechRecognition](https://developer.mozilla.org/en-US/docs/Web
 ## Passwordless figure update
 
 The figure no longer requires the login described in the initial voice release above. Anonymous visitors can use the microphone, voice test and message composer directly, through a separate public model route with no access to private owner history/files/Agents. Real anonymous model conversation was verified through the actual live browser. See [passwordless implementation and live proof](n7-apex-passwordless.md). Existing authenticated owner sessions remain supported.
+
+## Automatic spoken conversation update
+
+The primary voice action is now **Έναρξη συζήτησης**: final speech is sent automatically, the reply is spoken, and listening resumes after playback. No Send action is shown while this mode is active. **Υπαγόρευση** retains the optional editable/manual-confirmation flow described in the original release. Saying “τέλος συζήτησης” while being heard or using the End action stops the voice loop. See [automatic conversation evidence](n7-apex-conversation.md).
