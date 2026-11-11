@@ -8,7 +8,7 @@ import N7GuideView from "./N7GuideView";
 
 type ViewMode = "assembly" | "particle" | "original" | "compare";
 type Mood = "idle" | "listening" | "thinking" | "speaking";
-type N7Activity = "thinking" | "speaking" | null;
+type N7Activity = "listening" | "thinking" | "speaking" | null;
 type Stats = { particles:number; sampleW:number; sampleH:number; renderMs:number; assembly:number };
 
 const VERT = `

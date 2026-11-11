@@ -230,6 +230,13 @@ jobs:
             await b.close();
           })().catch(e=>{console.error(e);process.exit(1)});
           NODE
+      - name: Verify microphone and spoken reply lifecycle
+        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        env:
+          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
+          N7_VISUAL_URL: http://127.0.0.1:4173/n7-apex-step5/
+          N7_VOICE_OUT: ${{ runner.temp }}/n7-apex-evidence/voice
+        run: node tools/n7_apex_preview/test_voice.cjs
       - name: Recheck head coverage and ten-second background lighting
         if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
         env:
