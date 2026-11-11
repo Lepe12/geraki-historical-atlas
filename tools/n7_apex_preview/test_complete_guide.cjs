@@ -88,15 +88,15 @@ function metrics(png){let n=0,cyan=0,minX=png.width,maxX=-1,sumX=0;for(let y=0;y
     });
     await q.goto(url,{waitUntil:'networkidle'});await q.getByRole('dialog',{name:'N7 Humanoid preview'}).getByRole('button',{name:'Exit',exact:true}).click();await q.locator('[aria-controls="n7-workspace"]').click();await q.getByLabel('Νέο μήνυμα',{exact:true}).fill('fixture input');await q.getByRole('button',{name:'Αποστολή',exact:true}).click();
     while(!release)await q.waitForTimeout(20);await q.getByRole('button',{name:'HUMANOID',exact:true}).click();await q.getByText('MOOD · THINKING · LIVE N7 REQUEST',{exact:true}).waitFor();await q.getByRole('button',{name:'Exit',exact:true}).click();assert.equal(requests,1);release();
-    await q.getByText('Fixture reply, not a real AI response.',{exact:true}).waitFor();await q.getByRole('button',{name:'HUMANOID',exact:true}).click();await q.getByRole('dialog',{name:'N7 Humanoid preview'}).getByRole('button',{name:'Συνομιλία',exact:true}).click();await q.getByText('Fixture reply, not a real AI response.',{exact:true}).waitFor();
+    await q.getByText('Fixture reply, not a real AI response.',{exact:true}).waitFor();await q.getByRole('button',{name:'HUMANOID',exact:true}).click();await q.getByRole('dialog',{name:'N7 Humanoid preview'}).getByRole('button',{name:'Exit',exact:true}).click();await q.getByText('Fixture reply, not a real AI response.',{exact:true}).waitFor();
     fail=true;release=null;await q.getByLabel('Νέο μήνυμα',{exact:true}).fill('fixture failure');await q.getByRole('button',{name:'Αποστολή',exact:true}).click();while(!release)await q.waitForTimeout(20);await q.getByRole('button',{name:'HUMANOID',exact:true}).click();await q.getByText('MOOD · THINKING · LIVE N7 REQUEST',{exact:true}).waitFor();release();await q.getByText('MOOD · IDLE',{exact:true}).waitFor();
-    await q.getByRole('dialog',{name:'N7 Humanoid preview'}).getByRole('button',{name:'Συνομιλία',exact:true}).click();queued=true;fail=false;
+    await q.getByRole('dialog',{name:'N7 Humanoid preview'}).getByRole('button',{name:'Exit',exact:true}).click();queued=true;fail=false;
     await q.getByLabel('Νέο μήνυμα',{exact:true}).fill('queued fixture');await q.getByRole('button',{name:'Αποστολή',exact:true}).click();
     await q.getByText('Αναμονή απάντησης N7. Μπορείς να συνεχίσεις τη συνομιλία.',{exact:true}).waitFor();
     await q.getByRole('button',{name:'HUMANOID',exact:true}).click();await q.getByText('MOOD · THINKING · LIVE N7 REQUEST',{exact:true}).waitFor();
     await q.waitForTimeout(700);assert.equal(queuePolls,0,'Queue status was not using the existing interval');
     await q.getByText('MOOD · IDLE',{exact:true}).waitFor({timeout:15000});assert.equal(queuePolls,1);
-    await q.getByRole('dialog',{name:'N7 Humanoid preview'}).getByRole('button',{name:'Συνομιλία',exact:true}).click();await q.getByText('Queued fixture reply.',{exact:true}).waitFor();
+    await q.getByRole('dialog',{name:'N7 Humanoid preview'}).getByRole('button',{name:'Exit',exact:true}).click();await q.getByText('Queued fixture reply.',{exact:true}).waitFor();
     result.checks.push({integration:'local API fixture only',pendingRequestSurvivesExit:true,conversationPreserved:true,errorClearsThinking:true,fakeSpeakingRemoved:true,queuedRequestTrackedUntilDone:true});await q.close();
   }
   assert.deepEqual(errors,[]);result.browserErrors=errors;fs.writeFileSync(path.join(out,'guide-results.json'),JSON.stringify(result,null,2));console.log(JSON.stringify(result,null,2));
