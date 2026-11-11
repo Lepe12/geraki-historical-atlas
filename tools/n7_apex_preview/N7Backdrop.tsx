@@ -2,6 +2,7 @@
 import { useEffect, useRef } from "react";
 import { N7_BACKDROP_REFERENCE } from "./N7BackdropReference";
 
+// Step 6 deploy marker: living highlights + effects-off base preservation.
 export default function N7Backdrop({effects,reduced}:{effects:boolean;reduced:boolean}) {
   const hostRef=useRef<HTMLDivElement>(null);
 
