@@ -3,7 +3,7 @@
 (() => {
   const b = document.createElement("button");
   b.type = "button"; b.id = "nabouAssistantLauncher";
-  b.title = "Ναμπού — φωνητικός βοηθός"; b.setAttribute("aria-label", "Άνοιγμα φωνητικού βοηθού Ναμπού");
+  b.title = "N7 — φωνητικός βοηθός"; b.setAttribute("aria-label", "Άνοιγμα φωνής N7");
   b.style.cssText = "position:fixed;right:22px;bottom:14px;z-index:9001;width:34px;height:34px;min-width:0;min-height:0;box-sizing:border-box;padding:0;margin:0;border-radius:50%;" +
     "border:1px solid rgba(214,170,92,.7);background:radial-gradient(circle at 50% 45%,#3a2810,#140d06);cursor:pointer;display:grid;place-items:center";
   b.innerHTML = '<svg viewBox="-12 -12 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="#e8bd68" stroke-width="1.1">' +
@@ -15,8 +15,8 @@
     busy = true;
     try {
       if (!mod) {
-        const css = document.createElement("link"); css.rel = "stylesheet"; css.href = "./assistant/assistant.css?v=n7-voice-1"; document.head.appendChild(css);
-        mod = await import("./assistant/assistant.js?v=n7-voice-1");
+        const css = document.createElement("link"); css.rel = "stylesheet"; css.href = "./assistant/assistant.css?v=n7-voice-2"; document.head.appendChild(css);
+        mod = await import("./assistant/assistant.js?v=n7-voice-2");
         document.addEventListener("nabou:assistant", (e) => b.classList.toggle("open", e.detail.open));
       }
       mod.open();

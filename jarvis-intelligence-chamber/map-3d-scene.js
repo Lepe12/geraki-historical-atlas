@@ -206,8 +206,25 @@ export async function createScene(host, { view2d } = {}) {
     sealEl.addEventListener("click", () => src.seal?.click());
     flag.cloth.userData.open = () => src.label?.click();
     el.dataset.flag = flag.info.title;
-    markers.push({ lane, base, top, el, sealEl, src, sig: "", flag });
+    markers.push({ lane, base, top, el, sealEl, src, sig: "", flag, shadow: sh });
   }
+  /* research-method lanes (kind "science": Αντιφάσεις, Γενεαλογία πηγών, …) sit in the open Atlantic and are not
+     places: in 3D they follow the «Ερευνητές» layer like in 2D (body[data-pro-lanes]), hidden by default */
+  const hubLine = routeLines[routeLines.length - 1]; // hub ↔ core line, research tooling too
+  const applyLanes = () => {
+    const show = document.body.dataset.proLanes === "true" || !document.body.classList.contains("atlas-pro");
+    for (const m of markers) {
+      if (m.lane.kind !== "science") continue;
+      m.flag.group.visible = show; m.shadow.visible = show;
+      m.el.hidden = !show; m.sealEl.hidden = !show;
+      const line = routeLines.find((l) => l.userData.agentId === m.lane.agentId);
+      if (line) line.visible = show;
+    }
+    if (hubLine && !hubLine.userData.agentId) hubLine.visible = show;
+  };
+  applyLanes();
+  const laneObs = new MutationObserver(applyLanes);
+  laneObs.observe(document.body, { attributes: true, attributeFilter: ["data-pro-lanes", "class"] });
   const refreshPins = () => {
     for (const m of markers) {
       const { seal, label } = m.src;
@@ -239,7 +256,7 @@ export async function createScene(host, { view2d } = {}) {
     const r = canvas.getBoundingClientRect();
     ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
     ray.setFromCamera(ndc, camera);
-    const hit = ray.intersectObjects(markers.map((m) => m.flag.cloth), false)[0];
+    const hit = ray.intersectObjects(markers.filter((m) => m.flag.group.visible).map((m) => m.flag.cloth), false)[0];
     hit?.object.userData.open?.();
   });
 
@@ -373,6 +390,6 @@ export async function createScene(host, { view2d } = {}) {
     home: () => flyTo(homePose(), 900),
     zoom: (f) => flyTo({ ...poseFromCamera(), dist: Math.max(controls.minDistance, Math.min(controls.maxDistance, poseFromCamera().dist / f)) }, 350),
     camera3d: (c = {}) => { tween = null; const p = poseFromCamera(); if (c.tilt != null || c.rot != null || c.dist != null) { applyPose({ ...p, tilt: c.tilt ?? p.tilt, rot: c.rot ?? p.rot, dist: c.dist ?? p.dist, target: c.lon != null ? (() => { const q = project(c.lon, c.lat); return world(q.x, q.y, 0); })() : p.target }); controls.update(); } return poseFromCamera(); },
-    dispose: () => { stop(); clearInterval(pinTimer); ro.disconnect(); controls.dispose(); renderer.dispose(); host.replaceChildren(); },
+    dispose: () => { stop(); clearInterval(pinTimer); laneObs.disconnect(); ro.disconnect(); controls.dispose(); renderer.dispose(); host.replaceChildren(); },
   };
 }
