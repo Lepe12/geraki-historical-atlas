@@ -10,6 +10,7 @@ export type GuideSceneProps={mode:GuideMode;mood:GuideMood;effects:boolean;reduc
 const moods:GuideMood[]=["idle","listening","thinking","speaking"];
 
 // A single Three.js scene owns source tiles, moods, assembly and breathing.
+// Isolated preview: mouse yaw and pitch share a continuously textured head mesh.
 // The native canvas is an immutable reference/fallback, never an animated layer.
 export default function N7GuideScene(props:GuideSceneProps){
   const hostRef=useRef<HTMLDivElement>(null),config=useRef(props);
