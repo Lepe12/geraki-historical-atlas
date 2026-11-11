@@ -128,69 +128,80 @@ jobs:
             if(diffPixels(thinkingMood,speakingMood)<120) throw Error('Speaking mood is not visibly distinct');
             await p.getByRole('button',{name:'Idle',exact:true}).click();
 
-            // Guide Step 5 regression: turn the upper figure continuously through
-            // neck and shoulders. No detached/cut-head seam is allowed.
+            // Guide Step 5 exact regression: only head dots rotate around a fixed neck.
+            // Neck, shoulders and body must remain stable. Lighting = far-side shadow
+            // plus near silhouette profile line, not a global glow.
             await p.getByRole('button',{name:'Particles',exact:true}).click();
-            const turnHost=p.getByLabel('N7 continuous head-turn canvas');
-            const turnCanvas=turnHost.locator('canvas');
-            await turnCanvas.waitFor({state:'visible'});
+            const turnHost=p.getByLabel('N7 guide head-particle turn');
             const stage=p.getByLabel('N7 humanoid visual stage');
             const stageBox=await stage.boundingBox();
             if(!stageBox) throw Error('humanoid visual stage has no bounds');
 
             async function turnShot(name){
               const path=process.env.RUNNER_TEMP+'/n7-turn-'+name+'.png';
-              await turnCanvas.screenshot({path});
+              await stage.screenshot({path});
               return PNG.sync.read(fs.readFileSync(path));
             }
-            function diffRegion(a,b,y0,y1){
+            function diffRegion(a,b,y0,y1,x0=0,x1=1){
               let diff=0;
               const ys=Math.floor(a.height*y0), ye=Math.floor(a.height*y1);
-              for(let y=ys;y<ye;y++) for(let x=0;x<a.width;x++){
+              const xs=Math.floor(a.width*x0), xe=Math.floor(a.width*x1);
+              for(let y=ys;y<ye;y++) for(let x=xs;x<xe;x++){
                 const i=(y*a.width+x)*4;
                 const d=Math.abs(a.data[i]-b.data[i])+Math.abs(a.data[i+1]-b.data[i+1])+Math.abs(a.data[i+2]-b.data[i+2]);
                 if(d>30) diff++;
               }
               return diff;
             }
-            function visibleInBand(img,y0,y1){
-              let n=0;
+            function luminance(img,y0,y1,x0,x1){
+              let sum=0,n=0;
               const ys=Math.floor(img.height*y0), ye=Math.floor(img.height*y1);
-              for(let y=ys;y<ye;y++) for(let x=0;x<img.width;x++){
+              const xs=Math.floor(img.width*x0), xe=Math.floor(img.width*x1);
+              for(let y=ys;y<ye;y++) for(let x=xs;x<xe;x++){
                 const i=(y*img.width+x)*4;
                 const r=img.data[i],g=img.data[i+1],b=img.data[i+2],a=img.data[i+3];
-                if(a>24 && r+g+b>35) n++;
+                if(a>24 && r+g+b>30){ sum += .2126*r+.7152*g+.0722*b; n++; }
               }
-              return n;
+              return n?sum/n:0;
             }
 
-            await p.mouse.move(stageBox.x+stageBox.width*.50,stageBox.y+stageBox.height*.40);
-            await p.waitForTimeout(500);
+            await p.mouse.move(stageBox.x+stageBox.width*.50,stageBox.y+stageBox.height*.34);
+            await p.waitForTimeout(550);
             const centerTurn=await turnShot('center');
 
-            await p.mouse.move(stageBox.x+stageBox.width*.90,stageBox.y+stageBox.height*.40);
-            await p.waitForTimeout(650);
+            await p.mouse.move(stageBox.x+stageBox.width*.90,stageBox.y+stageBox.height*.34);
+            await p.waitForTimeout(700);
             const targetValue=Number(await turnHost.getAttribute('data-head-target'));
             const currentTurn=Number(await turnHost.getAttribute('data-current-turn'));
-            if(!Number.isFinite(targetValue)||targetValue<.75) throw Error('Step 5 pointer target did not reach continuous renderer: '+targetValue);
-            if(!Number.isFinite(currentTurn)||currentTurn<.45) throw Error('Step 5 continuous renderer did not turn enough: '+currentTurn);
+            const headParticles=Number(await turnHost.getAttribute('data-head-particles'));
+            if(!Number.isFinite(targetValue)||targetValue<.75) throw Error('Step 5 pointer target did not reach head renderer: '+targetValue);
+            if(!Number.isFinite(currentTurn)||currentTurn<.45) throw Error('Step 5 head renderer did not turn enough: '+currentTurn);
+            if(!Number.isFinite(headParticles)||headParticles<500) throw Error('Step 5 has too few head dots: '+headParticles);
             const rightTurn=await turnShot('right');
 
-            const headDelta=diffRegion(centerTurn,rightTurn,0,.46);
-            const lowerDelta=diffRegion(centerTurn,rightTurn,.66,1);
-            if(headDelta<250) throw Error('Step 5 revised turn is not visibly changing the upper figure: '+headDelta);
-            if(lowerDelta>headDelta*.20) throw Error('Step 5 revised turn is moving too much lower body: '+JSON.stringify({headDelta,lowerDelta}));
+            const headDelta=diffRegion(centerTurn,rightTurn,.03,.43,.15,.85);
+            const neckDelta=diffRegion(centerTurn,rightTurn,.44,.58,.25,.75);
+            const shoulderDelta=diffRegion(centerTurn,rightTurn,.58,.70,.10,.90);
+            const lowerDelta=diffRegion(centerTurn,rightTurn,.70,1,0,1);
+            if(headDelta<250) throw Error('Step 5 head dots are not visibly rotating: '+headDelta);
+            if(neckDelta>headDelta*.08) throw Error('Step 5 moves the neck; neck must be the fixed pivot: '+JSON.stringify({headDelta,neckDelta}));
+            if(shoulderDelta>headDelta*.08) throw Error('Step 5 moves shoulders; only head dots may turn: '+JSON.stringify({headDelta,shoulderDelta}));
+            if(lowerDelta>headDelta*.04) throw Error('Step 5 moves lower body: '+JSON.stringify({headDelta,lowerDelta}));
 
-            const neckCenter=visibleInBand(centerTurn,.40,.64);
-            const neckRight=visibleInBand(rightTurn,.40,.64);
-            if(neckCenter<250 || neckRight<250) throw Error('Step 5 neck band became too empty: '+JSON.stringify({neckCenter,neckRight}));
-            if(neckRight<neckCenter*.72) throw Error('Step 5 creates a cut/gap at neck-shoulder transition: '+JSON.stringify({neckCenter,neckRight}));
+            // Lighting check: no whole-head bright wash. The far half should darken
+            // relative to neutral while total head luminance stays controlled.
+            const neutralHeadLum=luminance(centerTurn,.05,.42,.20,.80);
+            const turnedHeadLum=luminance(rightTurn,.05,.42,.20,.80);
+            const neutralFarLum=luminance(centerTurn,.08,.40,.52,.82);
+            const turnedFarLum=luminance(rightTurn,.08,.40,.52,.82);
+            if(turnedHeadLum>neutralHeadLum*1.08) throw Error('Step 5 adds global head glow instead of profile lighting: '+JSON.stringify({neutralHeadLum,turnedHeadLum}));
+            if(turnedFarLum>neutralFarLum*.98) throw Error('Step 5 far side is not darkening: '+JSON.stringify({neutralFarLum,turnedFarLum}));
 
-            await p.mouse.move(stageBox.x+stageBox.width*.50,stageBox.y+stageBox.height*.40);
-            await p.waitForTimeout(800);
+            await p.mouse.move(stageBox.x+stageBox.width*.50,stageBox.y+stageBox.height*.34);
+            await p.waitForTimeout(850);
             const returnTurn=await turnShot('return');
-            const returnDelta=diffRegion(centerTurn,returnTurn,0,.46);
-            if(returnDelta>headDelta*.40) throw Error('Step 5 does not settle back toward approved neutral: '+JSON.stringify({headDelta,returnDelta}));
+            const returnDelta=diffRegion(centerTurn,returnTurn,.03,.43,.15,.85);
+            if(returnDelta>headDelta*.35) throw Error('Step 5 does not return toward untouched neutral front: '+JSON.stringify({headDelta,returnDelta}));
 
             // Reproduce the user's likely environment: OS/browser reduced-motion enabled.
             // Clicking Assembly is an explicit opt-in and must still animate.
