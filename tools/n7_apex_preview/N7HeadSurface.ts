@@ -1,6 +1,7 @@
 import * as THREE from "three";
 
 // N7 APEX Step 5: one shared depth-aware yaw/pitch rotation of the whole skull.
+// Isolated preview only; deploy is gated by real-browser visual regressions.
 // Only the skull-to-neck border blends into the stationary body.
 export type GuideFrame={turn:number;pitch?:number;breath?:number;assembly?:number;baseMood?:number;states?:number[];ages?:number[];ignition?:number;time?:number};
 export function createHeadSurface(image:HTMLCanvasElement) {
