@@ -79,11 +79,11 @@ jobs:
               await button.click();
             }
             await dialog.waitFor({state:'visible'});
-            await p.getByLabel('N7 image-sampled particle humanoid').locator('canvas').waitFor({state:'visible'});
+            await p.getByLabel(/N7 (?:guide artwork-tile|image-sampled particle) humanoid/).locator('canvas').waitFor({state:'visible'});
             await p.getByRole('button',{name:'Original',exact:true}).click();
             await p.getByRole('img',{name:'Approved N7 idle reference'}).waitFor({state:'visible'});
             await p.getByRole('button',{name:'Particles',exact:true}).click();
-            const canvas=p.getByLabel('N7 image-sampled particle humanoid').locator('canvas');
+            const canvas=p.getByLabel(/N7 (?:guide artwork-tile|image-sampled particle) humanoid/).locator('canvas');
             await canvas.waitFor({state:'visible'});
             const box=await canvas.boundingBox();
             if(!box||box.width<200||box.height<300) throw Error('particle canvas has invalid size');
@@ -129,7 +129,7 @@ jobs:
 
             // Guide Step 5: the same Three.js head particles turn around a fixed neck.
             await p.getByRole('button',{name:'Particles',exact:true}).click();
-            const headHost=p.getByLabel('N7 image-sampled particle humanoid');
+            const headHost=p.getByLabel(/N7 (?:guide artwork-tile|image-sampled particle) humanoid/);
             const headBox=await headHost.boundingBox();
             if(!headBox) throw Error('Step 5 particle host has no bounds');
             await p.mouse.move(headBox.x+headBox.width*.50,headBox.y+headBox.height*.34);
