@@ -76,7 +76,10 @@ jobs:
             await p.getByRole('dialog',{name:'N7 Humanoid preview'}).waitFor({state:'visible'});
             await p.getByLabel('N7 image-sampled particle humanoid').locator('canvas').waitFor({state:'visible'});
             await p.getByRole('button',{name:'Original',exact:true}).click();
-            await p.getByRole('img',{name:'Approved N7 idle reference'}).waitFor({state:'visible'});
+            const approvedImg=p.getByRole('img',{name:'Approved N7 idle reference'});
+            await approvedImg.waitFor({state:'visible'});
+            const approvedNeutralPath=process.env.RUNNER_TEMP+'/n7-approved-neutral.png';
+            await approvedImg.screenshot({path:approvedNeutralPath});
             await p.getByRole('button',{name:'Particles',exact:true}).click();
             const canvas=p.getByLabel('N7 image-sampled particle humanoid').locator('canvas');
             await canvas.waitFor({state:'visible'});
@@ -130,38 +133,41 @@ jobs:
             await p.waitForTimeout(1150);
 
             // Guide Step 5 exact regression: only head dots rotate around a fixed neck.
-            // Neck, shoulders and body must remain stable. Lighting = far-side shadow
-            // plus near silhouette profile line, not a global glow.
+            // WebGL canvases are not reliably captured by element screenshots in headless
+            // Chromium, so use the approved image as the neutral visual reference and
+            // inspect the 2D head-turn layer plus base-head alpha diagnostics.
             await p.getByRole('button',{name:'Particles',exact:true}).click();
             const turnHost=p.getByLabel('N7 guide head-particle turn');
+            const turnCanvas=turnHost.locator('canvas');
+            const baseHost=p.getByLabel('N7 image-sampled particle humanoid');
             const stage=p.getByLabel('N7 humanoid visual stage');
             const stageBox=await stage.boundingBox();
             if(!stageBox) throw Error('humanoid visual stage has no bounds');
 
-            async function turnShot(name){
-              const path=process.env.RUNNER_TEMP+'/n7-turn-'+name+'.png';
-              await stage.screenshot({path});
+            async function overlayShot(name){
+              const path=process.env.RUNNER_TEMP+'/n7-turn-overlay-'+name+'.png';
+              await turnCanvas.screenshot({path});
               return PNG.sync.read(fs.readFileSync(path));
             }
-            function diffRegion(a,b,y0,y1,x0=0,x1=1){
-              let diff=0;
-              const ys=Math.floor(a.height*y0), ye=Math.floor(a.height*y1);
-              const xs=Math.floor(a.width*x0), xe=Math.floor(a.width*x1);
+            function visibleCount(img,y0,y1,x0=0,x1=1){
+              let n=0;
+              const ys=Math.floor(img.height*y0), ye=Math.floor(img.height*y1);
+              const xs=Math.floor(img.width*x0), xe=Math.floor(img.width*x1);
               for(let y=ys;y<ye;y++) for(let x=xs;x<xe;x++){
-                const i=(y*a.width+x)*4;
-                const d=Math.abs(a.data[i]-b.data[i])+Math.abs(a.data[i+1]-b.data[i+1])+Math.abs(a.data[i+2]-b.data[i+2]);
-                if(d>30) diff++;
+                const i=(y*img.width+x)*4;
+                const r=img.data[i],g=img.data[i+1],b=img.data[i+2],a=img.data[i+3];
+                if(a>24 && r+g+b>30) n++;
               }
-              return diff;
+              return n;
             }
-            function luminance(img,y0,y1,x0,x1){
+            function avgLum(img,y0,y1,x0,x1){
               let sum=0,n=0;
               const ys=Math.floor(img.height*y0), ye=Math.floor(img.height*y1);
               const xs=Math.floor(img.width*x0), xe=Math.floor(img.width*x1);
               for(let y=ys;y<ye;y++) for(let x=xs;x<xe;x++){
                 const i=(y*img.width+x)*4;
                 const r=img.data[i],g=img.data[i+1],b=img.data[i+2],a=img.data[i+3];
-                if(a>24 && r+g+b>30){ sum += .2126*r+.7152*g+.0722*b; n++; }
+                if(a>24 && r+g+b>30){sum+=.2126*r+.7152*g+.0722*b;n++;}
               }
               return n?sum/n:0;
             }
@@ -170,45 +176,51 @@ jobs:
             await p.waitForFunction(()=>{
               const el=document.querySelector('[aria-label="N7 guide head-particle turn"]');
               if(!(el instanceof HTMLElement)) return false;
-              const v=Number(el.dataset.currentTurn);
-              const t=Number(el.dataset.headTarget);
+              const v=Number(el.dataset.currentTurn),t=Number(el.dataset.headTarget);
               return Number.isFinite(v)&&Number.isFinite(t)&&Math.abs(v)<.01&&Math.abs(t)<.01;
             },null,{timeout:3000});
-            const centerTurn=await turnShot('center');
+            const neutralBaseAlpha=Number(await baseHost.getAttribute('data-head-base-alpha'));
+            if(!Number.isFinite(neutralBaseAlpha)||neutralBaseAlpha<.98) throw Error('Neutral base head is not fully restored: '+neutralBaseAlpha);
 
             await p.mouse.move(stageBox.x+stageBox.width*.90,stageBox.y+stageBox.height*.34);
             await p.waitForTimeout(700);
             const targetValue=Number(await turnHost.getAttribute('data-head-target'));
             const currentTurn=Number(await turnHost.getAttribute('data-current-turn'));
             const headParticles=Number(await turnHost.getAttribute('data-head-particles'));
+            const turnedBaseAlpha=Number(await baseHost.getAttribute('data-head-base-alpha'));
             if(!Number.isFinite(targetValue)||targetValue<.75) throw Error('Step 5 pointer target did not reach head renderer: '+targetValue);
             if(!Number.isFinite(currentTurn)||currentTurn<.45) throw Error('Step 5 head renderer did not turn enough: '+currentTurn);
             if(!Number.isFinite(headParticles)||headParticles<500) throw Error('Step 5 has too few head dots: '+headParticles);
-            const rightTurn=await turnShot('right');
+            if(!Number.isFinite(turnedBaseAlpha)||turnedBaseAlpha>.12) throw Error('Base head remains visible under turned head, causing double lighting: '+turnedBaseAlpha);
 
-            const headDelta=diffRegion(centerTurn,rightTurn,.03,.43,.15,.85);
-            const neckDelta=diffRegion(centerTurn,rightTurn,.44,.58,.25,.75);
-            const shoulderDelta=diffRegion(centerTurn,rightTurn,.58,.70,.10,.90);
-            const lowerDelta=diffRegion(centerTurn,rightTurn,.70,1,0,1);
-            if(headDelta<250) throw Error('Step 5 head dots are not visibly rotating: '+headDelta);
-            if(neckDelta>headDelta*.08) throw Error('Step 5 moves the neck; neck must be the fixed pivot: '+JSON.stringify({headDelta,neckDelta}));
-            if(shoulderDelta>headDelta*.08) throw Error('Step 5 moves shoulders; only head dots may turn: '+JSON.stringify({headDelta,shoulderDelta}));
-            if(lowerDelta>headDelta*.04) throw Error('Step 5 moves lower body: '+JSON.stringify({headDelta,lowerDelta}));
+            const turnedOverlay=await overlayShot('right');
+            const headVisible=visibleCount(turnedOverlay,.03,.43,.15,.85);
+            const neckVisible=visibleCount(turnedOverlay,.44,.58,.25,.75);
+            const shoulderVisible=visibleCount(turnedOverlay,.58,.70,.10,.90);
+            const lowerVisible=visibleCount(turnedOverlay,.70,1,0,1);
+            if(headVisible<500) throw Error('Step 5 head dots are not visibly rotating: '+headVisible);
+            if(neckVisible>80) throw Error('Step 5 draws into neck; neck must remain the fixed pivot: '+neckVisible);
+            if(shoulderVisible>40) throw Error('Step 5 draws into shoulders; only head dots may turn: '+shoulderVisible);
+            if(lowerVisible>20) throw Error('Step 5 draws into lower body: '+lowerVisible);
 
-            // Lighting check: no whole-head bright wash. The far half should darken
-            // relative to neutral while total head luminance stays controlled.
-            const neutralHeadLum=luminance(centerTurn,.05,.42,.20,.80);
-            const turnedHeadLum=luminance(rightTurn,.05,.42,.20,.80);
-            const neutralFarLum=luminance(centerTurn,.08,.40,.52,.82);
-            const turnedFarLum=luminance(rightTurn,.08,.40,.52,.82);
+            const approvedNeutral=PNG.sync.read(fs.readFileSync(approvedNeutralPath));
+            const neutralHeadLum=avgLum(approvedNeutral,.05,.42,.20,.80);
+            const turnedHeadLum=avgLum(turnedOverlay,.05,.42,.20,.80);
+            const neutralFarLum=avgLum(approvedNeutral,.08,.40,.52,.82);
+            const turnedFarLum=avgLum(turnedOverlay,.08,.40,.52,.82);
             if(turnedHeadLum>neutralHeadLum*1.08) throw Error('Step 5 adds global head glow instead of profile lighting: '+JSON.stringify({neutralHeadLum,turnedHeadLum}));
             if(turnedFarLum>neutralFarLum*.98) throw Error('Step 5 far side is not darkening: '+JSON.stringify({neutralFarLum,turnedFarLum}));
 
             await p.mouse.move(stageBox.x+stageBox.width*.50,stageBox.y+stageBox.height*.34);
-            await p.waitForTimeout(850);
-            const returnTurn=await turnShot('return');
-            const returnDelta=diffRegion(centerTurn,returnTurn,.03,.43,.15,.85);
-            if(returnDelta>headDelta*.35) throw Error('Step 5 does not return toward untouched neutral front: '+JSON.stringify({headDelta,returnDelta}));
+            await p.waitForFunction(()=>{
+              const el=document.querySelector('[aria-label="N7 guide head-particle turn"]');
+              const base=document.querySelector('[aria-label="N7 image-sampled particle humanoid"]');
+              if(!(el instanceof HTMLElement)||!(base instanceof HTMLElement)) return false;
+              const v=Number(el.dataset.currentTurn),a=Number(base.dataset.headBaseAlpha);
+              return Number.isFinite(v)&&Number.isFinite(a)&&Math.abs(v)<.01&&a>.98;
+            },null,{timeout:3000});
+            const neutralOverlay=await overlayShot('neutral');
+            if(visibleCount(neutralOverlay,0,1)>40) throw Error('Step 5 overlay does not switch off completely at neutral');
 
             // Reproduce the user's likely environment: OS/browser reduced-motion enabled.
             // Clicking Assembly is an explicit opt-in and must still animate.
