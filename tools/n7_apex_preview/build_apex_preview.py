@@ -140,6 +140,7 @@ def main():
     overlay=pathlib.Path(__file__).resolve().parent
     shutil.copy2(overlay/"N7Workspace.tsx",out/"components/N7Workspace.tsx")
     shutil.copy2(overlay/"N7ApexStage.tsx",out/"components/N7ApexStage.tsx")
+    # Restore the user-approved Step 5 artwork-tile renderer for isolated preview.
     # The isolated Step 5 route must present the humanoid immediately.
     # Production /n7-apex keeps the normal button-controlled workflow.
     # isolated auto-open deployment marker
