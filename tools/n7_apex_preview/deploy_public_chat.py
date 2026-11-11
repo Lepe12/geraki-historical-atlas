@@ -11,17 +11,13 @@ def sha(b):return hashlib.sha256(b).hexdigest()
 def patch(data):
     src=data.decode()
     if MARKER in src:return data
-    hooks=re.findall(r'if\s*\(\s*await\s+n7Relay\.handle\(\s*req\s*,\s*res\s*\)\s*\)\s*return\s*;',src)
-    # Exactly one known hook; abort rather than editing unknown private code.
-    if len(hooks)!=1:raise RuntimeError('UNRECOGNIZED_RELAY_HOOK')
-    anchor=hooks[0]
     for symbol in ['API_KEY','MODEL','BASE']:
         if not re.search(r'\bconst\s+'+symbol+r'\s*=',src):raise RuntimeError('MISSING_PROVIDER_BINDING_'+symbol)
     pattern=r'(const\s+server\s*=\s*http\.createServer\(async\s*\(\s*req\s*,\s*res\s*\)\s*=>\s*\{)'
     if len(re.findall(pattern,src))!=1:raise RuntimeError('UNRECOGNIZED_HTTP_SERVER')
     shim="// "+MARKER+"\nconst n7ApexPublic=require('./n7-apex-public-chat.cjs').createApexPublicChat({apiKey:API_KEY,model:MODEL,base:BASE});\n"
-    src=re.sub(pattern,lambda m:shim+m.group(1),src,count=1)
-    return src.replace(anchor,'if(await n7ApexPublic.handle(req,res)) return;\n    '+anchor,1).encode()
+    guard="\n  try { if(await n7ApexPublic.handle(req,res)) return; } catch { res.writeHead(500,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify({error:'Η συνομιλία δεν ολοκληρώθηκε.'}));return; }\n"
+    return re.sub(pattern,lambda m:shim+m.group(1)+guard,src,count=1).encode()
 def syntax(data):
     with tempfile.NamedTemporaryFile(suffix='.cjs') as f:
         f.write(data);f.flush();p=subprocess.run(['node','--check',f.name],capture_output=True,timeout=20)
