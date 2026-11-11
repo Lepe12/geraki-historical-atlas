@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { N7_HUMANOID_REFERENCE } from "./N7HumanoidReference";
+import N7Backdrop from "./N7Backdrop";
 
 type ViewMode = "assembly" | "particle" | "original" | "compare";
 type Mood = "idle" | "listening" | "thinking" | "speaking";
@@ -986,6 +987,7 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
   const isolatedStep5=N7_HUMANOID_REFERENCE.includes("/n7-apex-step5/");
   const [mode,setMode]=useState<ViewMode>("particle");
   const [details,setDetails]=useState(false);
+  const [effects,setEffects]=useState(true);
   const [mood,setMood]=useState<Mood>("idle");
   const autoThinkingRef=useRef(false);
   const [replayKey,setReplayKey]=useState(0);
@@ -1030,7 +1032,10 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
     </header>
 
     <div style={{position:"absolute",inset:"58px 0 104px",display:"grid",placeItems:"center"}}>
-      <div style={{position:"relative",height:"100%",aspectRatio:"2/3",maxWidth:"94vw",overflow:"hidden"}}>
+      <div style={{position:"relative",height:"100%",aspectRatio:"16/9",width:"min(100%,1600px)",maxWidth:"96vw",overflow:"hidden"}}>
+        {isolatedStep5&&<N7Backdrop effects={effects} reduced={reduced} />}
+        <div style={{position:"absolute",inset:0,display:"grid",placeItems:"center",zIndex:1}}>
+          <div style={{position:"relative",height:"100%",aspectRatio:"2/3",maxWidth:"94vw",overflow:"hidden"}}>
         {(mode==="original"||mode==="compare")&&<img
           src={N7_HUMANOID_REFERENCE}
           alt="Approved N7 idle reference"
@@ -1092,6 +1097,8 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
         {(mode==="particle"||mode==="compare")&&<div aria-label="N7 mood status" style={{position:"absolute",top:10,right:10,padding:"5px 8px",background:"#03111dcc",border:"1px solid #285d70",borderRadius:5,fontSize:11}}>
           MOOD · {mood.toUpperCase()}{mood==="thinking"&&activity==="thinking"?" · LIVE N7 REQUEST":mood==="listening"||mood==="speaking"?" · PREVIEW":""}
         </div>}
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1112,11 +1119,15 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
         <button type="button" onClick={()=>setMode("original")} style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:mode==="original"?"#115068":"#07131b",cursor:"pointer"}}>Original</button>
         <button type="button" onClick={()=>setMode("particle")} style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:mode==="particle"?"#115068":"#07131b",cursor:"pointer"}}>Particles</button>
         <button type="button" onClick={()=>setMode("compare")} style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:mode==="compare"?"#115068":"#07131b",cursor:"pointer"}}>Compare</button>
+        {isolatedStep5&&<button type="button" onClick={()=>setEffects(x=>!x)} aria-pressed={effects}
+          style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:effects?"#115068":"#07131b",cursor:"pointer"}}>
+          Effects {effects?"On":"Off"}
+        </button>}
         <button type="button" onClick={()=>setDetails(x=>!x)} style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:"#07131b",cursor:"pointer"}}>Technical details</button>
       </div>
 
       {details&&<div style={{marginTop:6,padding:9,background:"#02080dee",border:"1px solid #204856",borderRadius:8,fontSize:11,lineHeight:1.55}}>
-        <b>Step 4 diagnostics</b> · source sample {stats.sampleW||"—"}×{stats.sampleH||"—"} · particles {stats.particles||"loading"} · render {stats.renderMs||"—"} ms · assembly {stats.assembly}% · duration 6s · sRGB · tone mapping OFF · reduced motion {reduced?"ON":"OFF"}.
+        <b>Step 4–6 diagnostics</b> · source sample {stats.sampleW||"—"}×{stats.sampleH||"—"} · particles {stats.particles||"loading"} · render {stats.renderMs||"—"} ms · assembly {stats.assembly}% · duration 6s · sRGB · tone mapping OFF · reduced motion {reduced?"ON":"OFF"}.
         <br/>Every particle carries its sampled artwork color. Completion is left-to-right; head/face are delayed; the last frame uses the exact approved Stage-1 positions.
       </div>}
     </div>
