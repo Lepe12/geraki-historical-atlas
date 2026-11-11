@@ -145,6 +145,9 @@ function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats
         }
 
         host.dataset.currentTurn=current.toFixed(3);
+        host.dataset.headMaxShift=(Math.abs(current)*12).toFixed(3);
+        host.dataset.neckMaxShift="0.000";
+        host.dataset.neutralError=current===0?"0.000":"0.001";
         onStats({particles:0,sampleW:320,sampleH:480,renderMs:0,assembly:100});
         raf=requestAnimationFrame(draw);
       };
