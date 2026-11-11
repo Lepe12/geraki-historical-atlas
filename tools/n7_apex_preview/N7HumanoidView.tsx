@@ -397,12 +397,12 @@ function ParticleReference({
         renderFrame(1);
         const turnTick=(now:number)=>{
           if(disposed) return;
-          const dt=Math.min(80,Math.max(0,now-turnClock));
+          const dt=Math.min(300,Math.max(0,now-turnClock));
           turnClock=now;
           if(!headTurnEnabled) targetTurn=0;
-          const ease=1-Math.exp(-dt/135);
+          const ease=1-Math.exp(-dt/110);
           currentTurn+=(targetTurn-currentTurn)*ease;
-          if(targetTurn===0&&Math.abs(currentTurn)<.003) currentTurn=0;
+          if(targetTurn===0&&Math.abs(currentTurn)<.006) currentTurn=0;
           renderFrame(1);
           raf=requestAnimationFrame(turnTick);
         };
