@@ -49,3 +49,5 @@ CPU-side submission time alone does not establish smooth presentation. The test 
 The starting rollback commit is `e2bbcc901ba578e8f5d6c0e1eec31d55c1baca88`; its live release marker was `cd6e13acf19cb4cf`. The existing deployer stages and verifies the new static files, renames the current directory to a backup, and restores it if verification fails. For the isolated Step 5 target the successful deployment now retains that backup and prints `N7_APEX_ROLLBACK_POINT`. No automatic merge or production deployment is requested.
 
 Live verification must check the new release marker, fetch the new asset, inspect the rendered isolated page, and compare the production release marker with its pre-change copy. CI success alone is not production verification.
+
+The first push workflow (`43011832536`) was cancelled when the PR validation (`43011840510`) started: both used the same global concurrency group. Concurrency now includes event type and ref. New pushes still cancel stale runs for their own branch, while a read-only PR validation cannot cancel its deployment. This does not change runtime code.
