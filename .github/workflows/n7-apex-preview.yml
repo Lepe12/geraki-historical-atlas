@@ -72,10 +72,13 @@ jobs:
             if(!r||!r.ok()) throw Error('preview HTTP failed');
             const text=await p.locator('body').innerText();
             if(!text.includes('N7')) throw Error('N7 branding missing');
-            const button=p.getByRole('button',{name:'HUMANOID'});
-            await button.waitFor({state:'visible'});
-            await button.click();
-            await p.getByRole('dialog',{name:'N7 Humanoid preview'}).waitFor({state:'visible'});
+            const dialog=p.getByRole('dialog',{name:'N7 Humanoid preview'});
+            if(!(await dialog.isVisible().catch(()=>false))){
+              const button=p.getByRole('button',{name:'HUMANOID'});
+              await button.waitFor({state:'visible'});
+              await button.click();
+            }
+            await dialog.waitFor({state:'visible'});
             await p.getByLabel('N7 image-sampled particle humanoid').locator('canvas').waitFor({state:'visible'});
             await p.getByRole('button',{name:'Original',exact:true}).click();
             await p.getByRole('img',{name:'Approved N7 idle reference'}).waitFor({state:'visible'});
