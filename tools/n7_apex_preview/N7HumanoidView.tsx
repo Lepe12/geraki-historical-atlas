@@ -45,6 +45,7 @@ function ParticleReference({
   assembly,
   replayKey,
   reduced,
+  headTurnRef,
   onStats,
   onAssemblyDone,
 }:{
@@ -52,6 +53,7 @@ function ParticleReference({
   assembly:boolean;
   replayKey:number;
   reduced:boolean;
+  headTurnRef?:React.MutableRefObject<number>;
   onStats:(s:Stats)=>void;
   onAssemblyDone:()=>void;
 }) {
@@ -97,6 +99,7 @@ function ParticleReference({
       const colors:number[]=[];
       const launchDelays:number[]=[];
       const jitter:number[]=[];
+      const headIndices:number[]=[];
 
       // One point = one sampled artwork pixel/color.
       for(let y=0;y<sampleH;y++){
@@ -113,8 +116,13 @@ function ParticleReference({
 
           const fx=x-sampleW/2+.5;
           const fy=sampleH/2-y-.5;
+          const pointIndex=finals.length/3;
           finals.push(fx,fy,0);
           colors.push(r,g,b);
+
+          // Guide Step 5: only skull/head dots move. Neck and body remain fixed.
+          // Image-space head cap is y < 205 (fy > 35) with conservative width.
+          if(y<205 && Math.abs(fx)<108) headIndices.push(pointIndex);
 
           // Guide Step 4: the body completes left-to-right.
           let delay=((fx+sampleW/2)/sampleW)*.66;
@@ -289,7 +297,19 @@ function ParticleReference({
           raf=requestAnimationFrame(tick);
         }
       }else{
-        renderFrame(1);
+        const idleTick=()=>{
+          if(disposed) return;
+          if(alphaAttr){
+            const aa=alphaAttr.array as Float32Array;
+            const amount=Math.abs(headTurnRef?.current ?? 0);
+            const headAlpha=1-clamp01(amount*5);
+            for(const n of headIndices) aa[n]=headAlpha;
+            alphaAttr.needsUpdate=true;
+          }
+          renderFrame(1);
+          raf=requestAnimationFrame(idleTick);
+        };
+        raf=requestAnimationFrame(idleTick);
       }
 
       ro=new ResizeObserver(()=>renderFrame(currentProgress));
@@ -305,7 +325,7 @@ function ParticleReference({
       renderer?.dispose();
       host.replaceChildren();
     };
-  },[enabled,assembly,replayKey,reduced,onStats,onAssemblyDone]);
+  },[enabled,assembly,replayKey,reduced,headTurnRef,onStats,onAssemblyDone]);
 
   return <div
     ref={hostRef}
@@ -497,7 +517,7 @@ function MoodCanvas({mood}:{mood:Mood}) {
 }
 
 
-function HeadTurnCanvas() {
+function HeadTurnCanvas({headTurnRef}:{headTurnRef:React.MutableRefObject<number>}) {
   const hostRef=useRef<HTMLDivElement>(null);
 
   useEffect(()=>{
@@ -526,7 +546,7 @@ function HeadTurnCanvas() {
     const move=(e:MouseEvent|PointerEvent)=>{
       const rect=host.getBoundingClientRect();
       if(rect.width<=0) return;
-      const nx=(e.clientX-(rect.left+rect.width/2))/(rect.width*.46);
+      const nx=(e.clientX-(rect.left+rect.width/2))/(rect.width*.45);
       target=Math.max(-1,Math.min(1,nx));
       host.dataset.headTarget=target.toFixed(3);
     };
@@ -538,69 +558,80 @@ function HeadTurnCanvas() {
 
     image.onload=()=>{
       if(disposed) return;
-      const src=document.createElement("canvas");
-      src.width=320;
-      src.height=480;
-      const sctx=src.getContext("2d",{willReadFrequently:true});
+      const sample=document.createElement("canvas");
+      sample.width=320; sample.height=480;
+      const sctx=sample.getContext("2d",{willReadFrequently:true});
       if(!sctx) return;
       sctx.drawImage(image,0,0,320,480);
+      const px=sctx.getImageData(0,0,320,480).data;
+
+      type HP={x:number;y:number;r:number;g:number;b:number;z:number;edge:number};
+      const points:HP[]=[];
+
+      // Head only. Neck starts below this cap and never moves.
+      for(let y=18;y<205;y+=2){
+        for(let x=52;x<268;x+=2){
+          const i=(y*320+x)*4;
+          const r=px[i],g=px[i+1],b=px[i+2],a=px[i+3];
+          const lum=.2126*r+.7152*g+.0722*b;
+          const chroma=Math.max(r,g,b)-Math.min(r,g,b);
+          if(a<8 || (lum<7 && chroma<7)) continue;
+
+          const nx=(x-160)/104;
+          const ny=(y-112)/118;
+          const inside=Math.max(0,1-nx*nx-ny*ny);
+          if(inside<=0) continue;
+          const z=Math.sqrt(inside)*42;
+          const edge=Math.max(0,(Math.abs(nx)-.68)/.32);
+          points.push({x:x+.5,y:y+.5,r,g,b,z,edge});
+        }
+      }
+
+      host.dataset.headParticles=String(points.length);
 
       const draw=(now:number)=>{
         if(disposed) return;
-        const dt=Math.min(120,Math.max(0,now-last));
+        const dt=Math.min(100,Math.max(0,now-last));
         last=now;
-        const alpha=1-Math.exp(-dt/120);
-        current+=(target-current)*alpha;
+        const a=1-Math.exp(-dt/120);
+        current+=(target-current)*a;
         if(Math.abs(target-current)<.0005) current=target;
+        headTurnRef.current=current;
         host.dataset.currentTurn=current.toFixed(3);
 
         ctx.clearRect(0,0,320,480);
-        const turn=Math.max(-1,Math.min(1,current));
+        const amount=Math.abs(current);
 
-        if(Math.abs(turn)<.002){
-          ctx.drawImage(image,0,0,320,480);
-        }else{
-          const maxShift=turn*16;
-          const maxCompress=1-Math.abs(turn)*.055;
+        if(amount>.002){
+          const angle=current*.23; // conservative ~13 degrees
+          const cs=Math.cos(angle), sn=Math.sin(angle);
+          const grow=1+amount*.22;
 
-          for(let y=0;y<480;y+=2){
-            let w=0;
-            if(y<205) w=1;
-            else if(y<305){
-              const q=(305-y)/100;
-              w=q*q*(3-2*q);
-            }
+          for(const p of points){
+            const ox=p.x-160;
+            const tx=160 + ox*cs + p.z*sn;
 
-            if(w<=0){
-              ctx.drawImage(src,0,y,320,2,0,y,320,2);
-              continue;
-            }
+            // Far side darkens progressively; at a hard turn it falls into
+            // clean shadow rather than showing compressed detail.
+            const far=Math.max(0,Math.sign(current)*ox/104);
+            let visibility=1;
+            if(far>.48) visibility=1-clamp01((far-.48)/.42)*.88;
+            const shade=1-far*.48;
 
-            const shift=maxShift*w;
-            const scale=1-(1-maxCompress)*w;
-            const dw=320*scale;
-            const dx=(320-dw)/2+shift;
-            ctx.drawImage(src,0,y,320,2,dx,y,dw,2);
+            // Only the near silhouette becomes a profile line.
+            const near=Math.max(0,-Math.sign(current)*ox/104);
+            const rim=p.edge*Math.max(0,(near-.55)/.45)*amount;
 
-            const farAlpha=.13*Math.abs(turn)*w;
-            if(farAlpha>0){
-              const grad=ctx.createLinearGradient(turn>0?0:320,0,turn>0?90:230,0);
-              grad.addColorStop(0,"rgba(0,0,0,"+farAlpha.toFixed(3)+")");
-              grad.addColorStop(1,"rgba(0,0,0,0)");
-              ctx.fillStyle=grad;
-              ctx.fillRect(0,y,320,2);
-            }
+            const rr=Math.min(255,p.r*shade + 10*rim);
+            const gg=Math.min(255,p.g*shade + 62*rim);
+            const bb=Math.min(255,p.b*shade + 88*rim);
+
+            ctx.fillStyle="rgb("+Math.round(rr)+","+Math.round(gg)+","+Math.round(bb)+")";
+            ctx.globalAlpha=Math.max(0,visibility);
+            const size=1.65*grow;
+            ctx.fillRect(tx-size/2,p.y-size/2,size,size);
           }
-
-          const rimX=turn>0?238:82;
-          const rim=ctx.createRadialGradient(rimX,138,16,rimX,138,90);
-          rim.addColorStop(0,"rgba(90,235,255,0)");
-          rim.addColorStop(.72,"rgba(90,235,255,0)");
-          rim.addColorStop(1,"rgba(90,235,255,"+(0.10*Math.abs(turn)).toFixed(3)+")");
-          ctx.fillStyle=rim;
-          ctx.beginPath();
-          ctx.ellipse(160+turn*10,140,108*maxCompress,126,0,0,Math.PI*2);
-          ctx.fill();
+          ctx.globalAlpha=1;
         }
 
         raf=requestAnimationFrame(draw);
@@ -610,6 +641,7 @@ function HeadTurnCanvas() {
 
     return()=>{
       disposed=true;
+      headTurnRef.current=0;
       cancelAnimationFrame(raf);
       window.removeEventListener("mousemove",move);
       window.removeEventListener("pointermove",move);
@@ -617,11 +649,11 @@ function HeadTurnCanvas() {
       document.removeEventListener("mouseleave",reset);
       host.replaceChildren();
     };
-  },[]);
+  },[headTurnRef]);
 
   return <div
     ref={hostRef}
-    aria-label="N7 continuous head-turn canvas"
+    aria-label="N7 guide head-particle turn"
     style={{position:"absolute",inset:0,pointerEvents:"none"}}
   />;
 }
@@ -789,6 +821,7 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
   const [replayKey,setReplayKey]=useState(0);
   const [assemblyDone,setAssemblyDone]=useState(false);
   const [stats,setStats]=useState<Stats>({particles:0,sampleW:0,sampleH:0,renderMs:0,assembly:100});
+  const headTurnRef=useRef(0);
 
   const handleAssemblyDone=useCallback(()=>setAssemblyDone(true),[]);
 
@@ -822,7 +855,7 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
     <header style={{position:"absolute",top:14,left:18,right:18,zIndex:5,display:"flex",justifyContent:"space-between",alignItems:"center",gap:12}}>
       <div>
         <strong style={{letterSpacing:4,color:"#62e8f7"}}>N7 · HUMANOID</strong>
-        <div style={{fontSize:11,opacity:.62}}>Guide Step 3–5 · moods + Assembly + continuous neck-safe mouse follow</div>
+        <div style={{fontSize:11,opacity:.62}}>Guide Step 3–5 · moods + Assembly + head dots rotate around fixed neck pivot</div>
       </div>
       <button type="button" onClick={onClose} style={{padding:"9px 13px",border:"1px solid #2c6c7e",background:"#091823",color:"#dffbff",borderRadius:7,cursor:"pointer"}}>Exit</button>
     </header>
@@ -840,13 +873,14 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
           assembly={false}
           replayKey={replayKey}
           reduced={false}
+          headTurnRef={headTurnRef}
           onStats={setStats}
           onAssemblyDone={handleAssemblyDone}
         />}
 
         {(mode==="particle"||mode==="compare")&&<MoodCanvas mood={mood} />}
 
-        {(mode==="particle"||mode==="compare")&&<HeadTurnCanvas />}
+        {(mode==="particle"||mode==="compare")&&<HeadTurnCanvas headTurnRef={headTurnRef} />}
 
         {mode==="assembly"&&<AssemblyCanvas
           replayKey={replayKey}
