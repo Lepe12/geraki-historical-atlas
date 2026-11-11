@@ -173,13 +173,12 @@ jobs:
             }
 
             await p.mouse.move(stageBox.x+stageBox.width*.50,stageBox.y+stageBox.height*.34);
-            await p.waitForFunction(()=>{
-              const el=document.querySelector('[aria-label="N7 guide head-particle turn"]');
-              if(!(el instanceof HTMLElement)) return false;
-              const v=Number(el.dataset.currentTurn),t=Number(el.dataset.headTarget);
-              return Number.isFinite(v)&&Number.isFinite(t)&&Math.abs(v)<.01&&Math.abs(t)<.01;
-            },null,{timeout:3000});
+            await p.waitForTimeout(1400);
+            const neutralTurn=Number(await turnHost.getAttribute('data-current-turn'));
+            const neutralTarget=Number(await turnHost.getAttribute('data-head-target'));
             const neutralBaseAlpha=Number(await baseHost.getAttribute('data-head-base-alpha'));
+            if(!Number.isFinite(neutralTurn)||Math.abs(neutralTurn)>.02) throw Error('Neutral head turn did not settle: '+neutralTurn);
+            if(!Number.isFinite(neutralTarget)||Math.abs(neutralTarget)>.02) throw Error('Neutral pointer target is not centered: '+neutralTarget);
             if(!Number.isFinite(neutralBaseAlpha)||neutralBaseAlpha<.98) throw Error('Neutral base head is not fully restored: '+neutralBaseAlpha);
 
             await p.mouse.move(stageBox.x+stageBox.width*.90,stageBox.y+stageBox.height*.34);
@@ -212,13 +211,11 @@ jobs:
             if(turnedFarLum>neutralFarLum*.98) throw Error('Step 5 far side is not darkening: '+JSON.stringify({neutralFarLum,turnedFarLum}));
 
             await p.mouse.move(stageBox.x+stageBox.width*.50,stageBox.y+stageBox.height*.34);
-            await p.waitForFunction(()=>{
-              const el=document.querySelector('[aria-label="N7 guide head-particle turn"]');
-              const base=document.querySelector('[aria-label="N7 image-sampled particle humanoid"]');
-              if(!(el instanceof HTMLElement)||!(base instanceof HTMLElement)) return false;
-              const v=Number(el.dataset.currentTurn),a=Number(base.dataset.headBaseAlpha);
-              return Number.isFinite(v)&&Number.isFinite(a)&&Math.abs(v)<.01&&a>.98;
-            },null,{timeout:3000});
+            await p.waitForTimeout(1400);
+            const returnTurn=Number(await turnHost.getAttribute('data-current-turn'));
+            const returnBaseAlpha=Number(await baseHost.getAttribute('data-head-base-alpha'));
+            if(!Number.isFinite(returnTurn)||Math.abs(returnTurn)>.02) throw Error('Step 5 did not return to neutral turn: '+returnTurn);
+            if(!Number.isFinite(returnBaseAlpha)||returnBaseAlpha<.98) throw Error('Step 5 did not restore base head alpha: '+returnBaseAlpha);
             const neutralOverlay=await overlayShot('neutral');
             if(visibleCount(neutralOverlay,0,1)>40) throw Error('Step 5 overlay does not switch off completely at neutral');
 
