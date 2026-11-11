@@ -72,11 +72,6 @@
   const yearInput = el("input", { type: "text", id: "libraryYear", maxlength: "20", inputmode: "numeric", placeholder: "π.χ. 2000" });
   const addButton = el("button", { type: "submit", id: "libraryAdd", text: "Πρόσθεσε στη βιβλιοθήκη" });
   const addState = el("p", { class: "library-add-state", role: "status", "aria-live": "polite" });
-  const keyInput = el("input", { type: "password", id: "libraryKey", autocomplete: "current-password", placeholder: "Κωδικός ιδιοκτήτη" });
-  const signButton = el("button", { type: "submit", text: "Σύνδεση" });
-  const signForm = el("form", { class: "library-sign", id: "librarySignIn" },
-    el("label", { for: "libraryKey", text: "Για να προσθέσεις βιβλία και να ψάχνει η Έρευνα μέσα τους, συνδέσου μία φορά σε αυτόν τον υπολογιστή." }),
-    el("div", { class: "library-row" }, keyInput, signButton));
   const addForm = el("form", { class: "library-add", id: "libraryAddForm" },
     el("h3", { text: "Πρόσθεσε βιβλίο (PDF)" }),
     el("p", { class: "library-note", text: "Το βιβλίο μπαίνει στη βιβλιοθήκη μαζί με τις υπόλοιπες πηγές. Από εκεί και πέρα κάθε ερώτημα ψάχνει και μέσα σε αυτό. Δεν χρειάζεται να εγκρίνεις αποσπάσματα." }),
@@ -96,9 +91,9 @@
     libStatus,
     el("h3", { text: "Δημοσιευμένες πηγές" }), pubList,
     el("h3", { text: "Βιβλία που πρόσθεσες" }), addedNote, addedList,
-    signForm, addForm,
+    addForm,
   );
-  let signedIn = false, serverReady = false;
+  let canAdd = false, serverReady = false;
 
   function bookItem(b) {
     const li = el("li");
@@ -113,14 +108,11 @@
     addedList.hidden = !(added && added.length);
     addedNote.textContent = !serverReady
       ? "Θα φαίνονται εδώ μόλις συνδεθεί η βιβλιοθήκη στον διακομιστή."
-      : !signedIn
-        ? "Συνδέσου για να δεις και να προσθέσεις τα δικά σου βιβλία."
-        : added && added.length
-          ? ""
-          : "Δεν έχεις προσθέσει ακόμη βιβλίο.";
-    signForm.hidden = !serverReady || signedIn;
-    addButton.disabled = !serverReady || !signedIn;
-    fileInput.disabled = !serverReady || !signedIn;
+      : added && added.length
+        ? ""
+        : "Δεν έχεις προσθέσει ακόμη βιβλίο.";
+    addButton.disabled = !serverReady || !canAdd;
+    fileInput.disabled = !serverReady || !canAdd;
   }
   let catalog = [];
   async function loadLibrary() {
@@ -130,7 +122,7 @@
     } catch (_) { catalog = []; }
     const status = await call("/library/status", { timeout: 8000 });
     serverReady = status.ok && status.schema === "nabou-library-status-v1";
-    signedIn = Boolean(serverReady && status.signed_in);
+    canAdd = Boolean(serverReady && status.can_add !== false);
     let added = null;
     if (serverReady) {
       const books = await call("/library/books", { timeout: 8000 });
@@ -142,22 +134,10 @@
     }
     libStatus.textContent = !serverReady
       ? "Η βιβλιοθήκη στον διακομιστή δεν έχει ανέβει ακόμη. Μέχρι τότε βλέπεις μόνο τους τίτλους των δημοσιευμένων πηγών, δεν μπορείς να προσθέσεις βιβλίο, και η Έρευνα δεν μπορεί να ψάξει μέσα τους."
-      : signedIn
-        ? "Συνδεδεμένος. Η Έρευνα ψάχνει πρώτα σε όλα αυτά τα βιβλία."
-        : "Η βιβλιοθήκη είναι διαθέσιμη. Συνδέσου για να ψάχνει η Έρευνα μέσα στα βιβλία.";
-    library.dataset.state = !serverReady ? "offline" : signedIn ? "ready" : "signed-out";
+      : "Η βιβλιοθήκη είναι διαθέσιμη. Η Έρευνα ψάχνει πρώτα εδώ.";
+    library.dataset.state = !serverReady ? "offline" : "ready";
     renderLibrary(catalog, added);
   }
-  signForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const key = keyInput.value.trim();
-    keyInput.value = "";
-    if (!key) return;
-    libStatus.textContent = "Σύνδεση…";
-    const r = await call("/session", { method: "POST", headers: { authorization: "Bearer " + key }, timeout: 15000 });
-    libStatus.textContent = r.ok ? "Συνδέθηκες." : r.status === 401 ? "Λάθος κωδικός." : "Η σύνδεση δεν έγινε. Δοκίμασε ξανά σε λίγο.";
-    if (r.ok) loadLibrary();
-  });
   fileInput.addEventListener("change", () => {
     const f = fileInput.files?.[0];
     if (f && !titleInput.value) titleInput.value = f.name.replace(/\.pdf$/i, "").replace(/[_]+/g, " ");
@@ -183,7 +163,7 @@
     } else if (r.ok) {
       addState.textContent = "Το βιβλίο υπάρχει ήδη στη βιβλιοθήκη.";
     } else {
-      addState.textContent = r.status === 401 ? "Χρειάζεται σύνδεση." : r.status === 422 ? "Δεν μπόρεσα να διαβάσω αυτό το PDF." : r.status === 413 ? "Το αρχείο είναι πολύ μεγάλο." : "Δεν μπήκε στη βιβλιοθήκη. Δοκίμασε ξανά σε λίγο.";
+      addState.textContent = r.status === 422 ? "Δεν μπόρεσα να διαβάσω αυτό το PDF." : r.status === 413 ? "Το αρχείο είναι πολύ μεγάλο." : "Δεν μπήκε στη βιβλιοθήκη. Δοκίμασε ξανά σε λίγο.";
     }
   });
 

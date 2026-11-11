@@ -17,8 +17,8 @@ const HITS=[{book:A,page:278,text:'Τον Μάρτιο του 1568 ο Πέτρο
    if(u.endsWith('/dispatch')){calls.dispatch++;return route.fulfill({status:202,json:{request_id:'own'}});}
    if(u.includes('/knowledge/')){calls.knowledge++;return route.abort();}
    if(u.includes('/library/')&&library==='offline')return route.abort();
-   if(u.endsWith('/library/status'))return route.fulfill({json:{schema:'nabou-library-status-v1',signed_in:signed,can_add:signed}});
-   if(u.endsWith('/library/books')&&m==='GET')return route.fulfill({json:{schema:'nabou-library-books-v1',published:[{id:'pub:Ioannou_2000_Thesaurismata30_Oi-fourtounes-tou-kapetan-Petrou-Lantza',pages:24}],added:signed?added:null}});
+   if(u.endsWith('/library/status'))return route.fulfill({json:{schema:'nabou-library-status-v1',signed_in:false,can_add:library!=='offline'}});
+   if(u.endsWith('/library/books')&&m==='GET')return route.fulfill({json:{schema:'nabou-library-books-v1',published:[{id:'pub:Ioannou_2000_Thesaurismata30_Oi-fourtounes-tou-kapetan-Petrou-Lantza',pages:24}],added}});
    if(u.endsWith('/library/books')&&m==='POST'){calls.add++;calls.addHeaders=route.request().headers();added=[{id:'src-1',kind:'uploaded',title:decodeURIComponent(calls.addHeaders['x-book-title']),author:'Δοκιμή',pages:3}];return route.fulfill({status:201,json:{status:'ADDED_TO_LIBRARY',book:added[0],pages:3,readable_pages:3,passages:5}});}
    if(u.endsWith('/library/search')){calls.search++;const q=JSON.parse(route.request().postData()).query;return route.fulfill({json:{schema:'nabou-library-search-v1',query:q,hits:/Λάντζα/.test(q)?HITS:[],stores:{published:'OK',uploaded:'OK',historical:'NOT_CONFIGURED'},took_ms:40}});}
    return route.fulfill({json:{snapshot,events:[]}});});

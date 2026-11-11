@@ -140,7 +140,7 @@
   });
   window.addEventListener("nabou:start-long-research", (e) => {
     const query = String(e.detail?.query || input.value || "").trim();
-    if (query.length >= 3 && !button.disabled) startLongRun(query);
+    if (query.length >= 3) startLongRun(query);
   });
   async function startLongRun(query) {
     button.disabled = true;
