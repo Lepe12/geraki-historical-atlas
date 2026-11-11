@@ -42,22 +42,24 @@ export function createHeadSurface(image:HTMLCanvasElement) {
     void main(){
       vec2 n=(source-vec2(160.,108.))/vec2(86.,98.);
       float r2=dot(n,n);
-      float neck=clamp((205.-source.y)/27.,0.,1.);
-      float head=pow(max(0.,1.-r2/1.18),.34)*neck;
+      // Head is a connected unit through the lower jaw. The old radial
+      // falloff multiplied by neck fade left the chin nearly static.
+      // Only the actual neck attachment (196–208) blends to the fixed torso.
+      float skull=1.-smoothstep(.96,1.38,r2);
+      float neck=1.-smoothstep(196.,208.,source.y);
+      float head=skull*neck;
       float depth=sqrt(max(0.,1.-min(1.,r2)))*42.;
       float a=turn*.34*head;
       vec2 p=source;
       p.x=160.+(source.x-160.)*cos(a)+depth*sin(a);
       p.y+=(source.y-205.)*(1.-cos(a))*.08*head;
-      // Actual orthographic X-axis tilt of the rounded artwork surface.
-      // A rotation mixes its original vertical coordinate with its assigned
-      // skull depth. Unlike y-dependent translation it cannot stretch the
-      // forehead or enlarge the face. The soft neck weight keeps the body fixed.
-      float b=pitch*.34;
-      // Rotate about the skull center, not the neck: at the neck
-      // the deformation fades to zero through the existing head weight.
-      float rotatedY=108.+(source.y-108.)*cos(b)-depth*sin(b);
-      p.y+=head*(rotatedY-source.y);
+      // Pitch is a genuine depth-aware X-axis rotation of the head around
+      // its cervical pivot. Chin, face and hair use the same angle; neck
+      // attachment weight alone blends the motion into the stationary body.
+      // Source tiles, image scale and UV stay unchanged.
+      float b=pitch*.34*head;
+      p.y=205.+(source.y-205.)*cos(b)-depth*sin(b)
+          +(source.y-205.)*(1.-cos(a))*.08*head;
       float chest=exp(-pow((source.y-320.)/94.,2.))*smoothstep(205.,250.,source.y)*(1.-smoothstep(420.,470.,source.y));
       p.x=160.+(p.x-160.)*(1.+breath*.006*chest);
       p.y-=breath*.9*chest;
