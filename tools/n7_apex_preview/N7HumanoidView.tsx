@@ -318,6 +318,7 @@ function ParticleReference({
           const a=angle*w;
           const cs=Math.cos(a), sn=Math.sin(a);
           const z=headDepths[n];
+          // Step 5 preview release marker: screen-safe 2.5D yaw, visually verified.
           // 2.5D yaw: preserve screen-space density/silhouette and use synthetic
           // depth only for lateral parallax. Never push particles toward/through camera.
           const tx=fx*cs+z*sn;
