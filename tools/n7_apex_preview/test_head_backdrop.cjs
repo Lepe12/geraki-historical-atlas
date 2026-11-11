@@ -96,6 +96,7 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
      await p.waitForFunction(t=>{const h=document.querySelector('[aria-label="N7 guide artwork-tile humanoid"]');return Math.abs(Number(h.dataset.currentPitch)-t)<.003;},pitch);
      await p.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
    };
+   // Deploy candidate: test requires visible movement, not just shader uniform updates.
    // Numeric pitch alone is insufficient. Measure visible vertical movement
    // of the source artwork in a fixed upper-head region.
    const headCenterY=px=>{
