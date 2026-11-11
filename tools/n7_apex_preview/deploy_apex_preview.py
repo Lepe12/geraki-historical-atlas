@@ -3,7 +3,7 @@
 import ftplib, hashlib, io, json, os, pathlib, secrets, socket, ssl, urllib.request, urllib.error
 
 PARENT="/bot.piratecartography.com/n7-app/public"
-TARGET="n7-apex"
+TARGET=os.getenv("N7_APEX_TARGET","n7-apex").strip("/") or "n7-apex"
 BASE="https://bot.piratecartography.com"
 TLS="linux3087.grserver.gr"
 UPSTREAM="a8732fad1078a809cadfa810cb0d89cf4445dbed"
@@ -64,7 +64,7 @@ def fetch(path):
     return urllib.request.urlopen(req,context=ssl.create_default_context(),timeout=25)
 
 def verify_live(release):
-    with fetch("/n7-apex/?v="+secrets.token_hex(8)) as r:
+    with fetch("/"+TARGET+"/?v="+secrets.token_hex(8)) as r:
         body=r.read(500000)
         if r.status!=200 or b"N7" not in body: raise RuntimeError("N7_APEX_PUBLIC_PAGE_FAILED")
     with fetch("/api/status") as r:
@@ -131,7 +131,7 @@ def main():
             raise
         if existing and exists_dir(ftp,backup):
             remove_tree(ftp,backup)
-        print("N7_APEX_DEPLOY_SUCCESS=true target=/n7-apex/ backendUntouched=true upgraded="+str(existing).lower())
+        print("N7_APEX_DEPLOY_SUCCESS=true target=/"+TARGET+"/ backendUntouched=true upgraded="+str(existing).lower())
     except BaseException:
         if stage and exists_dir(ftp,stage):
             try: ftp.cwd(PARENT); remove_tree(ftp,stage)
