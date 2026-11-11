@@ -61,7 +61,9 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   const [messages, setMessages] = useState<Msg[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [message, setMessage] = useState("");
-  const voice=useN7Voice(setMessage);
+  const autoSend=useRef<(text:string)=>void>(()=>{});
+  const sending=useRef(false);
+  const voice=useN7Voice(setMessage,text=>autoSend.current(text));
   const voiceRef=useRef(voice);voiceRef.current=voice;
   const heard=useRef<Record<string,number>>({});
   const readAnswer=(id:string,messages:Msg[])=>{const replies=messages.filter(m=>m.role==="assistant");if(replies.length>(heard.current[id]||0)){heard.current[id]=replies.length;voiceRef.current.speak(replies.at(-1)!.content);}};
@@ -95,10 +97,10 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
             if(activeConversation.current===job.conversationId){const reply=await n7("/api/conversations/"+idPath(job.conversationId));if(disposed)return;if(activeConversation.current===job.conversationId){const messages=(reply.conversation as {messages?:Msg[]})?.messages||[];setMessages(messages);readAnswerRef.current(job.conversationId,messages);}}
             setPendingJobs(jobs=>jobs.filter(j=>j.id!==job.id));
           }else if(state.status==="failed"){
-            if(activeConversation.current===job.conversationId)setError("Η εργασία N7 απέτυχε. Μπορείς να συνεχίσεις τη συνομιλία.");
+            if(activeConversation.current===job.conversationId){setError("Η εργασία N7 απέτυχε. Μπορείς να συνεχίσεις τη συνομιλία.");voiceRef.current.failConversation("Η εργασία N7 απέτυχε. Μπορείς να ξεκινήσεις ξανά τη συζήτηση.");}
             setPendingJobs(jobs=>jobs.filter(j=>j.id!==job.id));
-          }else if(attempt>=180){setError("Η παρακολούθηση της ουράς έληξε χωρίς επιβεβαιωμένη απάντηση.");setPendingJobs(jobs=>jobs.filter(j=>j.id!==job.id));}
-        }catch(e){if(!disposed){setError("Ο έλεγχος της ουράς απέτυχε· η ολοκλήρωση δεν επιβεβαιώθηκε. "+(e instanceof Error?e.message:String(e)));setPendingJobs(jobs=>jobs.filter(j=>j.id!==job.id));}}
+          }else if(attempt>=180){setError("Η παρακολούθηση της ουράς έληξε χωρίς επιβεβαιωμένη απάντηση.");if(activeConversation.current===job.conversationId)voiceRef.current.failConversation("Δεν επιβεβαιώθηκε απάντηση. Η φωνητική συζήτηση σταμάτησε.");setPendingJobs(jobs=>jobs.filter(j=>j.id!==job.id));}
+        }catch(e){if(!disposed){setError("Ο έλεγχος της ουράς απέτυχε· η ολοκλήρωση δεν επιβεβαιώθηκε. "+(e instanceof Error?e.message:String(e)));if(activeConversation.current===job.conversationId)voiceRef.current.failConversation("Η σύνδεση με την ουρά διακόπηκε. Η φωνητική συζήτηση σταμάτησε.");setPendingJobs(jobs=>jobs.filter(j=>j.id!==job.id));}}
       }));}finally{inflight=false;}
     },10000);
     return()=>{disposed=true;window.clearInterval(timer);};
@@ -146,7 +148,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   }, [missionId, open]);
 
   async function chooseConversation(id: string) {
-    voice.stop();setError("");
+    voice.suspend();setError("");
     try {
       const d = await n7("/api/conversations/" + idPath(id));
       const c = d.conversation as { messages?: Msg[] } | undefined;
@@ -165,19 +167,20 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
     setConversations(Array.isArray(list.conversations) ? list.conversations as Conversation[] : []);
     return id;
   }
-  async function send() {
-    if(!message.trim()||busy||(!authenticated&&!guest))return;
+  async function send(spoken?:string) {
+    const draft=typeof spoken==="string"?spoken:message;
+    if(!draft.trim()||busy||sending.current||(!authenticated&&!guest))return;
     if(guest){
-      const prompt=message.trim();if(prompt.length>2000){setError("Γράψε έως 2.000 χαρακτήρες ανά μήνυμα.");return;}
+      const prompt=draft.trim();if(prompt.length>2000){setError("Γράψε έως 2.000 χαρακτήρες ανά μήνυμα.");voice.failConversation("Το μήνυμα είναι πολύ μεγάλο. Δοκίμασε πιο σύντομη φράση.");return;}
       const rows=[...messages.slice(-6),{role:"user",content:prompt}].map(m=>({role:m.role,content:m.content.slice(0,1500)}));
       rows[rows.length-1].content=prompt;
-      voice.stop();setBusy(true);setError("");setMessages(previous=>[...previous,{role:"user",content:prompt}]);
+      sending.current=true;voice.stop();setBusy(true);setError("");setMessages(previous=>[...previous,{role:"user",content:prompt}]);
       try{const result=await n7("/api/n7-apex/chat",{messages:rows});if(typeof result.reply!=="string"||!result.reply.trim())throw Error("Το N7 δεν επέστρεψε απάντηση.");setMessages(previous=>[...previous,{role:"assistant",content:String(result.reply)}]);voiceRef.current.speak(result.reply);setMessage(current=>current.trim()===prompt?"":current);}
-      catch(e){setError(e instanceof Error?e.message:String(e));}
-      finally{setBusy(false);}
+      catch(e){const error=e instanceof Error?e.message:String(e);setError(error);voiceRef.current.failConversation(error);}
+      finally{sending.current=false;setBusy(false);}
       return;
     }
-    const prompt=message.trim();voice.stop();setBusy(true); setError(""); trace("orchestrator","memory","model_runtime");
+    const prompt=draft.trim();sending.current=true;voice.stop();setBusy(true); setError(""); trace("orchestrator","memory","model_runtime");
     try {
       const id = conversationId || await newConversation();
       const result = await n7("/api/conversations/" + idPath(id) + "/chat", { message: prompt });
@@ -192,9 +195,10 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
       const list = await n7("/api/conversations");
       setConversations(Array.isArray(list.conversations) ? list.conversations as Conversation[] : []);
       // Text arrival is not audio playback; never invent a speaking event.
-    } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
-    finally { setBusy(false); }
+    } catch (e) { const error=e instanceof Error?e.message:String(e);setError(error);voiceRef.current.failConversation(error); }
+    finally { sending.current=false;setBusy(false); }
   }
+  autoSend.current=text=>{if(pendingJobs.some(j=>j.conversationId===conversationId)||sending.current||busy){voiceRef.current.failConversation("Το N7 απαντά ακόμη. Περίμενε πριν ξεκινήσεις ξανά.");return;}void send(text);};
   async function submitTask() {
     if (!taskPrompt.trim() || busy || !authenticated) return;
     setBusy(true); setError("");
@@ -233,21 +237,22 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   const voiceControls=<div aria-label="Φωνητική συνομιλία N7" style={{fontSize:12,lineHeight:1.45}}>
     {!authenticated&&!guest?<>{loginForm}<button type="button" style={buttonStyle} onClick={()=>void check()}>Επανέλεγχος σύνδεσης</button></>:<>
       <div style={{display:"flex",gap:7,flexWrap:"wrap",alignItems:"center"}}>
-        <button type="button" style={buttonStyle} onClick={voice.toggle} aria-pressed={voice.enabled} disabled={!voice.supported.output}>Φωνή {voice.enabled?"ενεργή":"ανενεργή"}</button>
-        <button type="button" style={buttonStyle} onClick={voice.listen} disabled={busy||pendingJobs.some(j=>j.conversationId===conversationId)||!voice.supported.input}>Μικρόφωνο</button>
-        <button type="button" style={buttonStyle} onClick={()=>{voice.suspend();}}>Διακοπή ήχου</button>
-        <button type="button" style={buttonStyle} onClick={()=>voice.speak("Γεια σου. Είμαι το N7. Η φωνή είναι έτοιμη.",true)} disabled={!voice.supported.output}>Δοκιμή φωνής</button>
-        {lastAnswer&&<button type="button" style={buttonStyle} onClick={()=>voice.speak(lastAnswer,true)} disabled={!voice.supported.output}>Ανάγνωση απάντησης</button>}
+        {!voice.conversation&&<button type="button" style={buttonStyle} onClick={voice.toggle} aria-pressed={voice.enabled} disabled={!voice.supported.output}>Φωνή {voice.enabled?"ενεργή":"ανενεργή"}</button>}
+        <button type="button" style={{...buttonStyle,background:voice.conversation?"#713c25":"#12516a"}} onClick={voice.conversation?voice.suspend:voice.startConversation} disabled={!voice.conversation&&(busy||pendingJobs.some(j=>j.conversationId===conversationId)||!voice.supported.input||!voice.supported.output)}>{voice.conversation?"Τέλος συζήτησης":"Έναρξη συζήτησης"}</button>
+        {!voice.conversation&&<button type="button" style={buttonStyle} onClick={voice.listen} disabled={busy||pendingJobs.some(j=>j.conversationId===conversationId)||!voice.supported.input}>Υπαγόρευση</button>}
+        {!voice.conversation&&<button type="button" style={buttonStyle} onClick={()=>{voice.suspend();}}>Διακοπή ήχου</button>}
+        {!voice.conversation&&<button type="button" style={buttonStyle} onClick={()=>voice.speak("Γεια σου. Είμαι το N7. Η φωνή είναι έτοιμη.",true)} disabled={!voice.supported.output}>Δοκιμή φωνής</button>}
+        {!voice.conversation&&lastAnswer&&<button type="button" style={buttonStyle} onClick={()=>voice.speak(lastAnswer,true)} disabled={!voice.supported.output}>Ανάγνωση απάντησης</button>}
       </div>
-      {voice.voices.length>0&&<label>Φωνή συσκευής <select aria-label="Φωνή συσκευής" value={voice.voiceURI} onChange={e=>voice.setVoiceURI(e.target.value)}><option value="">Αυτόματη · ελληνικά εφόσον υπάρχουν</option>{voice.voices.map(v=><option key={v.voiceURI} value={v.voiceURI}>{v.name} ({v.lang})</option>)}</select></label>}
+      {!voice.conversation&&voice.voices.length>0&&<label>Φωνή συσκευής <select aria-label="Φωνή συσκευής" value={voice.voiceURI} onChange={e=>voice.setVoiceURI(e.target.value)}><option value="">Αυτόματη · ελληνικά εφόσον υπάρχουν</option>{voice.voices.map(v=><option key={v.voiceURI} value={v.voiceURI}>{v.name} ({v.lang})</option>)}</select></label>}
       {!voice.supported.input&&<p>Το μικρόφωνο δεν υποστηρίζεται εδώ. Δοκίμασε Chrome/Edge ή γράψε το μήνυμα.</p>}
       {!voice.supported.output&&<p>Δεν υπάρχει διαθέσιμη εκφώνηση στον browser. Οι απαντήσεις εμφανίζονται ως κείμενο.</p>}
-      <p style={{margin:"5px 0"}}>Το μικρόφωνο ανοίγει μόνο όταν το πατήσεις. Ο browser μπορεί να χρησιμοποιεί την υπηρεσία αναγνώρισής του. Έλεγξε το κείμενο πριν το στείλεις.</p>
+      <p style={{margin:"5px 0"}}>Πάτησε Έναρξη συζήτησης μία φορά. Μετά μιλάς και το N7 απαντά αυτόματα. Για διακοπή πες «τέλος συζήτησης» όταν σε ακούει. Το μικρόφωνο κλείνει όσο μιλά το N7. Ο browser μπορεί να χρησιμοποιεί την υπηρεσία αναγνώρισής του.</p>
       <p role="status" aria-label="Κατάσταση φωνής">{voice.status||"Πάτησε Δοκιμή φωνής για να ακούσεις το N7."}</p>
       {guideOpen&&<>
         {lastAnswer&&<div aria-label="Τελευταία απάντηση N7" style={{maxHeight:70,overflow:"auto",whiteSpace:"pre-wrap"}}>{lastAnswer}</div>}
-        <textarea aria-label="Φωνητικό μήνυμα" rows={2} value={message} onChange={e=>setMessage(e.target.value)} placeholder="Μίλησε ή γράψε εδώ…" style={inputStyle}/>
-        <button type="button" style={buttonStyle} onClick={()=>void send()} disabled={busy||!message.trim()}>Αποστολή στη φιγούρα</button>
+        <textarea aria-label="Φωνητικό μήνυμα" readOnly={voice.conversation} rows={2} value={message} onChange={e=>setMessage(e.target.value)} placeholder="Μίλησε ή γράψε εδώ…" style={inputStyle}/>
+        {!voice.conversation&&<button type="button" style={buttonStyle} onClick={()=>void send()} disabled={busy||!message.trim()}>Αποστολή στη φιγούρα</button>}
         {busy||pendingJobs.some(j=>j.conversationId===conversationId)?<span role="status"> Το N7 ετοιμάζει απάντηση…</span>:null}
       </>}
     </>}

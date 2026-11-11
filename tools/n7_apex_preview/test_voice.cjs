@@ -26,12 +26,12 @@ const url=process.env.N7_VISUAL_URL||'http://127.0.0.1:4177/n7-apex-step5/',out=
  });
  await p.goto(url,{waitUntil:'networkidle'});const dialog=p.getByRole('dialog',{name:'N7 Humanoid preview'});
  await dialog.getByRole('button',{name:'Φωνητική συνομιλία',exact:true}).click({timeout:5000});
- assert.equal(await dialog.locator('input[type=password]').count(),0);await dialog.getByRole('button',{name:'Μικρόφωνο',exact:true}).waitFor();
+ assert.equal(await dialog.locator('input[type=password]').count(),0);await dialog.getByRole('button',{name:'Υπαγόρευση',exact:true}).waitFor();
  const enableVoice=async()=>{const button=dialog.getByRole('button',{name:'Φωνή ανενεργή',exact:true});if(await button.isVisible())await button.click();};
  const mood=()=>dialog.getByLabel('N7 mood status');const count=()=>p.evaluate(()=>window.__voiceFixture.utterances.length);
  const skip=dialog.getByRole('button',{name:'Skip',exact:true});if(await skip.isVisible())await skip.click();
  assert.equal(await p.evaluate(()=>window.__voiceFixture.starts),0,'Mic started without gesture');assert.equal(await count(),0,'Audio started without gesture');
- await dialog.getByRole('button',{name:'Μικρόφωνο',exact:true}).click();assert(!((await mood().innerText()).includes('LISTENING')),'Listening before recognition start');
+ await dialog.getByRole('button',{name:'Υπαγόρευση',exact:true}).click();assert(!((await mood().innerText()).includes('LISTENING')),'Listening before recognition start');
  await p.evaluate(()=>window.__voiceFixture.recognition.onstart());await dialog.getByText('MOOD · LISTENING · LIVE N7 REQUEST',{exact:true}).waitFor();
  await p.evaluate(()=>{const r=window.__voiceFixture.recognition;r.onresult({results:[{isFinal:true,0:{transcript:'Πες μου για τη Ρόδο.'}}]});r.onend();});
  await dialog.getByText('MOOD · IDLE',{exact:true}).waitFor();assert.equal(await dialog.getByLabel('Φωνητικό μήνυμα',{exact:true}).inputValue(),'Πες μου για τη Ρόδο.');assert.equal(posts,0,'Transcript sent without confirmation');
@@ -42,7 +42,7 @@ const url=process.env.N7_VISUAL_URL||'http://127.0.0.1:4177/n7-apex-step5/',out=
  await p.evaluate(()=>window.__voiceFixture.current.onend());await dialog.getByText('MOOD · IDLE',{exact:true}).waitFor();
  await dialog.getByRole('button',{name:'Ανάγνωση απάντησης',exact:true}).click();await p.evaluate(()=>window.__voiceFixture.current.onstart());await dialog.getByRole('button',{name:'Διακοπή ήχου',exact:true}).click();await dialog.getByText('MOOD · IDLE',{exact:true}).waitFor();assert.equal(await dialog.getByRole('button',{name:'Φωνή ανενεργή',exact:true}).getAttribute('aria-pressed'),'false');
  await p.evaluate(()=>window.__voiceFixture.current.onend());assert.equal(await count(),2,'Cancelled speech resumed');
- await dialog.getByRole('button',{name:'Μικρόφωνο',exact:true}).click();await p.evaluate(()=>{const r=window.__voiceFixture.recognition;r.onstart();r.onerror({error:'not-allowed'});});await dialog.getByLabel('Κατάσταση φωνής').getByText(/Επίτρεψε το μικρόφωνο/).waitFor();await dialog.getByText('MOOD · IDLE',{exact:true}).waitFor();
+ await dialog.getByRole('button',{name:'Υπαγόρευση',exact:true}).click();await p.evaluate(()=>{const r=window.__voiceFixture.recognition;r.onstart();r.onerror({error:'not-allowed'});});await dialog.getByLabel('Κατάσταση φωνής').getByText(/Επίτρεψε το μικρόφωνο/).waitFor();await dialog.getByText('MOOD · IDLE',{exact:true}).waitFor();
  queued=true;release=null;await enableVoice();await dialog.getByLabel('Φωνητικό μήνυμα').fill('queued fixture');await dialog.getByRole('button',{name:'Αποστολή στη φιγούρα',exact:true}).click();await waitRelease();release();await dialog.getByText('MOOD · THINKING · LIVE N7 REQUEST',{exact:true}).waitFor();assert.equal(await count(),2,'Queued response spoke before completion');
  await p.waitForFunction(()=>window.__voiceFixture.utterances.length===3,{},{timeout:18000});assert.equal(poll,1);await p.evaluate(()=>window.__voiceFixture.current.onstart());await dialog.getByText('MOOD · SPEAKING · LIVE N7 REQUEST',{exact:true}).waitFor();await p.evaluate(()=>window.__voiceFixture.current.onend());await dialog.getByText('MOOD · IDLE',{exact:true}).waitFor();
  queued=false;fail=true;release=null;await dialog.getByLabel('Φωνητικό μήνυμα').fill('failure fixture');await dialog.getByRole('button',{name:'Αποστολή στη φιγούρα',exact:true}).click();await waitRelease();release();await dialog.getByText('MOOD · IDLE',{exact:true}).waitFor();assert.equal(await count(),3,'Error response spoke');
