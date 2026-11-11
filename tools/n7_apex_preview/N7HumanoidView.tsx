@@ -135,7 +135,7 @@ function ParticleReference({
           const inHead=y<205 && y>4 && Math.abs(x+.5-sampleW/2)<122;
           const neckWeight=inHead?smooth01(clamp01((205-y)/30)):0;
           headWeights.push(neckWeight);
-          headDepths.push(inHead?Math.sqrt(dome)*44:0);
+          headDepths.push(inHead?Math.sqrt(dome)*58:0);
           headEdges.push(inHead?clamp01((Math.abs(hx)-.72)/.28):0);
 
           // Guide Step 4: the body completes left-to-right.
@@ -296,7 +296,7 @@ function ParticleReference({
           return;
         }
 
-        const angle=currentTurn*.19; // deliberately conservative: depth illusion, not full 3D.
+        const angle=currentTurn*.31; // visible ~18° max: still an illusion, but clearly perceptible to the user.
         const sign=Math.sign(currentTurn)||1;
         for(let n=0;n<headWeights.length;n++){
           const j=n*3;
