@@ -29,13 +29,13 @@
     </script>
     <link rel="preload" href="./assets/nautical/fonts/EBGaramond.woff2" as="font" type="font/woff2" crossorigin />
     <script type="importmap">
-      { "imports": { "./live-bridge.js": "./live-bridge.js?v=startup-feedback-20261016-2" } }
+      { "imports": { "./live-bridge.js": "./live-bridge.js?v=research-progress-1", "./my-research.js": "./my-research.js?v=research-progress-1", "./research-overview.js": "./research-overview.js?v=research-progress-1", "./research-narrative-view.js": "./research-narrative-view.js?v=research-progress-1", "./research-narrative-panel.js": "./research-narrative-panel.js?v=research-progress-1" } }
     </script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=GFS+Didot&family=Noto+Serif:wght@400;500;600&display=swap" />
     <link rel="stylesheet" href="./atlas-reading.css?v=20261106-live-map-3" />
   <link rel="stylesheet" href="./atlas-unified.css?v=20261106-home-1" />
 <link rel="stylesheet" href="./professional-atlas.css?v=n7-layout-1" />
-<link rel="stylesheet" href="./n7-layout.css?v=n7-ux-1" />
+<link rel="stylesheet" href="./n7-layout.css?v=research-progress-1" />
 </head>
   <body class="nxs-active nx-mock nx-v2 atlas-ui atlas-reading n7-layout" data-atlas-page="home">
     <!-- Atlas page roots: only one of home/research is shown. Live map stays in #chartFrame. -->
@@ -552,14 +552,19 @@
         <header class="learning-head">
           <div class="nxs-index">03</div>
           <div>
-            <span>ΑΝΑΓΝΩΣΗ ΚΑΙ ΕΛΕΓΧΟΣ ΠΗΓΩΝ</span>
+            <span>Δεδομένα</span>
             <strong>Έλεγχος PDF</strong>
           </div>
           <button id="closeLearning" type="button" aria-label="Κλείσιμο ελέγχου PDF">×</button>
         </header>
 
+        <p class="learning-intro" id="learningIntro">
+          Εδώ διαβάζεις ένα PDF και διαλέγεις ποια αποσπάσματα κρατάς. Η ανάγνωση γίνεται στον υπολογιστή σου·
+          τίποτα δεν στέλνεται πριν πατήσεις «Αποθήκευση». <strong>Δεν είναι ακόμη η βιβλιοθήκη σου:</strong> το PDF
+          δεν θα φαίνεται στις «Πηγές» και δεν θα το ψάχνεις από την Έρευνα.
+        </p>
         <div class="learning-source">
-          <label for="learningFile" class="tool-help">1. Επιλέξτε PDF έως 25 MB</label>
+          <label for="learningFile" class="tool-help">1. Διάλεξε PDF έως 25 MB</label>
           <input id="learningFile" class="learning-file" type="file" accept="application/pdf,.pdf" />
           <button id="learningAnalyze" class="learning-analyze" type="button" disabled>
             2. Ανάλυση εγγράφου
@@ -571,22 +576,22 @@
         </div>
 
         <p class="tool-help">
-          Επιλέξτε έγγραφο, αναλύστε το και ελέγξτε τις προτάσεις πριν τις αποθηκεύσετε.
+          Διάλεξε έγγραφο, ανάλυσέ το και δες τις προτάσεις πριν τις αποθηκεύσεις.
         </p>
         <div class="learning-rule"></div>
 
         <div class="learning-review-head">
           <span>3. Έλεγχος προτάσεων</span>
-          <small id="learningSummary">Οι προτάσεις του εγγράφου θα εμφανιστούν εδώ.</small>
+          <small id="learningSummary">Οι προτάσεις του εγγράφου θα φανούν εδώ.</small>
         </div>
 
         <div class="learning-items" id="learningItems">
-          <div class="learning-empty">Επιλέξτε PDF για να ξεκινήσετε.</div>
+          <div class="learning-empty">Διάλεξε PDF για να ξεκινήσεις.</div>
         </div>
 
         <div class="learning-footer">
           <span class="learning-explain"
-            >Με την αποθήκευση, το PDF και τα εγκεκριμένα στοιχεία ανεβαίνουν στη βάση γνώσης του NABOU και χρησιμοποιούνται στην έρευνα ως ανεπιβεβαίωτο υλικό.</span
+            >Η αποθήκευση στέλνει το PDF και όσα εγκρίνεις σε μια ξεχωριστή βάση στον διακομιστή και θέλει σύνδεση χειριστή· χωρίς αυτήν δεν αποθηκεύεται τίποτα. Αν πετύχει, οι ερευνητές μπορεί να τα συμβουλευτούν σε επόμενη έρευνα ως ανεπιβεβαίωτο υλικό, χωρίς εγγύηση ότι θα χρησιμοποιηθούν.</span
           >
           <button id="learningSave" type="button" disabled>Αποθήκευση εγκεκριμένων</button>
         </div>
@@ -642,17 +647,17 @@
     <script src="./gpu-field.js?v=portolan-1" defer></script>
     <script src="./map-3d.js?v=map3d-12" defer></script>
     <script src="./nabou-assistant.js?v=n7-ux-1" defer></script>
-    <script src="./operator-command.js?v=dispatch-timeout-20261020" defer></script>
+    <script src="./operator-command.js?v=research-progress-1" defer></script>
     <script type="module" src="./research-ui.js?v=narrative-4"></script>
     <script src="./learning-proposals.js?v=v2-pdf-1" defer></script>
-    <script src="./learning-review.js?v=v2-pdf-1" defer></script>
+    <script src="./learning-review.js?v=research-progress-1" defer></script>
     <script type="module" src="./nabou-shell.js?v=v2-phase2-1"></script>
-    <script type="module" src="./workspace-insights.js?v=narrative-4"></script>
+    <script type="module" src="./workspace-insights.js?v=research-progress-1"></script>
     <script type="module" src="./nautical-dashboard.js?v=atlas-home-research-1"></script>
     <script src="./redesign-v2.js?v=v2-phase1-1" defer></script>
-    <script src="./redesign-v2-panels.js?v=v2-phase2-3" defer></script>
+    <script src="./redesign-v2-panels.js?v=research-progress-1" defer></script>
     <script src="./atlas-pages.js?v=live-map-3" defer></script>
-  <script src="./atlas-reading.js?v=20261106-unified-home-1" defer></script>
+  <script src="./atlas-reading.js?v=research-progress-1" defer></script>
   <script src="./atlas-unified.js?v=20261106-home-1" defer></script>
 <script src="./professional-atlas.js?v=n7-ux-1" defer></script>
 <script src="./n7-layout.js?v=n7-ux-1" defer></script>

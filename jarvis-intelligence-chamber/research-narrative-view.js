@@ -186,7 +186,7 @@ export function renderStoryHtml(narrative, { mode = "default", heading = true, f
       escapeHtml(modeLabel) +
       '">' +
       headingHtml +
-      '<p class="narrative-empty">Δεν προέκυψε τεκμηριωμένη αφήγηση από τις εξετασθείσες πηγές. Αυτό δεν αποδεικνύει ιστορική απουσία.</p>' +
+      '<p class="narrative-empty">Δεν βγήκε ιστορία από αυτή την έρευνα: στις πηγές που εξετάστηκαν δεν βρέθηκαν τεκμηριωμένα στοιχεία. Αυτό δεν σημαίνει ότι δεν υπήρξε.</p>' +
       mapNoteHtml(narrative, mode) +
       "</section>"
     );

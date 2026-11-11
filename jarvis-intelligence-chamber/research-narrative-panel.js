@@ -41,6 +41,9 @@ function modeMeta(which) {
   return { kicker: "ΙΣΤΟΡΙΑ", titleFallback: "Ιστορικό άρθρο", storyMode: "history" };
 }
 
+const RUNNING = ["RUNNING", "PREPARING", "QUEUED", "STARTING", "ACTIVE"];
+const stillRunning = (s) => RUNNING.includes(String(s?.mission?.status || "").toUpperCase());
+
 function emptyHtml(message) {
   return "<p class=\"nsp-empty\">" + escapeHtml(message) + "</p>";
 }
@@ -68,8 +71,11 @@ function render() {
       snapshot.mission?.purpose ||
       typed ||
       meta.titleFallback;
+    // Honest: only a running research may still produce a story; a finished one will not.
     body.innerHTML = emptyHtml(
-      "Η αφήγηση δεν είναι ακόμη έτοιμη. Μόλις ολοκληρωθεί η σύνθεση, θα εμφανιστεί εδώ μαζί με τον χάρτη.",
+      stillRunning(snapshot)
+        ? "Η έρευνα τρέχει ακόμη. Αν βγει ιστορία από τις πηγές, θα εμφανιστεί εδώ μαζί με τον χάρτη."
+        : "Αυτή η έρευνα τελείωσε χωρίς ελληνική ιστορία. Δεν θα εμφανιστεί αφήγηση εδώ· όσα βρέθηκαν είναι στις «Πηγές».",
     );
     return;
   }

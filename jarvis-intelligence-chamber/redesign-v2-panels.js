@@ -102,9 +102,9 @@
     zone.className = "v2-drop";
     zone.innerHTML =
       '<div class="v2-drop-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg></div>' +
-      '<p class="v2-drop-t">Σύρετε εδώ ένα αρχείο PDF</p><p class="v2-drop-s">ή</p>' +
-      '<button type="button" class="v2-drop-btn">Επιλογή αρχείου</button>' +
-      '<p class="v2-drop-h">Μόνο αρχεία PDF, έως 25 MB. Το έγγραφο διαβάζεται στον υπολογιστή σας.</p>' +
+      '<p class="v2-drop-t">Σύρε εδώ ένα PDF</p><p class="v2-drop-s">ή</p>' +
+      '<button type="button" class="v2-drop-btn">Διάλεξε αρχείο</button>' +
+      '<p class="v2-drop-h">Μόνο PDF, έως 25 MB. Το έγγραφο διαβάζεται στον υπολογιστή σου.</p>' +
       '<p class="v2-drop-file" role="status" aria-live="polite"></p>';
     input.after(zone);
     input.classList.add("v2-file-native");

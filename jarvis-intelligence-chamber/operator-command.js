@@ -16,11 +16,20 @@
     clearTimeout(waitingTimer);
     waitingTimer = null;
   };
+  // Minutes and the start time, not a seconds counter: a research run takes about 20–90 minutes.
+  const startedText = () => {
+    const minutes = Math.max(0, Math.floor((Date.now() - acceptedAt) / 60000));
+    let at = "";
+    try {
+      at = new Intl.DateTimeFormat("el-GR", { hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date(acceptedAt));
+    } catch (_) {}
+    const ago = minutes < 1 ? "μόλις τώρα" : "πριν από " + minutes + (minutes === 1 ? " λεπτό" : " λεπτά");
+    return "ξεκίνησε στις " + at + " · " + ago;
+  };
   const showWaiting = () => {
     if (!waitingForRun) return;
-    const elapsed = Math.floor((Date.now() - acceptedAt) / 1000);
-    setState("Αναμονή έναρξης · " + elapsed + " δευτ. · το αίτημα παραλήφθηκε", "is-pending");
-    waitingTimer = setTimeout(showWaiting, 1000);
+    setState("Η έρευνά σου τρέχει · " + startedText() + " · συνήθως 20–90 λεπτά", "is-pending");
+    waitingTimer = setTimeout(showWaiting, 30000);
   };
   window.addEventListener("jarvis:research-selection", () => {
     waitingForRun = false;
@@ -76,6 +85,16 @@
       setState(d.state || "RUN RECEIVED");
     }
   });
+  // A reload brings back the question this browser sent (workspace-insights.js / my-research.js).
+  window.addEventListener("jarvis:dispatch-accepted", (e) => {
+    if (!e.detail?.restored || !e.detail.request_id) return;
+    document.body.dataset.dispatchRequest = e.detail.request_id;
+    document.body.dataset.operatorQuery = e.detail.query || "";
+    waitingForRun = true;
+    acceptedAt = Number(e.detail.started_at) || Date.now();
+    clearWaiting();
+    showWaiting();
+  });
   input.addEventListener("input", () => setState(input.value.trim() ? "Ερώτημα έτοιμο" : "ΕΤΟΙΜΟ"));
   window.addEventListener("jarvis:reuse-query", (e) => {
     input.value = e.detail?.query || "";
@@ -103,11 +122,13 @@
       waitingForRun = true;
       acceptedAt = Date.now();
       clearWaiting();
-      waitingTimer = setTimeout(showWaiting, 1000);
+      waitingTimer = setTimeout(showWaiting, 30000);
       window.dispatchEvent(
-        new CustomEvent("jarvis:dispatch-accepted", { detail: { request_id: result.request_id, query } }),
+        new CustomEvent("jarvis:dispatch-accepted", {
+          detail: { request_id: result.request_id, query, started_at: acceptedAt },
+        }),
       );
-      setState("Το αίτημα παραλήφθηκε — αναμονή έναρξης έρευνας", "is-pending");
+      setState("Το ερώτημά σου στάλθηκε και τρέχει · συνήθως 20–90 λεπτά", "is-pending");
     } catch (err) {
       window.dispatchEvent(new CustomEvent("jarvis:dispatch-failed"));
       console.error("[NABOU//X] Research dispatch failed", err);
