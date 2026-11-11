@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {createPortal} from "react-dom";
 import useN7Voice from "./useN7Voice";
+import {FEMALE_VOICE_ID} from "./N7FemaleVoice";
 import {N7_HUMANOID_REFERENCE} from "./N7HumanoidReference";
 import type { OrbState } from "./ApexHeroOrb";
 
@@ -244,7 +245,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
         {!voice.conversation&&<button type="button" style={buttonStyle} onClick={()=>voice.speak("Γεια σου. Είμαι το N7. Η φωνή είναι έτοιμη.",true)} disabled={!voice.supported.output}>Δοκιμή φωνής</button>}
         {!voice.conversation&&lastAnswer&&<button type="button" style={buttonStyle} onClick={()=>voice.speak(lastAnswer,true)} disabled={!voice.supported.output}>Ανάγνωση απάντησης</button>}
       </div>
-      {!voice.conversation&&voice.voices.length>0&&<label>Φωνή συσκευής <select aria-label="Φωνή συσκευής" value={voice.voiceURI} onChange={e=>voice.setVoiceURI(e.target.value)}><option value="">Αυτόματη · ελληνικά εφόσον υπάρχουν</option>{voice.voices.map(v=><option key={v.voiceURI} value={v.voiceURI}>{v.name} ({v.lang})</option>)}</select></label>}
+      {!voice.conversation&&<label>Φωνή συσκευής <select aria-label="Φωνή συσκευής" value={voice.voiceURI} onChange={e=>voice.setVoiceURI(e.target.value)}><option value={FEMALE_VOICE_ID}>N7 · Ελληνική γυναικεία</option><option value="">Αυτόματη φωνή συσκευής</option>{voice.voices.map(v=><option key={v.voiceURI} value={v.voiceURI}>{v.name} ({v.lang})</option>)}</select></label>}
       {!voice.supported.input&&<p>Το μικρόφωνο δεν υποστηρίζεται εδώ. Δοκίμασε Chrome/Edge ή γράψε το μήνυμα.</p>}
       {!voice.supported.output&&<p>Δεν υπάρχει διαθέσιμη εκφώνηση στον browser. Οι απαντήσεις εμφανίζονται ως κείμενο.</p>}
       <p style={{margin:"5px 0"}}>Πάτησε Έναρξη συζήτησης μία φορά. Μετά μιλάς και το N7 απαντά αυτόματα. Για διακοπή πες «τέλος συζήτησης» όταν σε ακούει. Το μικρόφωνο κλείνει όσο μιλά το N7. Ο browser μπορεί να χρησιμοποιεί την υπηρεσία αναγνώρισής του.</p>

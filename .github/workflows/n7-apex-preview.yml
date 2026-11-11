@@ -22,7 +22,7 @@ jobs:
   validate:
     environment: nabou-production
     runs-on: ubuntu-24.04
-    timeout-minutes: 18
+    timeout-minutes: 30
     env:
       PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
       PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
@@ -47,7 +47,11 @@ jobs:
         run: |
           node --test tools/n7_apex_preview/test_public_chat.cjs
           python3 tools/n7_apex_preview/test_deploy_public_chat.py
+          python3 tools/n7_apex_preview/test_deploy_female_voice.py
           python3 tools/n7_apex_preview/deploy_public_chat.py
+      - name: Reconstruct pinned Greek female voice assets
+        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        run: python3 tools/n7_apex_preview/prepare_female_voice.py --out "$RUNNER_TEMP/n7-female-assets"
       - name: Reconstruct exact upstream APEX source with reviewed N7 overlay
         run: python3 tools/n7_apex_preview/build_apex_preview.py --out "$RUNNER_TEMP/n7-apex-src"
       - name: Build static /n7-apex export
@@ -65,6 +69,8 @@ jobs:
           echo "CHROME_BIN=$CHROME_BIN" >> "$GITHUB_ENV"
           mkdir -p "$RUNNER_TEMP/n7-apex-http${N7_APEX_BASE_PATH}"
           cp -a "$RUNNER_TEMP/n7-apex-src/out/." "$RUNNER_TEMP/n7-apex-http${N7_APEX_BASE_PATH}/"
+          mkdir -p "$RUNNER_TEMP/n7-apex-http/n7-apex-voice"
+          if [ -d "$RUNNER_TEMP/n7-female-assets" ]; then ln -s "$RUNNER_TEMP/n7-female-assets" "$RUNNER_TEMP/n7-apex-http/n7-apex-voice/rapunzelina-v1"; fi
           python3 -m http.server 4173 --directory "$RUNNER_TEMP/n7-apex-http" >"$RUNNER_TEMP/n7-apex-http.log" 2>&1 &
           NODE_PATH="$RUNNER_TEMP/n7-apex-browser/node_modules" node - <<'NODE'
           const { chromium }=require('playwright-core');
@@ -257,6 +263,13 @@ jobs:
           N7_VISUAL_URL: http://127.0.0.1:4173/n7-apex-step5/
           N7_VOICE_OUT: ${{ runner.temp }}/n7-apex-evidence/voice
         run: node tools/n7_apex_preview/test_voice.cjs
+      - name: Synthesize and play real Greek female speech without an OS voice
+        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        env:
+          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
+          N7_VISUAL_URL: http://127.0.0.1:4173/n7-apex-step5/
+          N7_FEMALE_OUT: ${{ runner.temp }}/n7-apex-evidence/female-voice
+        run: node tools/n7_apex_preview/test_female_voice.cjs
       - name: Verify automatic conversation turns without Send clicks
         if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
         env:
@@ -286,7 +299,7 @@ jobs:
     needs: validate
     environment: nabou-production
     runs-on: ubuntu-24.04
-    timeout-minutes: 18
+    timeout-minutes: 30
     env:
       PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
       PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
@@ -330,6 +343,13 @@ jobs:
       - name: Install passwordless figure chat without changing owner authentication
         if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
         run: python3 tools/n7_apex_preview/deploy_public_chat.py
+      - name: Publish immutable Greek female voice assets
+        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        env:
+          N7_FEMALE_VOICE_ASSETS: ${{ runner.temp }}/n7-female-assets
+        run: |
+          python3 tools/n7_apex_preview/prepare_female_voice.py --out "$RUNNER_TEMP/n7-female-assets"
+          python3 tools/n7_apex_preview/deploy_female_voice.py
       - name: Install isolated /n7-apex preview and verify live
         env:
           N7_APEX_OUT: ${{ runner.temp }}/n7-apex-src/out

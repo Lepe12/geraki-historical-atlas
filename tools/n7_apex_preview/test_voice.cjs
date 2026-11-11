@@ -26,7 +26,7 @@ const url=process.env.N7_VISUAL_URL||'http://127.0.0.1:4177/n7-apex-step5/',out=
  });
  await p.goto(url,{waitUntil:'networkidle'});const dialog=p.getByRole('dialog',{name:'N7 Humanoid preview'});
  await dialog.getByRole('button',{name:'Φωνητική συνομιλία',exact:true}).click({timeout:5000});
- assert.equal(await dialog.locator('input[type=password]').count(),0);await dialog.getByRole('button',{name:'Υπαγόρευση',exact:true}).waitFor();
+ assert.equal(await dialog.locator('input[type=password]').count(),0);await dialog.getByRole('button',{name:'Υπαγόρευση',exact:true}).waitFor();await dialog.getByLabel('Φωνή συσκευής',{exact:true}).selectOption('fixture-el');
  const enableVoice=async()=>{const button=dialog.getByRole('button',{name:'Φωνή ανενεργή',exact:true});if(await button.isVisible())await button.click();};
  const mood=()=>dialog.getByLabel('N7 mood status');const count=()=>p.evaluate(()=>window.__voiceFixture.utterances.length);
  const skip=dialog.getByRole('button',{name:'Skip',exact:true});if(await skip.isVisible())await skip.click();
