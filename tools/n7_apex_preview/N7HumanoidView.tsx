@@ -46,8 +46,6 @@ function smooth01(v:number){ const x=clamp01(v); return x*x*(3-2*x); }
 // Release candidate: soft silhouette falloff, no hard ellipse clip.
 // Release candidate: true artwork-silhouette mask, no ghost underlay.
 // Release candidate: full-frame source-tile reconstruction; no mask, clip, or underlay.
-// Rollback marker: rejected Step 6 removed; preserve approved Step 5.
-// Performance release: static body-layer cache; throttled React status updates.
 function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats)=>void}) {
   const hostRef=useRef<HTMLDivElement>(null);
 
@@ -141,23 +139,8 @@ function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats
         }
       }
 
-      // Render every stationary tile ONCE. Only the moving head tiles need
-      // per-frame projection. This preserves the approved tile geometry.
-      const bodyLayer=document.createElement("canvas");
-      bodyLayer.width=320; bodyLayer.height=480;
-      const bodyCtx=bodyLayer.getContext("2d");
-      if(!bodyCtx) return;
-      const headTiles=tiles.filter(q=>q.head>0);
-      for(const q of tiles){
-        if(q.head===0) bodyCtx.drawImage(image,q.sx,q.sy,tile,tile,q.sx,q.sy,tile,tile);
-      }
-      let lastStats=0;
-      let maxFrameMs=0;
-      let frames=0;
-      let droppedFrames=0;
       const draw=(now:number)=>{
         if(disposed) return;
-        const frameStart=performance.now();
         const dt=Math.min(100,Math.max(0,now-last));
         last=now;
         const ease=1-Math.exp(-dt/42);
@@ -172,8 +155,6 @@ function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats
           ctx.globalCompositeOperation="source-over";
           ctx.drawImage(image,0,0,320,480);
         }else{
-          ctx.globalAlpha=1;
-          ctx.drawImage(bodyLayer,0,0);
           const angle=current*.34;
           const sn=Math.sin(angle), cs=Math.cos(angle);
           const sign=Math.sign(current)||1;
@@ -182,7 +163,7 @@ function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats
           // Rebuild the ENTIRE figure from the same source tiles every frame.
           // Body tiles stay fixed; head tiles rotate around the neck. There is
           // no reference underlay, no previous frame, no mask, and no clip.
-          for(const q of headTiles){
+          for(const q of tiles){
             const mx=q.sx+tile/2;
             const my=q.sy+tile/2;
 
@@ -226,6 +207,8 @@ function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats
               continue;
             }
 
+            ctx.globalAlpha=1;
+            ctx.drawImage(image,q.sx,q.sy,tile,tile,dx,dy,tile,tile);
           }
           ctx.globalAlpha=1;
         }
@@ -234,19 +217,7 @@ function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats
         host.dataset.headMaxShift=(Math.abs(current)*30).toFixed(3);
         host.dataset.neckMaxShift="0.000";
         host.dataset.neutralError=current===0?"0.000":"0.001";
-        const frameMs=performance.now()-frameStart;
-        maxFrameMs=Math.max(maxFrameMs,frameMs);
-        frames++;
-        if(dt>32) droppedFrames++;
-        host.dataset.renderMs=frameMs.toFixed(2);
-        host.dataset.maxRenderMs=maxFrameMs.toFixed(2);
-        host.dataset.droppedFrames=String(droppedFrames);
-        host.dataset.frames=String(frames);
-        // Avoid React re-rendering the entire dialog every animation frame.
-        if(now-lastStats>1000){
-          onStats({particles:tiles.length,sampleW:320,sampleH:480,renderMs:+frameMs.toFixed(1),assembly:100});
-          lastStats=now;
-        }
+        onStats({particles:tiles.length,sampleW:320,sampleH:480,renderMs:0,assembly:100});
         raf=requestAnimationFrame(draw);
       };
 
@@ -1145,7 +1116,7 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
       </div>
 
       {details&&<div style={{marginTop:6,padding:9,background:"#02080dee",border:"1px solid #204856",borderRadius:8,fontSize:11,lineHeight:1.55}}>
-        <b>Step 4–5 diagnostics</b> · source sample {stats.sampleW||"—"}×{stats.sampleH||"—"} · particles {stats.particles||"loading"} · render {stats.renderMs||"—"} ms · assembly {stats.assembly}% · duration 6s · sRGB · tone mapping OFF · reduced motion {reduced?"ON":"OFF"}.
+        <b>Step 4 diagnostics</b> · source sample {stats.sampleW||"—"}×{stats.sampleH||"—"} · particles {stats.particles||"loading"} · render {stats.renderMs||"—"} ms · assembly {stats.assembly}% · duration 6s · sRGB · tone mapping OFF · reduced motion {reduced?"ON":"OFF"}.
         <br/>Every particle carries its sampled artwork color. Completion is left-to-right; head/face are delayed; the last frame uses the exact approved Stage-1 positions.
       </div>}
     </div>
