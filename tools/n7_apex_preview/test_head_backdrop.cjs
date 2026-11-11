@@ -119,6 +119,7 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
      return n?Math.sqrt(Math.max(0,sumSq/n-(sum/n)**2)):NaN;
    };
    const neutralSpread=headSpread(reference);
+   // Isolated jaw-and-skull validation release candidate.
    // The approved figure's lower face/chin must participate in the pitch.
    // Checking only the forehead previously allowed a frozen jaw to pass.
    const jawChange=px=>{
