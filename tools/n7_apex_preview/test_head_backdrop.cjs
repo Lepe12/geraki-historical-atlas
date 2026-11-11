@@ -23,7 +23,7 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
   await p.getByLabel('Breathing',{exact:true}).uncheck();
   const bounds=await host.boundingBox();
   const move=async turn=>{
-   await p.mouse.move(bounds.x+bounds.width/2+bounds.width*.42*turn,bounds.y+bounds.height*.3);
+   await p.mouse.move(bounds.x+bounds.width/2+bounds.width*.42*turn,bounds.y+bounds.height/2);
    await p.waitForFunction(t=>{const h=document.querySelector('[aria-label="N7 guide artwork-tile humanoid"]'),n=Number(h.dataset.currentTurn);return t===0?n===0&&h.querySelector('canvas').style.display==='block'&&Number(h.dataset.headTarget)===0:Math.abs(n-t)<.003;},turn);
    // Wait for presentation as well as the numeric target; direct WebGL and
    // native reference surfaces change on the next compositor frame.
@@ -51,7 +51,7 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
    const r=h.getBoundingClientRect();const rows=[];
    for(let frame=0;frame<96;frame++){
     const t=frame<32?-1:frame<64?1:0;
-    window.dispatchEvent(new PointerEvent('pointermove',{clientX:r.left+r.width/2+r.width*.42*t,clientY:r.top+80}));
+    window.dispatchEvent(new PointerEvent('pointermove',{clientX:r.left+r.width/2+r.width*.42*t,clientY:r.top+r.height/2}));
     await new Promise(requestAnimationFrame);
     const c=[...h.querySelectorAll('canvas')].find(c=>c.style.display!=='none');
     const ctx=c.getContext('2d');let px;
@@ -69,7 +69,7 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
   results.motion.profile=await host.evaluate(async h=>{
    const r=h.getBoundingClientRect(),times=[],render=[];let prev=0;
    for(let f=0;f<121;f++){
-    window.dispatchEvent(new PointerEvent('pointermove',{clientX:r.left+r.width/2+Math.sin(f/18)*r.width*.42,clientY:r.top+80}));
+    window.dispatchEvent(new PointerEvent('pointermove',{clientX:r.left+r.width/2+Math.sin(f/18)*r.width*.42,clientY:r.top+r.height/2}));
     const now=await new Promise(requestAnimationFrame);
     if(prev){times.push(now-prev);render.push(Number(h.dataset.renderMs));}prev=now;
    }
@@ -90,7 +90,25 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
    save(name,await canvas.evaluate(c=>c.toDataURL()));await p.screenshot({path:path.join(out,name+'-scene.png')});
    results.poses.push({name,turn:Number(await host.getAttribute('data-current-turn')),gaps,bodyMaxDifference:body.max});
   }
-  console.log('Eight poses: PASS. Observing backdrop for 10 seconds...');
+  console.log('Eight poses: PASS. Auditing vertical head pitch...');
+   const movePitch=async pitch=>{
+     await p.mouse.move(bounds.x+bounds.width/2,bounds.y+bounds.height/2-bounds.height*.42*pitch);
+     await p.waitForFunction(t=>{const h=document.querySelector('[aria-label="N7 guide artwork-tile humanoid"]');return Math.abs(Number(h.dataset.currentPitch)-t)<.003;},pitch);
+     await p.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+   };
+   results.pitch=[];
+   for(const [name,angle] of [['up50',.5],['up100',1],['down50',-.5],['down100',-1],['pitch-neutral',0]]){
+     await movePitch(angle);
+     const px=await pixels();let gaps=0;
+     for(let i=3;i<px.length;i+=4) gaps+=px[i]!==255;
+     assert.equal(gaps,0,name+' vertical motion coverage');
+     const body=difference(px.slice(208*320*4),reference.slice(208*320*4));
+     assert(body.max<=2,name+' fixed torso/neck changed');
+     if(angle===0)assert.equal(difference(px,reference).count,0,'Pitch return neutral differs from approved artwork');
+     save(name,await canvas.evaluate(c=>c.toDataURL()));
+     results.pitch.push({name,pitch:Number(await host.getAttribute('data-current-pitch')),gaps,bodyMaxDifference:body.max});
+   }
+   console.log('Vertical pitch: PASS. Observing backdrop for 10 seconds...');
   await p.getByRole('button',{name:'Technical details',exact:true}).click();
   const bg=p.getByLabel('N7 Step 6 living backdrop',{exact:true}),lights=bg.locator('[data-ridge-layer]');
   await p.waitForFunction(()=>Number(document.querySelector('[aria-label="N7 Step 6 living backdrop"]')?.dataset.highlightCount)>0);
