@@ -39,16 +39,16 @@ export default function N7Backdrop({effects,reduced}:{effects:boolean;reduced:bo
 
       type H={x:number;y:number;r:number;g:number;b:number;phase:number;speed:number;radius:number};
       const candidates:H[]=[];
-      for(let y=14;y<216;y+=3){
-        for(let x=4;x<396;x+=3){
+      for(let y=8;y<220;y+=2){
+        for(let x=2;x<398;x+=2){
           const i=(y*400+x)*4;
           const r=px[i],g=px[i+1],b=px[i+2];
           const lum=.2126*r+.7152*g+.0722*b;
-          const cyan=b>70&&g>60&&b>r*1.15;
-          const amber=r>85&&g>45&&r>b*1.35;
-          if(lum>68&&(cyan||amber)){
+          const cyan=b>42&&g>38&&b>r*1.08;
+          const amber=r>58&&g>32&&r>b*1.18;
+          if(lum>34&&(cyan||amber)){
             const h=((x*73856093)^(y*19349663))>>>0;
-            if(h%11===0){
+            if(h%5===0){
               candidates.push({
                 x:x*4,y:y*4,r,g,b,
                 phase:(h%6283)/1000,
