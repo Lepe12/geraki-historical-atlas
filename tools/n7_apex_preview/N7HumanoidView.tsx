@@ -318,11 +318,12 @@ function ParticleReference({
           const a=angle*w;
           const cs=Math.cos(a), sn=Math.sin(a);
           const z=headDepths[n];
+          // 2.5D yaw: preserve screen-space density/silhouette and use synthetic
+          // depth only for lateral parallax. Never push particles toward/through camera.
           const tx=fx*cs+z*sn;
-          const tz=-fx*sn+z*cs-z;
           arr[j]=tx;
           arr[j+1]=fy;
-          arr[j+2]=tz*.12;
+          arr[j+2]=0;
 
           const shift=Math.abs(tx-fx);
           maxShift=Math.max(maxShift,shift);
