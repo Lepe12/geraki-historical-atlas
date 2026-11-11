@@ -146,11 +146,11 @@ jobs:
             const headHost=p.getByLabel(/N7 (?:guide artwork-tile|image-sampled particle) humanoid/);
             const headBox=await headHost.boundingBox();
             if(!headBox) throw Error('Step 5 particle host has no bounds');
-            await p.mouse.move(headBox.x+headBox.width*.50,headBox.y+headBox.height*.34);
+            await p.mouse.move(headBox.x+headBox.width*.50,headBox.y+headBox.height*.50);
             await p.waitForTimeout(450);
             const neutralHeadPath=process.env.RUNNER_TEMP+'/n7-head-neutral.png';
             await rawCanvasPng(headHost.locator('canvas:visible'),neutralHeadPath);
-            await p.mouse.move(headBox.x+headBox.width*.88,headBox.y+headBox.height*.34);
+            await p.mouse.move(headBox.x+headBox.width*.88,headBox.y+headBox.height*.50);
             await p.waitForTimeout(750);
             const turnedHeadPath=process.env.RUNNER_TEMP+'/n7-head-turned.png';
             await rawCanvasPng(headHost.locator('canvas:visible'),turnedHeadPath);
@@ -176,7 +176,7 @@ jobs:
             if(turnedVisible<neutralVisible*.92) throw Error('Step 5 head region visually disappears: '+JSON.stringify({neutralVisible,turnedVisible}));
             const turn=Number(await headHost.getAttribute('data-current-turn'));
             if(!Number.isFinite(turn)||turn<.45) throw Error('Step 5 head turn did not follow pointer: '+turn);
-            await p.mouse.move(headBox.x+headBox.width*.50,headBox.y+headBox.height*.34);
+            await p.mouse.move(headBox.x+headBox.width*.50,headBox.y+headBox.height*.50);
             await p.waitForTimeout(950);
             const returned=Number(await headHost.getAttribute('data-current-turn'));
             if(!Number.isFinite(returned)||Math.abs(returned)>.01) throw Error('Step 5 did not return to neutral: '+returned);
