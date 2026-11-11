@@ -598,7 +598,8 @@ function HeadTurnCanvas({headTurnRef}:{headTurnRef:React.MutableRefObject<number
         last=now;
         const a=1-Math.exp(-dt/120);
         current+=(target-current)*a;
-        if(Math.abs(target-current)<.0005) current=target;
+        if(target===0 && Math.abs(current)<.025) current=0;
+        else if(Math.abs(target-current)<.0005) current=target;
         headTurnRef.current=current;
         host.dataset.currentTurn=current.toFixed(3);
 
