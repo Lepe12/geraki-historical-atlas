@@ -77,7 +77,7 @@ function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats
       if(rect.width<=0) return;
       const raw=(e.clientX-(rect.left+rect.width/2))/(rect.width*.42);
       target=Math.max(-1,Math.min(1,raw));
-      if(Math.abs(target)<.12) target=0;
+      if(Math.abs(target)<.10) target=0;
       host.dataset.headTarget=target.toFixed(3);
     };
     const clear=()=>{target=0;host.dataset.headTarget="0.000";};
@@ -88,112 +88,135 @@ function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats
     image.onload=()=>{
       if(disposed) return;
 
-      const tile=6;
-      const cx=160, cy=106;
-      const rx=92, ry=102;
-
-      // Build a mask from the REAL artwork silhouette, not a geometric ellipse.
-      // This lets us remove only the original head surface during a turn,
-      // preventing ghost trails while preserving the natural outline.
-      const src=document.createElement("canvas");
-      src.width=320; src.height=480;
-      const sctx=src.getContext("2d",{willReadFrequently:true});
+      const sample=document.createElement("canvas");
+      sample.width=320; sample.height=480;
+      const sctx=sample.getContext("2d",{willReadFrequently:true});
       if(!sctx) return;
       sctx.drawImage(image,0,0,320,480);
-      const spx=sctx.getImageData(0,0,320,480).data;
+      const px=sctx.getImageData(0,0,320,480).data;
 
-      const headMask=document.createElement("canvas");
-      headMask.width=320; headMask.height=480;
-      const mctx=headMask.getContext("2d");
-      if(!mctx) return;
-      mctx.fillStyle="rgba(255,255,255,1)";
-      for(let y=0;y<205;y++){
-        const neckFade=y<188?1:Math.max(0,(205-y)/17);
-        if(neckFade<=0) continue;
-        mctx.globalAlpha=neckFade;
-        for(let x=0;x<320;x++){
-          const i=(y*320+x)*4;
-          const r=spx[i],g=spx[i+1],b=spx[i+2],a=spx[i+3];
-          const lum=.2126*r+.7152*g+.0722*b;
-          const chroma=Math.max(r,g,b)-Math.min(r,g,b);
-          if(a>10 && (lum>10 || chroma>12)){
-            // Slight dilation closes tiny sampling seams without inventing shape.
-            mctx.fillRect(x-1,y-1,3,3);
+      type Tile={sx:number;sy:number;head:number;depth:number;edge:number;nx:number;ny:number};
+      const tiles:Tile[]=[];
+      const tile=4;
+      const cx=160;
+      const cy=108;
+      const rx=86;
+      const ry=98;
+      const neckY=205;
+
+      for(let sy=0;sy<480;sy+=tile){
+        for(let sx=0;sx<320;sx+=tile){
+          let visible=false;
+          for(let yy=sy;yy<Math.min(480,sy+tile)&&!visible;yy++){
+            for(let xx=sx;xx<Math.min(320,sx+tile);xx++){
+              const i=(yy*320+xx)*4;
+              const r=px[i],g=px[i+1],b=px[i+2],a=px[i+3];
+              const lum=.2126*r+.7152*g+.0722*b;
+              const chroma=Math.max(r,g,b)-Math.min(r,g,b);
+              if(a>8&&(lum>8||chroma>8)){ visible=true; break; }
+            }
           }
+          if(!visible) continue;
+
+          const mx=sx+tile/2, my=sy+tile/2;
+          const nx=(mx-cx)/rx;
+          const ny=(my-cy)/ry;
+          const r2=nx*nx+ny*ny;
+
+          // Head influence comes from the rounded skull AND fades continuously
+          // into zero at the neck pivot. No geometric clipping or masking.
+          let head=0;
+          if(r2<1.18 && my<neckY){
+            const skull=Math.max(0,1-r2/1.18);
+            const neckFade=my<178?1:Math.max(0,(neckY-my)/(neckY-178));
+            head=Math.min(1,Math.pow(skull,.34))*neckFade;
+          }
+
+          const depth=head>0 ? Math.sqrt(Math.max(0,1-Math.min(1,r2)))*42 : 0;
+          const edge=head>0 ? Math.max(0,1-Math.abs(Math.sqrt(Math.max(0,r2))-.92)/.18) : 0;
+          tiles.push({sx,sy,head,depth,edge,nx,ny});
         }
       }
-      mctx.globalAlpha=1;
 
       const draw=(now:number)=>{
         if(disposed) return;
         const dt=Math.min(100,Math.max(0,now-last));
         last=now;
-        const ease=1-Math.exp(-dt/36);
+        const ease=1-Math.exp(-dt/42);
         current+=(target-current)*ease;
-        if(target===0&&Math.abs(current)<.006) current=0;
+        if(target===0&&Math.abs(current)<.004) current=0;
 
         ctx.clearRect(0,0,320,480);
-        // Always begin from the untouched approved reference.
-        ctx.drawImage(image,0,0,320,480);
 
-        if(Math.abs(current)>.0005){
-          // Remove only the original head artwork using its true silhouette.
-          // This prevents double-image trails while avoiding a hard cut boundary.
-          ctx.save();
-          ctx.globalCompositeOperation="destination-out";
-          ctx.globalAlpha=Math.min(1,Math.abs(current)*1.35);
-          ctx.drawImage(headMask,0,0);
-          ctx.restore();
-          ctx.globalCompositeOperation="source-over";
+        if(current===0){
+          // The guide requires an untouched reference at rest.
           ctx.globalAlpha=1;
-
-          ctx.save();
-          const angle=current*.30; // stronger but still limited depth illusion.
+          ctx.globalCompositeOperation="source-over";
+          ctx.drawImage(image,0,0,320,480);
+        }else{
+          const angle=current*.34;
           const sn=Math.sin(angle), cs=Math.cos(angle);
           const sign=Math.sign(current)||1;
+          const amount=Math.abs(current);
 
-          for(let sy=Math.max(0,Math.floor(cy-ry));sy<Math.min(205,Math.ceil(cy+ry));sy+=tile){
-            for(let sx=Math.max(0,Math.floor(cx-rx));sx<Math.min(320,Math.ceil(cx+rx));sx+=tile){
-              const mx=sx+tile/2, my=sy+tile/2;
-              const nx=(mx-cx)/rx, ny=(my-cy)/ry;
-              const r2=nx*nx+ny*ny;
-              if(r2>1) continue;
+          // Rebuild the ENTIRE figure from the same source tiles every frame.
+          // Body tiles stay fixed; head tiles rotate around the neck. There is
+          // no reference underlay, no previous frame, no mask, and no clip.
+          for(const q of tiles){
+            const mx=q.sx+tile/2;
+            const my=q.sy+tile/2;
 
-              const depth=Math.sqrt(Math.max(0,1-r2))*46;
-              const turnX=(mx-cx)*cs+depth*sn;
-              const dx=cx+turnX-tile/2;
-              const dy=sy;
+            let dx=q.sx;
+            let dy=q.sy;
+            let alpha=1;
+            let scale=1;
 
-              const far=Math.max(0,-sign*nx);
-              const near=Math.max(0,sign*nx);
-              const edge=Math.max(0,Math.min(1,(1-r2)/.18));
-              const softEdge=edge*edge*(3-2*edge);
-              const shade=1-Math.abs(current)*(.06+.34*far);
-              const scale=1+Math.abs(current)*.14;
+            if(q.head>0){
+              const localX=mx-cx;
+              const a=angle*q.head;
+              const c=Math.cos(a), sgn=Math.sin(a);
+              const turnedX=localX*c + q.depth*sgn;
+              dx=cx+turnedX-tile/2;
+
+              // Anchor rotation visually around the neck: upper head receives
+              // the full yaw, lower head smoothly tends to the original pose.
+              const pivotLift=(my-neckY)*(1-c)*.08*q.head;
+              dy=q.sy+pivotLift;
+
+              const far=Math.max(0,-sign*q.nx);
+              const near=Math.max(0,sign*q.nx);
+              alpha=Math.max(.26,1-amount*q.head*(.08+.50*far));
+              scale=1+amount*q.head*.16;
+
+              if(amount>.72 && far>.40){
+                // Clean far-side shadow: suppress detail instead of compressing it.
+                alpha*=Math.max(.18,1-(amount-.72)*1.65*far);
+              }
+
               const dw=tile*scale, dh=tile*scale;
+              ctx.globalAlpha=alpha;
+              ctx.drawImage(image,q.sx,q.sy,tile,tile,dx-(dw-tile)/2,dy-(dh-tile)/2,dw,dh);
 
-              // Soft silhouette falloff: no hard cut at the head boundary.
-              ctx.globalAlpha=Math.max(.08,softEdge)*Math.max(.58,shade);
-              ctx.drawImage(image,sx,sy,tile,tile,dx-(dw-tile)/2,dy-(dh-tile)/2,dw,dh);
-
-              // Near-side profile line from the SAME silhouette, not a hard clip.
-              if(Math.abs(nx)>.72&&near>0&&softEdge<.65){
-                const rim=(1-softEdge)*near*Math.abs(current);
-                ctx.globalAlpha=.16*rim;
+              if(q.edge>.25&&near>0){
+                const rim=q.edge*near*amount*q.head;
+                ctx.globalAlpha=.13*rim;
                 ctx.fillStyle="#8cefff";
                 ctx.fillRect(dx-1,dy-1,dw+2,dh+2);
               }
+              continue;
             }
+
+            ctx.globalAlpha=1;
+            ctx.drawImage(image,q.sx,q.sy,tile,tile,dx,dy,tile,tile);
           }
-          ctx.restore();
           ctx.globalAlpha=1;
         }
 
         host.dataset.currentTurn=current.toFixed(3);
-        host.dataset.headMaxShift=(Math.abs(current)*24).toFixed(3);
+        host.dataset.headMaxShift=(Math.abs(current)*30).toFixed(3);
         host.dataset.neckMaxShift="0.000";
         host.dataset.neutralError=current===0?"0.000":"0.001";
-        onStats({particles:0,sampleW:320,sampleH:480,renderMs:0,assembly:100});
+        onStats({particles:tiles.length,sampleW:320,sampleH:480,renderMs:0,assembly:100});
         raf=requestAnimationFrame(draw);
       };
 
