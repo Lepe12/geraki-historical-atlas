@@ -119,6 +119,16 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
      return n?Math.sqrt(Math.max(0,sumSq/n-(sum/n)**2)):NaN;
    };
    const neutralSpread=headSpread(reference);
+   // The approved figure's lower face/chin must participate in the pitch.
+   // Checking only the forehead previously allowed a frozen jaw to pass.
+   const jawChange=px=>{
+     let changed=0;
+     for(let y=155;y<197;y++)for(let x=110;x<211;x++){
+       const i=(y*320+x)*4;
+       if(Math.abs(px[i]-reference[i])+Math.abs(px[i+1]-reference[i+1])+Math.abs(px[i+2]-reference[i+2])>24)changed++;
+     }
+     return changed;
+   };
    results.pitch=[];
    for(const [name,angle] of [['up50',.5],['up100',1],['down50',-.5],['down100',-1],['pitch-neutral',0]]){
      await movePitch(angle);
@@ -131,10 +141,12 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
      save(name,await canvas.evaluate(c=>c.toDataURL()));
      const visibleY=headCenterY(px),dy=visibleY-centerY;
      const spread=headSpread(px),scaleRatio=spread/neutralSpread;
+     const jawChangedPixels=jawChange(px);
+     if(Math.abs(angle)===1)assert(jawChangedPixels>140,name+' lower jaw is visually frozen: '+jawChangedPixels+' changed pixels');
      assert(scaleRatio<1.12&&scaleRatio>.85,name+' head stretched or collapsed: '+scaleRatio.toFixed(3));
      if(angle===1)assert(dy<-2.5,'Upward head nod is visually too small: '+dy.toFixed(2)+' px');
      if(angle===-1)assert(dy>2.5,'Downward head nod is visually too small: '+dy.toFixed(2)+' px');
-     results.pitch.push({name,pitch:Number(await host.getAttribute('data-current-pitch')),visibleCentroidY:visibleY,verticalDeltaPx:dy,headScaleRatio:scaleRatio,gaps,bodyMaxDifference:body.max});
+     results.pitch.push({name,pitch:Number(await host.getAttribute('data-current-pitch')),visibleCentroidY:visibleY,verticalDeltaPx:dy,headScaleRatio:scaleRatio,jawChangedPixels,gaps,bodyMaxDifference:body.max});
    }
    console.log('Vertical pitch: PASS. Observing backdrop for 10 seconds...');
   await p.getByRole('button',{name:'Technical details',exact:true}).click();
