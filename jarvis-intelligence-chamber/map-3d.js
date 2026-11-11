@@ -60,18 +60,18 @@
     host.setAttribute("aria-label", "Τρισδιάστατος χάρτης · βέλη: μετακίνηση · σύρσιμο: περιστροφή");
     host.innerHTML = '<div class="map3d-loading">Φόρτωση τρισδιάστατου χάρτη…</div>';
     view.insertBefore(host, tools);
-    loading = import("./map-3d-scene.js")
+    loading = import("./map-3d-scene.js?v=map3d-12")
       .then((mod) => mod.createScene(host, { view2d: planeView }))
       .then((s) => {
         scene = s;
         host.querySelector(".map3d-loading")?.remove();
         for (const p of pending.splice(0)) p.resolve(scene.addObject(p.obj, p.opts));
-        // the ship sails the Book III (1577) voyage of Petros Lantzas, as told in the book (3D only)
-        import("./map-3d-route.js?v=map3d-11").then((m) => m.addRoute(window.NABOU_MAP3D))
+        // the ship sails a decorative Constantinople → Cádiz line (3D only; ?route=lantzas for the Book III voyage)
+        import("./map-3d-route.js?v=map3d-12").then((m) => m.addRoute(window.NABOU_MAP3D))
           .then((r) => { window.NABOU_MAP3D.route = r; })
           .catch((e) => {
             console.warn("map3d: route not loaded, ship stays at its sea spot", e);
-            import("./map-3d-ship.js?v=map3d-11").then((m) => { window.NABOU_MAP3D.ship = m.addShip(window.NABOU_MAP3D); });
+            import("./map-3d-ship.js?v=map3d-12").then((m) => { window.NABOU_MAP3D.ship = m.addShip(window.NABOU_MAP3D); });
           });
         return s;
       })

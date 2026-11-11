@@ -7,9 +7,9 @@ const $ = (id) => document.getElementById(id);
 let ui = null, holo = null, holoP = null;
 
 const SAY = {
-  open: "Καλώς ήρθες στο Ναμπού! Εδώ εξερευνούμε την ιστορία της Μεσογείου μέσα από χάρτες, ιστορικές πηγές και τεκμήρια. Πάτα «Σύνδεση με N7» για ερωτήσεις με τη μνήμη και τις πηγές σου.",
+  open: "Καλώς ήρθες στο NABOU! Είμαι ο N7, ο βοηθός σου. Εδώ εξερευνούμε την ιστορία της Μεσογείου μέσα από χάρτες, ιστορικές πηγές και τεκμήρια. Πάτα «Σύνδεση με N7» για ερωτήσεις με τη μνήμη και τις πηγές σου.",
   close: "Επιστρέφω στη σφαίρα. Είμαι εδώ αν με χρειαστείς.",
-  hello: "Γεια σου. Είμαι ο Ναμπού, ο βοηθός του χάρτη.",
+  hello: "Γεια σου. Είμαι ο N7, ο βοηθός του χάρτη στο NABOU.",
   who: "Είμαι η φωνητική μορφή του N7 στον άτλαντα. Χειρίζομαι τον χάρτη και, όταν συνδεθείς, χρησιμοποιώ την ίδια συνομιλία, μνήμη έργου και βιβλιοθήκη του N7.",
   help: "Μπορείς να πεις: άνοιξε, κλείσε, γύρνα δεξιά ή αριστερά, ψάξε και μια λέξη, δείξε μου τον Λάντζα, δείξε την Κέρκυρα, τρισδιάστατο ή δισδιάστατο.",
   thanks: "Παρακαλώ.",
@@ -198,17 +198,17 @@ function setStatus(t) { if (ui) ui.status.textContent = t; }
 
 function build() {
   const root = document.createElement("section");
-  root.id = "nabouAssistant"; root.className = "nxa"; root.setAttribute("role", "dialog"); root.setAttribute("aria-label", "Ναμπού — φωνητικός βοηθός");
+  root.id = "nabouAssistant"; root.className = "nxa"; root.setAttribute("role", "dialog"); root.setAttribute("aria-label", "N7 — φωνητικός βοηθός");
   root.innerHTML = `
-    <header class="nxa-head"><span class="nxa-title">ΝΑΜΠΟΥ</span><small>φωνητικός βοηθός</small>
-      <button type="button" class="nxa-x" aria-label="Κλείσιμο βοηθού">×</button></header>
-    <div class="nxa-stage"><canvas class="nxa-canvas" aria-hidden="true"></canvas><button type="button" class="nxa-greet" aria-label="Άκου τον χαιρετισμό και τι είναι το Ναμπού" title="Πάτα για να ακούσεις τι είναι το Ναμπού"></button><p class="nxa-heard" aria-live="polite"></p></div>
+    <header class="nxa-head"><span class="nxa-title">N7</span><small>φωνητικός βοηθός</small>
+      <button type="button" class="nxa-x" aria-label="Κλείσιμο φωνής N7 (Esc)" title="Κλείσιμο (Esc)">×</button></header>
+    <div class="nxa-stage"><canvas class="nxa-canvas" aria-hidden="true"></canvas><button type="button" class="nxa-greet" aria-label="Άκου τον χαιρετισμό του N7" title="Πάτα για να ακούσεις τον χαιρετισμό του N7"></button><p class="nxa-heard" aria-live="polite"></p></div>
     <div class="nxa-log" aria-live="polite"></div>
     <div class="nxa-n7"><label><input type="checkbox" class="nxa-context-n7" checked> Με τον επιλεγμένο τόπο και την περίοδο</label><button type="button" class="nxa-connect-n7">Σύνδεση με N7</button><button type="button" class="nxa-disconnect-n7">Αποσύνδεση</button><button type="button" class="nxa-cancel-n7" disabled>Διακοπή απάντησης N7</button></div>
     <form class="nxa-form"><input class="nxa-text" type="text" autocomplete="off" maxlength="6000" placeholder="Ρώτησε το N7 ή πες μια εντολή χάρτη…" aria-label="Εντολή προς τον βοηθό"><button type="submit" class="nxa-send">Στείλε</button></form>
     <div class="nxa-bar">
       <button type="button" class="nxa-mic" aria-label="Πάτα και μίλα" title="Πάτα και μίλα"><svg class="nxa-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM6 11a6 6 0 0 0 12 0M12 17v4"/></svg><span class="nxa-l">Μίλα</span></button>
-      <button type="button" class="nxa-wake" aria-pressed="false" aria-label="Να ακούει πάντα" title="Ακούει συνεχώς· ξεκίνα την εντολή με «Ναμπού»"><svg class="nxa-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3l2-6 4 12 3-9 2 3h4"/></svg><span class="nxa-l">Ακούει</span></button>
+      <button type="button" class="nxa-wake" aria-pressed="false" aria-label="Να ακούει πάντα" title="Ακούει συνεχώς· ξεκίνα την εντολή με τη λέξη «Ναμπού»"><svg class="nxa-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3l2-6 4 12 3-9 2 3h4"/></svg><span class="nxa-l">Ακούει</span></button>
       <button type="button" class="nxa-stop" aria-label="Διακοπή φωνής" title="Διακοπή φωνής"><svg class="nxa-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h12v12H6z"/></svg><span class="nxa-l">Σίγαση</span></button>
       <button type="button" class="nxa-morph" aria-label="Εμφάνιση ή απόκρυψη της μορφής" title="Εμφάνιση ή απόκρυψη της μορφής"><svg class="nxa-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span class="nxa-l">Δείξε μορφή</span></button>
     </div>

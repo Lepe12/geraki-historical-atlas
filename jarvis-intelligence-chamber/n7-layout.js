@@ -190,5 +190,69 @@
  /* ---- 7. assistant capsule: the existing N7 chat link and voice ---- */
  shell.querySelector('.n7-assistant .pro-voice')?.addEventListener('click',()=>document.dispatchEvent(new CustomEvent('n7:open-voice')));
 
- window.N7_LAYOUT={setLayers,prepare};
+
+ /* ---- 8. one foreground dialog, and Esc closes it (Nov 2026 UX fixes) ----
+    Runs on window in the capture phase, before the older document-level Esc handlers (atlas-reading.js jumps between
+    pages, nabou-shell.js reopens the universe, professional-atlas.js used to hide the place card). Order: help dialog,
+    voice (N7), settings / layers popover, the Επίπεδα panel, the docked story panel, the old research workspaces
+    (PDF, agents, results, details), then any non-map page → back to the map. On the plain map Esc does nothing. */
+ const voiceEl=()=>$('nabouAssistant'),popEl=()=>$('nxPopover');
+ const voiceOpen=()=>{const v=voiceEl();return !!v&&!v.hidden;};
+ const closeVoice=()=>{if(voiceOpen())voiceEl().querySelector('.nxa-x')?.click();};
+ const popOpen=()=>{const p=popEl();return !!p&&!p.hidden;};
+ const closePop=()=>{const p=popEl();if(!p||p.hidden)return;const x=p.querySelector('.close');if(x)x.click();else p.hidden=true;};
+ const shown=el=>!!el&&!el.hidden&&!el.classList.contains('hidden')&&getComputedStyle(el).display!=='none';
+ const LEGACY=['detailPanel','learningPanel','activityStrip','nxsAgentsPage','resultsDrawer'];
+ const closeLegacy=()=>{let any=false;const disc=$('discoveryDetail');if(shown(disc)){$('closeDiscovery')?.click();any=true;}
+  for(const id of LEGACY){const el=$(id);if(shown(el)){(el.querySelector('.v2-x')||el.querySelector('[id^=close]'))?.click();any=true;}}return any;};
+ const offMap=()=>body.dataset.readerView&&body.dataset.readerView!=='map';
+ function closeDialogs(except){
+  if(except!=='help'&&help?.open)help.close();
+  if(except!=='voice')closeVoice();
+  if(except!=='settings')closePop();
+  // the PDF and agents workspaces are full dialogs of their own: leave them for the map before another dialog opens
+  if(except&&['tools','agents'].includes(body.dataset.readerView)){closeLegacy();toMap();}
+ }
+ window.addEventListener('keydown',e=>{
+  if(e.key!=='Escape'||e.defaultPrevented)return;
+  if(document.activeElement===search||!$('n7SavedMenu')?.hidden)return; // handled above (search / saved places)
+  const story=$('narrativeStoryPanel');
+  let done=true;
+  if(help?.open)help.close();
+  else if(voiceOpen())closeVoice();
+  else if(popOpen())closePop();
+  else if(layers&&!layers.hidden)setLayers(false);
+  else if(story&&!story.hidden&&story.parentElement===shell)story.querySelector('#nspClose')?.click();
+  else if(closeLegacy()){if(offMap())toMap();}
+  else if(offMap())toMap();
+  else done=false;
+  // never fall through to the old handlers: on the map Esc must not hide the place card or switch pages
+  e.preventDefault();e.stopImmediatePropagation();
+  if(done)requestAnimationFrame(()=>{const f=document.activeElement;if(!f||f===body)$('n7MapSlot')?.querySelector('.map3d-gl,#chartStage')?.focus?.({preventScroll:true});});
+ },true);
+ // opening one dialog closes the others (Βοήθεια, Ρυθμίσεις, Φωνή, Δεδομένα/PDF…)
+ shell.addEventListener('click',e=>{
+  const t=e.target.closest('[data-n7-nav="help"],[data-nx-go="settings"],.pro-voice,[data-atlas-nav],[data-nx-go]');if(!t)return;
+  if(t.matches('[data-n7-nav="help"]'))closeDialogs('help');
+  else if(t.matches('[data-nx-go="settings"]'))closeDialogs('settings');
+  else if(t.matches('.pro-voice'))closeDialogs('voice');
+  else{closeVoice();closePop();}
+ },true);
+ // Ρυθμίσεις: the old popover was placed for the old side menu and opened mostly off-screen; pin it fully on-screen
+ const pop=popEl();
+ if(pop){
+  // it lived inside the fixed #viewport (its own stacking context, below #n7Shell), so it was hidden behind the map
+  if(pop.parentElement!==body)body.append(pop);
+  const place=()=>{if(pop.hidden)return;const r=pop.getBoundingClientRect(),w=r.width||380,h=r.height||300,gap=10;
+   const anchor=shell.querySelector(`.n7-nav [data-nx-go="${pop.dataset.kind}"]`)||shell.querySelector('.n7-nav');
+   let x=gap,y=80;
+   if(anchor&&innerWidth>900){const a=anchor.getBoundingClientRect();x=a.right+gap;y=a.bottom-h;}
+   x=Math.max(gap,Math.min(x,innerWidth-w-gap));y=Math.max(gap,Math.min(y,innerHeight-h-gap));
+   pop.style.setProperty('left',Math.round(x)+'px','important');pop.style.setProperty('top',Math.round(y)+'px','important');
+   pop.style.setProperty('right','auto','important');pop.style.setProperty('bottom','auto','important');};
+  new MutationObserver(()=>requestAnimationFrame(place)).observe(pop,{attributes:true,attributeFilter:['hidden','data-kind']});
+  window.addEventListener('resize',()=>requestAnimationFrame(place));
+ }
+
+ window.N7_LAYOUT={setLayers,prepare,closeDialogs};
 })();

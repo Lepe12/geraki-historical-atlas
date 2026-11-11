@@ -61,33 +61,19 @@ export function addShip(api, opts = {}) {
   // wake: pale V-shaped streak on the water behind the stern (redesign v2: longer and brighter so the ship's course is readable)
   const cv = document.createElement("canvas"); cv.width = 64; cv.height = 256;
   const g = cv.getContext("2d"), gr = g.createLinearGradient(0, 0, 0, 256);
-  gr.addColorStop(0, "rgba(255,248,225,.95)"); gr.addColorStop(0.45, "rgba(255,248,225,.45)"); gr.addColorStop(1, "rgba(255,248,225,0)");
+  gr.addColorStop(0, "rgba(245,240,225,.7)"); gr.addColorStop(0.45, "rgba(245,240,225,.3)"); gr.addColorStop(1, "rgba(255,248,225,0)");
   g.fillStyle = gr; g.beginPath(); g.moveTo(26, 0); g.lineTo(38, 0); g.lineTo(64, 256); g.lineTo(0, 256); g.fill();
   const wakeTex = new T.CanvasTexture(cv);
-  const wake = new T.Mesh(new T.PlaneGeometry(LEN * 0.5, LEN * 1.9), new T.MeshBasicMaterial({ map: wakeTex, transparent: true, opacity: 0.7, depthWrite: false }));
+  const wake = new T.Mesh(new T.PlaneGeometry(LEN * 0.5, LEN * 1.9), new T.MeshBasicMaterial({ map: wakeTex, transparent: true, opacity: 0.55, depthWrite: false }));
   wake.rotation.x = -Math.PI / 2; wake.rotation.z = -Math.PI / 2; wake.position.set(-LEN * 1.4, 0.003, 0);
   holder.add(wake);
 
-  // redesign v2: a small gold ring with a soft glow that keeps the SAME size on screen at any zoom, drawn above terrain and labels' depth
-  const mc = document.createElement("canvas"); mc.width = mc.height = 128;
-  const mg = mc.getContext("2d"), glow = mg.createRadialGradient(64, 64, 8, 64, 64, 62);
-  glow.addColorStop(0, "rgba(255,214,120,.0)"); glow.addColorStop(0.5, "rgba(255,200,90,.55)"); glow.addColorStop(1, "rgba(255,200,90,0)");
-  mg.fillStyle = glow; mg.fillRect(0, 0, 128, 128);
-  mg.lineWidth = 11; mg.strokeStyle = "#1a1109"; mg.beginPath(); mg.arc(64, 64, 34, 0, Math.PI * 2); mg.stroke();
-  mg.lineWidth = 6; mg.strokeStyle = "#f0b43c"; mg.beginPath(); mg.arc(64, 64, 34, 0, Math.PI * 2); mg.stroke();
-  mg.fillStyle = "#f0b43c"; mg.strokeStyle = "#1a1109"; mg.lineWidth = 3; mg.beginPath(); mg.arc(64, 64, 5, 0, Math.PI * 2); mg.stroke(); mg.fill();
-  const marker = new T.Sprite(new T.SpriteMaterial({ map: new T.CanvasTexture(mc), transparent: true, depthTest: false, depthWrite: false, sizeAttenuation: false, toneMapped: false }));
-  marker.renderOrder = 999; marker.scale.set(0.095, 0.095, 1); marker.name = "nabou-ship-marker";
-  api.scene.add(marker);
+  // no gold ring / glow sprite over the ship any more: it read as a large yellow disc and hid the galleon (owner request, Nov 2026)
 
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const t0 = performance.now();
   // animate from the render loop (runs only while the 3D view is drawn)
-  const sync = () => {
-    marker.visible = holder.visible;
-    marker.position.copy(holder.position); marker.position.y += 0.03;
-    if (!reduce) { const k = 0.095 * (1 + 0.05 * Math.sin((performance.now() - t0) / 1000 * 2.2)); marker.scale.set(k, k, 1); }
-  };
+  const sync = () => {}; // kept for callers (map-3d-route.js); nothing to follow the hull any more
   wake.onBeforeRender = () => {
     sync();
     if (reduce) return;
@@ -98,5 +84,5 @@ export function addShip(api, opts = {}) {
   };
   const handle = api.addObject(holder, { lon: at.lon, lat: at.lat, z: 0 });
   holder.position.y = 0; // sea level, not the sea floor
-  return { handle, at, object: holder, ready, marker, sync };
+  return { handle, at, object: holder, ready, sync };
 }
