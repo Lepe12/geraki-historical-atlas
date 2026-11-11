@@ -1,8 +1,7 @@
 import * as THREE from "three";
 
-// Verification candidate: true X-axis pitch, no growing face; isolated preview only.
-// Adjacent artwork tiles share destination edges. No luminance culling, alpha
-// shadow, underlay or silhouette mask. This uses the already-installed engine.
+// N7 APEX Step 5: one shared depth-aware yaw/pitch rotation of the whole skull.
+// Only the skull-to-neck border blends into the stationary body.
 export type GuideFrame={turn:number;pitch?:number;breath?:number;assembly?:number;baseMood?:number;states?:number[];ages?:number[];ignition?:number;time?:number};
 export function createHeadSurface(image:HTMLCanvasElement) {
   const renderer=new THREE.WebGLRenderer({alpha:false,antialias:false,depth:false,preserveDrawingBuffer:true});
@@ -40,28 +39,24 @@ export function createHeadSurface(image:HTMLCanvasElement) {
     varying float shade;
     varying float rim;
     void main(){
+      // One rigid two-axis skull pose. Only the boundary between the head
+      // and the stationary neck fades out the transform. No face-part
+      // rotation weights, translations, stretching or secondary underlay.
       vec2 n=(source-vec2(160.,108.))/vec2(86.,98.);
       float r2=dot(n,n);
-      // Head is a connected unit through the lower jaw. The old radial
-      // falloff multiplied by neck fade left the chin nearly static.
-      // Only the actual neck attachment (196–208) blends to the fixed torso.
-      float skull=1.-smoothstep(.96,1.38,r2);
-      float neck=1.-smoothstep(196.,208.,source.y);
+      float skull=1.-smoothstep(1.06,1.52,r2);
+      float neck=1.-smoothstep(196.,210.,source.y);
       float head=skull*neck;
       float depth=sqrt(max(0.,1.-min(1.,r2)))*42.;
-      float a=turn*.34*head;
-      vec2 p=source;
-      p.x=160.+(source.x-160.)*cos(a)+depth*sin(a);
-      p.y+=(source.y-205.)*(1.-cos(a))*.08*head;
-      // Pitch is a genuine depth-aware X-axis rotation of the head around
-      // its cervical pivot. Chin, face and hair use the same angle; neck
-      // attachment weight alone blends the motion into the stationary body.
-      // Source tiles, image scale and UV stay unchanged.
-      float b=pitch*.34*head;
-      // Rotate the whole face about its skull center; blend only at the
-      // cervical attachment. This carries the chin with the upper face.
-      p.y=108.+(source.y-108.)*cos(b)-depth*sin(b)
-          +(source.y-205.)*(1.-cos(a))*.08*head;
+      float yaw=turn*.34;
+      float nod=pitch*.32;
+      float cy=cos(yaw),sy=sin(yaw),cp=cos(nod),sp=sin(nod);
+      // The neck remains the pivot; the entire face, chin and hair share
+      // this exact rotation matrix in the skull interior.
+      vec3 q=vec3(source.x-160.,source.y-154.,depth);
+      vec3 yawed=vec3(q.x*cy+q.z*sy,q.y,-q.x*sy+q.z*cy);
+      vec3 rotated=vec3(yawed.x,yawed.y*cp-yawed.z*sp,yawed.y*sp+yawed.z*cp);
+      vec2 p=source+head*(rotated.xy-q.xy);
       float chest=exp(-pow((source.y-320.)/94.,2.))*smoothstep(205.,250.,source.y)*(1.-smoothstep(420.,470.,source.y));
       p.x=160.+(p.x-160.)*(1.+breath*.006*chest);
       p.y-=breath*.9*chest;
