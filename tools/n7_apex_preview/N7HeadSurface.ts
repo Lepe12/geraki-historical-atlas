@@ -54,7 +54,9 @@ export function createHeadSurface(image:HTMLCanvasElement) {
       // skull depth. Unlike y-dependent translation it cannot stretch the
       // forehead or enlarge the face. The soft neck weight keeps the body fixed.
       float b=pitch*.34;
-      float rotatedY=205.+(source.y-205.)*cos(b)-depth*sin(b);
+      // Rotate about the skull center, not the neck: at the neck
+      // the deformation fades to zero through the existing head weight.
+      float rotatedY=108.+(source.y-108.)*cos(b)-depth*sin(b);
       p.y+=head*(rotatedY-source.y);
       float chest=exp(-pow((source.y-320.)/94.,2.))*smoothstep(205.,250.,source.y)*(1.-smoothstep(420.,470.,source.y));
       p.x=160.+(p.x-160.)*(1.+breath*.006*chest);
