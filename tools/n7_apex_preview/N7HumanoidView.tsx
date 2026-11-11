@@ -45,6 +45,7 @@ function ParticleReference({
   assembly,
   replayKey,
   reduced,
+  headTurnEnabled,
   onStats,
   onAssemblyDone,
 }:{
@@ -52,6 +53,7 @@ function ParticleReference({
   assembly:boolean;
   replayKey:number;
   reduced:boolean;
+  headTurnEnabled:boolean;
   onStats:(s:Stats)=>void;
   onAssemblyDone:()=>void;
 }) {
@@ -65,6 +67,7 @@ function ParticleReference({
     let geometry:THREE.BufferGeometry|null=null;
     let material:THREE.ShaderMaterial|null=null;
     let positionAttr:THREE.BufferAttribute|null=null;
+    let colorAttr:THREE.BufferAttribute|null=null;
     let alphaAttr:THREE.BufferAttribute|null=null;
     let ro:ResizeObserver|null=null;
     let raf=0;
@@ -72,6 +75,9 @@ function ParticleReference({
     let lastFrame=0;
     let completed=false;
     let currentProgress=assembly&&!reduced ? 0 : 1;
+    let targetTurn=0;
+    let currentTurn=0;
+    let turnClock=performance.now();
 
     const image=new Image();
     image.decoding="async";
@@ -97,6 +103,9 @@ function ParticleReference({
       const colors:number[]=[];
       const launchDelays:number[]=[];
       const jitter:number[]=[];
+      const headWeights:number[]=[];
+      const headDepths:number[]=[];
+      const headEdges:number[]=[];
 
       // One point = one sampled artwork pixel/color.
       for(let y=0;y<sampleH;y++){
@@ -115,6 +124,17 @@ function ParticleReference({
           const fy=sampleH/2-y-.5;
           finals.push(fx,fy,0);
           colors.push(r,g,b);
+
+          // Guide Step 5: the SAME sampled head particles gain synthetic depth.
+          // Motion fades naturally to zero at the neck so the neck itself stays fixed.
+          const hx=(x+.5-sampleW/2)/112;
+          const hy=(y+.5-110)/108;
+          const dome=Math.max(0,1-hx*hx-hy*hy);
+          const inHead=y<205 && y>4 && Math.abs(x+.5-sampleW/2)<122;
+          const neckWeight=inHead?smooth01(clamp01((205-y)/30)):0;
+          headWeights.push(neckWeight);
+          headDepths.push(inHead?Math.sqrt(dome)*44:0);
+          headEdges.push(inHead?clamp01((Math.abs(hx)-.72)/.28):0);
 
           // Guide Step 4: the body completes left-to-right.
           let delay=((fx+sampleW/2)/sampleW)*.66;
@@ -159,7 +179,9 @@ function ParticleReference({
       alphaAttr=new THREE.BufferAttribute(alphaArray,1);
       alphaAttr.setUsage(THREE.DynamicDrawUsage);
       geometry.setAttribute("position",positionAttr);
-      geometry.setAttribute("color",new THREE.Float32BufferAttribute(colors,3));
+      colorAttr=new THREE.BufferAttribute(new Float32Array(colors),3);
+      colorAttr.setUsage(THREE.DynamicDrawUsage);
+      geometry.setAttribute("color",colorAttr);
       geometry.setAttribute("alpha",alphaAttr);
 
       material=new THREE.ShaderMaterial({
@@ -180,6 +202,19 @@ function ParticleReference({
       renderer.toneMapping=THREE.NoToneMapping;
       renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
       host.replaceChildren(renderer.domElement);
+
+      const pointerMove=(e:PointerEvent)=>{
+        if(!headTurnEnabled){ targetTurn=0; host.dataset.headTarget="0.000"; return; }
+        const rect=host.getBoundingClientRect();
+        if(rect.width<=0) return;
+        const raw=Math.max(-1,Math.min(1,(e.clientX-(rect.left+rect.width/2))/(rect.width*.42)));
+        targetTurn=Math.abs(raw)<.18?0:raw;
+        host.dataset.headTarget=targetTurn.toFixed(3);
+      };
+      const clearTarget=()=>{ targetTurn=0; host.dataset.headTarget="0.000"; };
+      window.addEventListener("pointermove",pointerMove,{passive:true});
+      window.addEventListener("blur",clearTarget);
+      document.addEventListener("mouseleave",clearTarget);
 
       const applyAssembly=(progress:number)=>{
         currentProgress=progress;
@@ -238,9 +273,77 @@ function ParticleReference({
         alphaAttr.needsUpdate=true;
       };
 
+      const applyHeadTurn=()=>{
+        if(assembly||!positionAttr||!colorAttr) return;
+        const arr=positionAttr.array as Float32Array;
+        const cc=colorAttr.array as Float32Array;
+        const amount=Math.abs(currentTurn);
+        let maxShift=0;
+        let neckShift=0;
+        let neutralError=0;
+
+        if(amount<.0005){
+          arr.set(finalArray);
+          cc.set(colors);
+          host.dataset.currentTurn="0.000";
+          host.dataset.headMaxShift="0.000";
+          host.dataset.neckMaxShift="0.000";
+          host.dataset.neutralError="0.000";
+          positionAttr.needsUpdate=true;
+          colorAttr.needsUpdate=true;
+          return;
+        }
+
+        const angle=currentTurn*.19; // deliberately conservative: depth illusion, not full 3D.
+        const sign=Math.sign(currentTurn)||1;
+        for(let n=0;n<headWeights.length;n++){
+          const j=n*3;
+          const w=headWeights[n];
+          const fx=finalArray[j], fy=finalArray[j+1];
+          const br=colors[j], bg=colors[j+1], bb=colors[j+2];
+          if(w<=0){
+            arr[j]=fx; arr[j+1]=fy; arr[j+2]=0;
+            cc[j]=br; cc[j+1]=bg; cc[j+2]=bb;
+            continue;
+          }
+
+          const a=angle*w;
+          const cs=Math.cos(a), sn=Math.sin(a);
+          const z=headDepths[n];
+          const tx=fx*cs+z*sn;
+          const tz=-fx*sn+z*cs-z;
+          arr[j]=tx;
+          arr[j+1]=fy;
+          arr[j+2]=tz*.12;
+
+          const shift=Math.abs(tx-fx);
+          maxShift=Math.max(maxShift,shift);
+          if(w<.18) neckShift=Math.max(neckShift,shift);
+
+          // Guide shading: far side darkens; only the near silhouette gets a restrained rim.
+          const side=fx/112;
+          const far=Math.max(0,-sign*side);
+          const near=Math.max(0,sign*side);
+          const shade=1-amount*w*(.08+.43*far);
+          const rim=headEdges[n]*near*amount*w;
+          cc[j]=Math.min(1,br*shade+.015*rim);
+          cc[j+1]=Math.min(1,bg*shade+.075*rim);
+          cc[j+2]=Math.min(1,bb*shade+.12*rim);
+        }
+
+        for(let i=0;i<finalArray.length;i++) neutralError=Math.max(neutralError,Math.abs((positionAttr.array as Float32Array)[i]-finalArray[i]));
+        host.dataset.currentTurn=currentTurn.toFixed(3);
+        host.dataset.headMaxShift=maxShift.toFixed(3);
+        host.dataset.neckMaxShift=neckShift.toFixed(3);
+        host.dataset.neutralError=neutralError.toFixed(3);
+        positionAttr.needsUpdate=true;
+        colorAttr.needsUpdate=true;
+      };
+
       const renderFrame=(progress:number)=>{
         if(!renderer||!material) return;
         applyAssembly(progress);
+        if(!assembly) applyHeadTurn();
 
         const rect=host.getBoundingClientRect();
         renderer.setSize(Math.max(1,rect.width),Math.max(1,rect.height),false);
@@ -290,6 +393,18 @@ function ParticleReference({
         }
       }else{
         renderFrame(1);
+        const turnTick=(now:number)=>{
+          if(disposed) return;
+          const dt=Math.min(80,Math.max(0,now-turnClock));
+          turnClock=now;
+          if(!headTurnEnabled) targetTurn=0;
+          const ease=1-Math.exp(-dt/135);
+          currentTurn+=(targetTurn-currentTurn)*ease;
+          if(targetTurn===0&&Math.abs(currentTurn)<.003) currentTurn=0;
+          renderFrame(1);
+          raf=requestAnimationFrame(turnTick);
+        };
+        raf=requestAnimationFrame(turnTick);
       }
 
       ro=new ResizeObserver(()=>renderFrame(currentProgress));
@@ -300,12 +415,15 @@ function ParticleReference({
       disposed=true;
       cancelAnimationFrame(raf);
       ro?.disconnect();
+      window.removeEventListener("pointermove",pointerMove);
+      window.removeEventListener("blur",clearTarget);
+      document.removeEventListener("mouseleave",clearTarget);
       geometry?.dispose();
       material?.dispose();
       renderer?.dispose();
       host.replaceChildren();
     };
-  },[enabled,assembly,replayKey,reduced,onStats,onAssemblyDone]);
+  },[enabled,assembly,replayKey,reduced,headTurnEnabled,onStats,onAssemblyDone]);
 
   return <div
     ref={hostRef}
@@ -692,7 +810,7 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
     <header style={{position:"absolute",top:14,left:18,right:18,zIndex:5,display:"flex",justifyContent:"space-between",alignItems:"center",gap:12}}>
       <div>
         <strong style={{letterSpacing:4,color:"#62e8f7"}}>N7 · HUMANOID</strong>
-        <div style={{fontSize:11,opacity:.62}}>Guide Step 3 + 4 · face-bloom moods + real Thinking state + particle-river Assembly</div>
+        <div style={{fontSize:11,opacity:.62}}>Guide Step 3–5 · moods + Assembly + native particle head turn around a fixed neck</div>
       </div>
       <button type="button" onClick={onClose} style={{padding:"9px 13px",border:"1px solid #2c6c7e",background:"#091823",color:"#dffbff",borderRadius:7,cursor:"pointer"}}>Exit</button>
     </header>
@@ -710,11 +828,15 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
           assembly={false}
           replayKey={replayKey}
           reduced={false}
+          headTurnEnabled={mood==="idle"}
           onStats={setStats}
           onAssemblyDone={handleAssemblyDone}
         />}
 
         {(mode==="particle"||mode==="compare")&&<MoodCanvas mood={mood} />}
+        {mode==="particle"&&mood==="idle"&&<div aria-label="N7 Step 5 preview hint" style={{position:"absolute",bottom:10,left:"50%",transform:"translateX(-50%)",padding:"5px 8px",background:"#03111dcc",border:"1px solid #285d70",borderRadius:5,fontSize:10,opacity:.72,pointerEvents:"none"}}>
+          MOVE POINTER · GUIDE STEP 5
+        </div>}
 
         {mode==="assembly"&&<AssemblyCanvas
           replayKey={replayKey}
