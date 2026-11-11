@@ -63,6 +63,14 @@ jobs:
           NODE_PATH="$RUNNER_TEMP/n7-apex-browser/node_modules" node - <<'NODE'
           const { chromium }=require('playwright-core');
           (async()=>{
+            if(process.env.N7_APEX_BASE_PATH==='/n7-apex-step5'){
+              const {spawnSync}=require('node:child_process');
+              const checked=spawnSync(process.execPath,['tools/n7_apex_preview/test_complete_guide.cjs'],{
+                stdio:'inherit',env:{...process.env,N7_VISUAL_URL:'http://127.0.0.1:4173/n7-apex-step5/',N7_GUIDE_OUT:process.env.RUNNER_TEMP+'/n7-apex-evidence/guide'}
+              });
+              if(checked.status!==0)throw Error('Complete APEX guide browser verification failed');
+              return;
+            }
             const b=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN,args:['--no-sandbox','--disable-dev-shm-usage']});
             const p=await b.newPage({viewport:{width:1440,height:900}});
             const errors=[]; const failed=[];
@@ -222,7 +230,7 @@ jobs:
             await b.close();
           })().catch(e=>{console.error(e);process.exit(1)});
           NODE
-      - name: Verify Step 5 continuous-frame pixels and Step 6 ten-second lighting
+      - name: Recheck head coverage and ten-second background lighting
         if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
@@ -233,7 +241,7 @@ jobs:
         if: always() && env.N7_APEX_BASE_PATH == '/n7-apex-step5'
         uses: actions/upload-artifact@v4
         with:
-          name: n7-step5-step6-visual-evidence
+          name: n7-complete-guide-visual-evidence
           path: ${{ runner.temp }}/n7-apex-evidence
       - name: Read-only Top.Host target preflight
         env:

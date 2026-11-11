@@ -18,6 +18,9 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
   const host=p.getByLabel('N7 guide artwork-tile humanoid',{exact:true}),canvas=host.locator('canvas:visible');
   await canvas.waitFor();
   await p.waitForFunction(()=>document.querySelector('[aria-label="N7 guide artwork-tile humanoid"]')?.dataset.renderer==='shared-edge-texture-mesh');
+  const skip=p.getByRole('button',{name:'Skip',exact:true});if(await skip.isVisible())await skip.click();
+  await p.getByRole('button',{name:'Technical details',exact:true}).click();
+  await p.getByLabel('Breathing',{exact:true}).uncheck();
   const bounds=await host.boundingBox();
   const move=async turn=>{
    await p.mouse.move(bounds.x+bounds.width/2+bounds.width*.42*turn,bounds.y+bounds.height*.3);
@@ -26,7 +29,7 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
    // native reference surfaces change on the next compositor frame.
    await p.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
   };
-  const reference=await p.evaluate(async()=>{const img=new Image();img.src=location.pathname+'n7-humanoid-idle-v3.webp';await img.decode();const c=document.createElement('canvas');c.width=320;c.height=480;const x=c.getContext('2d');x.drawImage(img,0,0);return Array.from(x.getImageData(0,0,320,480).data);});
+  const decodedReference=await p.evaluate(async()=>{const img=new Image();img.src=location.pathname+'n7-humanoid-idle-v3.webp';await img.decode();const c=document.createElement('canvas');c.width=320;c.height=480;const x=c.getContext('2d');x.drawImage(img,0,0);return Array.from(x.getImageData(0,0,320,480).data);});
   async function pixels(){
    // Read the same encoded raster saved as evidence, after selecting the visible
    // surface atomically. This also avoids cross-context GPU readback races.
@@ -34,6 +37,8 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
    return PNG.sync.read(Buffer.from(read.png.split(',')[1],'base64')).data;
   }
 
+  const reference=Array.from(await host.evaluate(h=>Array.from(h.querySelector("canvas").getContext("2d").getImageData(0,0,320,480).data)));
+  assert(difference(reference,decodedReference).max<=2,"Frozen source differs beyond browser WebP rounding");
   const brightHead=px=>{let n=0;for(let i=0;i<205*320*4;i+=4)n+=px[i]+px[i+1]+px[i+2]>45;return n;};
   fs.writeFileSync(path.join(out,"reference-pixels.png"),PNG.sync.write({width:320,height:480,data:Buffer.from(reference)}));
   const referenceHead=brightHead(reference);
@@ -86,6 +91,7 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
    results.poses.push({name,turn:Number(await host.getAttribute('data-current-turn')),gaps,bodyMaxDifference:body.max});
   }
   console.log('Eight poses: PASS. Observing backdrop for 10 seconds...');
+  await p.getByRole('button',{name:'Technical details',exact:true}).click();
   const bg=p.getByLabel('N7 Step 6 living backdrop',{exact:true}),lights=bg.locator('[data-ridge-layer]');
   await p.waitForFunction(()=>Number(document.querySelector('[aria-label="N7 Step 6 living backdrop"]')?.dataset.highlightCount)>0);
   const figure=host.locator('..');await figure.evaluate(e=>e.style.visibility='hidden');

@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { OrbState } from "./ApexHeroOrb";
 
 type Msg = { role: string; content: string };
@@ -37,13 +37,15 @@ const buttonStyle: React.CSSProperties = {
   padding: "9px 12px", border: "1px solid #29677b", borderRadius: 7,
   color: "#cdf9ff", background: "#112d39", cursor: "pointer",
 };
-export default function N7Workspace({ onActivity, onTrace }: {
+export default function N7Workspace({ onActivity, onTrace, openSignal=0 }: {
+  openSignal?:number;
   onActivity: (s: OrbState | null) => void;
   onTrace: (t: { n: number; trace: Array<{ helper: string }> }) => void;
 }) {
   const trace = (...helpers: string[]) =>
     onTrace({ n: Date.now(), trace: helpers.map(helper => ({ helper })) });
   const [open, setOpen] = useState(false);
+  useEffect(()=>{if(openSignal>0)setOpen(true);},[openSignal]);
   const [tab, setTab] = useState<Tab>("chat");
   const [online, setOnline] = useState<boolean | null>(null);
   const [authenticated, setAuthenticated] = useState(false);
@@ -60,6 +62,31 @@ export default function N7Workspace({ onActivity, onTrace }: {
   const [missionId, setMissionId] = useState("");
   const [missionStatus, setMissionStatus] = useState("");
   const [busy, setBusy] = useState(false);
+  const [pendingJobs,setPendingJobs]=useState<{id:string;conversationId:string}[]>([]);
+  const activeConversation=useRef(conversationId);
+  useEffect(()=>{activeConversation.current=conversationId;},[conversationId]);
+  useEffect(()=>{onActivity(busy||pendingJobs.some(j=>j.conversationId===conversationId)?"thinking":null);},[busy,pendingJobs,conversationId,onActivity]);
+  useEffect(()=>{
+    if(!pendingJobs.length)return;
+    let disposed=false,inflight=false;const attempts=new Map<string,number>();
+    const timer=window.setInterval(async()=>{
+      if(inflight)return;inflight=true;
+      try{await Promise.all(pendingJobs.map(async job=>{
+        const attempt=(attempts.get(job.id)||0)+1;attempts.set(job.id,attempt);
+        try{
+          const state=await n7("/api/n7/job/"+idPath(job.id));if(disposed)return;
+          if(state.status==="done"){
+            if(activeConversation.current===job.conversationId){const reply=await n7("/api/conversations/"+idPath(job.conversationId));if(disposed)return;if(activeConversation.current===job.conversationId)setMessages((reply.conversation as {messages?:Msg[]})?.messages||[]);}
+            setPendingJobs(jobs=>jobs.filter(j=>j.id!==job.id));
+          }else if(state.status==="failed"){
+            if(activeConversation.current===job.conversationId)setError("Η εργασία N7 απέτυχε. Μπορείς να συνεχίσεις τη συνομιλία.");
+            setPendingJobs(jobs=>jobs.filter(j=>j.id!==job.id));
+          }else if(attempt>=180){setError("Η παρακολούθηση της ουράς έληξε χωρίς επιβεβαιωμένη απάντηση.");setPendingJobs(jobs=>jobs.filter(j=>j.id!==job.id));}
+        }catch(e){if(!disposed){setError("Ο έλεγχος της ουράς απέτυχε· η ολοκλήρωση δεν επιβεβαιώθηκε. "+(e instanceof Error?e.message:String(e)));setPendingJobs(jobs=>jobs.filter(j=>j.id!==job.id));}}
+      }));}finally{inflight=false;}
+    },10000);
+    return()=>{disposed=true;window.clearInterval(timer);};
+  },[pendingJobs]);
   const [error, setError] = useState("");
 
   const check = useCallback(async () => {
@@ -115,23 +142,27 @@ export default function N7Workspace({ onActivity, onTrace }: {
   }
   async function send() {
     if (!message.trim() || busy || !authenticated) return;
-    setBusy(true); setError(""); onActivity("thinking"); trace("orchestrator","memory","model_runtime");
+    setBusy(true); setError(""); trace("orchestrator","memory","model_runtime");
     try {
       const id = conversationId || await newConversation();
       const result = await n7("/api/conversations/" + idPath(id) + "/chat", { message: message.trim() });
       const conv = result.conversation as { messages?: Msg[] } | undefined;
-      if (conv?.messages) setMessages(conv.messages);
+      if(result.pending===true&&typeof result.job_id==="string"){
+        idPath(result.job_id);
+        setPendingJobs(jobs=>jobs.some(j=>j.id===result.job_id)?jobs:[...jobs,{id:String(result.job_id),conversationId:id}]);
+        setMessages(previous=>[...previous,{role:"user",content:message.trim()}]);
+      }else if (conv?.messages) setMessages(conv.messages);
       else await chooseConversation(id);
       setMessage("");
       const list = await n7("/api/conversations");
       setConversations(Array.isArray(list.conversations) ? list.conversations as Conversation[] : []);
-      onActivity("speaking");
+      // Text arrival is not audio playback; never invent a speaking event.
     } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
-    finally { setBusy(false); onActivity(null); }
+    finally { setBusy(false); }
   }
   async function submitTask() {
     if (!taskPrompt.trim() || busy || !authenticated) return;
-    setBusy(true); setError(""); onActivity("thinking");
+    setBusy(true); setError("");
     trace("orchestrator","task_runner",kind === "agent" ? "skills" : "model_runtime");
     try {
       await n7("/api/tasks", { prompt: taskPrompt.trim(), kind });
@@ -139,11 +170,11 @@ export default function N7Workspace({ onActivity, onTrace }: {
       setTasks(Array.isArray(t.tasks) ? t.tasks as Task[] : []);
       setTaskPrompt("");
     } catch(e) { setError(e instanceof Error ? e.message : String(e)); }
-    finally { setBusy(false); onActivity(null); }
+    finally { setBusy(false); }
   }
   async function submitMission() {
     if (missionTarget.trim().length < 3 || missionQuestion.trim().length < 12 || busy) return;
-    setBusy(true); setError(""); onActivity("thinking");
+    setBusy(true); setError("");
     trace("orchestrator","research_planner","historian","evidence_audit","source_library","mission_bridge");
     try {
       const m = await n7("/api/research/missions", {
@@ -155,7 +186,7 @@ export default function N7Workspace({ onActivity, onTrace }: {
       setMissionId(requestId);
       setMissionStatus("Ανατέθηκε: " + requestId + " — αναμονή επιβεβαίωσης εκτέλεσης");
     } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
-    finally { setBusy(false); onActivity(null); }
+    finally { setBusy(false); }
   }
 
   return (
@@ -180,6 +211,7 @@ export default function N7Workspace({ onActivity, onTrace }: {
         {!authenticated ? (
           <div style={{marginTop:18,fontSize:13,lineHeight:1.6}}>
             <p>Το πραγματικό N7 απαιτεί ενεργή συνεδρία στο ίδιο domain. Δεν χρησιμοποιούνται δοκιμαστικές απαντήσεις ή κρυφά tokens.</p>
+            <a href="/" target="_blank" rel="noopener noreferrer" style={{color:"#65e8f5",display:"block",marginBottom:12}}>Σύνδεση στο N7</a>
             <button style={buttonStyle} type="button" onClick={() => void check()}>Επανέλεγχος σύνδεσης</button>
           </div>
         ) : (
@@ -191,6 +223,7 @@ export default function N7Workspace({ onActivity, onTrace }: {
                   onClick={() => setTab(t)}>{t==="chat"?"Συνομιλία":t==="tasks"?"Agents":"Έρευνα"}</button>)}
             </nav>
             {tab === "chat" && <div>
+              {pendingJobs.some(j=>j.conversationId===conversationId)&&<p role="status" style={{fontSize:12}}>Αναμονή απάντησης N7. Μπορείς να συνεχίσεις τη συνομιλία.</p>}
               <select aria-label="Conversation" style={inputStyle} value={conversationId}
                 onChange={e => void chooseConversation(e.target.value)}>
                 <option value="">Νέα συνομιλία</option>

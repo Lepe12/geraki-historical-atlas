@@ -4,6 +4,7 @@ import * as THREE from "three";
 import { N7_HUMANOID_REFERENCE } from "./N7HumanoidReference";
 import { createHeadSurface } from "./N7HeadSurface";
 import N7Backdrop from "./N7Backdrop";
+import N7GuideView from "./N7GuideView";
 
 type ViewMode = "assembly" | "particle" | "original" | "compare";
 type Mood = "idle" | "listening" | "thinking" | "speaking";
@@ -858,7 +859,7 @@ function AssemblyCanvas({
   />;
 }
 
-export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onClose:()=>void;activity?:N7Activity}) {
+function LegacyHumanoidView({open,onClose,activity}:{open:boolean;onClose:()=>void;activity?:N7Activity}) {
   const systemReduced=useMemo(()=>typeof window!=="undefined"&&window.matchMedia?.("(prefers-reduced-motion: reduce)").matches,[]);
   const [allowMotion,setAllowMotion]=useState(false);
   const reduced=systemReduced&&!allowMotion;
@@ -1004,4 +1005,8 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
       </div>}
     </div>
   </section>;
+}
+
+export default function N7HumanoidView(props:{open:boolean;onClose:()=>void;activity?:N7Activity;onWorkspace?:()=>void}){
+  return N7_HUMANOID_REFERENCE.includes("/n7-apex-step5/")?<N7GuideView {...props}/>:<LegacyHumanoidView {...props}/>;
 }

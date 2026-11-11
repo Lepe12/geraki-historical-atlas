@@ -1,15 +1,18 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { N7_BACKDROP_REFERENCE } from "./N7BackdropReference";
 
 type Highlight={x:number;y:number;phase:number;sprite:HTMLCanvasElement};
 
-export default function N7Backdrop({effects,reduced}:{effects:boolean;reduced:boolean}) {
+export type N7BackdropHandle={wave:(x:number,y:number,radius:number,fade:number)=>void;clear:()=>void};
+const N7Backdrop=forwardRef<N7BackdropHandle,{effects:boolean;reduced:boolean}>(function N7Backdrop({effects,reduced},ref) {
   const hostRef=useRef<HTMLDivElement>(null);
   const imageRef=useRef<HTMLImageElement>(null);
   const layerRef=useRef<HTMLDivElement>(null);
   const flags=useRef({effects,reduced});
   const restart=useRef<()=>void>(()=>{});
+  const waveRef=useRef<(x:number,y:number,radius:number,fade:number)=>void>(()=>{});
+  useImperativeHandle(ref,()=>({wave:(x,y,r,f)=>waveRef.current(x,y,r,f),clear:()=>waveRef.current(0,0,-1,0)}),[]);
   useEffect(()=>{flags.current={effects,reduced};restart.current();},[effects,reduced]);
 
   useEffect(()=>{
@@ -17,6 +20,7 @@ export default function N7Backdrop({effects,reduced}:{effects:boolean;reduced:bo
     if(!host||!image||!layer) return;
     let disposed=false,loaded=false;
     const highlights:Highlight[]=[];
+    let centers:{x:number;y:number}[]=[];
     const start=()=>{
       layer.style.display=flags.current.effects&&!flags.current.reduced?"block":"none";
     };
@@ -63,7 +67,10 @@ export default function N7Backdrop({effects,reduced}:{effects:boolean;reduced:bo
       layout=()=>{
         const scale=Math.max(host.clientWidth/image.naturalWidth,host.clientHeight/image.naturalHeight);
         const iw=image.naturalWidth*scale,ih=image.naturalHeight*scale;
+        centers=[];
+        const box=host.getBoundingClientRect();
         for(const point of highlights){
+          centers.push({x:box.left+(host.clientWidth-iw)/2+point.x/w*iw,y:box.top+(host.clientHeight-ih)/2+point.y/h*ih});
           Object.assign(point.sprite.style,{
             left:`${(host.clientWidth-iw)/2+(point.x-12)/w*iw}px`,
             top:`${(host.clientHeight-ih)/2+(point.y-12)/h*ih}px`,
@@ -72,13 +79,22 @@ export default function N7Backdrop({effects,reduced}:{effects:boolean;reduced:bo
         }
       };
       layout();
+      waveRef.current=(cx,cy,radius,fade)=>{
+        for(let i=0;i<highlights.length;i++){
+          const point=highlights[i],center=centers[i];
+          const distance=fade>0?Math.hypot(center.x-cx,center.y-cy):0;
+          const lift=flags.current.effects&&!flags.current.reduced?Math.max(0,1-Math.abs(distance-radius)/55)*fade*.5:0;
+          const filter=lift>.001?`brightness(${1+lift})`:"";
+          if(point.sprite.style.filter!==filter)point.sprite.style.filter=filter;
+        }
+      };
       host.dataset.highlightCount=String(highlights.length);
       host.dataset.analysisCount="1";
       start();
     };
     image.addEventListener("load",load);
     if(image.complete&&image.naturalWidth) load();
-    return()=>{disposed=true;observer.disconnect();layer.replaceChildren();image.removeEventListener("load",load);restart.current=()=>{};};
+    return()=>{disposed=true;observer.disconnect();layer.replaceChildren();image.removeEventListener("load",load);restart.current=()=>{};waveRef.current=()=>{};};
   },[]);
 
   return <div ref={hostRef} aria-label="N7 Step 6 living backdrop" data-effects={effects&&!reduced?"on":"off"}
@@ -87,4 +103,5 @@ export default function N7Backdrop({effects,reduced}:{effects:boolean;reduced:bo
     <style>{`@keyframes n7-ridge-light {0%,100% {opacity:.08} 50% {opacity:.78}}`}</style>
     <div ref={layerRef} data-ridge-layer="" aria-label="Existing ridge illumination" style={{position:"absolute",inset:0}} />
   </div>;
-}
+});
+export default N7Backdrop;
