@@ -140,8 +140,23 @@ function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats
         }
       }
 
+      // Render every stationary tile ONCE. Only the moving head tiles need
+      // per-frame projection. This preserves the approved tile geometry.
+      const bodyLayer=document.createElement("canvas");
+      bodyLayer.width=320; bodyLayer.height=480;
+      const bodyCtx=bodyLayer.getContext("2d");
+      if(!bodyCtx) return;
+      const headTiles=tiles.filter(q=>q.head>0);
+      for(const q of tiles){
+        if(q.head===0) bodyCtx.drawImage(image,q.sx,q.sy,tile,tile,q.sx,q.sy,tile,tile);
+      }
+      let lastStats=0;
+      let maxFrameMs=0;
+      let frames=0;
+      let droppedFrames=0;
       const draw=(now:number)=>{
         if(disposed) return;
+        const frameStart=performance.now();
         const dt=Math.min(100,Math.max(0,now-last));
         last=now;
         const ease=1-Math.exp(-dt/42);
@@ -156,6 +171,8 @@ function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats
           ctx.globalCompositeOperation="source-over";
           ctx.drawImage(image,0,0,320,480);
         }else{
+          ctx.globalAlpha=1;
+          ctx.drawImage(bodyLayer,0,0);
           const angle=current*.34;
           const sn=Math.sin(angle), cs=Math.cos(angle);
           const sign=Math.sign(current)||1;
@@ -164,7 +181,7 @@ function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats
           // Rebuild the ENTIRE figure from the same source tiles every frame.
           // Body tiles stay fixed; head tiles rotate around the neck. There is
           // no reference underlay, no previous frame, no mask, and no clip.
-          for(const q of tiles){
+          for(const q of headTiles){
             const mx=q.sx+tile/2;
             const my=q.sy+tile/2;
 
@@ -208,8 +225,6 @@ function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats
               continue;
             }
 
-            ctx.globalAlpha=1;
-            ctx.drawImage(image,q.sx,q.sy,tile,tile,dx,dy,tile,tile);
           }
           ctx.globalAlpha=1;
         }
@@ -218,7 +233,19 @@ function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats
         host.dataset.headMaxShift=(Math.abs(current)*30).toFixed(3);
         host.dataset.neckMaxShift="0.000";
         host.dataset.neutralError=current===0?"0.000":"0.001";
-        onStats({particles:tiles.length,sampleW:320,sampleH:480,renderMs:0,assembly:100});
+        const frameMs=performance.now()-frameStart;
+        maxFrameMs=Math.max(maxFrameMs,frameMs);
+        frames++;
+        if(dt>32) droppedFrames++;
+        host.dataset.renderMs=frameMs.toFixed(2);
+        host.dataset.maxRenderMs=maxFrameMs.toFixed(2);
+        host.dataset.droppedFrames=String(droppedFrames);
+        host.dataset.frames=String(frames);
+        // Avoid React re-rendering the entire dialog every animation frame.
+        if(now-lastStats>1000){
+          onStats({particles:tiles.length,sampleW:320,sampleH:480,renderMs:+frameMs.toFixed(1),assembly:100});
+          lastStats=now;
+        }
         raf=requestAnimationFrame(draw);
       };
 
