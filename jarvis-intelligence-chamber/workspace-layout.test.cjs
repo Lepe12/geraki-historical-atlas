@@ -29,6 +29,8 @@ async function navTo(page,view){
   assert.equal(await page.locator('#nodeLabels .node-label').count(),17,'All original research nodes must be rendered');
   assert.equal(await page.locator('body').getAttribute('data-atlas-landing'),'true');
   assert.equal(await page.locator('#n7Shell [data-atlas-nav]').count(),5,'Shared home and workspace navigation');
+  const leftNav=await page.locator('.n7-nav > button:visible:not(.n7-collapse), .n7-nav > a:visible').evaluateAll(es=>es.map(e=>(e.querySelector('span')||e).textContent.trim()));
+  assert.deepEqual(leftNav,['Χάρτης','Έρευνα','Πηγές','Δεδομένα'],'Operator left nav keeps Δεδομένα; leftover chrome is hidden');
   assert.equal(await page.locator('#atlasExplore, .unified-welcome, .atlas-home-hero').count(),0,'No welcome card over the map');
   assert.equal(await page.locator('#v2rail').isVisible(),false,'Lab rail must not show under atlas home');
   assert.equal(await page.locator('#topbar').isVisible(),false,'Lab topbar/clock must not show under atlas home');

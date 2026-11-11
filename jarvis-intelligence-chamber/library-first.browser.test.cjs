@@ -28,11 +28,17 @@ const HITS=[{book:A,page:278,text:'Τον Μάρτιο του 1568 ο Πέτρο
  }
  const ask=async(page,q)=>{await page.locator('#n7Shell [data-atlas-nav="research"]').click();await page.locator('#operatorQuery').fill(q);await page.locator('#executeQuery').click();await page.waitForFunction(()=>{const c=document.querySelector('#libraryAnswer');return c&&!c.hidden&&c.dataset.path!=='searching';});};
  try{
-  // Reader nav: Χάρτης, Έρευνα, Πηγές; no operator screens.
+  // Reader nav: only Χάρτης, Έρευνα, Πηγές (plus the fold control). Δεδομένα / Ερευνητές stay operator-only.
   {const {page,errors}=await open();
    assert.equal(await page.locator('#n7Shell [data-atlas-nav="tools"]').isVisible(),false,'Δεδομένα is an operator screen');
    assert.equal(await page.locator('#n7Shell [data-atlas-nav="agents"]').isVisible(),false,'Ερευνητές is an operator screen');
    for(const n of ['map','research','sources'])assert.equal(await page.locator('#n7Shell [data-atlas-nav="'+n+'"]').first().isVisible(),true,n);
+   const visible=await page.locator('.n7-nav > button:visible:not(.n7-collapse), .n7-nav > a:visible').evaluateAll(es=>es.map(e=>(e.querySelector('span')||e).textContent.trim()));
+   assert.deepEqual(visible,['Χάρτης','Έρευνα','Πηγές']);
+   for(const label of ['Αρχική','Επίπεδα','Χρονολόγιο','Πρόσωπα','Γεγονότα','N7 AI','Ρυθμίσεις','Βοήθεια']){
+    assert.equal(await page.locator('.n7-nav').getByText(label,{exact:true}).isVisible(),false,label+' must not show in the left nav');
+   }
+   assert.equal(await page.locator('.n7-nav .n7-collapse').isVisible(),true,'sidebar fold control may stay');
    assert.deepEqual(errors,[]);await page.close();}
   {const {page}=await open({url:base+'&operator=1'});assert.equal(await page.locator('#n7Shell [data-atlas-nav="tools"]').isVisible(),true,'?operator=1 brings the operator screens back');await page.evaluate(()=>localStorage.removeItem('nabou-operator'));await page.close();}
   // 1. Library is enough: a short chronological story with a source under each fact, and no long run.

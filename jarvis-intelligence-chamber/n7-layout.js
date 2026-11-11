@@ -123,9 +123,10 @@
   else if(what==='activity'){reader()?.show('research',{focus:false});requestAnimationFrame(()=>document.querySelector('.nxs-activity-open')?.click());}
   else if(what==='collapse'){const c=shell.dataset.nav!=='collapsed';shell.dataset.nav=c?'collapsed':'open';b.textContent=c?'»':'«';b.setAttribute('aria-expanded',String(!c));b.setAttribute('aria-label',c?'Ανάπτυξη μενού':'Σύμπτυξη μενού');}
  });
- // Αρχική is the current item on the landing map; the reader marks the other items.
+ // Χάρτης is the current item on the landing map. Αρχική stays in the DOM but hidden, so it must not steal aria-current.
  const homeBtn=shell.querySelector('.n7-nav [data-n7-nav="home"]');
- function markHome(){const landing=body.dataset.atlasLanding==='true'&&body.dataset.readerView==='map';homeBtn?.setAttribute('aria-current',landing?'page':'false');if(landing)shell.querySelector('.n7-nav [data-atlas-nav="map"]')?.setAttribute('aria-current','false');}
+ const homeInNav=()=>!!homeBtn&&!homeBtn.hidden&&getComputedStyle(homeBtn).display!=='none';
+ function markHome(){const landing=body.dataset.atlasLanding==='true'&&body.dataset.readerView==='map';if(homeInNav()){homeBtn.setAttribute('aria-current',landing?'page':'false');if(landing)shell.querySelector('.n7-nav [data-atlas-nav="map"]')?.setAttribute('aria-current','false');}else{homeBtn?.setAttribute('aria-current','false');if(landing)shell.querySelector('.n7-nav [data-atlas-nav="map"]')?.setAttribute('aria-current','page');}}
  new MutationObserver(()=>requestAnimationFrame(markHome)).observe(body,{attributes:true,attributeFilter:['data-atlas-landing','data-reader-view','data-nxs-view','data-atlas-page']});
  markHome();setTimeout(markHome,300);
 

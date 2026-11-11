@@ -17,7 +17,8 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
  assert.equal(await page.locator('body').getAttribute('data-atlas-landing'),'true');
  assert.equal(await page.locator('#atlasExplore, .unified-welcome, .atlas-home-poster').count(),0);
  assert.equal(await page.locator('#chartFrame').isVisible(),true);
- assert.equal(await page.locator('.n7-nav [data-n7-nav="home"]').getAttribute('aria-current'),'page');
+ assert.equal(await page.locator('.n7-nav [data-atlas-nav="map"]').getAttribute('aria-current'),'page');
+ assert.equal(await page.locator('.n7-nav [data-n7-nav="home"]').isVisible(),false);
  await page.locator('.n7-nav [data-atlas-nav="map"]').hover();
  assert.equal(await page.locator('.n7-nav [data-atlas-nav="map"]').evaluate(e=>getComputedStyle(e).backgroundImage),'none');
  await page.screenshot({path:path.join(process.env.NABOU_SCREENSHOT_DIR||__dirname,'unified-home.png')});
@@ -28,9 +29,9 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
  assert.equal(await page.locator('#chartFrame').isVisible(),true);
  assert.equal(await page.locator('#nodeLabels .node-label').count(),17);
  assert.equal(await page.locator('body').getAttribute('data-pro-lanes'),'false','Research layers start collapsed on the geographic atlas');
- await page.locator('.n7-nav [data-n7-nav="layers"]').click();
+ await page.evaluate(()=>window.N7_LAYOUT.setLayers(true));
  await page.getByRole('checkbox',{name:'Ερευνητές',exact:true}).check();
- await page.locator('.n7-nav [data-n7-nav="layers"]').click();
+ await page.evaluate(()=>window.N7_LAYOUT.setLayers(false));
  const visibleAgents=await page.locator('#nodeLabels .node-label').evaluateAll(es=>es.filter(e=>getComputedStyle(e).visibility==='visible'&&e.getBoundingClientRect().width>0).length);
  assert.ok(visibleAgents>=5,'Researcher emblems must be visibly rendered on the real map');
  await page.waitForTimeout(500);
