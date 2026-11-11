@@ -41,6 +41,7 @@ function clamp01(v:number){ return Math.max(0,Math.min(1,v)); }
 function smooth01(v:number){ const x=clamp01(v); return x*x*(3-2*x); }
 
 
+// Isolated Step 5 deploy marker: guide-native artwork-tile renderer.
 function GuideHeadTileCanvas({enabled,onStats}:{enabled:boolean;onStats:(s:Stats)=>void}) {
   const hostRef=useRef<HTMLDivElement>(null);
 
