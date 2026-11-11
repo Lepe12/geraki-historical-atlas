@@ -13,3 +13,13 @@ Validation: the before-change browser fixture found one password field and faile
 The deployment acceptance check additionally requires a **real unauthenticated model reply** and verifies private conversation/task APIs still return 401. The real deployment result is recorded below after installation. Physical microphone/speaker behavior still depends on the user's browser, device voices and permission; the earlier voice integration evidence remains applicable.
 
 The first live read-only preflight rejected an unrecognized legacy relay hook before any writes. The installer was revised to use the recognized HTTP callback/provider bindings directly; it no longer depends on the legacy relay call layout.
+
+## Live verification — 2026-11-11
+
+Code: `b7c99794a48b42841d64086de9cc9b1522ae6960` (public route initially added in `5fdddb52fa6561fce2dbb1e7160b28c1ebd27cbe`). [Validation/deployment passed](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/43037553250); [CI visual evidence](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/43037553250/artifacts/13864506065).
+
+The deployment required and received a real anonymous provider answer before publishing the frontend. A second, independent **unmocked live browser** check then opened a fresh unauthenticated session, found zero password fields, sent a Greek greeting through the actual UI and received HTTP 200 with the real model answer: “Γεια σου, είμαι ο N7 και είμαι εδώ για να σε βοηθήσω.” The answer appeared in the figure, activity returned to Idle, exiting did not request a password and no browser errors occurred. Private `/api/conversations` and `/api/tasks` still returned 401. See `n7-passwordless-evidence/live-browser-results.json` and `live-desktop.png`. This verifies real anonymous model conversation; physical microphone/speaker output remains outside that browser check.
+
+[Live figure](https://bot.piratecartography.com/n7-apex-step5/?v=passwordless), release `c8f331bf71ca4220`. Production static release remains `bbdc05016a211581`; approved figure/background SHA256 hashes are unchanged. Public status returns `passwordRequired:false`, `available:true`, `privateHistory:false`.
+
+Rollback: static snapshot `/bot.piratecartography.com/n7-app/public/.n7-apex-backup-cc566dbe6598`; server backup `.n7-apex-public-backup-9746a9ae1e75-server.js` in the private application root. Installed public module SHA256 `c3e82760186f7a8704384c884005a02c62667f7c6ac0806d90ad6659944ff231`; server before/after hashes `459253828f71ab10deeb8ac7c1768341970033a99ea2eb98ed5e027c77828f44` / `2a4d6c8a6003a13f6b040ff25482516113a90b692372d89baaef7d3298eb05cd`.

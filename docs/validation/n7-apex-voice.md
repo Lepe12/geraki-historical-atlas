@@ -39,3 +39,7 @@ API references: [SpeechRecognition](https://developer.mozilla.org/en-US/docs/Web
 - The voice lifecycle fixture passed again using the **actual deployed frontend**, with browser-local API/device interception. These are recorded in `deployed-fixture-results.json`; they remain fixtures, not a live model answer or audible output.
 - Separate unmocked live capability probe confirms the voice UI, secure context and native API exposure; this headless device has no installed synthesis voices. Public real `/api/status` reports model/queue configured and `authenticated:false`. No authentication bypass or credentials entered.
 - PR #347 remains draft/open/unmerged. No production deployment performed.
+
+## Passwordless figure update
+
+The figure no longer requires the login described in the initial voice release above. Anonymous visitors can use the microphone, voice test and message composer directly, through a separate public model route with no access to private owner history/files/Agents. Real anonymous model conversation was verified through the actual live browser. See [passwordless implementation and live proof](n7-apex-passwordless.md). Existing authenticated owner sessions remain supported.
