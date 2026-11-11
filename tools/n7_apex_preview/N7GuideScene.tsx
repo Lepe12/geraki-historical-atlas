@@ -16,7 +16,7 @@ export default function N7GuideScene(props:GuideSceneProps){
   useEffect(()=>{config.current=props;},[props]);
   useEffect(()=>{
     const host=hostRef.current;if(!host)return;
-    let disposed=false,raf=0,target=0,current=0,last=0,lastStats=0;
+    let disposed=false,raf=0,target=0,current=0,targetPitch=0,currentPitch=0,last=0,lastStats=0;
     let surface:ReturnType<typeof createHeadSurface>|undefined;
     let mode:GuideMode|null=null,replay=-1,assemblyStart:number|null=null,completed=false,shockStart:number|null=null,breathStart=0;
     let baseMood=0,lastMood:GuideMood="idle",lastEffects=true,lastReduced=false;
@@ -25,7 +25,7 @@ export default function N7GuideScene(props:GuideSceneProps){
     Object.assign(reference.style,{width:"100%",height:"100%",display:"none"});
     const ctx=reference.getContext("2d",{willReadFrequently:true});if(!ctx)return;
     host.replaceChildren(reference);
-    const clearTarget=()=>{target=0;host.dataset.headTarget="0.000";};
+    const clearTarget=()=>{target=0;targetPitch=0;host.dataset.headTarget="0.000";host.dataset.headPitchTarget="0.000";};
     const pointer=(event:PointerEvent)=>{
       const c=config.current;
       if(event.target instanceof Element&&event.target.closest("button,input,select,textarea,a"))return;
@@ -33,7 +33,11 @@ export default function N7GuideScene(props:GuideSceneProps){
       const r=host.getBoundingClientRect();if(!r.width)return;
       target=Math.max(-1,Math.min(1,(event.clientX-r.left-r.width/2)/(r.width*.42)));
       if(Math.abs(target)<.1)target=0;
+      const rawPitch=(r.top+r.height/2-event.clientY)/(r.height*.42);
+      targetPitch=Math.max(-1,Math.min(1,rawPitch));
+      if(Math.abs(targetPitch)<.10)targetPitch=0;
       host.dataset.headTarget=target.toFixed(3);
+      host.dataset.headPitchTarget=targetPitch.toFixed(3);
     };
     window.addEventListener("pointermove",pointer,{passive:true});window.addEventListener("blur",clearTarget);document.addEventListener("mouseleave",clearTarget);
     const image=new Image();image.decoding="async";
@@ -43,7 +47,7 @@ export default function N7GuideScene(props:GuideSceneProps){
       try{surface=createHeadSurface(reference);}catch(e){host.dataset.renderError=String(e);reference.style.display="block";return;}
       Object.assign(surface.canvas.style,{width:"100%",height:"100%",display:"none"});host.append(surface.canvas);
       host.dataset.renderer="shared-edge-texture-mesh";host.dataset.engine="three-shared-scene";
-      host.dataset.referenceReady="true";host.dataset.headTarget="0.000";
+      host.dataset.referenceReady="true";host.dataset.headTarget="0.000";host.dataset.headPitchTarget="0.000";
       const draw=(now:number)=>{
         if(disposed)return;
         const c=config.current,rawDt=last?now-last:16.67,dt=Math.min(100,rawDt);last=now;
@@ -51,14 +55,14 @@ export default function N7GuideScene(props:GuideSceneProps){
         const previousMode=mode;
         if(mode!==c.mode||replay!==c.replay){
           mode=c.mode;replay=c.replay;shockStart=null;
-          if(mode==="assembly"){assemblyStart=now;breathStart=now;completed=false;clearTarget();current=0;}
+          if(mode==="assembly"){assemblyStart=now;breathStart=now;completed=false;clearTarget();current=0;currentPitch=0;}
           else{if(!completed||previousMode===null||previousMode==="original")breathStart=now;assemblyStart=null;completed=true;
             if(replay!==-1){baseMood=moods.indexOf(c.mood);lastMood=c.mood;transitions=[];}
           }
           if(previousMode==="assembly"&&mode!=="assembly")host.dataset.cancelledAssembly="true";
         }
         if(!c.effects||lastEffects!==c.effects){
-          shockStart=null;breathStart=now;clearTarget();current=0;
+          shockStart=null;breathStart=now;clearTarget();current=0;currentPitch=0;
           if(!c.effects){baseMood=0;transitions=[];}
         }
         lastEffects=c.effects;
@@ -68,9 +72,11 @@ export default function N7GuideScene(props:GuideSceneProps){
         if(mode==="assembly"&&progress>=1&&!completed){
           completed=true;breathStart=now;shockStart=c.effects&&!c.reduced?now:null;c.onComplete();
         }
-        if(!c.effects||c.reduced){shockStart=null;clearTarget();current=0;if(c.reduced){baseMood=moods.indexOf(c.effects?c.mood:"idle");transitions=[];}}
-        if(mode==="original"){clearTarget();current=0;}
-        current+=(target-current)*(1-Math.exp(-dt/42));if(Math.abs(target-current)<.0001)current=target;
+        if(!c.effects||c.reduced){shockStart=null;clearTarget();current=0;currentPitch=0;if(c.reduced){baseMood=moods.indexOf(c.effects?c.mood:"idle");transitions=[];}}
+        if(mode==="original"){clearTarget();current=0;currentPitch=0;}
+        const follow=1-Math.exp(-dt/42);
+        current+=(target-current)*follow;if(Math.abs(target-current)<.0001)current=target;
+        currentPitch+=(targetPitch-currentPitch)*follow;if(Math.abs(targetPitch-currentPitch)<.0001)currentPitch=targetPitch;
         const desired=c.effects?c.mood:"idle";
         if(desired!==lastMood){
           if(!c.effects||c.reduced){baseMood=moods.indexOf(desired);transitions=[];}
@@ -90,15 +96,15 @@ export default function N7GuideScene(props:GuideSceneProps){
         if(shock>1)shockStart=null;
         const wave=shock>=0&&shock<=1?shock:-1;
         const ignition=c.effects&&!c.reduced?(progress<1?Math.max(0,(progress-.91)/.09):wave>=0?Math.max(0,1-wave*3):0):0;
-        const exact=mode==="original"||!c.effects||progress===1&&current===0&&breath===0&&baseMood===0&&!transitions.length&&ignition===0;
+        const exact=mode==="original"||!c.effects||progress===1&&current===0&&currentPitch===0&&breath===0&&baseMood===0&&!transitions.length&&ignition===0;
         const start=performance.now();
         if(exact){surface!.canvas.style.display="none";reference.style.display="block";}
         else{
           reference.style.display="none";surface!.canvas.style.display="block";
-          surface!.render({turn:current,breath,assembly:progress,baseMood,states:transitions.map(t=>t.mood),ages:transitions.map(t=>Math.min(1,(now-t.start)/1000)),ignition,time:c.reduced?0:now/1000});
+          surface!.render({turn:current,pitch:currentPitch,breath,assembly:progress,baseMood,states:transitions.map(t=>t.mood),ages:transitions.map(t=>Math.min(1,(now-t.start)/1000)),ignition,time:c.reduced?0:now/1000});
         }
         const renderMs=performance.now()-start;
-        host.dataset.currentTurn=current.toFixed(4);host.dataset.assemblyProgress=progress.toFixed(4);
+        host.dataset.currentTurn=current.toFixed(4);host.dataset.currentPitch=currentPitch.toFixed(4);host.dataset.assemblyProgress=progress.toFixed(4);
         host.dataset.breath=breath.toFixed(4);host.dataset.shock=wave.toFixed(4);
         host.dataset.referenceVisible=String(exact);host.dataset.mood=desired;
         if(c.diagnostics){host.dataset.renderMs=renderMs.toFixed(3);host.dataset.frameMs=rawDt.toFixed(3);host.dataset.moodRadius=String(transitions.length?Math.min(1,(now-transitions.at(-1)!.start)/1000)*430:430);}
