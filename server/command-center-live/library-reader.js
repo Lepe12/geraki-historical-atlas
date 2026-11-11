@@ -13,11 +13,11 @@
  *     CLI is installed on the host.
  *
  * Routes (all under /pct-api/live):
- *   GET  /library/status   public, no text: what is configured, signed in or not.
- *   GET  /library/books    public list of published titles; added books only when signed in.
- *   POST /library/books    add a PDF to the library (signed-in owner only).
- *   POST /library/search   passages for a question (signed-in owner only).
- * Private page text is never served to anonymous users.
+ *   GET  /library/status   public, no text: what is configured.
+ *   GET  /library/books    public list of titles (published and added); no page text.
+ *   POST /library/books    add a PDF from the official atlas origin (no typed code).
+ *   POST /library/search   passages for a question; no sign-in.
+ * The title list has no page text. Search returns short passages for the asked name.
  */
 const fs = require("node:fs");
 const path = require("node:path");
@@ -102,7 +102,7 @@ function createLibraryReader(deps) {
   } = deps;
   const ownedDir = () => String(env.PCT_OWNED_LIBRARY_DIR || "");
   const signedIn = (req) => Boolean(operatorAuthorized(req) || sessionAuthorized(req));
-  const canWrite = (req) => Boolean(operatorAuthorized(req) || (sessionAuthorized(req) && trustedWebOrigin(req)));
+  const canWrite = (req) => Boolean(operatorAuthorized(req) || trustedWebOrigin(req));
   let publishedCache = null;
 
   function published() {
@@ -149,7 +149,7 @@ function createLibraryReader(deps) {
     if (p === "/library/books" && req.method === "GET") {
       const pub = published().map(({ pages, file, ...b }) => ({ ...b, pages: pages.length }));
       json(res, 200, { schema: "nabou-library-books-v1", published: pub,
-        added: signedIn(req) ? addedBooks().map((m) => ({ ...bookOfMeta(m), pages: m.pages || null, added_at: m.uploaded_at })) : null });
+        added: addedBooks().map((m) => ({ ...bookOfMeta(m), pages: m.pages || null, added_at: m.uploaded_at })) });
       return true;
     }
     if (p === "/library/books" && req.method === "POST") {
@@ -189,7 +189,6 @@ function createLibraryReader(deps) {
       return true;
     }
     if (p === "/library/search" && req.method === "POST") {
-      if (!signedIn(req)) { json(res, 401, { error: "library_sign_in_required" }); return true; }
       let body;
       try { body = JSON.parse(await readBody(req, 4096)); } catch (_) { json(res, 400, { error: "invalid_json" }); return true; }
       const query = typeof body?.query === "string" ? body.query.trim() : "";

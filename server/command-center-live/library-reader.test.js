@@ -9,7 +9,7 @@ const { Readable } = require("node:stream");
 const { createLibraryReader, publishedPages, pagePassages } = require("./library-reader");
 const { fromReviewedKnowledge } = require("./historical-evidence");
 
-function harness({ signed = true, owned = true } = {}) {
+function harness({ signed = true, owned = true, trusted = true } = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "nabou-lib-"));
   const uploads = path.join(dir, "uploads"); fs.mkdirSync(uploads);
   const ownedDir = path.join(dir, "owned"); fs.mkdirSync(ownedDir);
@@ -25,7 +25,7 @@ function harness({ signed = true, owned = true } = {}) {
     readRawBody: async (req) => req.raw,
     sessionAuthorized: () => signed,
     operatorAuthorized: () => false,
-    trustedWebOrigin: () => true,
+    trustedWebOrigin: () => trusted,
     readKnowledgeIndex: () => JSON.parse(JSON.stringify(index)),
     writeKnowledgeIndex: (v) => { index = v; },
     knowledgeRecordPath: (id) => path.join(dir, id + ".json"),
@@ -52,17 +52,27 @@ test("published .txt pages keep the printed page number", () => {
   assert.equal(pagePassages("short").length, 0);
 });
 
-test("anonymous readers get no page text, only the published titles", async () => {
-  const h = harness({ signed: false });
+test("research searches published sources without a sign-in code; other origins cannot add a PDF", async () => {
+  const h = harness({ signed: false, trusted: false });
   const s = await h.call("POST", "/library/search", { body: { query: "Πέτρος Λάντζας" } });
-  assert.equal(s.status, 401);
+  assert.equal(s.status, 200);
+  assert.ok(s.body.hits.length >= 2, "published passages are searchable without a code");
+  assert.ok(s.body.hits.some((x) => /διοικητής|Parga|Lanza|Λάντζ/.test(x.text)));
   const b = await h.call("GET", "/library/books");
   assert.equal(b.status, 200);
   assert.equal(b.body.published.length, 2);
-  assert.equal(b.body.added, null);
-  assert.ok(!JSON.stringify(b.body).includes("διοικητής"), "no page text in the public list");
+  assert.ok(Array.isArray(b.body.added));
+  assert.ok(!JSON.stringify(b.body).includes("διοικητής"), "no page text in the title list");
   const up = await h.call("POST", "/library/books", { raw: Buffer.from("%PDF-1.4"), headers: { "content-type": "application/pdf" } });
   assert.equal(up.status, 401);
+});
+
+test("a PDF can be added from the official atlas origin, with no typed code", async () => {
+  const h = harness({ signed: false, trusted: true });
+  const up = await h.call("POST", "/library/books", { raw: Buffer.from("%PDF-1.4 fake"), headers: {
+    "content-type": "application/pdf", "x-file-name": encodeURIComponent("atlas.pdf"),
+    "x-book-title": encodeURIComponent("Δοκιμαστικό βιβλίο") } });
+  assert.equal(up.status, 201);
 });
 
 test("adding a PDF puts it in the library with no approve/reject step, and the next search finds it", async () => {
