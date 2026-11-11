@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import argparse, pathlib, shutil, subprocess, base64, hashlib
+import argparse, pathlib, shutil, subprocess, base64, hashlib, os
 
 UPSTREAM="https://github.com/RubenM1990/APEX-UI.git"
 COMMIT="a8732fad1078a809cadfa810cb0d89cf4445dbed"
@@ -128,6 +128,7 @@ def main():
     ap.add_argument("--out",required=True)
     args=ap.parse_args()
     out=pathlib.Path(args.out).resolve()
+    base_path=os.getenv("N7_APEX_BASE_PATH","/n7-apex").rstrip("/") or "/n7-apex"
     if out.exists(): shutil.rmtree(out)
     out.mkdir(parents=True)
     run("git","init",str(out))
@@ -191,13 +192,13 @@ def main():
       (out/"components/ApexWorld.tsx").write_text(txt.replace(old,new))
     txt=(out/"components/ReasoningWeb.jsx").read_text().replace("lab.textContent = 'Apex'","lab.textContent = 'N7'").replace('aria-label="Apex reasoning web"','aria-label="N7 reasoning web"')
     (out/"components/ReasoningWeb.jsx").write_text(txt)
-    txt=(out/"components/ApexOverviewPanel.tsx").read_text().replace('fetch("/api/weather")','fetch("/n7-apex/api/weather/")')
+    txt=(out/"components/ApexOverviewPanel.tsx").read_text().replace('fetch("/api/weather")',f'fetch("{base_path}/api/weather/")')
     (out/"components/ApexOverviewPanel.tsx").write_text(txt)
     (out/"app/api/weather/route.ts").write_text('''import { NextResponse } from "next/server";
 export const dynamic = "force-static";
 export function GET(){ return NextResponse.json({current:null,city:"Athens"}); }
 ''')
-    (out/"next.config.mjs").write_text('''const nextConfig={output:"export",trailingSlash:true,basePath:"/n7-apex",assetPrefix:"/n7-apex",images:{unoptimized:true}}; export default nextConfig;
+    (out/"next.config.mjs").write_text(f'''const nextConfig={{output:"export",trailingSlash:true,basePath:"{base_path}",assetPrefix:"{base_path}",images:{{unoptimized:true}}}}; export default nextConfig;
 ''')
     print("N7_APEX_SOURCE_READY="+head)
 
