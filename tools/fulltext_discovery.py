@@ -416,7 +416,8 @@ def run(root,request,ctx,lane='travellers',ia_enabled=True):
     out=root/'fulltext_discovery';out.mkdir(exist_ok=True)
     path=root/'lane_discovery'/f'{lane}.json'
     discovery=json.loads(path.read_text()) if path.exists() else {'results':[],'attempts':[]}
-    focus=decompose(ctx['target'],ctx.get('aliases',[]),ctx.get('purpose',''))
+    from research_focus import request_focus
+    focus=request_focus({**ctx,'target_context':(request or {}).get('target_context')})
     from question_scope import queries as scope_queries
     focus['request_scope_queries']=scope_queries(request)
     terms=search_terms(focus);places=context_terms(focus);records=[];attempts=[]

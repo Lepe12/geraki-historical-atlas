@@ -52,8 +52,8 @@ def configuration():
     return {'configured':not missing,'missing':sorted(set(missing))}
 
 def person_passage_hold_reason(text,title,request,uncertainties,bibliography=None,years_in_scope=None):
-    from research_focus import fold,name_pattern,decompose
-    focus=decompose(request.get('target',''),request.get('aliases',[]))
+    from research_focus import fold,name_pattern,request_focus
+    focus=request_focus(request)
     if focus.get('kind')!='person':return None
     literal_target=bool(re.search(name_pattern(fold(request['target']).split()),fold(text)))
     folded=fold(text)
@@ -112,7 +112,7 @@ def collect(run_root, provenance_root=None):
                 excluded.append({'finding_id':f.get('finding_id'),'reason':'CATALOGUE_METADATA_NOT_CONSULTED_DOCUMENT_TEXT'});continue
             # Recheck historical exports without rewriting their indexed evidence.
             from research_relevance import later_namesake_requires_review
-            from research_focus import decompose
+            from research_focus import request_focus
             req=read(p.parent.parent/'run_manifest/manifest.json',{}).get('normalized_request') or {}
             metadata=f.get('source_bibliography') or source_by_file.get(Path(str(f.get('file') or '')).name,{})
             from historical_source_admissibility import hold_reason
@@ -123,7 +123,7 @@ def collect(run_root, provenance_root=None):
             if hold:
                 excluded.append({'finding_id':f.get('finding_id'),'reason':hold});continue
             scope=[int(y) for y in re.findall(r'\b1\d{3}\b',req.get('date_range',''))]
-            if req.get('target') and not (scope and min(scope)>=1750) and later_namesake_requires_review(raw,decompose(req['target'],req.get('aliases',[]))):
+            if req.get('target') and not (scope and min(scope)>=1750) and later_namesake_requires_review(raw,request_focus(req)):
                 excluded.append({'finding_id':f.get('finding_id'),'reason':'LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW'});continue
             loc=f.get('locator') or {}
             if not raw or not f.get('url') or not loc:
@@ -197,7 +197,8 @@ def collect(run_root, provenance_root=None):
     # In-scope passages first, then useful unresolved context. Nothing is erased
     # from lane evidence; bounded model coverage is recorded explicitly.
     from research_topics import BASES,PIRACY,normalized,strong_region_matches
-    focus=decompose(req.get('target',''),req.get('aliases',[])) if seen else {}
+    from research_focus import request_focus
+    focus=request_focus(req) if seen else {}
     requested_years=[int(y) for y in re.findall(r'\b\d{4}\b',req.get('date_range',''))] if seen else []
     century=(sum(requested_years)//len(requested_years)-1)//100+1 if requested_years else None
     priorities={}
@@ -1155,13 +1156,13 @@ def extraction_request(group, question, question_kind):
 
 
 def _execute(run_root, question, caller=call, config=None, output_root=None, provenance_root=None,resume_reviewed_from=None,resume_private_proposals_from=None):
-    from research_focus import decompose
+    from research_focus import request_focus
     all_records,excluded=collect(run_root,provenance_root)
     request={}
     for manifest in sorted(Path(run_root).glob('*/run_manifest/manifest.json')):
         request=read(manifest).get('normalized_request') or {}
         if request:break
-    question_kind=decompose(request.get('target',''),request.get('aliases',[])).get('kind') if request else None
+    question_kind=request_focus(request).get('kind') if request else None
     if resume_reviewed_from and resume_private_proposals_from:
         raise ValueError('MUTUALLY_EXCLUSIVE_PRIVATE_REVIEW_AND_REVIEWED_RESUME')
     previous_private=None

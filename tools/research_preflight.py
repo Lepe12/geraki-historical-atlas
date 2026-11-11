@@ -5,7 +5,7 @@ from research_execution_policy import from_environment
 from research_stage import record
 from request_context import load_request
 from request_identity import write_identity
-from orchestrator.research_query import split_research_query
+from orchestrator.research_query import extract_research_focus
 
 INSTRUCTION=re.compile(r'^(?:investigate|assess|determine whether|identify a|evaluate a|given a|reconcile|resolve a|research a|for a contested)\b',re.I)
 
@@ -17,6 +17,25 @@ def validate_question(req):
         raise ValueError('BLOCKED_INPUT_INSTRUCTION_USED_AS_TARGET')
     if not question:raise ValueError('BLOCKED_INPUT_QUESTION_REQUIRED')
     return req
+
+
+def focus_context(extracted,supplied=None):
+    """Request-level kind for an extracted focus; explicit target_context wins.
+
+    A role around the name (κουρσάρος, pirate) makes it a person; «το νησί …»
+    makes it a place. Gazetteer variants are deliberately not used here: they
+    must never change the request identity hash. A bare name stays 'unknown',
+    which every later stage already treats as a place. Search constraints,
+    not historical facts.
+    """
+    supplied=dict(supplied or {}) if isinstance(supplied,dict) else {}
+    if supplied.get('type'):return None
+    kind=extracted.get('kind_hint')
+    if not kind:return None
+    out={**supplied,'type':kind,'type_basis':'EXTRACTED_FROM_QUESTION'}
+    if extracted.get('role_terms'):out['role_terms']=list(extracted['role_terms'])
+    out.setdefault('region_terms',[])
+    return out
 
 
 def validate_case(case):
@@ -32,7 +51,11 @@ def prepare(require_semantic=False,case_id='',case_file='config/research-baselin
     policy=from_environment();record('execution_receipts','prepare','policy','SUCCEEDED',policy=policy)
     _,req,ctx=load_request()
     require_semantic=require_semantic or req.get('require_semantic_analysis') is True
-    target,dates,purpose=split_research_query(ctx['target'],ctx['date_range'],ctx['purpose'])
+    # Search for the thing asked about, not the instruction around it:
+    # «Βρες στοιχεία για Κρεβελιέ τον κουρσάρο» -> target «Κρεβελιέ» (person),
+    # «ψάξε για την Κίμωλο» -> «Κίμωλο». The full question stays in purpose.
+    extracted=extract_research_focus(ctx['target'],ctx['date_range'],ctx['purpose'])
+    target,dates,purpose=extracted['target'],extracted['date_range'],extracted['purpose']
     normalized={**req,'target':target,'aliases':ctx['aliases'],'date_range':dates,'purpose':purpose}
     validate_question(normalized)
     if os.getenv('PCT_SEMANTIC_QUERY_EXPANSION')=='1':
@@ -55,6 +78,10 @@ def prepare(require_semantic=False,case_id='',case_file='config/research-baselin
     variants=search_name_variants(target,ctx['aliases'])
     normalized['search_name_variants']=[v['name'] for v in variants]
     normalized['search_name_variant_basis']=variants
+    hint=focus_context(extracted,normalized.get('target_context'))
+    if hint:
+        normalized['target_context']=hint
+        normalized['research_focus_extraction']={k:extracted[k] for k in ('original_question','instruction_removed','kind_hint','role_terms')}
     Path('resolved_research_request.json').write_text(json.dumps(normalized,ensure_ascii=False,indent=2)+'\n')
     os.environ['PCT_TARGET']='';os.environ['PCT_REQUEST_FILE']='resolved_research_request.json'
     identity=write_identity()

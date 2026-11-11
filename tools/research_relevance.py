@@ -29,13 +29,14 @@ def identity(req, ctx):
     # place for relevance; the request's own aliases stay first.
     extra = [v for v in (req.get('search_name_variants') or []) if isinstance(v, str)]
     aliases = list(dict.fromkeys([*ctx.get('aliases', []), *[v for v in extra if v != ctx['target']]]))
-    focus=decompose(ctx['target'],aliases,ctx.get('purpose',''),kind,regions)
+    roles = [r for r in (supplied.get('role_terms') or []) if isinstance(r, str)]
+    focus=decompose(ctx['target'],aliases,ctx.get('purpose',''),kind,regions,roles)
     return {'target': ctx['target'], 'aliases': aliases, 'type': focus['kind'], 'focus':focus,
             'region_terms': regions, 'date_range': ctx.get('date_range', ''), 'purpose': ctx.get('purpose', ''),
             'rule': 'User-supplied geographic context is a search constraint, not source evidence.'}
 
 
-HISTORY = re.compile(r'(?<!\w)(?:voyag|travel|reise|viaggio|relation\b|itinerar|geograph|histor|histoire|storia|chronicle|memoir|περιηγ|ιστορι|ναυτι|navigation|diplomat|consul|pirat|corsair|corsar|ransom|captiv|portolan)')
+HISTORY = re.compile(r'(?<!\w)(?:voyag|travel|reise|viaggio|relation\b|itinerar|geograph|histor|histoire|storia|chronicle|memoir|περιηγ|ιστορι|ναυτι|navigation|diplomat|consul|pirat|corsair|corsar|ransom|captiv|portolan|πειρατ|κουρσαρ|κορσαρ|καταδρομ)')
 GEO = re.compile(r'\bisland\b|\bisle\b|\bisola\b|\binsel\b|νησ|cyclad|aegean|egee|archipel|greece|grece|grecia|ελλα|harbour|harbor')
 OFF_TOPIC = re.compile(r'(?<!\w)(?:respirat|toxicolog|epidemiolog|mortality|morbidity|hadronic|butterflies|moths|soundtrack|milkshake schedule|cia reading room|proceedings of.*physics)')
 NOISE = re.compile(r'quintet|symphon|zeitschrift.{0,12}musik|musical|coleoptera|scolytinae|favorites$|\bpodcast\b|\blivestream\b|\btv\b|\byoutube\b')
@@ -200,8 +201,13 @@ def later_namesake_requires_review(text, focus):
     folded=fold(text)
     for name in greek:
         words=name.split()
-        if len(words)>=2 and re.search(name_pattern(words), folded):
+        if len(words)>=1 and re.search(name_pattern([fold(w) for w in words]), folded):
             return False
+    # A modern study about a 17th-century corsair («17th Century», «17ος
+    # αιώνας», «XVII siècle») is not a later namesake just because it was
+    # published in 2023.
+    if re.search(r'(?<!\d)1[0-7](?:th|st|nd|rd|ος|ου|ο)?\s*(?:-\s*)?(?:century|siecle|secolo|siglo|jahrhundert|αι(?:ωνα|ων|ωνασ|\.))|\b(?:xi|xii|xiii|xiv|xv|xvi|xvii)(?:e|eme)?\s*(?:siecle|secolo|siglo|century)', folded):
+        return False
     years=contextual_years(text)
     # An OCR error such as 1370 beside an explicitly modern corporate record
     # cannot establish a Renaissance identity. Keep the record for review.
@@ -209,6 +215,14 @@ def later_namesake_requires_review(text, focus):
     if corporate and any(1900<=year<=2099 for year in years):
         return True
     return bool(years) and any(1750<=year<=2099 for year in years) and not any(year<=1700 for year in years)
+
+
+def transliterated_subject(topical, history):
+    """A mechanical spelling of the requested name in the subject fields, or
+    in an excerpt with historical/piracy context, is worth reading."""
+    if topical.get('reason')!='TRANSLITERATION_REQUIRES_IDENTITY_REVIEW':
+        return False
+    return topical.get('matched_field') in ('title','description','subject') or bool(history)
 
 
 def assess(record, ident):
@@ -269,7 +283,15 @@ def assess(record, ident):
     # Generic maritime/history vocabulary is useful context, not an answer about
     # a named person. Keep every discovery but prevent it outranking name hits.
     if focus['kind']=='person':
-        if topical['category']=='POSSIBLE_TARGET':
+        if topical['category']=='POSSIBLE_TARGET' and transliterated_subject(topical,history):
+            # «Creveliers» for a request about «Κρεβελιέ τον κουρσάρο»: read the
+            # source (acquisition), never treat the spelling as verified identity.
+            if OFF_TOPIC.search(title) or (NOISE.search(title) and not (geographic and history)):
+                status='REVIEW_REQUIRED';reasons.append('SURNAME_CONTEXT_REQUIRES_IDENTITY_REVIEW')
+            else:
+                status='PRIORITY';research_score=max(research_score,60)
+                reasons.append('TRANSLITERATED_SUBJECT_NAME_ACQUISITION_NOT_VERIFICATION')
+        elif topical['category']=='POSSIBLE_TARGET':
             status='REVIEW_REQUIRED';research_score=min(65,max(45,research_score));reasons.append('SURNAME_CONTEXT_REQUIRES_IDENTITY_REVIEW')
         elif not name_match:
             status='EXCLUDE_FROM_ACQUISITION';research_score=min(research_score,20)

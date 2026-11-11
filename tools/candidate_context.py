@@ -2,7 +2,7 @@
 import json
 import re
 from itertools import product
-from research_focus import decompose,fold
+from research_focus import decompose,fold,find_term_spans
 
 POLICY = 'pct-event-context-v2'
 STRONG = re.compile(r'(?<!\w)(?:corsair\w*|corsaire\w*|corsar\w*|pirat\w*|forban\w*|privateer\w*|zeerover\w*|seer[aä]uber\w*|κουρσάρ\w*|πειρατ\w*|ransom\w*|ran[cç]on\w*|riscatt\w*|fidye\w*|captiv\w*|esclav\w*|schiav\w*|slaves?|slavery|αιχμαλωσ\w*|λύτρ\w*|pillage\w*|plunder\w*|λεηλασ\w*)(?!\w)', re.I)
@@ -11,6 +11,15 @@ MARITIME = re.compile(r'(?<!\w)(?:ships?|vessels?|galleys?|gal[eè]r\w*|galera\w
 GEOGRAPHY = re.compile(r'(?<!\w)(?:islands?|isles?|[iî]les?|insel\w*|isola|isole|islas?|ports?|porto|porti|puertos?|harbou?rs?|coasts?|villages?|towns?|cities|city|adalar?|liman\w*|νησί\w*|νήσο\w*|λιμάνι\w*|λιμέν\w*|en|dans|at|near|off|sur|στη|στην|στο|στον)(?!\w)', re.I)
 CULTURAL = re.compile(r'(?<!\w)(?:librett\w*|operas?|drama per musica|zeitschrift f[uü]r musik|imperial painting|slavische rhapsodie)(?!\w)', re.I)
 ROLE = re.compile(r'\b(?:born|birth|died|published|publication|edition|né|née|geboren|gestorben|έκδοση|γεννήθηκε)\b', re.I)
+
+
+class _Span:
+    """Minimal match object over the original text."""
+    def __init__(self, text, a, b):
+        self._text, self._a, self._b = text, a, b
+    def start(self): return self._a
+    def end(self): return self._b
+    def group(self, index=0): return self._text[self._a:self._b]
 
 
 def variants(target, aliases):
@@ -36,7 +45,9 @@ def assess(text, terms, lo=0, hi=9999, target_kind="place"):
     """Keep place/action/year linked locally, preserving unresolved leads."""
     output = []
     for term in terms:
-        for place in re.finditer(r'(?<!\w)' + re.escape(term) + r'(?!\w)', text, re.I):
+        # Accent/case-insensitive and inflection-tolerant for one-word Greek
+        # names (a request typed «Κρεβελιε» must find «Κρεβελιέ»).
+        for place in (_Span(text, a, b) for a, b in find_term_spans(term, text)):
             start, end = max(0, place.start()-300), min(len(text), place.end()+300)
             previous=list(re.finditer(r'\n\s*\n',text[start:place.start()]))
             if previous: start+=previous[-1].end()
