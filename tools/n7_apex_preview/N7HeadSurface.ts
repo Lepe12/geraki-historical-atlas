@@ -53,7 +53,7 @@ export function createHeadSurface(image:HTMLCanvasElement) {
       float cy=cos(yaw),sy=sin(yaw),cp=cos(nod),sp=sin(nod);
       // The neck remains the pivot; the entire face, chin and hair share
       // this exact rotation matrix in the skull interior.
-      vec3 q=vec3(source.x-160.,source.y-154.,depth);
+      vec3 q=vec3(source.x-160.,source.y-196.,depth);
       vec3 yawed=vec3(q.x*cy+q.z*sy,q.y,-q.x*sy+q.z*cy);
       vec3 rotated=vec3(yawed.x,yawed.y*cp-yawed.z*sp,yawed.y*sp+yawed.z*cp);
       vec2 p=source+head*(rotated.xy-q.xy);
