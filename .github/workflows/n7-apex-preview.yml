@@ -17,7 +17,7 @@ permissions:
   contents: read
 concurrency:
   group: n7-apex-preview-${{ github.event_name }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name != 'push' }}
 jobs:
   validate:
     environment: nabou-production
@@ -42,6 +42,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Verify passwordless public chat isolation and deployment patch
+        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        run: |
+          node --test tools/n7_apex_preview/test_public_chat.cjs
+          python3 tools/n7_apex_preview/test_deploy_public_chat.py
+          python3 tools/n7_apex_preview/deploy_public_chat.py
       - name: Reconstruct exact upstream APEX source with reviewed N7 overlay
         run: python3 tools/n7_apex_preview/build_apex_preview.py --out "$RUNNER_TEMP/n7-apex-src"
       - name: Build static /n7-apex export
@@ -230,6 +236,13 @@ jobs:
             await b.close();
           })().catch(e=>{console.error(e);process.exit(1)});
           NODE
+      - name: Verify unauthenticated figure conversation without password fields
+        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        env:
+          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
+          N7_VISUAL_URL: http://127.0.0.1:4173/n7-apex-step5/
+          N7_PASSWORDLESS_OUT: ${{ runner.temp }}/n7-apex-evidence/passwordless
+        run: node tools/n7_apex_preview/test_passwordless.cjs
       - name: Verify microphone and spoken reply lifecycle
         if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
         env:
@@ -300,6 +313,9 @@ jobs:
           cd "$RUNNER_TEMP/n7-apex-src"
           npm ci
           npm run build
+      - name: Install passwordless figure chat without changing owner authentication
+        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        run: python3 tools/n7_apex_preview/deploy_public_chat.py
       - name: Install isolated /n7-apex preview and verify live
         env:
           N7_APEX_OUT: ${{ runner.temp }}/n7-apex-src/out

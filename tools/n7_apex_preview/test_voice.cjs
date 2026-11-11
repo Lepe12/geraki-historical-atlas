@@ -12,7 +12,7 @@ const url=process.env.N7_VISUAL_URL||'http://127.0.0.1:4177/n7-apex-step5/',out=
    Object.defineProperty(window,'speechSynthesis',{value:{getVoices:()=>[{voiceURI:'fixture-el',name:'Fixture Greek',lang:'el-GR'}],addEventListener(){},removeEventListener(){},speak(u){window.__voiceFixture.utterances.push(u);window.__voiceFixture.current=u;},cancel(){window.__voiceFixture.cancelled++;}},configurable:true});
  });
  const waitRelease=async()=>{const until=Date.now()+10000;while(!release&&Date.now()<until)await p.waitForTimeout(20);assert(release,'Chat POST never reached fixture');};
- let authenticated=false,messages=[],queued=false,poll=0,posts=0,fail=false,release;
+ let authenticated=true,messages=[],queued=false,poll=0,posts=0,fail=false,release;
  await p.route('**/api/**',async route=>{const req=route.request(),pathname=new URL(req.url()).pathname;let data={},status=200;
    if(pathname==='/api/status')data={authenticated};
    else if(pathname==='/api/login'){if(req.postDataJSON().password==='fixture-only-not-a-secret'){authenticated=true;data={ok:true};}else{status=401;data={error:'Λάθος κωδικός.'};}}
@@ -26,8 +26,7 @@ const url=process.env.N7_VISUAL_URL||'http://127.0.0.1:4177/n7-apex-step5/',out=
  });
  await p.goto(url,{waitUntil:'networkidle'});const dialog=p.getByRole('dialog',{name:'N7 Humanoid preview'});
  await dialog.getByRole('button',{name:'Φωνητική συνομιλία',exact:true}).click({timeout:5000});
- await dialog.getByLabel('Κωδικός N7',{exact:true}).fill('wrong-fixture');await dialog.getByRole('button',{name:'Σύνδεση',exact:true}).click();await dialog.getByRole('alert').getByText('Λάθος κωδικός.',{exact:true}).waitFor();assert.equal(await dialog.getByLabel('Κωδικός N7',{exact:true}).inputValue(),'');
- await dialog.getByLabel('Κωδικός N7',{exact:true}).fill('fixture-only-not-a-secret');await dialog.getByRole('button',{name:'Σύνδεση',exact:true}).click();await dialog.getByRole('button',{name:'Μικρόφωνο',exact:true}).waitFor();
+ assert.equal(await dialog.locator('input[type=password]').count(),0);await dialog.getByRole('button',{name:'Μικρόφωνο',exact:true}).waitFor();
  const enableVoice=async()=>{const button=dialog.getByRole('button',{name:'Φωνή ανενεργή',exact:true});if(await button.isVisible())await button.click();};
  const mood=()=>dialog.getByLabel('N7 mood status');const count=()=>p.evaluate(()=>window.__voiceFixture.utterances.length);
  const skip=dialog.getByRole('button',{name:'Skip',exact:true});if(await skip.isVisible())await skip.click();
@@ -50,7 +49,7 @@ const url=process.env.N7_VISUAL_URL||'http://127.0.0.1:4177/n7-apex-step5/',out=
  await dialog.getByRole('button',{name:'Δοκιμή φωνής',exact:true}).click();await p.evaluate(()=>window.__voiceFixture.current.onstart());await dialog.getByText('MOOD · SPEAKING · LIVE N7 REQUEST',{exact:true}).waitFor();await dialog.getByRole('button',{name:'Exit',exact:true}).click();assert((await p.evaluate(()=>window.__voiceFixture.cancelled))>0);
  await p.getByRole('button',{name:'HUMANOID',exact:true}).click();await dialog.getByRole('button',{name:'Φωνή ανενεργή',exact:true}).waitFor();
  await p.setViewportSize({width:390,height:844});await p.screenshot({path:path.join(out,'mobile-voice.png')});const box=await dialog.getByLabel('Φωνητικό μήνυμα').boundingBox();assert(box.width>200&&box.x>=0&&box.x+box.width<=390,'Mobile composer overflow');
- assert.deepEqual(errors,[]);fs.writeFileSync(path.join(out,'fixture-results.json'),JSON.stringify({scope:'Local mocked N7 API and speech device events; not an actual model or audible audio test',login:true,passwordCleared:true,micRequiresGesture:true,transcriptRequiresConfirmation:true,listenStartEnd:true,playbackStartEnd:true,stopCancels:true,permissionDenied:true,queuedReplyRead:true,errorClearsActivity:true,exitCancels:true,mobile:true,errors},null,2));
+ assert.deepEqual(errors,[]);fs.writeFileSync(path.join(out,'fixture-results.json'),JSON.stringify({scope:'Local mocked N7 API and speech device events; not an actual model or audible audio test',existingSessionReused:true,passwordFieldAbsent:true,micRequiresGesture:true,transcriptRequiresConfirmation:true,listenStartEnd:true,playbackStartEnd:true,stopCancels:true,permissionDenied:true,queuedReplyRead:true,errorClearsActivity:true,exitCancels:true,mobile:true,errors},null,2));
  await p.close();
  // Read-only native capability and deployed UI probe. No auth bypass or mocked model.
  const real=await b.newPage();await real.goto(url,{waitUntil:'networkidle'});await real.getByRole('button',{name:'Φωνητική συνομιλία',exact:true}).click();

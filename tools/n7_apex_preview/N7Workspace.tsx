@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {createPortal} from "react-dom";
 import useN7Voice from "./useN7Voice";
+import {N7_HUMANOID_REFERENCE} from "./N7HumanoidReference";
 import type { OrbState } from "./ApexHeroOrb";
 
 type Msg = { role: string; content: string };
@@ -52,6 +53,8 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   const [tab, setTab] = useState<Tab>("chat");
   const [online, setOnline] = useState<boolean | null>(null);
   const [authenticated, setAuthenticated] = useState(false);
+  const guest=!authenticated&&N7_HUMANOID_REFERENCE.includes("/n7-apex-step5/");
+  const wasAuthenticated=useRef(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [conversationId, setConversationId] = useState("");
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -104,7 +107,8 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
     try {
       const s = await n7("/api/status");
       setOnline(true);
-      setAuthenticated(s.authenticated === true);
+      if(wasAuthenticated.current&&s.authenticated!==true){voiceRef.current.suspend();setMessages([]);setConversations([]);setTasks([]);setPendingJobs([]);setConversationId("");}
+      wasAuthenticated.current=s.authenticated===true;setAuthenticated(s.authenticated === true);
       if (s.authenticated === true) {
         const [c, t] = await Promise.all([n7("/api/conversations"), n7("/api/tasks")]);
         setConversations(Array.isArray(c.conversations) ? c.conversations as Conversation[] : []);
@@ -150,6 +154,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   }
   async function newConversation() {
     voice.stop();
+    if(guest){setMessages([]);setConversationId("");return "";}
     const d = await n7("/api/conversations", {});
     const id = String(d.id || "");
     if (!id) throw Error("N7 returned no conversation ID");
@@ -159,7 +164,17 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
     return id;
   }
   async function send() {
-    if (!message.trim() || busy || !authenticated) return;
+    if(!message.trim()||busy||(!authenticated&&!guest))return;
+    if(guest){
+      const prompt=message.trim();if(prompt.length>2000){setError("Γράψε έως 2.000 χαρακτήρες ανά μήνυμα.");return;}
+      const rows=[...messages.slice(-6),{role:"user",content:prompt}].map(m=>({role:m.role,content:m.content.slice(0,1500)}));
+      rows[rows.length-1].content=prompt;
+      voice.stop();setBusy(true);setError("");setMessages(previous=>[...previous,{role:"user",content:prompt}]);
+      try{const result=await n7("/api/n7-apex/chat",{messages:rows});if(typeof result.reply!=="string"||!result.reply.trim())throw Error("Το N7 δεν επέστρεψε απάντηση.");setMessages(previous=>[...previous,{role:"assistant",content:String(result.reply)}]);voiceRef.current.speak(result.reply);setMessage(current=>current.trim()===prompt?"":current);}
+      catch(e){setError(e instanceof Error?e.message:String(e));}
+      finally{setBusy(false);}
+      return;
+    }
     const prompt=message.trim();voice.stop();setBusy(true); setError(""); trace("orchestrator","memory","model_runtime");
     try {
       const id = conversationId || await newConversation();
@@ -214,7 +229,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
     <p style={{fontSize:12,margin:0}}>Ο ίδιος κωδικός που χρησιμοποιείς στο N7. Δεν χρειάζεται νέος λογαριασμός.</p>
   </form>;
   const voiceControls=<div aria-label="Φωνητική συνομιλία N7" style={{fontSize:12,lineHeight:1.45}}>
-    {!authenticated?<>{loginForm}<button type="button" style={buttonStyle} onClick={()=>void check()}>Επανέλεγχος σύνδεσης</button></>:<>
+    {!authenticated&&!guest?<>{loginForm}<button type="button" style={buttonStyle} onClick={()=>void check()}>Επανέλεγχος σύνδεσης</button></>:<>
       <div style={{display:"flex",gap:7,flexWrap:"wrap",alignItems:"center"}}>
         <button type="button" style={buttonStyle} onClick={voice.toggle} aria-pressed={voice.enabled} disabled={!voice.supported.output}>Φωνή {voice.enabled?"ενεργή":"ανενεργή"}</button>
         <button type="button" style={buttonStyle} onClick={voice.listen} disabled={busy||pendingJobs.some(j=>j.conversationId===conversationId)||!voice.supported.input}>Μικρόφωνο</button>
@@ -256,10 +271,10 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
         <header style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10}}>
           <strong style={{letterSpacing:3,color:"#65e8f5"}}>N7 CONTROL</strong>
           <span style={{fontSize:11,color:authenticated?"#68d4a1":"#efb58d"}}>
-            {authenticated ? "Συνδεδεμένο" : online ? "Απαιτείται σύνδεση N7" : "Μη διαθέσιμο"}
+            {guest?"Συνομιλία χωρίς κωδικό":authenticated ? "Συνδεδεμένο" : online ? "Απαιτείται σύνδεση N7" : "Μη διαθέσιμο"}
           </span>
         </header>
-        {!authenticated ? (
+        {!authenticated&&!guest ? (
           <div style={{marginTop:18,fontSize:13,lineHeight:1.6}}>
             {loginForm}
             <a href="/" target="_blank" rel="noopener noreferrer" style={{color:"#65e8f5",display:"block",marginBottom:12}}>Σύνδεση στο N7</a>
@@ -267,20 +282,20 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
           </div>
         ) : (
           <>
-            <nav aria-label="N7 operations" style={{display:"flex",gap:7,margin:"16px 0"}}>
+            {!guest&&<nav aria-label="N7 operations" style={{display:"flex",gap:7,margin:"16px 0"}}>
               {(["chat","tasks","research"] as const).map(t =>
                 <button key={t} type="button" style={{...buttonStyle,
                   background:tab===t?"#12516a":"#101c28",fontSize:12}}
                   onClick={() => setTab(t)}>{t==="chat"?"Συνομιλία":t==="tasks"?"Agents":"Έρευνα"}</button>)}
-            </nav>
-            {tab === "chat" && <div>
+            </nav>}
+            {(guest||tab === "chat") && <div>
               {!guideOpen&&voiceControls}
               {pendingJobs.some(j=>j.conversationId===conversationId)&&<p role="status" style={{fontSize:12}}>Αναμονή απάντησης N7. Μπορείς να συνεχίσεις τη συνομιλία.</p>}
-              <select aria-label="Conversation" style={inputStyle} value={conversationId}
+              {!guest&&<select aria-label="Conversation" style={inputStyle} value={conversationId}
                 onChange={e => void chooseConversation(e.target.value)}>
                 <option value="">Νέα συνομιλία</option>
                 {conversations.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
-              </select>
+              </select>}
               <div aria-live="polite" style={{height:240,overflow:"auto",padding:"10px 0",whiteSpace:"pre-wrap",fontSize:13}}>
                 {messages.length===0 && <p style={{opacity:.7}}>Δεν υπάρχουν μηνύματα σε αυτή τη συνομιλία.</p>}
                 {messages.map((m,i)=><article key={i} style={{marginBottom:12,
@@ -294,7 +309,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
               <button type="button" style={{...buttonStyle,marginTop:8}} disabled={busy||!message.trim()}
                 onClick={() => void send()}>{busy?"Εκτέλεση...":"Αποστολή"}</button>
             </div>}
-            {tab === "tasks" && <div>
+            {!guest&&tab === "tasks" && <div>
               <textarea aria-label="Εργασία agent" value={taskPrompt} onChange={e=>setTaskPrompt(e.target.value)}
                 rows={3} style={inputStyle} placeholder="Ανάθεσε εργασία στον N7..." />
               <select aria-label="Είδος εργασίας" value={kind} onChange={e=>setKind(e.target.value)}
@@ -311,7 +326,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
                 </article>)}
               </div>
             </div>}
-            {tab === "research" && <div>
+            {!guest&&tab === "research" && <div>
               <input aria-label="Τόπος ή πρόσωπο" placeholder="Τόπος ή πρόσωπο" value={missionTarget}
                 onChange={e=>setMissionTarget(e.target.value)} style={inputStyle}/>
               <textarea aria-label="Ερευνητικό ερώτημα" rows={3} placeholder="Ερευνητικό ερώτημα" value={missionQuestion}
