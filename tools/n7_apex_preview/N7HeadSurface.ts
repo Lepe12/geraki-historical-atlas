@@ -1,5 +1,6 @@
 import * as THREE from "three";
 
+// Verification candidate: true X-axis pitch, no growing face; isolated preview only.
 // Adjacent artwork tiles share destination edges. No luminance culling, alpha
 // shadow, underlay or silhouette mask. This uses the already-installed engine.
 export type GuideFrame={turn:number;pitch?:number;breath?:number;assembly?:number;baseMood?:number;states?:number[];ages?:number[];ignition?:number;time?:number};
