@@ -1,0 +1,532 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "identity_resolution",
+  "label": "Identity Resolution Agent",
+  "assignment_id": "identity_resolution:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "entity_candidates",
+    "variant_names",
+    "same_entity_assessment",
+    "collision_warnings"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "76890c5002e86acfe73787ef97161d3ae140461bc07daef63f122ee30b9186c2",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "identity_resolution",
+    "assignment_id": "identity_resolution:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:SearchCulture.gr / EKT",
+      "repo:Gallica/BnF",
+      "repo:Internet Culturale",
+      "repo:OpenArchives.gr / EKT"
+    ],
+    "queries": [
+      "\"Βρες στοιχεια για Κρεβελιε τον κουρσατο\" variant spelling",
+      "\"Βρες στοιχεια για Κρεβελιε τον κουρσατο\" alias OR aliases",
+      "\"Βρες στοιχεια για Κρεβελιε τον κουρσατο\" historical name",
+      "\"Βρες στοιχεια για Κρεβελιε τον κουρσατο\" transliteration"
+    ],
+    "operation": "search",
+    "search_budget": 16,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:SearchCulture.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "SearchCulture.gr / EKT",
+        "connector_id": null,
+        "score": 130,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 102,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 4,
+    "total_search_budget": 16,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Βρες στοιχεια για Κρεβελιε τον κουρσατο\" transliteration",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+transliteration\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+transliteration\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 799}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+transliteration\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Βρες στοιχεια για Κρεβελιε τον κουρσατο\" alias OR aliases",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+alias+OR+aliases\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+alias+OR+aliases\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 799}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+alias+OR+aliases\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "REMOTE_ERROR",
+      "query": "\"Βρες στοιχεια για Κρεβελιε τον κουρσατο\" historical name",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+historical+name\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 500, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_500\", \"elapsed_ms\": 860}], \"detail\": {\"error_code\": \"HTTP_500\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ERROR",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+historical+name\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 500, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_500\", \"elapsed_ms\": 860}], \"detail\": {\"error_code\": \"HTTP_500\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "REMOTE_ERROR",
+      "query": "\"Βρες στοιχεια για Κρεβελιε τον κουρσατο\" variant spelling",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+variant+spelling\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 500, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_500\", \"elapsed_ms\": 865}], \"detail\": {\"error_code\": \"HTTP_500\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ERROR",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+variant+spelling\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 500, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_500\", \"elapsed_ms\": 865}], \"detail\": {\"error_code\": \"HTTP_500\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Βρες στοιχεια για Κρεβελιε τον κουρσατο\" alias OR aliases",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF++alias+OR+aliases%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF++alias+OR+aliases%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 686, \"response_sha256\": \"20c497ebb38ef8495312bd50aebde560ad7906ef6292d073463ed3b96e8cae71\", \"elapsed_ms\": 960}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF++alias+OR+aliases%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Βρες στοιχεια για Κρεβελιε τον κουρσατο\" variant spelling",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF++variant+spelling%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF++variant+spelling%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 686, \"response_sha256\": \"098bb903bac5466dc30011d2ca51e3e9a4b80d77d55d3538d1a2ee3d857d47a2\", \"elapsed_ms\": 984}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF++variant+spelling%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Βρες στοιχεια για Κρεβελιε τον κουρσατο\" alias OR aliases",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+alias+OR+aliases&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+alias+OR+aliases&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25813, \"response_sha256\": \"f5a428199c74def1fdab5b1f722c59684c8b698d8e700d27256efe84b8c9f5be\", \"elapsed_ms\": 490}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+alias+OR+aliases&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Βρες στοιχεια για Κρεβελιε τον κουρσατο\" transliteration",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+transliteration&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+transliteration&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25813, \"response_sha256\": \"acfbfd6328232a7053c4e76ebb95303e97c84564750e67f88f682b7e3bd191ae\", \"elapsed_ms\": 374}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+transliteration&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Βρες στοιχεια για Κρεβελιε τον κουρσατο\" variant spelling",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+variant+spelling&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+variant+spelling&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25813, \"response_sha256\": \"9c17ed3f8f12b00e342e2a6e440971191ca44a46557a88747fff93bc2201bf07\", \"elapsed_ms\": 505}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+variant+spelling&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Βρες στοιχεια για Κρεβελιε τον κουρσατο\" historical name",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+historical+name&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+historical+name&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 31568, \"response_sha256\": \"c962a29925e5898d8ebbf90e40a369cda78a842446c75ed02f6187ea23cf094b\", \"elapsed_ms\": 403}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+historical+name&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Βρες στοιχεια για Κρεβελιε τον κουρσατο\" historical name",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF++historical+name%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF++historical+name%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 685, \"response_sha256\": \"dcfdfe6eaa004c870585176538f843f2546b207cfc8612a1d38790d7c3f6ac7b\", \"elapsed_ms\": 604}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF++historical+name%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Βρες στοιχεια για Κρεβελιε τον κουρσατο\" transliteration",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF++transliteration%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF++transliteration%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 685, \"response_sha256\": \"0c2569546a853b071cd12b779031b9d807fe67aa27eb618229947856c13337b2\", \"elapsed_ms\": 623}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF++transliteration%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "REMOTE_ERROR",
+      "query": "\"Βρες στοιχεια για Κρεβελιε τον κουρσατο\" transliteration",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+transliteration&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20091}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ERROR",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+transliteration&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20091}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "REMOTE_ERROR",
+      "query": "\"Βρες στοιχεια για Κρεβελιε τον κουρσατο\" historical name",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+historical+name&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20091}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ERROR",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+historical+name&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20091}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "REMOTE_ERROR",
+      "query": "\"Βρες στοιχεια για Κρεβελιε τον κουρσατο\" alias OR aliases",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+alias+OR+aliases&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20098}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ERROR",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+alias+OR+aliases&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20098}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "REMOTE_ERROR",
+      "query": "\"Βρες στοιχεια για Κρεβελιε τον κουρσατο\" variant spelling",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+variant+spelling&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20104}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ERROR",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+variant+spelling&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20104}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "historical_evidence": {
+    "schema": "nabou-discovery-evidence-queue-v1",
+    "run_id": "42984961899",
+    "agent_id": "identity_resolution",
+    "source_leads": [],
+    "connector_errors": [
+      {
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "status": "REMOTE_ERROR",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+historical+name\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 500, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_500\", \"elapsed_ms\": 860}], \"detail\": {\"error_code\": \"HTTP_500\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "status": "REMOTE_ERROR",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+variant+spelling\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 500, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_500\", \"elapsed_ms\": 865}], \"detail\": {\"error_code\": \"HTTP_500\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "status": "REMOTE_ERROR",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+transliteration&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20091}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "status": "REMOTE_ERROR",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+historical+name&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20091}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "status": "REMOTE_ERROR",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+alias+OR+aliases&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20098}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "status": "REMOTE_ERROR",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%92%CF%81%CE%B5%CF%82+%CF%83%CF%84%CE%BF%CE%B9%CF%87%CE%B5%CE%B9%CE%B1+%CE%B3%CE%B9%CE%B1+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%B5+%CF%84%CE%BF%CE%BD+%CE%BA%CE%BF%CF%85%CF%81%CF%83%CE%B1%CF%84%CE%BF%22+variant+spelling&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": null, \"tls_verification\": true, \"error_code\": \"TIMEOUT\", \"elapsed_ms\": 20104}], \"detail\": {\"error_code\": \"TIMEOUT\", \"error_type\": \"TimeoutError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      }
+    ],
+    "historical_attestations": [],
+    "verified_count": 0,
+    "learned_pdf_evidence": {
+      "status": "EXECUTED",
+      "hits": [],
+      "verified_count": 0,
+      "source": "PRODUCTION_LEARNING_EVIDENCE",
+      "original_pdf_replayed": false
+    },
+    "historical_map_catalogue": {
+      "schema": "nabou-map-catalogue-bridge-v1",
+      "status": "NOT_RELEVANT_TO_OPERATOR_QUERY",
+      "leads": [],
+      "historically_verified": 0,
+      "archival_search_executed": false
+    }
+  },
+  "result_count": 0,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
