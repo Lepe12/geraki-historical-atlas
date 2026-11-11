@@ -130,24 +130,31 @@
  new MutationObserver(()=>requestAnimationFrame(markHome)).observe(body,{attributes:true,attributeFilter:['data-atlas-landing','data-reader-view','data-nxs-view','data-atlas-page']});
  markHome();setTimeout(markHome,300);
 
- /* ---- 4. top search (Ctrl+K): a place name selects the place; a question starts the research (library first).
+ /* ---- 4. top search (Ctrl+K): the one question field. A question + Enter starts the research (library first);
+    a single word that is a place may jump to the map. No second «Έρευνα: …» frame opens under the field:
+    the only list that may appear is a compact one of matching places, and only for a single word.
     Topics still only prepare a question in the research form. ---- */
- const search=$('n7Search'),results=$('n7SearchResults');
- function prepare(text){const q=$('operatorQuery');if(!q)return;q.value=text.slice(0,500);q.dispatchEvent(new Event('input',{bubbles:true}));reader()?.show('research');requestAnimationFrame(()=>q.focus({preventScroll:true}));}
+ const search=$('n7Search'),results=$('n7SearchResults'),asked=$('n7AskedQuestion');
+ /* After a top-field question, «Η έρευνά μου» shows it as text and hides its own text box,
+    so there are never two editable question boxes on screen. */
+ function topAsk(text){if(text){body.dataset.n7TopAsk='true';if(asked){const k=document.createElement('span');k.textContent='Η ερώτησή σου';asked.replaceChildren(k,' «'+text+'»');asked.hidden=false;}}
+  else{delete body.dataset.n7TopAsk;if(asked){asked.hidden=true;asked.replaceChildren();}}}
+ function prepare(text){const q=$('operatorQuery');if(!q)return;topAsk('');q.value=text.slice(0,500);q.dispatchEvent(new Event('input',{bubbles:true}));reader()?.show('research');requestAnimationFrame(()=>q.focus({preventScroll:true}));}
+ window.addEventListener('jarvis:reuse-query',()=>topAsk(''));
  /* The question goes through the same form and submit as «Η έρευνά μου» (operator-command.js → library first,
     the long run only if the library is not enough). Nothing new is sent from here. */
- function ask(text){const q=$('operatorQuery'),form=$('operatorCommand');if(!q||!form){prepare(text);return;}
-  q.value=text.slice(0,500);q.dispatchEvent(new Event('input',{bubbles:true}));reader()?.show('research',{focus:false});
+ function ask(text){const q=$('operatorQuery'),form=$('operatorCommand');text=text.slice(0,500);if(!q||!form||text.length<3){prepare(text);return;}
+  q.value=text;q.dispatchEvent(new Event('input',{bubbles:true}));topAsk(text);reader()?.show('research',{focus:false});
   if(typeof form.requestSubmit==='function')form.requestSubmit();else $('executeQuery')?.click();}
  const years=()=>{const r=[...document.querySelectorAll('#n7TimelineRange input')].map(i=>+i.value);return r.length===2?r[0]+'–'+r[1]:'1500–1700';};
  let options=[],active=-1;
- function closeResults(){results.hidden=true;search.setAttribute('aria-expanded','false');active=-1;}
+ function closeResults(){results.hidden=true;results.replaceChildren();options=[];search.setAttribute('aria-expanded','false');active=-1;}
  function choose(o){closeResults();if(o.place){toMap();atlas()?.select(o.place);search.value='';}else if(o.ask){search.value='';search.blur();ask(o.ask);}else prepare(o.query);}
+ // Only one word can be a place name; anything longer is a question and shows no list at all.
  function renderResults(){
-  const q=search.value.trim();options=[];
-  if(q){const places=(atlas()?.search(q)||[]).slice(0,8).map(p=>({label:p.name,hint:'Τόπος στον χάρτη',place:p.id}));const question={label:'Έρευνα: «'+q+'»',hint:q.length<3?'γράψε λίγο περισσότερο':'ξεκινά την έρευνα, πρώτα στη βιβλιοθήκη',ask:q};
-   // One word may be a place; a longer text is a question, so Enter starts the research.
-   options=/\s/.test(q)?[question,...places]:[...places,question];}
+  const q=search.value.trim();
+  options=q&&!/\s/.test(q)?(atlas()?.search(q)||[]).slice(0,6).map(p=>({label:p.name,hint:'Τόπος στον χάρτη',place:p.id})):[];
+  if(active>=options.length)active=-1;
   results.replaceChildren(...options.map((o,i)=>{const b=document.createElement('button');b.type='button';b.setAttribute('role','option');b.setAttribute('aria-selected',String(i===active));b.append(o.label);const s=document.createElement('small');s.textContent=' · '+o.hint;b.append(s);b.addEventListener('mousedown',e=>e.preventDefault());b.addEventListener('click',()=>choose(o));return b;}));
   results.hidden=!options.length;search.setAttribute('aria-expanded',String(!!options.length));
  }
@@ -157,7 +164,9 @@
   search.addEventListener('blur',()=>setTimeout(closeResults,120));
   search.addEventListener('keydown',e=>{
    if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();if(!options.length)return;active=(active+(e.key==='ArrowDown'?1:-1)+options.length)%options.length;renderResults();}
-   else if(e.key==='Enter'){e.preventDefault();const o=options[active>=0?active:0];if(o)choose(o);}
+   else if(e.key==='Enter'){e.preventDefault();const q=search.value.trim();if(!q)return;
+    // A picked place, or a single word that matches a place, goes to the map; anything else is a research question.
+    const o=active>=0?options[active]:(!/\s/.test(q)&&options[0]);choose(o||{ask:q});}
   });
  }
  window.addEventListener('keydown',e=>{
