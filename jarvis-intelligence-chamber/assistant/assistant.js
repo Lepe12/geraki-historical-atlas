@@ -225,7 +225,7 @@ function build() {
   q(".nxa-stop").onclick = () => { stopSpeech(); setStatus("Η φωνή σταμάτησε."); };
   q(".nxa-mic").onclick = () => { wakeOn = false; ui.wake.setAttribute("aria-pressed", "false"); listening ? rec?.stop() : startRec(false); };
   ui.wake.onclick = () => { wakeOn = !wakeOn; ui.wake.setAttribute("aria-pressed", String(wakeOn)); if (wakeOn) startRec(true); else { try { rec?.stop(); } catch {} setStatus(""); } };
-  q(".nxa-morph").onclick = () => handle(holo?.active ? "κλείσε" : "άνοιξε");
+  q(".nxa-morph").hidden = true; // portrait withdrawn; no "show form" control
   q(".nxa-form").onsubmit = (e) => { e.preventDefault(); const v = q(".nxa-text").value; q(".nxa-text").value = ""; handle(v); };
   root.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
   setStatus(SR ? "Πάτα «Πάτα και μίλα» και πες μια εντολή, ή άνοιξε το «Να ακούει πάντα» και ξεκίνα με «Ναμπού»." : "Αυτό το πρόγραμμα περιήγησης δεν έχει αναγνώριση ομιλίας· γράψε την εντολή στο πεδίο.");
