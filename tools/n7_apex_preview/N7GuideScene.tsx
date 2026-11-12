@@ -21,7 +21,7 @@ export default function N7GuideScene(props:GuideSceneProps){
     let disposed=false,raf=0,target=0,current=0,targetPitch=0,currentPitch=0,last=0,lastStats=0;
     let surface:ReturnType<typeof createHeadSurface>|undefined;
     let mode:GuideMode|null=null,replay=-1,assemblyStart:number|null=null,completed=false,shockStart:number|null=null,breathStart=0;
-    let baseMood=0,lastMood:GuideMood="idle",lastEffects=true,lastReduced=false;
+    let baseMood=0,lastMood:GuideMood="idle",lastEffects=true,lastReduced=false,stillFrameKey="";
     let transitions:{mood:number;start:number}[]=[];
     const reference=document.createElement("canvas");reference.width=320;reference.height=480;
     Object.assign(reference.style,{width:"100%",height:"100%",display:"none"});
@@ -102,10 +102,20 @@ export default function N7GuideScene(props:GuideSceneProps){
         const voiceLevel=c.effects&&!c.reduced?readVoiceSignal(now):0;
         host.dataset.voiceLevel=voiceLevel.toFixed(4);
         const start=performance.now();
-        if(exact){surface!.canvas.style.display="none";reference.style.display="block";}
+        if(exact){stillFrameKey="";surface!.canvas.style.display="none";reference.style.display="block";}
         else{
           reference.style.display="none";surface!.canvas.style.display="block";
-          surface!.render({turn:current,pitch:currentPitch,breath,assembly:progress,baseMood,states:transitions.map(t=>t.mood),ages:transitions.map(t=>Math.min(1,(now-t.start)/1000)),ignition,voiceLevel,time:c.reduced?0:now/1000});
+          // The approved APEX reduced-motion mode must be a *frozen* frame,
+          // not a busy WebGL loop which periodically exposes partial draws
+          // to screenshot/readback and wastes GPU time. Render again only
+          // when a real state or explicit manual assembly step changes.
+          const frameKey=c.reduced
+            ?[progress.toFixed(5),baseMood,current.toFixed(5),currentPitch.toFixed(5),
+              transitions.length,c.effects].join(":"):"";
+          if(!c.reduced||stillFrameKey!==frameKey){
+            surface!.render({turn:current,pitch:currentPitch,breath,assembly:progress,baseMood,states:transitions.map(t=>t.mood),ages:transitions.map(t=>Math.min(1,(now-t.start)/1000)),ignition,voiceLevel,time:c.reduced?0:now/1000});
+            stillFrameKey=frameKey;
+          }
         }
         const renderMs=performance.now()-start;
         host.dataset.currentTurn=current.toFixed(4);host.dataset.currentPitch=currentPitch.toFixed(4);host.dataset.assemblyProgress=progress.toFixed(4);
