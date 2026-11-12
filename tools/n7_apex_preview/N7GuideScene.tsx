@@ -48,7 +48,7 @@ export default function N7GuideScene(props:GuideSceneProps){
       ctx.drawImage(image,0,0);ctx.putImageData(ctx.getImageData(0,0,320,480),0,0);
       try{surface=createHeadSurface(reference);}catch(e){host.dataset.renderError=String(e);reference.style.display="block";return;}
       Object.assign(surface.canvas.style,{width:"100%",height:"100%",display:"none"});host.append(surface.canvas);
-      host.dataset.renderer="shared-edge-texture-mesh";host.dataset.engine="three-shared-scene";
+      host.dataset.renderer="shared-edge-texture-mesh";host.dataset.engine="three-shared-scene";host.dataset.rig="approved-rigid-head-layer-v1";
       host.dataset.referenceReady="true";host.dataset.referenceUrl=image.src;host.dataset.headTarget="0.000";host.dataset.headPitchTarget="0.000";
       const draw=(now:number)=>{
         if(disposed)return;
