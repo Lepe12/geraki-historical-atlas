@@ -170,6 +170,12 @@ def main():
     if humanoid_sha != "bdba288c56230908e1c6abd1a199e5a895159730faf27c672916b03d51a5c7e5":
         raise RuntimeError(f"wrong N7 humanoid asset sha256: {humanoid_sha}")
     (out/"public/n7-humanoid-idle-v3.webp").write_bytes(humanoid_bytes)
+    if base_path.endswith("n7-apex-step5"):
+        face_bytes=(overlay/"assets/n7-humanoid-face-v4.webp").read_bytes()
+        if hashlib.sha256(face_bytes).hexdigest()!="1abf41530c4253962a46fe426c107eb2f776f54ad5c2c5e594b8765bd569ea68":
+            raise RuntimeError("wrong N7 face artwork")
+        (out/"public/n7-humanoid-face-v4.webp").write_bytes(face_bytes)
+        (out/"components/N7HumanoidReference.ts").write_text(f'export const N7_HUMANOID_REFERENCE = "{base_path}/n7-humanoid-face-v4.webp";\n')
     shutil.copy2(overlay/"assets/n7-mountain-backdrop.webp",out/"public/n7-mountain-backdrop.webp")
 
     patch_exact(out/"app/page.tsx",'import ApexWorld from "@/components/ApexWorld";','import N7ApexStage from "@/components/N7ApexStage";')

@@ -1,0 +1,9 @@
+# MIRA-style N7 face artwork
+
+The owner explicitly requested changing the face form, then approved keeping N7's cyan/gold palette with MIRA's clear facial outline. The earlier measured voice-light change did not change the face artwork; this update does.
+
+The new source was edited with image generation using the original N7 and a frame extracted from the supplied MIRA video as references. The dark face now has a smooth tapered luminous contour and curved cyan/gold filaments, replacing the horizontal scan lines and central orange orb. The N7 updo, frontal composition and cyan/gold identity are retained; this is a newly generated source artwork, not a claim that every non-face pixel is identical to the previous image. The full generated original remains in the workspace; its 320x480 lossless WebP export is committed as `assets/n7-humanoid-face-v4.webp`, SHA256 `1abf41530c4253962a46fe426c107eb2f776f54ad5c2c5e594b8765bd569ea68`.
+
+The builder selects this separately pinned asset only for `/n7-apex-step5/`. The original chunk-reconstructed v3 artwork and production `/n7-apex/` selection are preserved. The visual reference, particles, head rotation, mood palettes, assembly and real audio response all use the new source consistently. Head regression now independently decodes the declared source URL rather than hard-coding the old filename; its pixel, coverage, movement and fixed-body acceptance limits are unchanged.
+
+Deployment and verification results are recorded separately; a generated image or local build alone does not establish that it is live.

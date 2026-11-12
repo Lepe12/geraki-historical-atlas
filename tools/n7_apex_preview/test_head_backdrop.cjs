@@ -29,7 +29,7 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
    // native reference surfaces change on the next compositor frame.
    await p.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
   };
-  const decodedReference=await p.evaluate(async()=>{const img=new Image();img.src=location.pathname+'n7-humanoid-idle-v3.webp';await img.decode();const c=document.createElement('canvas');c.width=320;c.height=480;const x=c.getContext('2d');x.drawImage(img,0,0);return Array.from(x.getImageData(0,0,320,480).data);});
+  const decodedReference=await p.evaluate(async()=>{const img=new Image();img.src=document.querySelector('[aria-label="N7 guide artwork-tile humanoid"]').dataset.referenceUrl;await img.decode();const c=document.createElement('canvas');c.width=320;c.height=480;const x=c.getContext('2d');x.drawImage(img,0,0);return Array.from(x.getImageData(0,0,320,480).data);});
   async function pixels(){
    // Read the same encoded raster saved as evidence, after selecting the visible
    // surface atomically. This also avoids cross-context GPU readback races.
