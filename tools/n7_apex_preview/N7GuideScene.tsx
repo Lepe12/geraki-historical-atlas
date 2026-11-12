@@ -54,7 +54,7 @@ export default function N7GuideScene(props:GuideSceneProps){
       if(disposed)return;
       if(scale===1)ctx.drawImage(image,0,0);else ctx.drawImage(image,0,0,W,H);
       ctx.putImageData(ctx.getImageData(0,0,W,H),0,0);
-      try{surface=createHeadSurface(reference,scale);}catch(e){host.dataset.renderError=String(e);reference.style.display="block";return;}
+      try{surface=createHeadSurface(reference,scale,config.current.source?1:0);}catch(e){host.dataset.renderError=String(e);reference.style.display="block";return;}
       Object.assign(surface.canvas.style,{width:"100%",height:"100%",display:"none"});host.append(surface.canvas);
       // Freeze each reduced-motion state on a native 2D canvas. Keeping a
       // constantly re-composited WebGL canvas visible was not byte-stable

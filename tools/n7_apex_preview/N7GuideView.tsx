@@ -129,10 +129,10 @@ export default function N7GuideView({open,onClose,activity,onWorkspace}:{open:bo
         <button type="button" aria-pressed={mode==="compare"} onClick={()=>{setMode("compare");setDetails(true);}}>Compare</button>
       </span>
       <span className="n7-guide-group"><small aria-hidden="true">ΣΚΗΝΗ</small>
-        <button type="button" className="n7-guide-assembly" disabled={!effects} onClick={replayAssembly}>{mode==="assembly"?"Replay Assembly":"Assembly"}</button>
         <button type="button" aria-pressed={effects} onClick={changeEffects}>Effects {effects?"On":"Off"}</button>
         <button type="button" aria-expanded={details} onClick={()=>setDetails(v=>!v)}>Technical details</button>
         <a href={N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/"))+"/avatar-3d/"} target="_blank" rel="noopener noreferrer">Πραγματικό 3D</a>
+        <button type="button" className="n7-guide-assembly" disabled={!effects} onClick={replayAssembly}>{mode==="assembly"?"Replay Assembly":"Assembly"}</button>
         {/* Skip keeps its slot when it does not apply, so the dock and the figure never jump. */}
         {mode==="assembly"||!done?<button type="button" onClick={skip}>Skip</button>:<button type="button" disabled aria-hidden="true" tabIndex={-1} style={{visibility:"hidden"}}>Skip</button>}
       </span>

@@ -10,7 +10,10 @@ import * as THREE from "three";
 export type GuideFrame={turn:number;pitch?:number;roll?:number;breath?:number;assembly?:number;baseMood?:number;states?:number[];ages?:number[];ignition?:number;time?:number;voiceLevel?:number};
 // `scale` only raises the raster resolution (second face option); geometry,
 // joints and limits stay in the same 320x480 layout units.
-export function createHeadSurface(image:HTMLCanvasElement,scale=1) {
+// `faceRelief` 0 keeps the approved N7 volume exactly. 1 is for a realistic
+// face (H01): eyes, nose and mouth sit on a nearly flat plate that turns as
+// one piece, and the curvature moves out to the sides under the hair.
+export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0) {
   const renderer=new THREE.WebGLRenderer({alpha:false,antialias:false,depth:false,preserveDrawingBuffer:true});
   renderer.setSize(Math.round(320*scale),Math.round(480*scale),false);renderer.setPixelRatio(1);
   renderer.outputColorSpace=THREE.SRGBColorSpace;
@@ -34,7 +37,7 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1) {
   geometry.setAttribute("source",new THREE.Float32BufferAttribute(sources,2));
   geometry.setIndex(indices);
   const material=new THREE.ShaderMaterial({
-    uniforms:{turn:{value:0},pitch:{value:0},neckMatrix:{value:new THREE.Matrix4()},headMatrix:{value:new THREE.Matrix4()},artwork:{value:texture},breath:{value:0},opacity:{value:1},
+    uniforms:{turn:{value:0},pitch:{value:0},neckMatrix:{value:new THREE.Matrix4()},headMatrix:{value:new THREE.Matrix4()},faceRelief:{value:faceRelief},artwork:{value:texture},breath:{value:0},opacity:{value:1},
       baseMood:{value:0},states:{value:[0,0,0,0]},ages:{value:[0,0,0,0]},count:{value:0},ignition:{value:0},time:{value:0},voiceLevel:{value:-1}},
     depthTest:false,depthWrite:false,side:THREE.DoubleSide,toneMapped:false,transparent:true,
     vertexShader:`
@@ -44,6 +47,7 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1) {
     uniform float breath;
     uniform mat4 neckMatrix;
     uniform mat4 headMatrix;
+    uniform float faceRelief;
     varying vec2 texUV;
     varying float shade;
     varying float rim;
@@ -57,7 +61,9 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1) {
       // Rounded rest volume measured on the approved 320x480 artwork:
       // face oval, skull with hair, and the neck column under the chin.
       float face=dome(tile,vec2(160.,138.),vec2(66.,92.),64.);
-      float skull=dome(tile,vec2(160.,105.),vec2(96.,102.),46.);
+      float skull=dome(tile,vec2(160.,105.),vec2(96.,102.),mix(46.,34.,faceRelief));
+      float plateRho=min(1.,length((tile-vec2(160.,140.))/vec2(72.,98.)));
+      face=mix(face,42.*(1.-pow(plateRho,2.8)),faceRelief);
       float neck=28.*cos(min(1.,abs(tile.x-160.)/30.)*1.5707963)*smoothstep(170.,200.,tile.y);
       float depth=smax(smax(face,skull),neck)-6.;
       vec4 rest=vec4(tile.x,tile.y,depth,1.);

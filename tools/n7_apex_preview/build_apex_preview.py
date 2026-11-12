@@ -195,13 +195,13 @@ def main():
         (out/"app/avatar-3d/page.tsx").write_text('import N7RealAvatar from "@/components/N7RealAvatar";\nexport default function RealAvatar(){return <N7RealAvatar/>;}\n')
     shutil.copy2(overlay/"assets/n7-mountain-backdrop.webp",out/"public/n7-mountain-backdrop.webp")
     if isolated:
-        # Visual trial: wider, quieter N7 environment and the H01 second face option.
-        for name,digest in (("n7-mountain-backdrop-v2.webp","6eaf941944deb09ac1b773c74f968ed87de2ecbb032aec0bcc3e1c61cee13747"),
+        # Visual trial: the designed N7 environment and the H01 second face option.
+        for name,digest in (("n7-environment-v3.webp","be5e936a4fa14e3831adb8381e3f56c30b38009c2b716049eb68b21cf6ef9d8d"),
                             ("n7-humanoid-h01-v1.webp","6d5033bcbf9e84cf647a31da52d7c648637aafc8490a64cf663887c3cc9d2d36")):
             data=(overlay/"assets"/name).read_bytes()
             if hashlib.sha256(data).hexdigest()!=digest: raise RuntimeError("wrong visual asset "+name)
             (out/"public"/name).write_bytes(data)
-        (out/"components/N7BackdropReference.ts").write_text(f'export const N7_BACKDROP_REFERENCE = "{base_path}/n7-mountain-backdrop-v2.webp";\n')
+        (out/"components/N7BackdropReference.ts").write_text(f'export const N7_BACKDROP_REFERENCE = "{base_path}/n7-environment-v3.webp";\n')
 
     patch_exact(out/"app/page.tsx",'import ApexWorld from "@/components/ApexWorld";','import N7ApexStage from "@/components/N7ApexStage";')
     patch_exact(out/"app/page.tsx",'''<section style={{ position: "relative", height: "100vh", minHeight: 620 }}>

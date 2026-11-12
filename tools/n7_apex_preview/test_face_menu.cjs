@@ -51,7 +51,7 @@ const LABEL='[aria-label="N7 guide artwork-tile humanoid"]';
 
   // Environment: the v2 raster is the one shown, and it still has living highlights.
   const bg=p.getByLabel('N7 Step 6 living backdrop',{exact:true});
-  assert((await bg.locator('img').getAttribute('src')).endsWith('/n7-mountain-backdrop-v2.webp'),'New environment is not in use');
+  assert((await bg.locator('img').getAttribute('src')).endsWith('/n7-environment-v3.webp'),'New environment is not in use');
   await p.waitForFunction(()=>Number(document.querySelector('[aria-label="N7 Step 6 living backdrop"]')?.dataset.highlightCount)>0);
   result.backdrop={highlights:Number(await bg.getAttribute('data-highlight-count'))};
 
