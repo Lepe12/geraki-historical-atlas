@@ -176,6 +176,11 @@ def main():
             raise RuntimeError("wrong N7 face artwork")
         (out/"public/n7-humanoid-face-v4.webp").write_bytes(face_bytes)
         (out/"components/N7HumanoidReference.ts").write_text(f'export const N7_HUMANOID_REFERENCE = "{base_path}/n7-humanoid-face-v4.webp";\n')
+    if base_path.endswith("n7-apex-step5"):
+        shutil.copy2(overlay/"N7HeadTest.tsx",out/"components/N7HeadTest.tsx")
+        shutil.copy2(overlay/"assets/n7-head-h01.webp",out/"public/n7-head-h01.webp")
+        (out/"app/head-test").mkdir(parents=True,exist_ok=True)
+        (out/"app/head-test/page.tsx").write_text('import N7HeadTest from "@/components/N7HeadTest";\nexport default function HeadTest(){return <N7HeadTest/>;}\n')
     shutil.copy2(overlay/"assets/n7-mountain-backdrop.webp",out/"public/n7-mountain-backdrop.webp")
 
     patch_exact(out/"app/page.tsx",'import ApexWorld from "@/components/ApexWorld";','import N7ApexStage from "@/components/N7ApexStage";')

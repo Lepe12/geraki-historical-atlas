@@ -99,6 +99,7 @@ export default function N7GuideView({open,onClose,activity,onWorkspace}:{open:bo
       <button type="button" onClick={()=>{setMode("compare");setDetails(true);}}>Compare</button>
       <button type="button" aria-pressed={effects} onClick={changeEffects}>Effects {effects?"On":"Off"}</button>
       <button type="button" aria-expanded={details} onClick={()=>setDetails(v=>!v)}>Technical details</button>
+      <a href={N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/"))+"/head-test/"} target="_blank" rel="noopener noreferrer" style={{color:"#9befff",padding:"8px"}}>Δοκιμή κεφαλιού</a>
     </footer>
   </section>;
 }

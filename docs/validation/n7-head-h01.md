@@ -1,0 +1,11 @@
+# H01 realistic head movement trial
+
+The owner supplied the realistic cyan/amber female head marked H01 and asked to insert it and try its movement. A transparent clean asset was prepared with image generation from that supplied image: grid, labels, frame and logos removed; face, eyes, hair and lighting retained as the reference. The lossless 1122x1402 WebP is `assets/n7-head-h01.webp`, SHA256 `3d6062af7015d73bd83f9acc5e209ddece193f37bf544d6302daa00251687219`.
+
+The isolated preview gains `/head-test/` and a trial link that opens in a separate tab, preserving the original mounted workspace. Default view places H01 over N7's shoulders/chest; “Μόνο κεφάλι” switches to a close-up. The old head is cropped out of the body geometry rather than left behind the new face. A short alpha blend at the new neck's base connects the supplied portrait to the existing body. This is a trial, not replacement of the main v4 humanoid.
+
+One Three.js scene uses a continuously textured, shallow curved surface and one rigid head pose. No independent cheek, mouth or jaw warping. Orthographic projection preserves front-view proportions; bounded yaw/pitch and a shared combined pose budget avoid exaggerated corners. Original texture colors are retained. Direction buttons, mouse follow, automatic movement, pause and center are available. Body remains stationary. Resize fitting, reduced-motion behavior, cleanup and a WebGL error message are included. No AI, voice provider, microphone, camera, owner auth or backend changes. This is a front-artwork depth illusion, not a complete scan of the head with unseen views.
+
+Local optimized build/type/lint passed. Actual browser texture/geometry/pixel tests passed in four directions: visible movement in each pose, width ratio 0.977–0.998, height ratio 0.991–1.000, area ratio 0.981–0.994; byte-exact return to center; automatic and mouse movement; body toggle; unchanged lower torso pixels; mobile layout and reduced motion. No browser or shader errors. The initial test sampled the near-neutral interpolation too early; it now waits for the exact final pose before checking pixel equality. See `n7-h01-evidence/`.
+
+Deployment is gated by CI and recorded separately; production `/n7-apex/` and the default v4 figure are not replaced by this trial.
