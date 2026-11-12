@@ -50,11 +50,17 @@ export default function N7GuideScene(props:GuideSceneProps){
     };
     window.addEventListener("pointermove",pointer,{passive:true});window.addEventListener("blur",clearTarget);document.addEventListener("mouseleave",clearTarget);
     const image=new Image();image.decoding="async";
-    image.onload=()=>{
+    // With the approved N7 face, each mood shows the owner's own aligned picture.
+    const folder=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/")+1);
+    const moodUrls=config.current.source?[]:["listening","thinking","speaking"].map(m=>folder+`n7-mood-${m}-v1.webp`);
+    const moodArt:Promise<HTMLCanvasElement[]|undefined>=moodUrls.length?Promise.all(moodUrls.map(url=>new Promise<HTMLCanvasElement>((resolve,reject)=>{const img=new Image();img.decoding="async";img.onload=()=>{const c=document.createElement("canvas");c.width=320;c.height=480;c.getContext("2d")!.drawImage(img,0,0,320,480);resolve(c);};img.onerror=()=>reject(Error(url));img.src=url;}))).catch(()=>undefined):Promise.resolve(undefined);
+    image.onload=async()=>{
+      const art=await moodArt;
       if(disposed)return;
       if(scale===1)ctx.drawImage(image,0,0);else ctx.drawImage(image,0,0,W,H);
       ctx.putImageData(ctx.getImageData(0,0,W,H),0,0);
-      try{surface=createHeadSurface(reference,scale,config.current.source?1:0);}catch(e){host.dataset.renderError=String(e);reference.style.display="block";return;}
+      host.dataset.moodArt=art?"approved-pictures":"computed";
+      try{surface=createHeadSurface(reference,scale,config.current.source?1:0,art);}catch(e){host.dataset.renderError=String(e);reference.style.display="block";return;}
       Object.assign(surface.canvas.style,{width:"100%",height:"100%",display:"none"});host.append(surface.canvas);
       // Freeze each reduced-motion state on a native 2D canvas. Keeping a
       // constantly re-composited WebGL canvas visible was not byte-stable

@@ -13,7 +13,10 @@ export type GuideFrame={turn:number;pitch?:number;roll?:number;talk?:number;brea
 // `faceRelief` 0 keeps the approved N7 volume exactly. 1 is for a realistic
 // face (H01): eyes, nose and mouth sit on a nearly flat plate that turns as
 // one piece, and the curvature moves out to the sides under the hair.
-export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0) {
+// `moodArt` (optional): the owner's approved Listening, Thinking and Speaking
+// pictures, aligned to the idle frame. When given, each mood shows its own
+// picture instead of a colour variation computed from the idle.
+export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,moodArt?:HTMLCanvasElement[]) {
   const renderer=new THREE.WebGLRenderer({alpha:false,antialias:false,depth:false,preserveDrawingBuffer:true});
   renderer.setSize(Math.round(320*scale),Math.round(480*scale),false);renderer.setPixelRatio(1);
   renderer.outputColorSpace=THREE.SRGBColorSpace;
@@ -37,7 +40,7 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0) 
   geometry.setAttribute("source",new THREE.Float32BufferAttribute(sources,2));
   geometry.setIndex(indices);
   const material=new THREE.ShaderMaterial({
-    uniforms:{turn:{value:0},pitch:{value:0},neckMatrix:{value:new THREE.Matrix4()},headMatrix:{value:new THREE.Matrix4()},faceRelief:{value:faceRelief},talk:{value:0},artwork:{value:texture},breath:{value:0},opacity:{value:1},
+    uniforms:{turn:{value:0},pitch:{value:0},neckMatrix:{value:new THREE.Matrix4()},headMatrix:{value:new THREE.Matrix4()},faceRelief:{value:faceRelief},talk:{value:0},useArt:{value:moodArt?.length===3?1:0},artListening:{value:null as THREE.Texture|null},artThinking:{value:null as THREE.Texture|null},artSpeaking:{value:null as THREE.Texture|null},artwork:{value:texture},breath:{value:0},opacity:{value:1},
       baseMood:{value:0},states:{value:[0,0,0,0]},ages:{value:[0,0,0,0]},count:{value:0},ignition:{value:0},time:{value:0},voiceLevel:{value:-1}},
     depthTest:false,depthWrite:false,side:THREE.DoubleSide,toneMapped:false,transparent:true,
     vertexShader:`
@@ -117,7 +120,21 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0) 
     uniform float voiceLevel;
     uniform float talk;
     uniform float faceRelief;
+    uniform float useArt;
+    uniform sampler2D artListening;
+    uniform sampler2D artThinking;
+    uniform sampler2D artSpeaking;
     vec3 palette(vec3 c,float mood){
+      if(useArt>.5&&mood>.5){
+        // The owner's own mood picture, sampled at this same point of the figure,
+        // so the dots never move for a mood change: only what they show changes.
+        if(mood<1.5)return texture2D(artListening,texUV).rgb;
+        if(mood<2.5)return texture2D(artThinking,texUV).rgb;
+        // Speaking follows the real playback level: the face brightens with the
+        // voice and settles back toward the idle picture in quiet pauses.
+        float level=voiceLevel<0.?(.78+.22*sin(time*1000./115.)):(.32+.68*voiceLevel);
+        return mix(c,texture2D(artSpeaking,texUV).rgb,level);
+      }
       vec3 s=linearToOutputTexel(vec4(c,1.)).rgb;
       float d=distance(texUV*vec2(320.,480.),vec2(160.,150.));
       // Soft mask: mood light follows the drawn lines and fades with them, so
@@ -166,7 +183,8 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0) 
         float inner=exp(-pow((q.x-160.)/7.5,2.)-pow((q.y-138.)/36.,2.));
         float veil=exp(-pow((q.x-160.)/30.,2.)-pow((q.y-138.)/52.,2.));
         float dark=1.-smoothstep(.10,.45,max(max(c.r,c.g),c.b));
-        float sheen=talk*level*(1.-.8*faceRelief)*dark*(1.9*inner+.12*veil);
+        // The approved Speaking picture already carries its own face light.
+        float sheen=talk*level*(1.-.8*faceRelief)*(1.-.6*useArt)*dark*(1.9*inner+.12*veil);
         color+=vec3(.72,.93,1.)*sheen;
       }
       // Shadow changes light, never coverage. Glow only modulates source color.
@@ -175,6 +193,8 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0) 
     }
   `
   });
+  const artTextures=(moodArt?.length===3?moodArt:[]).map(canvas=>{const tex=new THREE.Texture(canvas);tex.colorSpace=THREE.SRGBColorSpace;tex.flipY=false;tex.generateMipmaps=false;tex.minFilter=THREE.LinearFilter;tex.magFilter=THREE.LinearFilter;tex.needsUpdate=true;return tex;});
+  if(artTextures.length===3){material.uniforms.artListening.value=artTextures[0];material.uniforms.artThinking.value=artTextures[1];material.uniforms.artSpeaking.value=artTextures[2];}
   const scene=new THREE.Scene();
   const mesh=new THREE.Mesh(geometry,material);mesh.frustumCulled=false;scene.add(mesh);
   // Galaxy assembly (owner reference: MIRA). A light core is born at the
@@ -300,6 +320,6 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0) 
   return {
     canvas:renderer.domElement,vertices:sources.length/2,particles:anchors.length/3,
     render,draw(turn:number){render({turn});},limits:{yaw:MAX_YAW,pitch:MAX_PITCH,roll:MAX_ROLL},
-    dispose(){geometry.dispose();material.dispose();particleGeometry.dispose();particleMaterial.dispose();glowGeometry.dispose();glowMaterial.dispose();texture.dispose();renderer.dispose();renderer.forceContextLoss();}
+    dispose(){artTextures.forEach(tex=>tex.dispose());geometry.dispose();material.dispose();particleGeometry.dispose();particleMaterial.dispose();glowGeometry.dispose();glowMaterial.dispose();texture.dispose();renderer.dispose();renderer.forceContextLoss();}
   };
 }

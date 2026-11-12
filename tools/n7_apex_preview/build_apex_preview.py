@@ -202,6 +202,11 @@ def main():
             if hashlib.sha256(data).hexdigest()!=digest: raise RuntimeError("wrong visual asset "+name)
             (out/"public"/name).write_bytes(data)
         (out/"components/N7BackdropReference.ts").write_text(f'export const N7_BACKDROP_REFERENCE = "{base_path}/n7-environment-v4.webp";\n')
+        # The owner's approved mood pictures, aligned to the idle frame (prepare_mood_art.py).
+        for name in ("listening","thinking","speaking"):
+            data=(overlay/"assets"/f"n7-mood-{name}-v1.webp").read_bytes()
+            if hashlib.sha256(data).hexdigest()!={'listening': '1842217c1bbbc2fca5836ad243954b2291a80420876db64d7820a7da6d4c5ea8', 'thinking': '480713cb170db59e98f1fb7939e7cea6f097c75843fa3cf1bc92ecaf058821df', 'speaking': '41124f09f0493bb123e5744592341e5fd93c19b7f839a8e10c150637bd5452e0'}[name]: raise RuntimeError("wrong mood picture "+name)
+            (out/"public"/f"n7-mood-{name}-v1.webp").write_bytes(data)
 
     patch_exact(out/"app/page.tsx",'import ApexWorld from "@/components/ApexWorld";','import N7ApexStage from "@/components/N7ApexStage";')
     patch_exact(out/"app/page.tsx",'''<section style={{ position: "relative", height: "100vh", minHeight: 620 }}>
