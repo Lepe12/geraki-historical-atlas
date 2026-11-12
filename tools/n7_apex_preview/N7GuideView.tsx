@@ -88,7 +88,7 @@ export default function N7GuideView({open,onClose,activity,onWorkspace}:{open:bo
       .n7-guide-main[data-details=true]{grid-template-columns:minmax(0,1fr) 260px}
       .n7-guide-figure-slot{min-height:0;min-width:0;display:grid;place-items:center;overflow:hidden}
       .n7-guide-figure{position:relative;height:100%;aspect-ratio:2/3;max-width:100%;mix-blend-mode:screen}
-      .n7-guide-controls{flex:none;z-index:5;align-self:center;display:flex;justify-content:center;align-items:center;gap:4px 8px;flex-wrap:wrap;margin:6px 12px 12px;padding:6px 10px;max-width:calc(100% - 24px);box-sizing:border-box;background:rgba(3,12,19,.66);border:1px solid rgba(120,220,240,.14);border-radius:16px;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 10px 40px rgba(0,0,0,.35)}
+      .n7-guide-controls{flex:none;z-index:5;align-self:center;display:flex;justify-content:center;align-items:center;gap:4px 8px;flex-wrap:wrap;margin:6px 12px 12px;padding:6px 10px;max-width:calc(100% - 24px);box-sizing:border-box;background:rgba(3,11,18,.84);border:1px solid rgba(120,220,240,.16);border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.35)}
       .n7-guide-status{display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.14em;color:#9fdbe8;white-space:nowrap;padding-right:4px}
       .n7-guide-status::before{content:"";width:6px;height:6px;border-radius:50%;background:#f5c26b;box-shadow:0 0 10px #f5c26b}
       .n7-guide-group{display:inline-flex;align-items:center;gap:0;padding-left:8px;border-left:1px solid rgba(120,220,240,.14)}
@@ -96,10 +96,10 @@ export default function N7GuideView({open,onClose,activity,onWorkspace}:{open:bo
       .n7-guide-group button{border-color:transparent;background:transparent;padding:6px 7px}.n7-guide-assembly{min-width:112px;text-align:left}
       .n7-guide-group a{color:#9befff;font-size:12px;padding:6px 10px;border-radius:9px;text-decoration:none;white-space:nowrap}.n7-guide-group a:hover{background:rgba(98,232,247,.10)}
       /* Voice panel: presentation only. Its markup and behaviour live in N7Workspace. */
-      #n7-guide-voice>div{background:rgba(3,12,19,.66)!important;border:1px solid rgba(120,220,240,.14);border-radius:16px;margin:0 auto;width:min(880px,calc(100% - 24px));box-sizing:border-box;padding:8px 12px!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
-      #n7-guide-voice>div:has(>button:only-child){width:fit-content;background:transparent!important;border:0;overflow:visible!important;padding:0!important;-webkit-backdrop-filter:none;backdrop-filter:none}
+      #n7-guide-voice>div{background:rgba(3,11,18,.86)!important;border:1px solid rgba(120,220,240,.14);border-radius:16px;margin:0 auto;width:min(880px,calc(100% - 24px));box-sizing:border-box;padding:8px 12px!important}
+      #n7-guide-voice>div:has(>button:only-child){width:fit-content;background:transparent!important;border:0;overflow:visible!important;padding:0!important}
       #n7-guide-voice p{font-size:12px;line-height:1.5;margin:6px 0;color:#a9cfd9}
-      .n7-guide-details{padding:14px;background:rgba(2,9,14,.80);border:1px solid rgba(120,220,240,.16);border-radius:12px;overflow:auto;font-size:12px;line-height:1.6;min-height:0;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+      .n7-guide-details{padding:14px;background:rgba(2,9,14,.88);border:1px solid rgba(120,220,240,.16);border-radius:12px;overflow:auto;font-size:12px;line-height:1.6;min-height:0}
       @media(max-width:700px), (max-width:1000px) and (max-height:500px){.n7-guide-main[data-details=true]{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) 115px}.n7-guide-controls{align-self:stretch;margin:0;max-width:none;border-radius:0;border-width:1px 0 0;padding:6px 8px;gap:4px 10px;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;min-height:42px}#n7-guide-voice>div{width:100%;border-radius:0;border-width:1px 0 0}.n7-guide-controls>*{flex-shrink:0}.n7-guide-group{padding-left:10px}.n7-guide-view button{padding:6px 8px;font-size:11px}}
     `}</style>
     <N7Backdrop ref={backdrop} effects={effects} reduced={reduced}/>
