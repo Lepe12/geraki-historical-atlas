@@ -162,7 +162,7 @@ def main():
         shutil.copy2(part, out/"components"/part.name)
     shutil.copy2(overlay/"N7HumanoidIdle.ts",out/"components/N7HumanoidIdle.ts")
     (out/"public").mkdir(parents=True, exist_ok=True)
-    shutil.copy2(overlay/"N7FemaleVoiceWorker.js",out/"public/n7-female-voice-worker-v1.js")
+    shutil.copy2(overlay/"N7FemaleVoiceWorker.js",out/"public/n7-female-voice-worker-v2.js")
     chunks = sorted((overlay/"assets_v3").glob("chunk*.b64"))
     if len(chunks) != 15:
         raise RuntimeError(f"expected 15 humanoid asset chunks, found {len(chunks)}")
