@@ -9,3 +9,11 @@ Verification: optimized Next build/type checking/lint passed. Controlled alterna
 Deployment status is separate from these local results. CI now includes the audio-reactivity browser check. Keep production `/n7-apex/` unchanged; publish only the isolated preview after checks pass. Do not report local screenshots as a live deployment.
 
 The passwordless and mobile regressions also passed after updating their exit expectations: CONTROL now requires an explicit workspace action; closing the figure does not automatically open it. Desktop continuous direct/queued conversation passed. These remain locally executed tests with the documented fixture boundaries.
+
+## Live verification — 2026-11-12
+
+[Validation and deployment passed](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/43168483804) for source `475331e33`. Isolated preview release: `6e2c67f0d67b4dc1`. Production remains `bbdc05016a211581`.
+
+A fresh live browser (TLS verification enabled) passed the same real analyser/rendered-pixel check using controlled silence/tone PCM: loud 0.9426, quiet 0.0041; 13,666 brighter face pixels; delta 1,283,738; Stop, effects-off and reduced motion passed with no browser errors.
+
+A separate live check used the deployed frontend, actual public N7 API and Greek model/real Web Audio playback, with only recognition input controlled. The actual API returned HTTP 200 and “Γεια σου! Πώς μπορώ να σε βοηθήσω σήμερα;”. Playback completed and automatic listening resumed; Stop and cache reuse passed; zero native voice calls and no browser errors. Fresh cold voice start was 43.709 s, then reload reused the model without a second download. It does not claim capture from a physical microphone or sound heard through the owner's speakers. See `live-real-model.json`, `live-audio-reactivity.json` and `live-conversation.png`.
