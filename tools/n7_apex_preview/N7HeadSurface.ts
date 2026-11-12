@@ -7,7 +7,7 @@ import * as THREE from "three";
 // point is carried by rigid joint rotations (yaw, pitch, roll); the shoulders
 // are not skinned at all. Orthographic projection, so the head never grows.
 // The approved image is untouched at rest. No eyes or facial features exist.
-export type GuideFrame={turn:number;pitch?:number;roll?:number;breath?:number;assembly?:number;baseMood?:number;states?:number[];ages?:number[];ignition?:number;time?:number;voiceLevel?:number};
+export type GuideFrame={turn:number;pitch?:number;roll?:number;talk?:number;breath?:number;assembly?:number;baseMood?:number;states?:number[];ages?:number[];ignition?:number;time?:number;voiceLevel?:number};
 // `scale` only raises the raster resolution (second face option); geometry,
 // joints and limits stay in the same 320x480 layout units.
 // `faceRelief` 0 keeps the approved N7 volume exactly. 1 is for a realistic
@@ -37,7 +37,7 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0) 
   geometry.setAttribute("source",new THREE.Float32BufferAttribute(sources,2));
   geometry.setIndex(indices);
   const material=new THREE.ShaderMaterial({
-    uniforms:{turn:{value:0},pitch:{value:0},neckMatrix:{value:new THREE.Matrix4()},headMatrix:{value:new THREE.Matrix4()},faceRelief:{value:faceRelief},artwork:{value:texture},breath:{value:0},opacity:{value:1},
+    uniforms:{turn:{value:0},pitch:{value:0},neckMatrix:{value:new THREE.Matrix4()},headMatrix:{value:new THREE.Matrix4()},faceRelief:{value:faceRelief},talk:{value:0},artwork:{value:texture},breath:{value:0},opacity:{value:1},
       baseMood:{value:0},states:{value:[0,0,0,0]},ages:{value:[0,0,0,0]},count:{value:0},ignition:{value:0},time:{value:0},voiceLevel:{value:-1}},
     depthTest:false,depthWrite:false,side:THREE.DoubleSide,toneMapped:false,transparent:true,
     vertexShader:`
@@ -115,6 +115,8 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0) 
     uniform float ignition;
     uniform float time;
     uniform float voiceLevel;
+    uniform float talk;
+    uniform float faceRelief;
     vec3 palette(vec3 c,float mood){
       vec3 s=linearToOutputTexel(vec4(c,1.)).rgb;
       float d=distance(texUV*vec2(320.,480.),vec2(160.,150.));
@@ -155,6 +157,18 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0) 
         }
       }
       color+=c.rgb*vec3(.50,.25,.03)*ignition*exp(-pow(d/38.,2.));
+      // Speaking (owner reference: MIRA): a soft vertical light inside the
+      // dark, featureless face, carried by the real playback level. It lights
+      // only the empty face; drawn lines and the outline are left as they are.
+      if(talk>0.){
+        vec2 q=texUV*vec2(320.,480.);
+        float level=voiceLevel<0.?(.55+.45*sin(time*6.5)):voiceLevel;
+        float inner=exp(-pow((q.x-160.)/7.5,2.)-pow((q.y-138.)/36.,2.));
+        float veil=exp(-pow((q.x-160.)/30.,2.)-pow((q.y-138.)/52.,2.));
+        float dark=1.-smoothstep(.10,.45,max(max(c.r,c.g),c.b));
+        float sheen=talk*level*(1.-.8*faceRelief)*dark*(1.9*inner+.12*veil);
+        color+=vec3(.72,.93,1.)*sheen;
+      }
       // Shadow changes light, never coverage. Glow only modulates source color.
       gl_FragColor=vec4(color*shade+color*vec3(.55,.94,1.)*rim,c.a*opacity);
       #include <colorspace_fragment>
@@ -163,8 +177,15 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0) 
   });
   const scene=new THREE.Scene();
   const mesh=new THREE.Mesh(geometry,material);mesh.frustumCulled=false;scene.add(mesh);
+  // Galaxy assembly (owner reference: MIRA). A light core is born at the
+  // heart, matter spirals out of it as a rotating two-armed galaxy, the galaxy
+  // grows to the height of the figure and every grain then settles on its own
+  // place in the approved artwork, leaving a dotted silhouette. The full
+  // figure is revealed after the burst (see N7GuideView). Same sampled grains,
+  // same colours: no new shape is drawn.
+  const CORE_X=160,CORE_Y=297;
   const particleGeometry=new THREE.BufferGeometry();
-  const anchors:number[]=[],delays:number[]=[],jitter:number[]=[];
+  const anchors:number[]=[],seeds:number[]=[],jitter:number[]=[];
   let sample=image;
   if(image.width!==320||image.height!==480){sample=document.createElement("canvas");sample.width=320;sample.height=480;sample.getContext("2d")!.drawImage(image,0,0,320,480);}
   const px=sample.getContext("2d")!.getImageData(0,0,320,480).data;
@@ -173,43 +194,65 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0) 
     if(px[i]+px[i+1]+px[i+2]<21||px[i+3]<8)continue;
     const hash=((x*73856093)^(y*19349663))>>>0;
     anchors.push(x+1,y+1,0);
-    delays.push(Math.min(.76,x/320*.60+(y<168?.08:0)+(y<168&&x>105&&x<215?.10:0)));
+    seeds.push((hash%10007)/10007,((hash>>>8)%9973)/9973);
     jitter.push((hash%2001-1000)/1000);
   }
   particleGeometry.setAttribute("position",new THREE.Float32BufferAttribute(anchors,3));
-  particleGeometry.setAttribute("delay",new THREE.Float32BufferAttribute(delays,1));
+  particleGeometry.setAttribute("seed",new THREE.Float32BufferAttribute(seeds,2));
   particleGeometry.setAttribute("jitter",new THREE.Float32BufferAttribute(jitter,1));
   const particleMaterial=new THREE.ShaderMaterial({
     uniforms:{artwork:{value:texture},progress:{value:0},opacity:{value:1},pointSize:{value:2*scale}},
     transparent:true,depthTest:false,depthWrite:false,toneMapped:false,blending:THREE.AdditiveBlending,
     vertexShader:`
-      attribute float delay;attribute float jitter;
-      uniform float progress;uniform float pointSize;varying vec2 sampleUV;varying float alpha;
+      attribute vec2 seed;attribute float jitter;
+      uniform float progress;uniform float pointSize;varying vec2 sampleUV;varying float alpha;varying float settle;
+      const vec2 core=vec2(${CORE_X}.,${CORE_Y}.);
       void main(){
-        float local=clamp((progress-delay)/.20,0.,1.);
-        float e=local*local*(3.-2.*local),inv=1.-e;
-        vec2 control=vec2(105.+position.x*.28+jitter*10.,38.-max(0.,160.-position.y)*.04-abs(jitter)*8.);
-        vec2 p=inv*inv*vec2(15.,415.)+2.*inv*e*control+e*e*position.xy;
+        float r=sqrt(seed.x);                       // place in the galaxy, inner first
+        float born=.06+.30*r;                        // grains leave the core in order
+        float life=clamp((progress-born)/.10,0.,1.);
+        // Two arms, wound tighter toward the centre, the whole disc turning.
+        float arm=step(.5,fract(seed.y*7.31))*3.14159;
+        float spread=mix(8.,150.,smoothstep(.06,.56,progress));
+        // Stardust, not a solid band: each grain has its own scatter around its arm.
+        float scatter=fract(seed.y*31.7),drift=fract(seed.x*57.3)-.5;
+        float radius=r*spread*(.72+.56*scatter);
+        float angle=arm+r*5.2-progress*11.+jitter*.55+drift*1.4*(1.-r*.5);
+        // The disc stands up as it grows, from a flat swirl to the height of the figure.
+        float tall=mix(.55,1.55,smoothstep(.20,.60,progress));
+        vec2 swirl=core+vec2(cos(angle)*radius*.78,sin(angle)*radius*tall*.62-radius*.32*smoothstep(.25,.6,progress))+vec2(drift,scatter-.5)*6.*r;
+        // Then each grain settles on its own place, top of the figure last.
+        float order=clamp((480.-position.y)/480.,0.,1.)*.10+fract(seed.y*13.7)*.06;
+        settle=smoothstep(.52+order,.80+order,progress);
+        vec2 p=mix(swirl,position.xy,settle);
         gl_Position=vec4(p.x/160.-1.,1.-p.y/240.,0.,1.);
-        gl_PointSize=pointSize;alpha=min(1.,local*3.);
+        gl_PointSize=pointSize*(1.+.25*(1.-settle));
+        // Thousands of grains add up: faint while flying, a sparse lit dot once settled.
+        float twinkle=.6+.4*fract(seed.x*91.7+progress*13.);
+        alpha=life*mix(.11,.42,settle)*twinkle*(1.-.45*smoothstep(.86,.95,progress));
         sampleUV=position.xy/vec2(320.,480.);
       }`,
     fragmentShader:`
       uniform sampler2D artwork;uniform float opacity;
-      varying vec2 sampleUV;varying float alpha;
+      varying vec2 sampleUV;varying float alpha;varying float settle;
       void main(){
         if(alpha<.01)discard;
+        float d=length(gl_PointCoord-.5)*2.;if(d>1.)discard;
         vec2 tileUVOffset=(vec2(gl_PointCoord.x,1.-gl_PointCoord.y)-.5)*2./vec2(320.,480.);
         vec4 c=texture2D(artwork,sampleUV+tileUVOffset);
-        gl_FragColor=vec4(c.rgb,c.a*alpha*opacity);
+        // Star-white with a cyan cast while flying; the artwork's own colour once settled.
+        vec3 star=vec3(.62,.90,1.);
+        vec3 col=mix(star,max(c.rgb,star*.35),settle);
+        gl_FragColor=vec4(col,alpha*opacity*(1.-d*d*.6));
         #include <colorspace_fragment>
       }`
   });
   const particles=new THREE.Points(particleGeometry,particleMaterial);particles.frustumCulled=false;scene.add(particles);
-  const glowGeometry=new THREE.BufferGeometry();glowGeometry.setAttribute("position",new THREE.Float32BufferAttribute([15,415,0],3));
-  const glowMaterial=new THREE.ShaderMaterial({uniforms:{strength:{value:1}},transparent:true,depthTest:false,depthWrite:false,
-    vertexShader:`void main(){gl_Position=vec4(position.x/160.-1.,1.-position.y/240.,0.,1.);gl_PointSize=${(30*scale).toFixed(1)};}`,
-    fragmentShader:`uniform float strength;void main(){float d=length(gl_PointCoord-.5)*2.;gl_FragColor=vec4(1.,.55,.06,max(0.,1.-d)*max(0.,1.-d)*strength);}`});
+  // The core: a soft light at the heart that is born first and pulses.
+  const glowGeometry=new THREE.BufferGeometry();glowGeometry.setAttribute("position",new THREE.Float32BufferAttribute([CORE_X,CORE_Y,0],3));
+  const glowMaterial=new THREE.ShaderMaterial({uniforms:{strength:{value:1},size:{value:1}},transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending,
+    vertexShader:`uniform float size;void main(){gl_Position=vec4(position.x/160.-1.,1.-position.y/240.,0.,1.);gl_PointSize=${(150*scale).toFixed(1)}*size;}`,
+    fragmentShader:`uniform float strength;void main(){float d=length(gl_PointCoord-.5)*2.;if(d>1.)discard;float halo=pow(1.-d,3.)*.55;float ring=exp(-pow((d-.10)/.035,2.))*.9;float spark=exp(-d*d/.004);gl_FragColor=vec4(vec3(.62,.90,1.)*(halo+ring)+vec3(1.)*spark,clamp(halo+ring+spark,0.,1.)*strength);}`});
   const glow=new THREE.Points(glowGeometry,glowMaterial);glow.frustumCulled=false;scene.add(glow);
   const camera=new THREE.OrthographicCamera(-1,1,1,-1,.1,10);camera.position.z=1;
   // Real joint hierarchy: shoulders (fixed) -> neck base -> skull base.
@@ -246,8 +289,12 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0) 
     material.uniforms.ages.value=[...(frame.ages||[]),0,0,0,0].slice(0,4);
     material.uniforms.count.value=frame.states?.length||0;
     material.uniforms.voiceLevel.value=frame.voiceLevel??-1;
+    material.uniforms.talk.value=frame.talk||0;
     material.uniforms.ignition.value=frame.ignition||0;material.uniforms.time.value=frame.time||0;
-    particleMaterial.uniforms.progress.value=p;particleMaterial.uniforms.opacity.value=1-blend;glowMaterial.uniforms.strength.value=1-blend;
+    particleMaterial.uniforms.progress.value=p;particleMaterial.uniforms.opacity.value=1-blend;
+    const born=Math.min(1,p/.06),pulse=.85+.15*Math.sin((frame.time||0)*5.5);
+    glowMaterial.uniforms.strength.value=born*(1-blend)*(p<.86?1:Math.max(0,1-(p-.86)/.10));
+    glowMaterial.uniforms.size.value=(.35+.65*born)*pulse*(1+.6*Math.max(0,(p-.80)/.10));
     renderer.render(scene,camera);
   };
   return {

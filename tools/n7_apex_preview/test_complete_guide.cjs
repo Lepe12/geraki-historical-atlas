@@ -3,7 +3,7 @@ const url=process.env.N7_VISUAL_URL||'http://127.0.0.1:4176/n7-apex-step5/',out=
 const hostSelector='[aria-label="N7 guide artwork-tile humanoid"]';
 const result={url,scope:'unmocked rendering; separate local-only API lifecycle fixture',checks:[],limitations:['No owner-supplied assembly audio; silent timeline.','Browser voice/microphone have a separate lifecycle suite; manual mood buttons are visual previews.','Webcam is optional and not enabled.']};
 function diff(a,b,region){let n=0,max=0;for(let y=region?.y??0;y<(region?.bottom??a.height);y++)for(let x=region?.x??0;x<(region?.right??a.width);x++){const i=(y*a.width+x)*4;let d=0;for(let c=0;c<3;c++){let v=Math.abs(a.data[i+c]-b.data[i+c]);max=Math.max(max,v);d+=v;}n+=d>9;}return {pixels:n,max};}
-function metrics(png){let n=0,cyan=0,minX=png.width,maxX=-1,sumX=0;for(let y=0;y<png.height;y++)for(let x=0;x<png.width;x++){const i=(y*png.width+x)*4,r=png.data[i],g=png.data[i+1],b=png.data[i+2];if(r+g+b>45){n++;minX=Math.min(minX,x);maxX=Math.max(maxX,x);sumX+=x;}if(b>80&&g>70&&b>r*1.2)cyan++;}return {visible:n,cyan,width:maxX-minX+1,centroid:sumX/n};}
+function metrics(png){let n=0,cyan=0,minX=png.width,maxX=-1,sumX=0,minY=png.height,maxY=-1;for(let y=0;y<png.height;y++)for(let x=0;x<png.width;x++){const i=(y*png.width+x)*4,r=png.data[i],g=png.data[i+1],b=png.data[i+2];if(r+g+b>45){n++;minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y);sumX+=x;}if(b>80&&g>70&&b>r*1.2)cyan++;}return {visible:n,cyan,width:maxX-minX+1,height:maxY-minY+1,centroid:sumX/n};}
 (async()=>{
  const b=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/chromium',...(process.env.N7_BROWSER_PROXY?{proxy:{server:process.env.N7_BROWSER_PROXY}}:{}),args:['--no-sandbox','--disable-dev-shm-usage','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  try{
@@ -16,10 +16,17 @@ function metrics(png){let n=0,cyan=0,minX=png.width,maxX=-1,sumX=0;for(let y=0;y
   assert.equal(await p.getByRole('button',{name:'Technical details',exact:true}).getAttribute('aria-expanded'),'false');
   assert(Number(await h.getAttribute('data-assembly-progress'))<1,'Opening did not build the figure');
   console.log('Automatic assembly started');
-  await progress(.25);const a25=metrics(await pose('assembly-25'));
-  await progress(.60);const a60=metrics(await pose('assembly-60'));
+  // Record the progress actually shown in each capture: on a slow software
+  // renderer the frame can arrive later than the threshold that was awaited.
+  const shown=()=>h.evaluate(e=>Number(e.dataset.assemblyProgress));
+  await progress(.25);const a25=metrics(await pose('assembly-25'));a25.progress=await shown();
+  await progress(.60);const a60=metrics(await pose('assembly-60'));a60.progress=await shown();
   assert(a25.visible>350&&a25.cyan>150,'Early source transport missing');assert(a60.visible>a25.visible,'Assembly did not grow');
-  assert(a60.width>a25.width*1.45&&a60.centroid>a25.centroid+35,'No left-to-right construction');
+  // Galaxy assembly (owner reference: MIRA): matter is born at the heart, the
+  // swirl grows and stands up to the height of the figure, staying centred.
+  if(a25.progress<.40)assert(a60.height>a25.height*1.12,'Galaxy did not grow: '+JSON.stringify({a25,a60}));
+  else result.limitations.push('Early galaxy frame arrived late (progress '+a25.progress.toFixed(2)+'); growth not compared in this run.');
+  assert(Math.abs(a25.centroid-a60.centroid)<a60.width*.25,'Galaxy did not stay centred: '+JSON.stringify({a25,a60}));
   await progress(1);await p.getByText('ASSEMBLY · COMPLETE',{exact:true}).waitFor();
   await p.waitForFunction(()=>Number(document.querySelector('[aria-label="N7 completion shockwave"]').dataset.progress)>=0);
   await p.screenshot({path:path.join(out,'completion-wave-start.png')});

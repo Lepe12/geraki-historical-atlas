@@ -92,16 +92,46 @@ const N7Backdrop=forwardRef<N7BackdropHandle,{effects:boolean;reduced:boolean}>(
       host.dataset.analysisCount="1";
       start();
     };
+    // Floating strands (owner reference: MIRA): a few long, faint silk-like
+    // ribbons drifting slowly across the scene. Drawn at half resolution, about
+    // 30 times a second, only while effects are on and motion is allowed.
+    const strands=layer.querySelector<HTMLCanvasElement>("[data-strands]");
+    const sctx2=strands?.getContext("2d")||null;
+    const ribbons=Array.from({length:7},(_,i)=>({y:.12+i*.12+((i*37)%11)/100,amp:.04+((i*53)%7)/120,len:.55+((i*29)%5)/10,phase:i*1.7,speed:.018+((i*13)%5)/400,tilt:((i%3)-1)*.10,alpha:.10+((i*17)%5)/40,lines:2+(i%3)}));
+    let strandRaf=0,lastStrand=0;
+    const drawStrands=(now:number)=>{
+      strandRaf=requestAnimationFrame(drawStrands);
+      if(!strands||!sctx2||disposed)return;
+      if(!flags.current.effects||flags.current.reduced||now-lastStrand<33)return;lastStrand=now;
+      const w=Math.max(1,Math.round(host.clientWidth/2)),h=Math.max(1,Math.round(host.clientHeight/2));
+      if(strands.width!==w||strands.height!==h){strands.width=w;strands.height=h;}
+      sctx2.clearRect(0,0,w,h);const t=now/1000;
+      for(const r of ribbons){
+        const start=((t*r.speed+r.phase*.13)%1.6)-.55,x0=start*w,x1=(start+r.len)*w;
+        const g=sctx2.createLinearGradient(x0,0,x1,0);g.addColorStop(0,"rgba(170,232,248,0)");g.addColorStop(.5,`rgba(196,240,252,${r.alpha})`);g.addColorStop(1,"rgba(170,232,248,0)");
+        sctx2.strokeStyle=g;
+        for(let l=0;l<r.lines;l++){
+          sctx2.lineWidth=l?.6:1;sctx2.beginPath();
+          for(let s=0;s<=40;s++){const f=s/40,x=x0+(x1-x0)*f,yy=(r.y+r.tilt*(f-.5)+r.amp*Math.sin(f*5.2+t*.35+r.phase)+.012*Math.sin(f*13+t*.6+r.phase))*h+l*2.2;s?sctx2.lineTo(x,yy):sctx2.moveTo(x,yy);}
+          sctx2.stroke();
+        }
+      }
+    };
+    strandRaf=requestAnimationFrame(drawStrands);
     image.addEventListener("load",load);
     if(image.complete&&image.naturalWidth) load();
-    return()=>{disposed=true;observer.disconnect();layer.replaceChildren();image.removeEventListener("load",load);restart.current=()=>{};waveRef.current=()=>{};};
+    return()=>{disposed=true;cancelAnimationFrame(strandRaf);observer.disconnect();for(const point of highlights)point.sprite.remove();image.removeEventListener("load",load);restart.current=()=>{};waveRef.current=()=>{};};
   },[]);
 
   return <div ref={hostRef} aria-label="N7 Step 6 living backdrop" data-effects={effects&&!reduced?"on":"off"}
     style={{position:"absolute",inset:0,zIndex:0,pointerEvents:"none",overflow:"hidden"}}>
     <img ref={imageRef} src={N7_BACKDROP_REFERENCE} alt="Cinematic mountain landscape" style={{position:"absolute",width:"100%",height:"100%",objectFit:"cover"}} />
-    <style>{`@keyframes n7-ridge-light {0%,100% {opacity:.08} 50% {opacity:.78}}`}</style>
-    <div ref={layerRef} data-ridge-layer="" aria-label="Existing ridge illumination" style={{position:"absolute",inset:0}} />
+    <style>{`@keyframes n7-ridge-light {0%,100% {opacity:.08} 50% {opacity:.78}}@keyframes n7-smoke-drift {0% {transform:scale(1.10) translate(-1.8%,.8%)} 100% {transform:scale(1.14) translate(1.8%,-1.2%)}}`}</style>
+    <div ref={layerRef} data-ridge-layer="" aria-label="Existing ridge illumination" style={{position:"absolute",inset:0}}>
+      {/* Slow smoke drift: a soft, faint copy of the same raster moving very slowly. */}
+      <div aria-hidden="true" data-smoke-drift="" style={{position:"absolute",inset:0,backgroundImage:`url(${N7_BACKDROP_REFERENCE})`,backgroundSize:"cover",backgroundPosition:"center",opacity:.32,mixBlendMode:"screen",filter:"blur(6px)",animation:"n7-smoke-drift 48s ease-in-out infinite alternate"}}/>
+      <canvas data-strands="" aria-hidden="true" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/>
+    </div>
   </div>;
 });
 export default N7Backdrop;

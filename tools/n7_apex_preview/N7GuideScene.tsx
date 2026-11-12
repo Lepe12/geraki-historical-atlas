@@ -18,7 +18,7 @@ export default function N7GuideScene(props:GuideSceneProps){
   useEffect(()=>{config.current=props;},[props]);
   useEffect(()=>{
     const host=hostRef.current;if(!host)return;
-    let disposed=false,raf=0,target=0,current=0,targetPitch=0,currentPitch=0,last=0,lastStats=0;
+    let talk=0,disposed=false,raf=0,target=0,current=0,targetPitch=0,currentPitch=0,last=0,lastStats=0;
     // Critically damped joint springs (no overshoot) and a separate, slower
     // life/state gesture layer. The pointer value reported in the dataset is
     // the pointer-following part only.
@@ -145,9 +145,12 @@ export default function N7GuideScene(props:GuideSceneProps){
         voiceNod+=(nodTarget-voiceNod)*(1-Math.exp(-dt/120));
         if(!alive&&Math.abs(gestureYaw)+Math.abs(gesturePitch)+Math.abs(gestureRoll)+Math.abs(voiceNod)<.002){gestureYaw=0;gesturePitch=0;gestureRoll=0;voiceNod=0;}
         if(!c.effects||c.reduced||mode==="original"){gestureYaw=0;gesturePitch=0;gestureRoll=0;voiceNod=0;}
+        // Face light for Speaking eases in and out; none in reduced motion or with effects off.
+        const wantTalk=c.effects&&desired==="speaking"&&progress>=1&&mode!=="original"?1:0;
+        talk+=(wantTalk-talk)*(1-Math.exp(-dt/(wantTalk?160:140)));if(Math.abs(wantTalk-talk)<.002)talk=wantTalk;if(c.reduced)talk=wantTalk;
         const poseYaw=Math.max(-1,Math.min(1,current+gestureYaw)),posePitch=Math.max(-1,Math.min(1,currentPitch+gesturePitch+voiceNod)),poseRoll=gestureRoll;
         const still=poseYaw===0&&posePitch===0&&poseRoll===0;
-        const exact=mode==="original"||!c.effects||progress===1&&still&&breath===0&&baseMood===0&&!transitions.length&&ignition===0;
+        const exact=mode==="original"||!c.effects||progress===1&&still&&breath===0&&baseMood===0&&!transitions.length&&ignition===0&&talk===0;
         host.dataset.voiceLevel=voiceLevel.toFixed(4);
         const start=performance.now();
         if(exact){
@@ -159,9 +162,9 @@ export default function N7GuideScene(props:GuideSceneProps){
           reference.style.display="none";
           const frameKey=c.reduced
             ?[progress.toFixed(5),baseMood,poseYaw.toFixed(5),posePitch.toFixed(5),
-              transitions.length,c.effects].join(":"):"";
+              transitions.length,c.effects,talk.toFixed(3)].join(":"):"";
           if(!c.reduced||stillFrameKey!==frameKey){
-            surface!.render({turn:poseYaw,pitch:posePitch,roll:poseRoll,breath,assembly:progress,baseMood,states:transitions.map(t=>t.mood),ages:transitions.map(t=>Math.min(1,(now-t.start)/1000)),ignition,voiceLevel,time:c.reduced?0:now/1000});
+            surface!.render({turn:poseYaw,pitch:posePitch,roll:poseRoll,talk,breath,assembly:progress,baseMood,states:transitions.map(t=>t.mood),ages:transitions.map(t=>Math.min(1,(now-t.start)/1000)),ignition,voiceLevel,time:c.reduced?0:now/1000});
             if(c.reduced&&stillContext){
               // Once per actual state: preserve the frame pixels, then
               // stop presenting WebGL while reduced motion is requested.
