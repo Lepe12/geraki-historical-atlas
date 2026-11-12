@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
+import {readVoiceSignal} from "./N7VoiceSignal";
 import { createHeadSurface } from "./N7HeadSurface";
 import { N7_HUMANOID_REFERENCE } from "./N7HumanoidReference";
 
@@ -98,11 +99,13 @@ export default function N7GuideScene(props:GuideSceneProps){
         const wave=shock>=0&&shock<=1?shock:-1;
         const ignition=c.effects&&!c.reduced?(progress<1?Math.max(0,(progress-.91)/.09):wave>=0?Math.max(0,1-wave*3):0):0;
         const exact=mode==="original"||!c.effects||progress===1&&current===0&&currentPitch===0&&breath===0&&baseMood===0&&!transitions.length&&ignition===0;
+        const voiceLevel=c.effects&&!c.reduced?readVoiceSignal(now):0;
+        host.dataset.voiceLevel=voiceLevel.toFixed(4);
         const start=performance.now();
         if(exact){surface!.canvas.style.display="none";reference.style.display="block";}
         else{
           reference.style.display="none";surface!.canvas.style.display="block";
-          surface!.render({turn:current,pitch:currentPitch,breath,assembly:progress,baseMood,states:transitions.map(t=>t.mood),ages:transitions.map(t=>Math.min(1,(now-t.start)/1000)),ignition,time:c.reduced?0:now/1000});
+          surface!.render({turn:current,pitch:currentPitch,breath,assembly:progress,baseMood,states:transitions.map(t=>t.mood),ages:transitions.map(t=>Math.min(1,(now-t.start)/1000)),ignition,voiceLevel,time:c.reduced?0:now/1000});
         }
         const renderMs=performance.now()-start;
         host.dataset.currentTurn=current.toFixed(4);host.dataset.currentPitch=currentPitch.toFixed(4);host.dataset.assemblyProgress=progress.toFixed(4);

@@ -1,11 +1,14 @@
+import {attachVoiceSignal,detachVoiceSignal} from "./N7VoiceSignal";
 import {N7_HUMANOID_REFERENCE} from "./N7HumanoidReference";
 export const FEMALE_VOICE_ID="n7:el-female";
 type Callbacks={start:()=>void;end:()=>void;error:(message:string)=>void;progress:(message:string)=>void};
 export function createFemaleVoice(){
+ let analyser:AnalyserNode|null=null;
  let playbackTimer:ReturnType<typeof setTimeout>|null=null;
  let worker:Worker|null=null,context:AudioContext|null=null,source:AudioBufferSourceNode|null=null,sequence=0,job:{id:number;callbacks:Callbacks;timer:ReturnType<typeof setTimeout>}|null=null;
  const unlock=()=>{if(!context)context=new AudioContext();return context.resume();};
- const cancel=()=>{sequence++;if(playbackTimer)clearTimeout(playbackTimer);playbackTimer=null;if(job){clearTimeout(job.timer);job=null;worker?.terminate();worker=null;}if(source){source.onended=null;try{source.stop();}catch{}source.disconnect();source=null;}};
+ const clearSignal=()=>{if(analyser){detachVoiceSignal(analyser);analyser.disconnect();analyser=null;}};
+ const cancel=()=>{sequence++;clearSignal();if(playbackTimer)clearTimeout(playbackTimer);playbackTimer=null;if(job){clearTimeout(job.timer);job=null;worker?.terminate();worker=null;}if(source){source.onended=null;try{source.stop();}catch{}source.disconnect();source=null;}};
  const play=(text:string,callbacks:Callbacks)=>{
   cancel();const id=++sequence;
   const fail=(message:string)=>{if(id!==sequence)return;cancel();callbacks.error(message);};
@@ -25,8 +28,8 @@ export function createFemaleVoice(){
       await context!.resume();if(!job||job.id!==data.id||data.id!==sequence)return;
       if(context!.state!=='running')throw Error('audio_locked');
       clearTimeout(job.timer);job=null;
-      const node=context!.createBufferSource();source=node;node.buffer=audio;node.connect(context!.destination);
-      node.onended=()=>{if(data.id!==sequence)return;if(playbackTimer)clearTimeout(playbackTimer);playbackTimer=null;source=null;node.disconnect();current.callbacks.end();};
+      const node=context!.createBufferSource();source=node;node.buffer=audio;const meter=context!.createAnalyser();meter.fftSize=1024;analyser=meter;node.connect(meter);meter.connect(context!.destination);attachVoiceSignal(meter);
+      node.onended=()=>{if(data.id!==sequence)return;if(playbackTimer)clearTimeout(playbackTimer);playbackTimer=null;source=null;node.disconnect();clearSignal();current.callbacks.end();};
       node.start();playbackTimer=setTimeout(()=>{if(data.id===sequence){cancel();current.callbacks.error("Ο ήχος διακόπηκε. Μπορείς να ξεκινήσεις ξανά τη συζήτηση.");}},audio.duration*1000+10000);current.callbacks.start();
      }catch{if(data.id===sequence){cancel();current.callbacks.error("Ο ήχος δεν ξεκίνησε. Πάτησε Δοκιμή φωνής για να επιτρέψεις τον ήχο.");}}
     };

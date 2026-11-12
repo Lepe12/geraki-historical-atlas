@@ -3,7 +3,7 @@ import * as THREE from "three";
 // N7 APEX Step 5: one shared depth-aware yaw/pitch rotation of the whole skull.
 // Isolated preview only; deploy is gated by real-browser visual regressions.
 // Only the skull-to-neck border blends into the stationary body.
-export type GuideFrame={turn:number;pitch?:number;breath?:number;assembly?:number;baseMood?:number;states?:number[];ages?:number[];ignition?:number;time?:number};
+export type GuideFrame={turn:number;pitch?:number;breath?:number;assembly?:number;baseMood?:number;states?:number[];ages?:number[];ignition?:number;time?:number;voiceLevel?:number};
 export function createHeadSurface(image:HTMLCanvasElement) {
   const renderer=new THREE.WebGLRenderer({alpha:false,antialias:false,depth:false,preserveDrawingBuffer:true});
   renderer.setSize(320,480,false);renderer.setPixelRatio(1);
@@ -29,7 +29,7 @@ export function createHeadSurface(image:HTMLCanvasElement) {
   geometry.setIndex(indices);
   const material=new THREE.ShaderMaterial({
     uniforms:{turn:{value:0},pitch:{value:0},artwork:{value:texture},breath:{value:0},opacity:{value:1},
-      baseMood:{value:0},states:{value:[0,0,0,0]},ages:{value:[0,0,0,0]},count:{value:0},ignition:{value:0},time:{value:0}},
+      baseMood:{value:0},states:{value:[0,0,0,0]},ages:{value:[0,0,0,0]},count:{value:0},ignition:{value:0},time:{value:0},voiceLevel:{value:-1}},
     depthTest:false,depthWrite:false,side:THREE.DoubleSide,toneMapped:false,transparent:true,
     vertexShader:`
     attribute vec2 source;
@@ -88,6 +88,7 @@ export function createHeadSurface(image:HTMLCanvasElement) {
     uniform int count;
     uniform float ignition;
     uniform float time;
+    uniform float voiceLevel;
     vec3 palette(vec3 c,float mood){
       vec3 s=linearToOutputTexel(vec4(c,1.)).rgb;
       float d=distance(texUV*vec2(320.,480.),vec2(160.,150.));
@@ -104,7 +105,7 @@ export function createHeadSurface(image:HTMLCanvasElement) {
           if(amber)s+=vec3(28.,12.,4.)*k*visible/255.;
         }else s*=vec3(.90,.94,.97);
       }else if(mood>2.5){
-        float k=max(0.,1.-d/92.)*(.68+.32*sin(time*1000./115.));
+        float k=max(0.,1.-d/92.)*(voiceLevel<0.?(.68+.32*sin(time*1000./115.)):voiceLevel);
         s+=vec3(135.,70.,-35.)*k*visible/255.;
         if(cyan)s*=vec3(1.,1.08,1.12);
       }
@@ -192,6 +193,7 @@ export function createHeadSurface(image:HTMLCanvasElement) {
     material.uniforms.states.value=[...(frame.states||[]),0,0,0,0].slice(0,4);
     material.uniforms.ages.value=[...(frame.ages||[]),0,0,0,0].slice(0,4);
     material.uniforms.count.value=frame.states?.length||0;
+    material.uniforms.voiceLevel.value=frame.voiceLevel??-1;
     material.uniforms.ignition.value=frame.ignition||0;material.uniforms.time.value=frame.time||0;
     particleMaterial.uniforms.progress.value=p;particleMaterial.uniforms.opacity.value=1-blend;glowMaterial.uniforms.strength.value=1-blend;
     renderer.render(scene,camera);
