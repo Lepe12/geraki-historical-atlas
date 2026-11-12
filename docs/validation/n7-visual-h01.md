@@ -33,4 +33,11 @@ New `test_face_menu.cjs`: default face is the approved v4 at 320×480; all 15 bu
 
 All eleven existing suites pass unchanged on the same build: head/backdrop regression, joints, complete guide, voice, voice reactivity, Greek female Piper voice, automatic conversation, mobile conversation, passwordless, real-avatar trial and H01 head trial. As before, API, speech-recognition input and tone PCM in those suites are fixtures; the Piper model, Web Audio and rendering are real. The workflow now takes the preview path from the environment instead of hard-coding `/n7-apex-step5/`. One change to an existing test: the reduced-motion check in `test_complete_guide.cjs` waited a fixed 200 ms after selecting Speaking and failed intermittently under load at the end of that suite (once in CI, three of four live runs; six of six isolated replays were stable). It now waits for the Speaking still frame itself before comparing two captures 350 ms apart; the assertion is unchanged. The cause of the slow state change was not established beyond load.
 
-Evidence: `n7-visual-h01-evidence/`. Live results are added below only after the deployed trial has actually been checked.
+Evidence: `n7-visual-h01-evidence/`.
+
+## Live verification — 2026-11-12
+
+- Source `d6cff2685`; [validation and trial deployment passed](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/43230213791), all twelve browser suites in CI. Public-chat and voice deployment steps were skipped for this branch.
+- [Visual trial](https://bot.piratecartography.com/n7-apex-step5-visual/), release `0c5487071961799a`. Read after deployment: functional preview `/n7-apex-step5/` still `2c3286f6ce6b899a`, production `/n7-apex/` still `bbdc05016a211581`. The H01 figure served live has the same SHA-256 as the committed asset.
+- Fresh TLS-verified browser against the live trial, no API or rendering mocks: `test_face_menu.cjs`, `test_head_joints.cjs`, `test_head_backdrop.cjs` and `test_complete_guide.cjs` all passed.
+- Not re-run live on this trial: a real spoken conversation turn. Voice and conversation code are unchanged and their fixture suites pass in CI on this build; the last real Greek voice turn was verified on the functional preview (see `n7-head-joints.md`). Physical microphone and speaker, authenticated owner sessions and frame rate on a real GPU remain unverified.
