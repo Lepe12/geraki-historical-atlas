@@ -1,0 +1,88 @@
+name: N7 library hybrid search — index and install
+on:
+  pull_request:
+    paths:
+      - 'tools/library/n7_library.php'
+      - 'tools/library/n7-semantic-index.mjs'
+      - 'tools/library/n7_semantic_*.py'
+      - 'tools/library/deploy_n7_semantic_ftps.py'
+      - 'tools/library/probe_n7_semantic.py'
+      - 'tools/n7/semantic-model.json'
+      - 'tools/n7/prepare-semantic-model.cjs'
+      - '.github/workflows/n7-library-semantic.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'ops_ftps_requests/n7-library-semantic.json'
+  workflow_dispatch: # rebuild the index after books are added
+permissions:
+  contents: read
+concurrency:
+  group: n7-library-semantic-production
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/library
+            tools/n7
+      - name: Static checks (no production access)
+        run: |
+          php -l tools/library/n7_library.php
+          php tools/library/n7_library.php self-test
+          python3 -m py_compile tools/library/n7_semantic_fetch_pages.py tools/library/n7_semantic_vocab.py tools/library/deploy_n7_semantic_ftps.py tools/library/probe_n7_semantic.py
+          node --check tools/n7/prepare-semantic-model.cjs
+          python3 -c "import json;json.load(open('tools/n7/semantic-model.json'))"
+  install:
+    needs: validate
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 90
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME || 'linux3087.grserver.gr' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/library
+            tools/n7
+            ops_ftps_requests/n7-library-semantic.json
+      - name: Owner authorization
+        run: |
+          python3 - <<'PY'
+          import json,os
+          if os.environ['GITHUB_EVENT_NAME']=='push':
+              j=json.load(open('ops_ftps_requests/n7-library-semantic.json'))
+              assert j=={'authorization':'INSTALL-N7-HYBRID-LIBRARY-SEARCH','writes':['n7_library.php','n7-semantic index','n7-model public files'],
+                         'database_writes':False,'page_text_published':False}, j
+          PY
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install offline-only tools (never deployed)
+        run: |
+          python3 -m pip install --disable-pip-version-check 'wordfreq==3.1.1'
+          mkdir -p "$RUNNER_TEMP/n7sem" && cd "$RUNNER_TEMP/n7sem" && npm init -y >/dev/null && npm install --no-audit --no-fund @huggingface/transformers@3.7.5
+      - name: Read library pages through the existing signed bridge
+        run: python3 tools/library/n7_semantic_fetch_pages.py "$RUNNER_TEMP/pages.jsonl"
+      - name: Build vocabulary and passage index (multilingual-e5-small, offline)
+        run: |
+          python3 tools/library/n7_semantic_vocab.py "$RUNNER_TEMP/pages.jsonl" "$RUNNER_TEMP/vocab.json"
+          cp tools/library/n7-semantic-index.mjs "$RUNNER_TEMP/n7sem/"
+          cd "$RUNNER_TEMP/n7sem" && node n7-semantic-index.mjs "$RUNNER_TEMP/pages.jsonl" "$RUNNER_TEMP/vocab.json" "$RUNNER_TEMP/index"
+      - name: Fetch and verify pinned public model
+        run: node tools/n7/prepare-semantic-model.cjs "$RUNNER_TEMP/n7-model"
+      - name: Install (staged, read back, PHP backup kept)
+        run: |
+          rm -f "$RUNNER_TEMP/pages.jsonl"
+          python3 tools/library/deploy_n7_semantic_ftps.py "$RUNNER_TEMP/index" "$RUNNER_TEMP/n7-model"
+      - name: Read-only production verification
+        run: python3 tools/library/probe_n7_semantic.py
