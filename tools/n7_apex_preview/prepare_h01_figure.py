@@ -2,8 +2,9 @@
 """Compose the owner-supplied H01 head onto the approved N7 body (second face option).
 
 Inputs are the committed, pinned assets only; no image generation is involved.
-The H01 face is scaled uniformly (no feature warping), its neck is shown only
-inside the body's own neck outline, and both layers get a light colour match.
+The H01 head and neck are scaled uniformly and never warped; the body's
+shoulder lines are raised next to the neck to meet H01's own neck flare, and
+both layers get a light colour match.
 Output: 800x1200 lossless WebP whose 320x480-unit layout equals the approved
 figure, so the existing neck/skull joint rig applies unchanged.
 """
@@ -58,11 +59,21 @@ def main():
     ux, uy = xx / K, yy / K          # layout units
     dx = np.abs(ux - 160)
 
-    # 1. Remove the approved line-art head; keep its neck and shoulders.
-    #    Its loose strands beside the neck go too: H01 brings its own.
-    #    The cut follows the shoulder slope, just above its contour line.
-    #    It stays clear of that contour so the shoulder lines keep rising into the neck.
-    keep_from = 204.0 + np.interp(dx, [28, 40, 50, 62, 100, 160], [0, 3, 11, 18, 36, 56])
+    # 1. H01 keeps its own neck at its natural width. Its neck flares into the
+    #    shoulders about 13 units higher than the body's shoulder line, so the
+    #    body's shoulder lines are raised to meet it next to the neck (nothing
+    #    further out or lower moves) and the two outlines become one.
+    lift = 13.0 * (1 - smooth(44, 112, dx)) * (1 - smooth(250, 300, uy))
+    rows = np.arange(H, dtype=np.float32)
+    lifted = np.empty_like(body)
+    source_y = (uy + lift) * K
+    for column in range(W):
+        for channel in range(3):
+            lifted[:, column, channel] = np.interp(source_y[:, column], rows, body[:, column, channel])
+    body = lifted
+    #    Remove the approved line-art head and its loose strands; keep the
+    #    (raised) shoulders. The cut stays clear of the shoulder contour.
+    keep_from = 204.0 + np.interp(dx, [28, 40, 50, 62, 100, 160], [0, 3, 11, 18, 36, 56]) - 13.0 * (1 - smooth(44, 112, dx))
     body_keep = smooth(-4, 4, uy - keep_from)
     body *= body_keep[..., None]
 
@@ -90,32 +101,24 @@ def main():
     rgb = hue_shift(rgb, 196, 232, -6)
     rgb = hue_shift(rgb, 14, 40, +5)
 
-    # 4. One neck. Below the chin only, the H01 neck is narrowed sideways so
-    #    its own warm and cool rim lines run into the body's neck outline
-    #    (half-width 34 -> 26.5 units). The face and chin are not warped.
-    ramp = smooth(192, 207, uy)
-    knots_out = np.array([0, 12, 26.5, 46, 400], np.float32)
-    knots_src = np.array([0, 12, 34.0, 46, 400], np.float32)
-    src_dx = np.interp(dx, knots_out, knots_src)
-    src_ux = 160 + np.sign(ux - 160) * (dx + (src_dx - dx) * ramp)
-    premult = np.concatenate([rgb * alpha[..., None], alpha[..., None]], axis=2)
-    warped = np.empty_like(premult)
-    columns = np.arange(W, dtype=np.float32)
-    for row in range(H):
-        sample = src_ux[row] * K
-        for channel in range(4):
-            warped[row, :, channel] = np.interp(sample, columns, premult[row, :, channel])
-    alpha = warped[..., 3]
-    #    Then the H01 skin fades into the body's own neck and never reaches
-    #    the shoulders; its cut-off bust edge is not shown.
-    neck_half = 26.5 + 9.0 * smooth(226, 246, uy)
-    inside_neck = 1 - smooth(neck_half + 1.0, neck_half + 5.0, dx)
-    fade = (1 - smooth(210, 240, uy)) * (1 - smooth(212, 222, uy) * (1 - inside_neck))
-    #    Nothing of H01's flaring bust may stick out beside the neck base; only its
-    #    loose hair, further out, is kept there.
-    flare = smooth(205, 212, uy) * smooth(neck_half + 1.0, neck_half + 5.0, dx) * (1 - smooth(44, 48, dx))
-    fade *= 1 - flare
-    out = body * (1 - alpha * fade)[..., None] + warped[..., :3] * fade[..., None]
+    # 4. One neck: no narrowing and no cut. H01's neck and its flare stay as
+    #    drawn and dissolve softly into the body: sideways along the shoulder
+    #    line, where its warm and cool rims hand over to the body's own line,
+    #    and downward over the upper chest. Loose hair beside the neck is kept.
+    radius = int(7 * K)
+    kernel = np.exp(-.5 * (np.arange(-3 * radius, 3 * radius + 1) / radius) ** 2); kernel /= kernel.sum()
+    column_soft = np.empty_like(alpha)
+    for column in range(W):
+        column_soft[:, column] = np.convolve(np.pad(alpha[:, column], 3 * radius, mode="edge"), kernel, mode="valid")
+    low = smooth(210, 218, uy)
+    sideways = 1 - low * smooth(40, 56, dx)
+    downward = 1 - low * (1 - smooth(.50, .96, column_soft))
+    #    The matte skin thins out gradually toward the chest; its bright
+    #    filaments carry further, so they read as the body's own lines.
+    bright = smooth(.40, .85, rgb.max(axis=2))
+    downward *= 1 - smooth(212, 244, uy) * (1 - .75 * bright)
+    fade = sideways * downward
+    out = body * (1 - alpha * fade)[..., None] + rgb * (alpha * fade)[..., None]
 
     image = Image.fromarray((np.clip(out, 0, 1) * 255 + 0.5).astype(np.uint8), "RGB")
     target = pathlib.Path(args.out)

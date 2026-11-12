@@ -61,18 +61,21 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0) 
       // Rounded rest volume measured on the approved 320x480 artwork:
       // face oval, skull with hair, and the neck column under the chin.
       float face=dome(tile,vec2(160.,138.),vec2(66.,92.),64.);
-      float skull=dome(tile,vec2(160.,105.),vec2(96.,102.),mix(46.,34.,faceRelief));
+      float skull=dome(tile,vec2(160.,105.),vec2(96.,102.),mix(46.,40.,faceRelief));
       float plateRho=min(1.,length((tile-vec2(160.,140.))/vec2(72.,98.)));
-      face=mix(face,42.*(1.-pow(plateRho,2.8)),faceRelief);
+      face=mix(face,58.*(1.-pow(plateRho,3.0)),faceRelief);
       float neck=28.*cos(min(1.,abs(tile.x-160.)/30.)*1.5707963)*smoothstep(170.,200.,tile.y);
       float depth=smax(smax(face,skull),neck)-6.;
       vec4 rest=vec4(tile.x,tile.y,depth,1.);
 
       // Skin weights. The skull, face, jaw and loose hair are fully bound to
       // the head joint. The neck column blends head -> neck -> fixed shoulders.
-      float lateral=smoothstep(30.,46.,abs(tile.x-160.));
-      float wHead=1.-smoothstep(mix(200.,210.,lateral),mix(226.,232.,lateral),tile.y);
-      float wNeck=1.-smoothstep(mix(222.,210.,lateral),mix(256.,232.,lateral),tile.y);
+      float lateral=smoothstep(mix(30.,36.,faceRelief),mix(46.,50.,faceRelief),abs(tile.x-160.));
+      // With H01 the shoulder lines rise higher beside the neck, so the loose
+      // hair there lets go earlier and the raised shoulders stay fixed.
+      float looseFrom=mix(210.,204.,faceRelief),looseTo=mix(232.,217.,faceRelief);
+      float wHead=1.-smoothstep(mix(200.,looseFrom,lateral),mix(226.,looseTo,lateral),tile.y);
+      float wNeck=1.-smoothstep(mix(222.,looseFrom,lateral),mix(256.,looseTo,lateral),tile.y);
       wNeck=max(wNeck,wHead);
       vec3 skinned=rest.xyz*(1.-wNeck)+(neckMatrix*rest).xyz*(wNeck-wHead)+(headMatrix*rest).xyz*wHead;
       vec2 p=skinned.xy;
