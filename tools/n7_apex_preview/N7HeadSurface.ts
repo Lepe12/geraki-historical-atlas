@@ -8,9 +8,11 @@ import * as THREE from "three";
 // are not skinned at all. Orthographic projection, so the head never grows.
 // The approved image is untouched at rest. No eyes or facial features exist.
 export type GuideFrame={turn:number;pitch?:number;roll?:number;breath?:number;assembly?:number;baseMood?:number;states?:number[];ages?:number[];ignition?:number;time?:number;voiceLevel?:number};
-export function createHeadSurface(image:HTMLCanvasElement) {
+// `scale` only raises the raster resolution (second face option); geometry,
+// joints and limits stay in the same 320x480 layout units.
+export function createHeadSurface(image:HTMLCanvasElement,scale=1) {
   const renderer=new THREE.WebGLRenderer({alpha:false,antialias:false,depth:false,preserveDrawingBuffer:true});
-  renderer.setSize(320,480,false);renderer.setPixelRatio(1);
+  renderer.setSize(Math.round(320*scale),Math.round(480*scale),false);renderer.setPixelRatio(1);
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   renderer.toneMapping=THREE.NoToneMapping;
   const texture=new THREE.Texture(image);
@@ -154,7 +156,9 @@ export function createHeadSurface(image:HTMLCanvasElement) {
   const mesh=new THREE.Mesh(geometry,material);mesh.frustumCulled=false;scene.add(mesh);
   const particleGeometry=new THREE.BufferGeometry();
   const anchors:number[]=[],delays:number[]=[],jitter:number[]=[];
-  const px=image.getContext("2d")!.getImageData(0,0,320,480).data;
+  let sample=image;
+  if(image.width!==320||image.height!==480){sample=document.createElement("canvas");sample.width=320;sample.height=480;sample.getContext("2d")!.drawImage(image,0,0,320,480);}
+  const px=sample.getContext("2d")!.getImageData(0,0,320,480).data;
   for(let y=0;y<480;y+=2)for(let x=0;x<320;x+=2){
     const i=(y*320+x)*4;
     if(px[i]+px[i+1]+px[i+2]<21||px[i+3]<8)continue;
@@ -167,18 +171,18 @@ export function createHeadSurface(image:HTMLCanvasElement) {
   particleGeometry.setAttribute("delay",new THREE.Float32BufferAttribute(delays,1));
   particleGeometry.setAttribute("jitter",new THREE.Float32BufferAttribute(jitter,1));
   const particleMaterial=new THREE.ShaderMaterial({
-    uniforms:{artwork:{value:texture},progress:{value:0},opacity:{value:1}},
+    uniforms:{artwork:{value:texture},progress:{value:0},opacity:{value:1},pointSize:{value:2*scale}},
     transparent:true,depthTest:false,depthWrite:false,toneMapped:false,blending:THREE.AdditiveBlending,
     vertexShader:`
       attribute float delay;attribute float jitter;
-      uniform float progress;varying vec2 sampleUV;varying float alpha;
+      uniform float progress;uniform float pointSize;varying vec2 sampleUV;varying float alpha;
       void main(){
         float local=clamp((progress-delay)/.20,0.,1.);
         float e=local*local*(3.-2.*local),inv=1.-e;
         vec2 control=vec2(105.+position.x*.28+jitter*10.,38.-max(0.,160.-position.y)*.04-abs(jitter)*8.);
         vec2 p=inv*inv*vec2(15.,415.)+2.*inv*e*control+e*e*position.xy;
         gl_Position=vec4(p.x/160.-1.,1.-p.y/240.,0.,1.);
-        gl_PointSize=2.;alpha=min(1.,local*3.);
+        gl_PointSize=pointSize;alpha=min(1.,local*3.);
         sampleUV=position.xy/vec2(320.,480.);
       }`,
     fragmentShader:`
@@ -195,7 +199,7 @@ export function createHeadSurface(image:HTMLCanvasElement) {
   const particles=new THREE.Points(particleGeometry,particleMaterial);particles.frustumCulled=false;scene.add(particles);
   const glowGeometry=new THREE.BufferGeometry();glowGeometry.setAttribute("position",new THREE.Float32BufferAttribute([15,415,0],3));
   const glowMaterial=new THREE.ShaderMaterial({uniforms:{strength:{value:1}},transparent:true,depthTest:false,depthWrite:false,
-    vertexShader:`void main(){gl_Position=vec4(position.x/160.-1.,1.-position.y/240.,0.,1.);gl_PointSize=30.;}`,
+    vertexShader:`void main(){gl_Position=vec4(position.x/160.-1.,1.-position.y/240.,0.,1.);gl_PointSize=${(30*scale).toFixed(1)};}`,
     fragmentShader:`uniform float strength;void main(){float d=length(gl_PointCoord-.5)*2.;gl_FragColor=vec4(1.,.55,.06,max(0.,1.-d)*max(0.,1.-d)*strength);}`});
   const glow=new THREE.Points(glowGeometry,glowMaterial);glow.frustumCulled=false;scene.add(glow);
   const camera=new THREE.OrthographicCamera(-1,1,1,-1,.1,10);camera.position.z=1;

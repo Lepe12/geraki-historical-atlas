@@ -8,7 +8,7 @@ on:
       - '.github/workflows/n7-apex-preview.yml'
       - 'ops_ftps_requests/n7-apex-preview.json'
   push:
-    branches: [main, 'preview/n7-apex-step5-guide']
+    branches: [main, 'preview/n7-apex-step5-guide', 'preview/n7-visual-h01']
     paths:
       - 'tools/n7_apex_preview/**'
       - '.github/workflows/n7-apex-preview.yml'
@@ -29,8 +29,9 @@ jobs:
       PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
       PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
       N7_DRY_RUN: '1'
-      N7_APEX_BASE_PATH: ${{ github.ref == 'refs/heads/main' && '/n7-apex' || '/n7-apex-step5' }}
-      N7_APEX_TARGET: ${{ github.ref == 'refs/heads/main' && 'n7-apex' || 'n7-apex-step5' }}
+      # The visual trial branch publishes beside the functional preview, never over it.
+      N7_APEX_BASE_PATH: ${{ github.ref == 'refs/heads/main' && '/n7-apex' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && '/n7-apex-step5-visual' || '/n7-apex-step5') }}
+      N7_APEX_TARGET: ${{ github.ref == 'refs/heads/main' && 'n7-apex' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && 'n7-apex-step5-visual' || 'n7-apex-step5') }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -50,7 +51,7 @@ jobs:
           python3 tools/n7_apex_preview/test_deploy_female_voice.py
           python3 tools/n7_apex_preview/deploy_public_chat.py
       - name: Reconstruct pinned Greek female voice assets
-        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
         run: python3 tools/n7_apex_preview/prepare_female_voice.py --out "$RUNNER_TEMP/n7-female-assets"
       - name: Reconstruct exact upstream APEX source with reviewed N7 overlay
         run: python3 tools/n7_apex_preview/build_apex_preview.py --out "$RUNNER_TEMP/n7-apex-src"
@@ -75,10 +76,10 @@ jobs:
           NODE_PATH="$RUNNER_TEMP/n7-apex-browser/node_modules" node - <<'NODE'
           const { chromium }=require('playwright-core');
           (async()=>{
-            if(process.env.N7_APEX_BASE_PATH==='/n7-apex-step5'){
+            if(process.env.N7_APEX_BASE_PATH.startsWith('/n7-apex-step5')){
               const {spawnSync}=require('node:child_process');
               const checked=spawnSync(process.execPath,['tools/n7_apex_preview/test_complete_guide.cjs'],{
-                stdio:'inherit',env:{...process.env,N7_VISUAL_URL:'http://127.0.0.1:4173/n7-apex-step5/',N7_GUIDE_OUT:process.env.RUNNER_TEMP+'/n7-apex-evidence/guide'}
+                stdio:'inherit',env:{...process.env,N7_VISUAL_URL:'http://127.0.0.1:4173'+process.env.N7_APEX_BASE_PATH+'/',N7_GUIDE_OUT:process.env.RUNNER_TEMP+'/n7-apex-evidence/guide'}
               });
               if(checked.status!==0)throw Error('Complete APEX guide browser verification failed');
               return;
@@ -243,77 +244,84 @@ jobs:
           })().catch(e=>{console.error(e);process.exit(1)});
           NODE
       - name: Verify unauthenticated figure conversation without password fields
-        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
-          N7_VISUAL_URL: http://127.0.0.1:4173/n7-apex-step5/
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
           N7_PASSWORDLESS_OUT: ${{ runner.temp }}/n7-apex-evidence/passwordless
         run: node tools/n7_apex_preview/test_passwordless.cjs
       - name: Keep mobile conversation beside the visible humanoid
-        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
-          N7_VISUAL_URL: http://127.0.0.1:4173/n7-apex-step5/
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
           N7_MOBILE_OUT: ${{ runner.temp }}/n7-apex-evidence/mobile
         run: node tools/n7_apex_preview/test_mobile_conversation.cjs
       - name: Verify microphone and spoken reply lifecycle
-        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
-          N7_VISUAL_URL: http://127.0.0.1:4173/n7-apex-step5/
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
           N7_VOICE_OUT: ${{ runner.temp }}/n7-apex-evidence/voice
         run: node tools/n7_apex_preview/test_voice.cjs
       - name: Verify real rigged avatar, facial morphs and automatic audio conversation
-        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
-          N7_VISUAL_URL: http://127.0.0.1:4173/n7-apex-step5/
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
           N7_REAL3D_OUT: ${{ runner.temp }}/n7-apex-evidence/real-avatar
         run: node tools/n7_apex_preview/test_real_avatar.cjs
       - name: Verify H01 head-only motion and exact neutral return
-        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
-          N7_VISUAL_URL: http://127.0.0.1:4173/n7-apex-step5/
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
           N7_H01_OUT: ${{ runner.temp }}/n7-apex-evidence/head-h01
         run: node tools/n7_apex_preview/test_head_h01.cjs
       - name: Verify face brightness follows real output audio and silent pauses
-        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
-          N7_VISUAL_URL: http://127.0.0.1:4173/n7-apex-step5/
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
           N7_REACTIVITY_OUT: ${{ runner.temp }}/n7-apex-evidence/voice-reactivity
         run: node tools/n7_apex_preview/test_voice_reactivity.cjs
       - name: Synthesize and play real Greek female speech without an OS voice
-        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
-          N7_VISUAL_URL: http://127.0.0.1:4173/n7-apex-step5/
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
           N7_FEMALE_OUT: ${{ runner.temp }}/n7-apex-evidence/female-voice
         run: node tools/n7_apex_preview/test_female_voice.cjs
       - name: Verify automatic conversation turns without Send clicks
-        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
-          N7_VISUAL_URL: http://127.0.0.1:4173/n7-apex-step5/
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
           N7_CONVERSATION_OUT: ${{ runner.temp }}/n7-apex-evidence/conversation
         run: node tools/n7_apex_preview/test_conversation.cjs
       - name: Recheck head coverage and ten-second background lighting
-        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
-          N7_VISUAL_URL: http://127.0.0.1:4173/n7-apex-step5/
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
           N7_VISUAL_OUT: ${{ runner.temp }}/n7-apex-evidence
         run: node tools/n7_apex_preview/test_head_backdrop.cjs
       - name: Verify jointed neck and skull motion, smooth return and state postures
-        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
-          N7_VISUAL_URL: http://127.0.0.1:4173/n7-apex-step5/
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
           N7_JOINTS_OUT: ${{ runner.temp }}/n7-apex-evidence/head-joints
         run: node tools/n7_apex_preview/test_head_joints.cjs
+      - name: Verify H01 face option, complete menu and new environment
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        env:
+          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
+          N7_FACE_OUT: ${{ runner.temp }}/n7-apex-evidence/face-menu
+        run: node tools/n7_apex_preview/test_face_menu.cjs
       - name: Preserve visual evidence
-        if: always() && env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        if: always() && startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
         uses: actions/upload-artifact@v4
         with:
           name: n7-complete-guide-visual-evidence
@@ -334,8 +342,9 @@ jobs:
       PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
       PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
       N7_DRY_RUN: '0'
-      N7_APEX_BASE_PATH: ${{ github.ref == 'refs/heads/main' && '/n7-apex' || '/n7-apex-step5' }}
-      N7_APEX_TARGET: ${{ github.ref == 'refs/heads/main' && 'n7-apex' || 'n7-apex-step5' }}
+      # The visual trial branch publishes beside the functional preview, never over it.
+      N7_APEX_BASE_PATH: ${{ github.ref == 'refs/heads/main' && '/n7-apex' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && '/n7-apex-step5-visual' || '/n7-apex-step5') }}
+      N7_APEX_TARGET: ${{ github.ref == 'refs/heads/main' && 'n7-apex' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && 'n7-apex-step5-visual' || 'n7-apex-step5') }}
     steps:
       - uses: actions/checkout@v4
         with:

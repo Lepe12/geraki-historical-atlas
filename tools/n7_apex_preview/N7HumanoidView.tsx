@@ -864,7 +864,7 @@ function LegacyHumanoidView({open,onClose,activity}:{open:boolean;onClose:()=>vo
   const [allowMotion,setAllowMotion]=useState(false);
   const reduced=systemReduced&&!allowMotion;
 
-  const isolatedStep5=N7_HUMANOID_REFERENCE.includes("/n7-apex-step5/");
+  const isolatedStep5=N7_HUMANOID_REFERENCE.includes("/n7-apex-step5");
   const [mode,setMode]=useState<ViewMode>("particle");
   const [details,setDetails]=useState(false);
   const [effects,setEffects]=useState(true);
@@ -1008,5 +1008,5 @@ function LegacyHumanoidView({open,onClose,activity}:{open:boolean;onClose:()=>vo
 }
 
 export default function N7HumanoidView(props:{open:boolean;onClose:()=>void;activity?:N7Activity;onWorkspace?:()=>void}){
-  return N7_HUMANOID_REFERENCE.includes("/n7-apex-step5/")?<N7GuideView {...props}/>:<LegacyHumanoidView {...props}/>;
+  return N7_HUMANOID_REFERENCE.includes("/n7-apex-step5")?<N7GuideView {...props}/>:<LegacyHumanoidView {...props}/>;
 }

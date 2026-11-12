@@ -7,7 +7,7 @@ import { N7_HUMANOID_REFERENCE } from "./N7HumanoidReference";
 export type GuideMood="idle"|"listening"|"thinking"|"speaking";
 export type GuideMode="assembly"|"particle"|"original"|"compare";
 export type GuideFrameInfo={turn:number;breath:number;progress:number;shock:number;ignition:number;renderMs:number;particles:number;frameMs:number};
-export type GuideSceneProps={mode:GuideMode;mood:GuideMood;effects:boolean;reduced:boolean;breathing:boolean;gestures?:boolean;replay:number;manualMotion:boolean;diagnostics:boolean;onComplete:()=>void;onFrame:(f:GuideFrameInfo)=>void};
+export type GuideSceneProps={mode:GuideMode;mood:GuideMood;effects:boolean;reduced:boolean;breathing:boolean;gestures?:boolean;source?:string;scale?:number;replay:number;manualMotion:boolean;diagnostics:boolean;onComplete:()=>void;onFrame:(f:GuideFrameInfo)=>void};
 const moods:GuideMood[]=["idle","listening","thinking","speaking"];
 
 // A single Three.js scene owns source tiles, moods, assembly and breathing.
@@ -27,7 +27,9 @@ export default function N7GuideScene(props:GuideSceneProps){
     let mode:GuideMode|null=null,replay=-1,assemblyStart:number|null=null,completed=false,shockStart:number|null=null,breathStart=0;
     let baseMood=0,lastMood:GuideMood="idle",lastEffects=true,lastReduced=false,stillFrameKey="";
     let transitions:{mood:number;start:number}[]=[];
-    const reference=document.createElement("canvas");reference.width=320;reference.height=480;
+    // Fixed for the lifetime of this mount: the view remounts the scene when the face option changes.
+    const sourceUrl=config.current.source||N7_HUMANOID_REFERENCE,scale=config.current.scale||1,W=Math.round(320*scale),H=Math.round(480*scale);
+    const reference=document.createElement("canvas");reference.width=W;reference.height=H;
     Object.assign(reference.style,{width:"100%",height:"100%",display:"none"});
     const ctx=reference.getContext("2d",{willReadFrequently:true});if(!ctx)return;
     host.replaceChildren(reference);
@@ -50,14 +52,15 @@ export default function N7GuideScene(props:GuideSceneProps){
     const image=new Image();image.decoding="async";
     image.onload=()=>{
       if(disposed)return;
-      ctx.drawImage(image,0,0);ctx.putImageData(ctx.getImageData(0,0,320,480),0,0);
-      try{surface=createHeadSurface(reference);}catch(e){host.dataset.renderError=String(e);reference.style.display="block";return;}
+      if(scale===1)ctx.drawImage(image,0,0);else ctx.drawImage(image,0,0,W,H);
+      ctx.putImageData(ctx.getImageData(0,0,W,H),0,0);
+      try{surface=createHeadSurface(reference,scale);}catch(e){host.dataset.renderError=String(e);reference.style.display="block";return;}
       Object.assign(surface.canvas.style,{width:"100%",height:"100%",display:"none"});host.append(surface.canvas);
       // Freeze each reduced-motion state on a native 2D canvas. Keeping a
       // constantly re-composited WebGL canvas visible was not byte-stable
       // between two screenshots of the same stationary Speaking state.
       const stillCanvas=document.createElement("canvas");
-      stillCanvas.width=320;stillCanvas.height=480;
+      stillCanvas.width=W;stillCanvas.height=H;
       Object.assign(stillCanvas.style,{width:"100%",height:"100%",display:"none"});
       const stillContext=stillCanvas.getContext("2d");
       host.append(stillCanvas);
@@ -162,7 +165,7 @@ export default function N7GuideScene(props:GuideSceneProps){
             if(c.reduced&&stillContext){
               // Once per actual state: preserve the frame pixels, then
               // stop presenting WebGL while reduced motion is requested.
-              stillContext.clearRect(0,0,320,480);
+              stillContext.clearRect(0,0,W,H);
               stillContext.drawImage(surface!.canvas,0,0);
             }
             stillFrameKey=frameKey;
@@ -183,7 +186,8 @@ export default function N7GuideScene(props:GuideSceneProps){
       };
       raf=requestAnimationFrame(draw);
     };
-    image.src=N7_HUMANOID_REFERENCE;
+    host.dataset.face=config.current.source?"h01":"n7";
+    image.src=sourceUrl;
     return()=>{disposed=true;cancelAnimationFrame(raf);surface?.dispose();window.removeEventListener("pointermove",pointer);window.removeEventListener("blur",clearTarget);document.removeEventListener("mouseleave",clearTarget);host.replaceChildren();};
   },[]);
   return <div ref={hostRef} aria-label="N7 guide artwork-tile humanoid" style={{position:"absolute",inset:0}} />;

@@ -9,7 +9,7 @@ import { N7_HUMANOID_REFERENCE } from "./N7HumanoidReference";
 export type N7Trace = { n: number; trace: Array<{ helper: string }> };
 
 export default function N7ApexStage() {
-  const isolatedGuide=N7_HUMANOID_REFERENCE.includes("/n7-apex-step5/");
+  const isolatedGuide=N7_HUMANOID_REFERENCE.includes("/n7-apex-step5");
   const [n7Activity, setN7Activity] = useState<OrbState | "listening" | null>(null);
   const [workspaceRequest,setWorkspaceRequest]=useState(0);
   const [n7Trace, setN7Trace] = useState<N7Trace | null>(null);

@@ -4,11 +4,23 @@ import N7GuideScene,{type GuideFrameInfo,type GuideMode,type GuideMood} from "./
 import N7Backdrop,{type N7BackdropHandle} from "./N7Backdrop";
 import { N7_HUMANOID_REFERENCE } from "./N7HumanoidReference";
 
+// Second face option: the owner-supplied H01 head composed onto the same body.
+// It is a different source raster for the same scene, rig, moods and voice.
+type Face="n7"|"h01";
+const H01_FIGURE=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/"))+"/n7-humanoid-h01-v1.webp";
+const H01_SCALE=2.5;
+
 export default function N7GuideView({open,onClose,activity,onWorkspace}:{open:boolean;onClose:()=>void;activity?:GuideMood|null;onWorkspace?:()=>void}){
   const [reduced,setReduced]=useState(false),[effects,setEffects]=useState(true),[breathing,setBreathing]=useState(true),[gestures,setGestures]=useState(true);
   const [mode,setMode]=useState<GuideMode>("assembly"),[mood,setMood]=useState<GuideMood>("idle");
   const [replay,setReplay]=useState(0),[done,setDone]=useState(false),[manualMotion,setManualMotion]=useState(false),[details,setDetails]=useState(false);
   const [stats,setStats]=useState<GuideFrameInfo|null>(null);
+  const [faceChoice,setFace]=useState<Face>("n7");
+  useEffect(()=>{
+    try{const asked=new URLSearchParams(window.location.search).get("face"),saved=window.localStorage.getItem("n7-face");const next=asked||saved;if(next==="h01"||next==="n7")setFace(next);}catch{}
+  },[]);
+  const chooseFace=(next:Face)=>{setFace(next);try{window.localStorage.setItem("n7-face",next);}catch{}};
+  const figureUrl=faceChoice==="h01"?H01_FIGURE:N7_HUMANOID_REFERENCE;
   const dialogRef=useRef<HTMLElement>(null);
   const figureRef=useRef<HTMLDivElement>(null),waveRef=useRef<HTMLDivElement>(null),backdrop=useRef<N7BackdropHandle>(null),ignitionRef=useRef<HTMLDivElement>(null);
   const lastStats=useRef(0),settings=useRef({details:false,effects:true,reduced:false}),wasOpen=useRef(false),automatic=useRef(false);
@@ -65,25 +77,38 @@ export default function N7GuideView({open,onClose,activity,onWorkspace}:{open:bo
     }
   }} role="dialog" aria-modal="true" aria-label="N7 Humanoid preview" className="n7-guide-view">
     <style>{`
-      .n7-guide-view{position:fixed;inset:0;height:100dvh;max-height:100dvh;z-index:120;background:#000;color:#e9fbff;font-family:system-ui,sans-serif;display:flex;flex-direction:column;overflow:hidden}
-      .n7-guide-view button{padding:8px 11px;border:1px solid #28667a;border-radius:6px;color:#defaff;background:#07131b;cursor:pointer;font-size:12px}
-      .n7-guide-view button[aria-pressed=true]{background:#115068}.n7-guide-view button:disabled{opacity:.45;cursor:default}
+      .n7-guide-view{position:fixed;inset:0;height:100dvh;max-height:100dvh;z-index:120;background:#000;color:#e6f7fb;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column;overflow:hidden}
+      .n7-guide-view button{padding:7px 12px;border:1px solid rgba(120,220,240,.20);border-radius:9px;color:#cfeff6;background:rgba(6,20,30,.55);cursor:pointer;font-size:12px;line-height:1.2;letter-spacing:.02em}
+      .n7-guide-view button:hover:not(:disabled){background:rgba(98,232,247,.10);border-color:rgba(120,220,240,.42);color:#f2fdff}
+      .n7-guide-view button:focus-visible,.n7-guide-view a:focus-visible{outline:2px solid #f5c26b;outline-offset:2px}
+      .n7-guide-view button[aria-pressed=true]{background:rgba(98,232,247,.17);border-color:rgba(120,232,247,.60);color:#f2fdff}.n7-guide-view button:disabled{opacity:.40;cursor:default}
       .n7-guide-header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;gap:12px;z-index:5;flex:none}
+      .n7-guide-brand{letter-spacing:.34em;color:#7fe6f5;font-size:13px;font-weight:600}.n7-guide-brand i{font-style:normal;color:#f5c26b}
       .n7-guide-main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding:0 12px}
       .n7-guide-main[data-details=true]{grid-template-columns:minmax(0,1fr) 260px}
       .n7-guide-figure-slot{min-height:0;min-width:0;display:grid;place-items:center;overflow:hidden}
       .n7-guide-figure{position:relative;height:100%;aspect-ratio:2/3;max-width:100%;mix-blend-mode:screen}
-      .n7-guide-controls{flex:none;z-index:5;display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;padding:12px;background:#030c13e8}
-      .n7-guide-details{padding:12px;background:#02080de8;border:1px solid #204856;border-radius:8px;overflow:auto;font-size:12px;line-height:1.6;min-height:0}
-      @media(max-width:700px), (max-width:1000px) and (max-height:500px){.n7-guide-main[data-details=true]{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) 115px}.n7-guide-controls{padding:8px;gap:4px;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;min-height:42px}.n7-guide-controls>*{flex-shrink:0}.n7-guide-view button{padding:6px 8px;font-size:11px}}
+      .n7-guide-controls{flex:none;z-index:5;align-self:center;display:flex;justify-content:center;align-items:center;gap:4px 8px;flex-wrap:wrap;margin:6px 12px 12px;padding:6px 10px;max-width:calc(100% - 24px);box-sizing:border-box;background:rgba(3,12,19,.66);border:1px solid rgba(120,220,240,.14);border-radius:16px;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 10px 40px rgba(0,0,0,.35)}
+      .n7-guide-status{display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.14em;color:#9fdbe8;white-space:nowrap;padding-right:4px}
+      .n7-guide-status::before{content:"";width:6px;height:6px;border-radius:50%;background:#f5c26b;box-shadow:0 0 10px #f5c26b}
+      .n7-guide-group{display:inline-flex;align-items:center;gap:0;padding-left:8px;border-left:1px solid rgba(120,220,240,.14)}
+      .n7-guide-group>small{font-size:9px;letter-spacing:.16em;color:#5f97a6;margin-right:3px;white-space:nowrap}
+      .n7-guide-group button{border-color:transparent;background:transparent;padding:6px 7px}.n7-guide-assembly{min-width:112px;text-align:left}
+      .n7-guide-group a{color:#9befff;font-size:12px;padding:6px 10px;border-radius:9px;text-decoration:none;white-space:nowrap}.n7-guide-group a:hover{background:rgba(98,232,247,.10)}
+      /* Voice panel: presentation only. Its markup and behaviour live in N7Workspace. */
+      #n7-guide-voice>div{background:rgba(3,12,19,.66)!important;border:1px solid rgba(120,220,240,.14);border-radius:16px;margin:0 auto;width:min(880px,calc(100% - 24px));box-sizing:border-box;padding:8px 12px!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+      #n7-guide-voice>div:has(>button:only-child){width:fit-content;background:transparent!important;border:0;overflow:visible!important;padding:0!important;-webkit-backdrop-filter:none;backdrop-filter:none}
+      #n7-guide-voice p{font-size:12px;line-height:1.5;margin:6px 0;color:#a9cfd9}
+      .n7-guide-details{padding:14px;background:rgba(2,9,14,.80);border:1px solid rgba(120,220,240,.16);border-radius:12px;overflow:auto;font-size:12px;line-height:1.6;min-height:0;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+      @media(max-width:700px), (max-width:1000px) and (max-height:500px){.n7-guide-main[data-details=true]{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) 115px}.n7-guide-controls{align-self:stretch;margin:0;max-width:none;border-radius:0;border-width:1px 0 0;padding:6px 8px;gap:4px 10px;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;min-height:42px}#n7-guide-voice>div{width:100%;border-radius:0;border-width:1px 0 0}.n7-guide-controls>*{flex-shrink:0}.n7-guide-group{padding-left:10px}.n7-guide-view button{padding:6px 8px;font-size:11px}}
     `}</style>
     <N7Backdrop ref={backdrop} effects={effects} reduced={reduced}/>
     <div ref={waveRef} aria-label="N7 completion shockwave" data-progress="-1" style={{display:"none",position:"fixed",pointerEvents:"none",border:"2px solid #ffe0a6",boxShadow:"0 0 12px #63ddff88",borderRadius:"50%",zIndex:3}}/>
-    <header className="n7-guide-header"><strong style={{letterSpacing:4,color:"#62e8f7"}}>N7 · HUMANOID</strong><div style={{display:"flex",gap:8}}>{onWorkspace&&<button type="button" onClick={onWorkspace}>Συνομιλία</button>}<button type="button" data-exit="" onClick={onClose}>Exit</button></div></header>
+    <header className="n7-guide-header"><strong className="n7-guide-brand">N7 <i>·</i> HUMANOID</strong><div style={{display:"flex",gap:8}}>{onWorkspace&&<button type="button" onClick={onWorkspace}>Συνομιλία</button>}<button type="button" data-exit="" onClick={onClose}>Exit</button></div></header>
     <div className="n7-guide-main" data-details={details}>
       <div className="n7-guide-figure-slot"><div ref={figureRef} className="n7-guide-figure" aria-label={mode==="assembly"?"N7 guide particle-river assembly":undefined}>
-        {(mode==="original"||mode==="compare")&&<img src={N7_HUMANOID_REFERENCE} alt="Approved N7 idle reference" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"contain",opacity:mode==="compare"?.38:1,zIndex:mode==="compare"?1:undefined}}/>}
-        <N7GuideScene mode={mode} mood={mood} effects={effects} reduced={reduced} breathing={breathing} gestures={gestures} replay={replay} manualMotion={manualMotion} diagnostics={details} onComplete={complete} onFrame={frame}/>
+        {(mode==="original"||mode==="compare")&&<img src={figureUrl} alt="Approved N7 idle reference" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"contain",opacity:mode==="compare"?.38:1,zIndex:mode==="compare"?1:undefined}}/>}
+        <N7GuideScene key={faceChoice} source={faceChoice==="h01"?H01_FIGURE:undefined} scale={faceChoice==="h01"?H01_SCALE:undefined} mode={mode} mood={mood} effects={effects} reduced={reduced} breathing={breathing} gestures={gestures} replay={replay} manualMotion={manualMotion} diagnostics={details} onComplete={complete} onFrame={frame}/>
         <span ref={ignitionRef} aria-label="N7 face ignition" data-active="false" style={{position:"absolute",pointerEvents:"none"}}/>
         {mode==="assembly"&&!done&&<span aria-label="N7 visible assembly source" style={{position:"absolute",left:"4.7%",top:"86.5%",width:1,height:1,pointerEvents:"none"}}/>}
       </div></div>
@@ -91,15 +116,26 @@ export default function N7GuideView({open,onClose,activity,onWorkspace}:{open:bo
     </div>
     <div id="n7-guide-voice" style={{position:"relative",zIndex:5,flex:"none"}}/>
     <footer className="n7-guide-controls">
-      <span role="status" aria-label="N7 mood status" style={{fontSize:11,marginRight:5}}>{mode==="assembly"?`ASSEMBLY · ${done?"COMPLETE":"BUILDING"}`:`MOOD · ${(realMood||mood).toUpperCase()}${realMood?" · LIVE N7 REQUEST":mood!=="idle"?" · PREVIEW":""}`}</span>
-      <button type="button" disabled={!effects} onClick={replayAssembly}>{mode==="assembly"?"Replay Assembly":"Assembly"}</button>
-      {(mode==="assembly"||!done)&&<button type="button" onClick={skip}>Skip</button>}
-      {(["idle","listening","thinking","speaking"] as GuideMood[]).map(s=><button type="button" key={s} disabled={!effects} aria-pressed={mood===s} onClick={()=>{automatic.current=false;setMood(s);skip();}}>{s[0].toUpperCase()+s.slice(1)}</button>)}
-      <button type="button" onClick={()=>setMode("original")}>Original</button><button type="button" onClick={()=>setMode("particle")}>Particles</button>
-      <button type="button" onClick={()=>{setMode("compare");setDetails(true);}}>Compare</button>
-      <button type="button" aria-pressed={effects} onClick={changeEffects}>Effects {effects?"On":"Off"}</button>
-      <button type="button" aria-expanded={details} onClick={()=>setDetails(v=>!v)}>Technical details</button>
-      <a href={N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/"))+"/avatar-3d/"} target="_blank" rel="noopener noreferrer" style={{color:"#9befff",padding:"8px"}}>Πραγματικό 3D</a>
+      <span role="status" aria-label="N7 mood status" className="n7-guide-status">{mode==="assembly"?`ASSEMBLY · ${done?"COMPLETE":"BUILDING"}`:`MOOD · ${(realMood||mood).toUpperCase()}${realMood?" · LIVE N7 REQUEST":mood!=="idle"?" · PREVIEW":""}`}</span>
+      <span className="n7-guide-group"><small aria-hidden="true">ΔΙΑΘΕΣΗ</small>
+        {(["idle","listening","thinking","speaking"] as GuideMood[]).map(s=><button type="button" key={s} disabled={!effects} aria-pressed={mood===s} onClick={()=>{automatic.current=false;setMood(s);skip();}}>{s[0].toUpperCase()+s.slice(1)}</button>)}
+      </span>
+      <span className="n7-guide-group"><small aria-hidden="true">ΠΡΟΣΩΠΟ</small>
+        <button type="button" aria-label="Πρόσωπο N7" aria-pressed={faceChoice==="n7"} onClick={()=>chooseFace("n7")}>N7</button>
+        <button type="button" aria-label="Πρόσωπο H01" aria-pressed={faceChoice==="h01"} onClick={()=>chooseFace("h01")}>H01</button>
+      </span>
+      <span className="n7-guide-group"><small aria-hidden="true">ΠΡΟΒΟΛΗ</small>
+        <button type="button" aria-pressed={mode==="original"} onClick={()=>setMode("original")}>Original</button><button type="button" aria-pressed={mode==="particle"} onClick={()=>setMode("particle")}>Particles</button>
+        <button type="button" aria-pressed={mode==="compare"} onClick={()=>{setMode("compare");setDetails(true);}}>Compare</button>
+      </span>
+      <span className="n7-guide-group"><small aria-hidden="true">ΣΚΗΝΗ</small>
+        <button type="button" className="n7-guide-assembly" disabled={!effects} onClick={replayAssembly}>{mode==="assembly"?"Replay Assembly":"Assembly"}</button>
+        <button type="button" aria-pressed={effects} onClick={changeEffects}>Effects {effects?"On":"Off"}</button>
+        <button type="button" aria-expanded={details} onClick={()=>setDetails(v=>!v)}>Technical details</button>
+        <a href={N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/"))+"/avatar-3d/"} target="_blank" rel="noopener noreferrer">Πραγματικό 3D</a>
+        {/* Skip keeps its slot when it does not apply, so the dock and the figure never jump. */}
+        {mode==="assembly"||!done?<button type="button" onClick={skip}>Skip</button>:<button type="button" disabled aria-hidden="true" tabIndex={-1} style={{visibility:"hidden"}}>Skip</button>}
+      </span>
     </footer>
   </section>;
 }

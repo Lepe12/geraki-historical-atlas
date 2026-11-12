@@ -130,7 +130,7 @@ def main():
                 print("N7_APEX_ROLLBACK_RESTORED=true")
             raise
         if existing and exists_dir(ftp,backup):
-            if TARGET=="n7-apex-step5":
+            if TARGET.startswith("n7-apex-step5"):
                 print("N7_APEX_ROLLBACK_POINT="+PARENT+"/"+backup)
             else:
                 remove_tree(ftp,backup)

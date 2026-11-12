@@ -55,7 +55,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   const [tab, setTab] = useState<Tab>("chat");
   const [online, setOnline] = useState<boolean | null>(null);
   const [authenticated, setAuthenticated] = useState(false);
-  const guest=!authenticated&&N7_HUMANOID_REFERENCE.includes("/n7-apex-step5/");
+  const guest=!authenticated&&N7_HUMANOID_REFERENCE.includes("/n7-apex-step5");
   const wasAuthenticated=useRef(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [conversationId, setConversationId] = useState("");
@@ -265,7 +265,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
         <button type="button" aria-expanded={voiceOpen} onClick={()=>{setVoiceOpen(x=>!x);if(voiceOpen)voice.suspend();}}>Φωνητική συνομιλία</button>
         {voiceOpen&&voiceControls}
       </div>,voiceHost)}
-      <button type="button" onClick={() => {if(onOpenFigure&&N7_HUMANOID_REFERENCE.includes("/n7-apex-step5/")&&window.matchMedia("(max-width:700px), (max-width:1000px) and (max-height:500px)").matches){setVoiceOpen(true);onOpenFigure();return;}setOpen(x => !x);}}
+      <button type="button" onClick={() => {if(onOpenFigure&&N7_HUMANOID_REFERENCE.includes("/n7-apex-step5")&&window.matchMedia("(max-width:700px), (max-width:1000px) and (max-height:500px)").matches){setVoiceOpen(true);onOpenFigure();return;}setOpen(x => !x);}}
         aria-expanded={open} aria-controls="n7-workspace"
         style={{ position:"fixed",right:18,bottom:18,zIndex:80,...buttonStyle,
           boxShadow:"0 0 22px #00dafa45",fontWeight:700,letterSpacing:2 }}>

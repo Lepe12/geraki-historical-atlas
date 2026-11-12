@@ -129,6 +129,8 @@ def main():
     args=ap.parse_args()
     out=pathlib.Path(args.out).resolve()
     base_path=os.getenv("N7_APEX_BASE_PATH","/n7-apex").rstrip("/") or "/n7-apex"
+    # Isolated guide previews: /n7-apex-step5 and its visual trial /n7-apex-step5-visual.
+    isolated=base_path.rsplit("/",1)[-1].startswith("n7-apex-step5")
     if out.exists(): shutil.rmtree(out)
     out.mkdir(parents=True)
     run("git","init",str(out))
@@ -144,7 +146,7 @@ def main():
     # The isolated Step 5 route must present the humanoid immediately.
     # Production /n7-apex keeps the normal button-controlled workflow.
     # isolated auto-open deployment marker
-    if base_path.endswith("n7-apex-step5"):
+    if isolated:
         patch_exact(out/"components/N7ApexStage.tsx",
             "const [humanoidOpen,setHumanoidOpen]=useState(false);",
             "const [humanoidOpen,setHumanoidOpen]=useState(true);")
@@ -170,18 +172,18 @@ def main():
     if humanoid_sha != "bdba288c56230908e1c6abd1a199e5a895159730faf27c672916b03d51a5c7e5":
         raise RuntimeError(f"wrong N7 humanoid asset sha256: {humanoid_sha}")
     (out/"public/n7-humanoid-idle-v3.webp").write_bytes(humanoid_bytes)
-    if base_path.endswith("n7-apex-step5"):
+    if isolated:
         face_bytes=(overlay/"assets/n7-humanoid-face-v4.webp").read_bytes()
         if hashlib.sha256(face_bytes).hexdigest()!="1abf41530c4253962a46fe426c107eb2f776f54ad5c2c5e594b8765bd569ea68":
             raise RuntimeError("wrong N7 face artwork")
         (out/"public/n7-humanoid-face-v4.webp").write_bytes(face_bytes)
         (out/"components/N7HumanoidReference.ts").write_text(f'export const N7_HUMANOID_REFERENCE = "{base_path}/n7-humanoid-face-v4.webp";\n')
-    if base_path.endswith("n7-apex-step5"):
+    if isolated:
         shutil.copy2(overlay/"N7HeadTest.tsx",out/"components/N7HeadTest.tsx")
         shutil.copy2(overlay/"assets/n7-head-h01.webp",out/"public/n7-head-h01.webp")
         (out/"app/head-test").mkdir(parents=True,exist_ok=True)
         (out/"app/head-test/page.tsx").write_text('import N7HeadTest from "@/components/N7HeadTest";\nexport default function HeadTest(){return <N7HeadTest/>;}\n')
-    if base_path.endswith("n7-apex-step5"):
+    if isolated:
         for name in ("N7RealAvatar.tsx","N7RealAvatarView.tsx"):
             shutil.copy2(overlay/name,out/"components"/name)
         real=(overlay/"assets/n7-mpfb-v1.glb").read_bytes()
@@ -192,6 +194,14 @@ def main():
         (out/"app/avatar-3d").mkdir(parents=True,exist_ok=True)
         (out/"app/avatar-3d/page.tsx").write_text('import N7RealAvatar from "@/components/N7RealAvatar";\nexport default function RealAvatar(){return <N7RealAvatar/>;}\n')
     shutil.copy2(overlay/"assets/n7-mountain-backdrop.webp",out/"public/n7-mountain-backdrop.webp")
+    if isolated:
+        # Visual trial: wider, quieter N7 environment and the H01 second face option.
+        for name,digest in (("n7-mountain-backdrop-v2.webp","6eaf941944deb09ac1b773c74f968ed87de2ecbb032aec0bcc3e1c61cee13747"),
+                            ("n7-humanoid-h01-v1.webp","6d5033bcbf9e84cf647a31da52d7c648637aafc8490a64cf663887c3cc9d2d36")):
+            data=(overlay/"assets"/name).read_bytes()
+            if hashlib.sha256(data).hexdigest()!=digest: raise RuntimeError("wrong visual asset "+name)
+            (out/"public"/name).write_bytes(data)
+        (out/"components/N7BackdropReference.ts").write_text(f'export const N7_BACKDROP_REFERENCE = "{base_path}/n7-mountain-backdrop-v2.webp";\n')
 
     patch_exact(out/"app/page.tsx",'import ApexWorld from "@/components/ApexWorld";','import N7ApexStage from "@/components/N7ApexStage";')
     patch_exact(out/"app/page.tsx",'''<section style={{ position: "relative", height: "100vh", minHeight: 620 }}>
