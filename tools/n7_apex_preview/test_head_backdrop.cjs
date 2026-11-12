@@ -157,11 +157,23 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
      const spread=headSpread(px),scaleRatio=spread/neutralSpread;
      const jawChangedPixels=jawChange(px);
      if(Math.abs(angle)===1)assert(jawChangedPixels>140,name+' lower jaw is visually frozen: '+jawChangedPixels+' changed pixels');
-     assert(scaleRatio<1.12&&scaleRatio>.85,name+' head stretched or collapsed: '+scaleRatio.toFixed(3));
+     assert(scaleRatio<1.05&&scaleRatio>.95,name+' head stretched or collapsed: '+scaleRatio.toFixed(3));
      if(angle===1)assert(faceDelta<-2.5,'Upward face-core motion is too small: '+faceDelta.toFixed(2)+' px');
      if(angle===-1)assert(faceDelta>2.5,'Downward face-core motion is too small: '+faceDelta.toFixed(2)+' px');
      results.pitch.push({name,pitch:Number(await host.getAttribute('data-current-pitch')),visibleCentroidY:visibleY,verticalDeltaPx:dy,faceCoreDeltaPx:faceDelta,headScaleRatio:scaleRatio,jawChangedPixels,gaps,bodyMaxDifference:body.max});
    }
+   results.diagonal=[];
+   for(const [name,yaw,nod]of [['upper-left',-1,1],['upper-right',1,1],['lower-left',-1,-1],['lower-right',1,-1]]){
+     await p.mouse.move(bounds.x+bounds.width/2+bounds.width*.42*yaw,bounds.y+bounds.height/2-bounds.height*.42*nod);
+     await p.waitForFunction(({yaw,nod})=>{const h=document.querySelector('[aria-label="N7 guide artwork-tile humanoid"]');return Math.abs(Number(h.dataset.currentTurn)-yaw)<.003&&Math.abs(Number(h.dataset.currentPitch)-nod)<.003;},{yaw,nod});
+     await p.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+     const px=await pixels(),scaleRatio=headSpread(px)/neutralSpread,body=difference(px.slice(208*320*4),reference.slice(208*320*4));
+     assert(scaleRatio>.95&&scaleRatio<1.05,name+' diagonal collapsed/stretched head: '+scaleRatio.toFixed(3));
+     assert(body.max<=2,name+' moved fixed neck/body');
+     assert(brightHead(px)>referenceHead*.92,name+' lost head coverage');
+     save(name,await canvas.evaluate(c=>c.toDataURL()));results.diagonal.push({name,headScaleRatio:scaleRatio,bodyMaxDifference:body.max});
+   }
+   await movePitch(0);await move(0);
    console.log('Vertical pitch: PASS. Observing backdrop for 10 seconds...');
   await p.getByRole('button',{name:'Technical details',exact:true}).click();
   const bg=p.getByLabel('N7 Step 6 living backdrop',{exact:true}),lights=bg.locator('[data-ridge-layer]');

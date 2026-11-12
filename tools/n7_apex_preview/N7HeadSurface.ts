@@ -49,8 +49,11 @@ export function createHeadSurface(image:HTMLCanvasElement) {
       float neck=1.-smoothstep(196.,208.,source.y);
       float head=skull*neck;
       float depth=sqrt(max(0.,1.-min(1.,r2)))*42.;
-      float yaw=turn*.34;
-      float nod=pitch*.32;
+      // A front artwork is a shallow depth illusion, not a fully modelled head.
+      // Bound the combined pose so a corner cannot stack two extreme turns.
+      float poseLimit=max(1.,length(vec2(turn,pitch)));
+      float yaw=turn*.22/poseLimit;
+      float nod=pitch*.16/poseLimit;
       float cy=cos(yaw),sy=sin(yaw),cp=cos(nod),sp=sin(nod);
       // The neck remains the pivot; the entire face, chin and hair share
       // this exact rotation matrix in the skull interior.
@@ -63,7 +66,7 @@ export function createHeadSurface(image:HTMLCanvasElement) {
       p.y-=breath*.9*chest;
       float farSide=max(0.,-sign(turn)*n.x);
       float nearSide=max(0.,sign(turn)*n.x);
-      float amount=abs(turn);
+      float amount=abs(yaw)/.34;
       // Darken the far side without erasing the lower face at hard yaw.
       // Full-jaw rotation exposes more textured pixels than the previous
       // fading skull mask; shadow must not suppress those artwork details.
