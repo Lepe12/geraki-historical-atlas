@@ -21,7 +21,7 @@ export default function N7GuideScene(props:GuideSceneProps){
     let disposed=false,raf=0,target=0,current=0,targetPitch=0,currentPitch=0,last=0,lastStats=0;
     let surface:ReturnType<typeof createHeadSurface>|undefined;
     let mode:GuideMode|null=null,replay=-1,assemblyStart:number|null=null,completed=false,shockStart:number|null=null,breathStart=0;
-    let baseMood=0,lastMood:GuideMood="idle",lastEffects=true,lastReduced=false;
+    let baseMood=0,lastMood:GuideMood="idle",lastEffects=true,lastReduced=false,stillFrameKey="";
     let transitions:{mood:number;start:number}[]=[];
     const reference=document.createElement("canvas");reference.width=320;reference.height=480;
     Object.assign(reference.style,{width:"100%",height:"100%",display:"none"});
@@ -48,7 +48,15 @@ export default function N7GuideScene(props:GuideSceneProps){
       ctx.drawImage(image,0,0);ctx.putImageData(ctx.getImageData(0,0,320,480),0,0);
       try{surface=createHeadSurface(reference);}catch(e){host.dataset.renderError=String(e);reference.style.display="block";return;}
       Object.assign(surface.canvas.style,{width:"100%",height:"100%",display:"none"});host.append(surface.canvas);
-      host.dataset.renderer="shared-edge-texture-mesh";host.dataset.engine="three-shared-scene";host.dataset.rig="approved-rigid-head-layer-v1";
+      // Freeze each reduced-motion state on a native 2D canvas. Keeping a
+      // constantly re-composited WebGL canvas visible was not byte-stable
+      // between two screenshots of the same stationary Speaking state.
+      const stillCanvas=document.createElement("canvas");
+      stillCanvas.width=320;stillCanvas.height=480;
+      Object.assign(stillCanvas.style,{width:"100%",height:"100%",display:"none"});
+      const stillContext=stillCanvas.getContext("2d");
+      host.append(stillCanvas);
+      host.dataset.renderer="shared-edge-texture-mesh";host.dataset.engine="three-shared-scene";host.dataset.rig="apex-guide-depth-head-v2";
       host.dataset.referenceReady="true";host.dataset.referenceUrl=image.src;host.dataset.headTarget="0.000";host.dataset.headPitchTarget="0.000";
       const draw=(now:number)=>{
         if(disposed)return;
@@ -102,10 +110,29 @@ export default function N7GuideScene(props:GuideSceneProps){
         const voiceLevel=c.effects&&!c.reduced?readVoiceSignal(now):0;
         host.dataset.voiceLevel=voiceLevel.toFixed(4);
         const start=performance.now();
-        if(exact){surface!.canvas.style.display="none";reference.style.display="block";}
-        else{
-          reference.style.display="none";surface!.canvas.style.display="block";
-          surface!.render({turn:current,pitch:currentPitch,breath,assembly:progress,baseMood,states:transitions.map(t=>t.mood),ages:transitions.map(t=>Math.min(1,(now-t.start)/1000)),ignition,voiceLevel,time:c.reduced?0:now/1000});
+        if(exact){
+          stillFrameKey="";
+          surface!.canvas.style.display="none";
+          stillCanvas.style.display="none";
+          reference.style.display="block";
+        }else{
+          reference.style.display="none";
+          const frameKey=c.reduced
+            ?[progress.toFixed(5),baseMood,current.toFixed(5),currentPitch.toFixed(5),
+              transitions.length,c.effects].join(":"):"";
+          if(!c.reduced||stillFrameKey!==frameKey){
+            surface!.render({turn:current,pitch:currentPitch,breath,assembly:progress,baseMood,states:transitions.map(t=>t.mood),ages:transitions.map(t=>Math.min(1,(now-t.start)/1000)),ignition,voiceLevel,time:c.reduced?0:now/1000});
+            if(c.reduced&&stillContext){
+              // Once per actual state: preserve the frame pixels, then
+              // stop presenting WebGL while reduced motion is requested.
+              stillContext.clearRect(0,0,320,480);
+              stillContext.drawImage(surface!.canvas,0,0);
+            }
+            stillFrameKey=frameKey;
+          }
+          const useStill=c.reduced&&!!stillContext;
+          surface!.canvas.style.display=useStill?"none":"block";
+          stillCanvas.style.display=useStill?"block":"none";
         }
         const renderMs=performance.now()-start;
         host.dataset.currentTurn=current.toFixed(4);host.dataset.currentPitch=currentPitch.toFixed(4);host.dataset.assemblyProgress=progress.toFixed(4);

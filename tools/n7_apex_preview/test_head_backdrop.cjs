@@ -18,7 +18,7 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
   const host=p.getByLabel('N7 guide artwork-tile humanoid',{exact:true}),canvas=host.locator('canvas:visible');
   await canvas.waitFor();
   await p.waitForFunction(()=>document.querySelector('[aria-label="N7 guide artwork-tile humanoid"]')?.dataset.renderer==='shared-edge-texture-mesh');
-  assert.equal(await host.getAttribute('data-rig'),'approved-rigid-head-layer-v1','Old pointwise face deformation is still active');
+  assert.equal(await host.getAttribute('data-rig'),'apex-guide-depth-head-v2','APEX depth-and-neck-pivot head geometry is not active');
   const skip=p.getByRole('button',{name:'Skip',exact:true});if(await skip.isVisible())await skip.click();
   await p.getByRole('button',{name:'Technical details',exact:true}).click();
   await p.getByLabel('Breathing',{exact:true}).uncheck();
