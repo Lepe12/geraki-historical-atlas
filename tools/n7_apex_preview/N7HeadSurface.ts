@@ -50,7 +50,10 @@ export function createHeadSurface(image:HTMLCanvasElement) {
       float depth=72.*sqrt(max(0.,1.-normalizedX*normalizedX));
       float combined=max(1.,length(vec2(turn,pitch)));
       float yaw=turn*.32/combined;
-      float nod=pitch*.20/combined;
+      // Full downward nod formerly collapsed the source hair/face height to
+      // 0.907 of neutral. Limit pitch while preserving genuine 3D depth
+      // rotation and pixel-locked jaw: APEX forbids silhouette squashing.
+      float nod=pitch*.10/combined;
       float cy=cos(yaw),sy=sin(yaw),cp=cos(nod),sp=sin(nod);
 
       // The central face, lower jaw, hair and outline share this same
