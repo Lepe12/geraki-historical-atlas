@@ -46,7 +46,7 @@ export function createHeadSurface(image:HTMLCanvasElement) {
       vec2 n=(source-vec2(160.,108.))/vec2(86.,98.);
       float r2=dot(n,n);
       float skull=1.-smoothstep(1.06,1.52,r2);
-      float neck=1.-smoothstep(196.,210.,source.y);
+      float neck=1.-smoothstep(196.,208.,source.y);
       float head=skull*neck;
       float depth=sqrt(max(0.,1.-min(1.,r2)))*42.;
       float yaw=turn*.34;
