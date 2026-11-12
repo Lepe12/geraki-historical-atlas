@@ -11,7 +11,9 @@ const GROUPS=[
   {id:"aegean",keys:["αιγαί","αιγαι","aegean","egeo"],terms:["Aegean"]},
   {id:"ottoman",keys:["οθωμαν","ottoman"],terms:["Ottoman"]},
   {id:"corsair",keys:["κουρσάρ","κουρσαρ","πειρατ","corsair","pirat"],terms:["corsair","pirate"]},
-  {id:"malta",keys:["μάλτα","μαλτα","malta"],terms:["Malta"]}
+  {id:"malta",keys:["μάλτα","μαλτα","malta"],terms:["Malta"]},
+  {id:"astypalaia",keys:["αστυπάλ","αστυπαλ","astypal","astipal","stampali","astropal"],terms:["Αστυπάλαια","Astypalaia","Stampalia","Astropalia"]},
+  {id:"gramvousa",keys:["γραμβούσ","γραμβουσ","gramvous","grabus","garabus","grabous"],terms:["Γραμβούσα","Gramvousa","Grabusa","Garabusa"]}
 ];
 const HISTORICAL=/ιστορ|πηγ[ήες]|βιβλιογραφ|αρχε[ίι]|μελετ|έρευν|ερευν|πειρατ|κουρσ|αιγα|οθωμαν|βαρβαρ|μπαρμπαρ|χαιρεντιν|ντραγουτ|δραγουτ|λαντζ|barbar|dragut|lanza|lantza|doria|preves|corfu|malta|ναυμαχ|ναυτικ|τεκμηρι|χρονολογ|τουρκικ|μεσόγ|μεσογ|τι γνωρίζουμε|τι ξέρουμε/i;
 function fold(s){return String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();}
@@ -20,9 +22,12 @@ function historicalIntent(q){return HISTORICAL.test(fold(clean(q)));}
 function queryTerms(question){
   const normalized=fold(clean(question));
   let selected=[],matched=[];
+  // Specific people/places first; broad thematic groups only fill remaining slots.
+  const thematic=new Set(["corsair","ottoman","aegean"]),later=[];
   for(const group of GROUPS){
-    if(group.keys.some(x=>normalized.includes(fold(x)))){selected.push(...group.terms);matched.push(group.id);}
+    if(group.keys.some(x=>normalized.includes(fold(x)))){(thematic.has(group.id)?later:selected).push(...group.terms);matched.push(group.id);}
   }
+  selected.push(...later);
   if(!selected.length){
     const ignores=new Set(["τι","πότε","γιατί","πως","ποιος","ποια","ποιες","πηγές","βιβλία","ιστορία","ιστορικά","έρευνα","γνωρίζουμε","γνωρίζεις","about","when","where","historical","sources","the","και","από","στη","στην","των"]);
     const words=clean(question).match(/[\p{L}\p{N}-]{4,}/gu)||[];

@@ -219,6 +219,15 @@ class GuardedDeployTest(unittest.TestCase):
         self.assertEqual(self.ftp.events, [])
         self.assertFalse(self.ftp.lock)
 
+    def test_stage_styles_are_appended_once_and_only_to_the_reviewed_stylesheet(self):
+        stage = (deploy.HERE / 'humanoid-stage.css').read_bytes()
+        installed = b'body{color:#000}\n\n'
+        target = deploy.transform_css(installed)
+        self.assertEqual(target, installed + b'\n' + stage)
+        self.assertEqual(deploy.transform_css(target), target)
+        with self.assertRaisesRegex(RuntimeError, 'CSS_ANCHOR_CHANGED'):
+            deploy.transform_css(target + stage)
+
     def test_upgrade_accepts_only_exact_previous_modules_and_rejects_drift(self):
         modules = {name: (deploy.HERE / source).read_bytes() for name, source in deploy.PUBLIC_MODULES.items()}
         previous = {name: b'// previous approved ' + name.encode() for name in modules if name != 'conversation-store.js'}
@@ -230,7 +239,7 @@ class GuardedDeployTest(unittest.TestCase):
                    'files': {'server.js': deploy.sha(server), **{name: deploy.sha(data) for name, data in modules.items()}}}
         with patch.object(deploy, 'syntax'):
             payload, originals = deploy.plan(self.ftp, release, 'b'*40, transformer=lambda _: server)
-        self.assertEqual(set(payload), deploy.WRITABLE - {'public/app.js', 'public/index.html'})
+        self.assertEqual(set(payload), deploy.WRITABLE - {'public/app.js', 'public/index.html', 'public/style.css'})
         self.assertIsNone(originals['conversation-store.js'])
         self.assertEqual(list(payload)[0], 'conversation-store.js')
         self.assertEqual(list(payload)[-1], 'server.js')

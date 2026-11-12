@@ -86,11 +86,48 @@ function n7isReferenceIndexPage(string $text): bool {
     $chars=max(1,mb_strlen($text,'UTF-8'));
     return $refs>=8 && $punct>=12 && ($refs*1000/$chars)>=4.0;
 }
+/** Accent-, case- and final-sigma-insensitive form used for matching only; stored text is never changed. */
+function n7fold(string $s): string {
+    static $cache=[];
+    if (isset($cache[$s])) return $cache[$s];
+    $f=$s;
+    if (class_exists('Normalizer')) {
+        $d=Normalizer::normalize($s, Normalizer::FORM_D);
+        if ($d!==false) $f=(string)preg_replace('/\p{Mn}+/u','',$d);
+    } else {
+        $f=strtr($s,['ά'=>'α','έ'=>'ε','ή'=>'η','ί'=>'ι','ό'=>'ο','ύ'=>'υ','ώ'=>'ω','ϊ'=>'ι','ϋ'=>'υ','ΐ'=>'ι','ΰ'=>'υ',
+            'Ά'=>'Α','Έ'=>'Ε','Ή'=>'Η','Ί'=>'Ι','Ό'=>'Ο','Ύ'=>'Υ','Ώ'=>'Ω','Ϊ'=>'Ι','Ϋ'=>'Υ']);
+    }
+    $f=str_replace('ς','σ',mb_strtolower($f,'UTF-8'));
+    if (mb_strlen($s,'UTF-8')===1 && count($cache)<4096) $cache[$s]=$f;
+    return $f;
+}
+/** Folds text while recording, for each folded character, the index of its original character. */
+function n7foldIndexed(string $text): array {
+    $out=''; $map=[]; $n=0;
+    foreach (mb_str_split($text,1,'UTF-8') as $i=>$c) {
+        foreach (mb_str_split(n7fold($c),1,'UTF-8') as $fc) { $out.=$fc; $map[$n++]=$i; }
+    }
+    return [$out,$map];
+}
+/** Returns [count, first original character position] of whole-word matches, or [0,-1]. */
+function n7match(string $text,string $term): array {
+    $needle=n7fold(trim($term));
+    if ($needle==='') return [0,-1];
+    [$folded,$map]=n7foldIndexed($text);
+    $count=preg_match_all('/(?<![\p{L}\p{N}])'.preg_quote($needle,'/').'(?![\p{L}\p{N}])/u',$folded,$hits,PREG_OFFSET_CAPTURE);
+    if (!$count) return [0,-1];
+    $foldedPos=mb_strlen(substr($folded,0,$hits[0][0][1]),'UTF-8');
+    return [$count,$map[$foldedPos]??0];
+}
 function n7search(PDO $db,string $term): array {
     $term=trim($term);
     if(mb_strlen($term)<2||mb_strlen($term)>150)n7fail('INVALID_SEARCH');
-    $pattern='%'.str_replace(['!','%','_'],['!!','!%','!_'],$term).'%';
-    $rows=n7query($db,"SELECT s.source_id,s.title,s.author,s.publication_year,s.bibliographic_reference,s.source_uri,s.rights_note,p.scan_index,p.printed_page,p.ocr_status,p.ocr_text,p.text_sha256 FROM pc_library_pages p JOIN pc_library_sources s ON s.source_id=p.source_id WHERE p.ocr_text LIKE ? ESCAPE '!' ORDER BY p.scan_index LIMIT 600",[$pattern])->fetchAll();
+    // Prefilter with the typed and the folded spelling; collation differences cannot drop a page.
+    $forms=array_values(array_unique([$term,n7fold($term)]));
+    $patterns=array_map(static fn($t)=>'%'.str_replace(['!','%','_'],['!!','!%','!_'],$t).'%',$forms);
+    $where=implode(' OR ',array_fill(0,count($patterns),"p.ocr_text LIKE ? ESCAPE '!'"));
+    $rows=n7query($db,"SELECT s.source_id,s.title,s.author,s.publication_year,s.bibliographic_reference,s.source_uri,s.rights_note,p.scan_index,p.printed_page,p.ocr_status,p.ocr_text,p.text_sha256 FROM pc_library_pages p JOIN pc_library_sources s ON s.source_id=p.source_id WHERE ($where) ORDER BY p.scan_index LIMIT 600",$patterns)->fetchAll();
     $ranked=[];
     foreach($rows as $row){
         $label=(string)($row['printed_page']??'');
@@ -98,10 +135,8 @@ function n7search(PDO $db,string $term): array {
         if($label!==''&&!ctype_digit($label))continue;
         if(preg_match('/^(contents|list of illustrations|illustrations|index)\\b/i',trim($full)))continue;
         if(n7isReferenceIndexPage($full))continue;
-        preg_match_all('/(?<![\\p{L}\\p{N}])'.preg_quote($term,'/').'(?![\\p{L}\\p{N}])/iu',$full,$hits,PREG_OFFSET_CAPTURE);
-        $count=count($hits[0]);
+        [$count,$pos]=n7match($full,$term);
         if(!$count)continue;
-        $pos=mb_strlen(substr($full,0,$hits[0][0][1]),'UTF-8');
         $start=max(0,$pos-140);
         if($start>0){
             $opening=mb_substr($full,$start,40,'UTF-8');
@@ -120,6 +155,126 @@ function n7search(PDO $db,string $term): array {
     return array_slice($ranked,0,30);
 }
 
+/* ---------- N7_HYBRID_SEARCH_V1 ----------
+ * Lexical results (n7search, unchanged) fused by reciprocal rank with a semantic list.
+ * Passage vectors are produced OFFLINE (multilingual-e5-small) and deployed as read-only files in
+ * n7-semantic/; no model runs here. The query vector is a weighted mean of offline word vectors
+ * looked up by binary search. Every semantic excerpt is cut from the CURRENT page text in the
+ * database and is dropped if that page changed after indexing (text_sha256 mismatch).
+ * Without a valid index, search is exactly the lexical search. */
+const N7_SEM_DIR = __DIR__.'/n7-semantic';
+const N7_SEM_DIMS = 384;
+const N7_SEM_KEY_WIDTH = 48;
+const N7_SEM_SCALE = 508;        // int8 = round(component * 508); |component| < 0.25 for e5 unit vectors
+const N7_SEM_MIN_COSINE = 0.5;   // e5 passages relevant or not score 0.7-0.85; this only drops degenerate matches
+function n7semIndex(string $dir=N7_SEM_DIR): ?array {
+    static $cache=[];
+    if (array_key_exists($dir,$cache)) return $cache[$dir];
+    $cache[$dir]=null;
+    $m=@json_decode((string)@file_get_contents($dir.'/manifest.json'),true);
+    if (!is_array($m)||($m['schema']??'')!=='n7-semantic-index-v1'||(int)($m['dims']??0)!==N7_SEM_DIMS) return null;
+    foreach (['chunks.i8','chunks.meta.json','words.keys','words.i8','words.w'] as $f) {
+        $path=$dir.'/'.$f;
+        if (!is_file($path)||is_link($path)||hash_file('sha256',$path)!==($m['files'][$f]??'')) return null;
+    }
+    $meta=json_decode((string)file_get_contents($dir.'/chunks.meta.json'),true);
+    $n=(int)$m['chunks'];$w=(int)$m['words'];
+    if (!is_array($meta)||count($meta)!==$n||filesize($dir.'/chunks.i8')!==$n*N7_SEM_DIMS||
+        filesize($dir.'/words.i8')!==$w*N7_SEM_DIMS||filesize($dir.'/words.keys')!==$w*N7_SEM_KEY_WIDTH||filesize($dir.'/words.w')!==$w) return null;
+    return $cache[$dir]=['dir'=>$dir,'meta'=>$meta,'chunks'=>$n,'words'=>$w,'model'=>(string)($m['model']??'')];
+}
+function n7semWord($fh,int $count,string $key): int {
+    $key=substr($key,0,N7_SEM_KEY_WIDTH);$lo=0;$hi=$count-1;
+    while ($lo<=$hi) {
+        $mid=intdiv($lo+$hi,2);fseek($fh,$mid*N7_SEM_KEY_WIDTH);
+        $cmp=strcmp(rtrim((string)fread($fh,N7_SEM_KEY_WIDTH),"\0"),$key);
+        if ($cmp===0) return $mid;
+        if ($cmp<0) $lo=$mid+1; else $hi=$mid-1;
+    }
+    return -1;
+}
+/** Query vector from offline word vectors; null when no query word is known. */
+function n7semQuery(array $index,string $query): ?array {
+    preg_match_all('/[\p{L}]{2,}/u',$query,$m);
+    $keys=$index['dir'].'/words.keys';$vecs=$index['dir'].'/words.i8';$weights=$index['dir'].'/words.w';
+    $fk=fopen($keys,'rb');$fv=fopen($vecs,'rb');$fw=fopen($weights,'rb');
+    $sum=array_fill(0,N7_SEM_DIMS,0.0);$used=0;
+    foreach (array_unique(array_map('n7fold',$m[0])) as $word) {
+        if (strlen($word)>N7_SEM_KEY_WIDTH) continue;
+        $i=n7semWord($fk,$index['words'],$word);
+        if ($i<0) continue;
+        fseek($fw,$i);$weight=ord((string)fread($fw,1))/20;
+        fseek($fv,$i*N7_SEM_DIMS);$v=unpack('c'.N7_SEM_DIMS,(string)fread($fv,N7_SEM_DIMS));
+        for ($k=0;$k<N7_SEM_DIMS;$k++) $sum[$k]+=$weight*$v[$k+1];
+        $used++;
+    }
+    fclose($fk);fclose($fv);fclose($fw);
+    if (!$used) return null;
+    $norm=sqrt(array_sum(array_map(static fn($x)=>$x*$x,$sum)));
+    return $norm>0?array_map(static fn($x)=>$x/$norm,$sum):null;
+}
+/** Top passages by dot product: [[chunk_index, score], ...]. */
+function n7semTop(array $index,array $q,int $limit=200): array {
+    $raw=(string)file_get_contents($index['dir'].'/chunks.i8');$top=[];
+    for ($c=0;$c<$index['chunks'];$c++) {
+        $v=unpack('c'.N7_SEM_DIMS,$raw,$c*N7_SEM_DIMS);$d=0.0;
+        for ($k=0;$k<N7_SEM_DIMS;$k++) $d+=$q[$k]*$v[$k+1];
+        $top[$c]=$d;
+    }
+    arsort($top);
+    return array_slice($top,0,$limit,true);
+}
+function n7hybridSearch(PDO $db,string $term,?array $index=null): array {
+    $lexical=array_map(static fn($r)=>$r+['retrieval'=>'lexical'],n7search($db,$term));
+    $index=$index??n7semIndex();
+    // Names, toponyms and short spellings stay exact (lexical); meaning is used for phrased questions.
+    if (!$index||preg_match_all('/[\p{L}]{2,}/u',$term)<3) return $lexical;
+    $q=n7semQuery($index,$term);
+    if (!$q) return $lexical;
+    $semantic=[];
+    foreach (n7semTop($index,$q) as $c=>$score) {
+        if ($score/N7_SEM_SCALE<N7_SEM_MIN_COSINE) break;
+        [$sid,$scan,$start,$end,$hash]=$index['meta'][$c];
+        $key=$sid.':'.$scan;
+        if (!isset($semantic[$key])) $semantic[$key]=['chunk'=>$c,'score'=>$score,'start'=>$start,'end'=>$end,'hash'=>$hash];
+    }
+    $fused=[];$rank=0;
+    foreach ($lexical as $row) $fused[$row['source_id'].':'.$row['scan_index']]=['rrf'=>1/(60+ ++$rank),'row'=>$row];
+    $rank=0;
+    foreach ($semantic as $key=>$hit) {
+        $fused[$key]=$fused[$key]??['rrf'=>0.0,'row'=>null];
+        $fused[$key]['rrf']+=1/(60+ ++$rank);$fused[$key]['sem']=$hit;
+    }
+    uasort($fused,static fn($a,$b)=>$b['rrf']<=>$a['rrf']);
+    $out=[];
+    $page=$db->prepare('SELECT s.source_id,s.title,s.author,s.publication_year,s.bibliographic_reference,s.source_uri,s.rights_note,p.scan_index,p.printed_page,p.ocr_status,p.ocr_text,p.text_sha256 FROM pc_library_pages p JOIN pc_library_sources s ON s.source_id=p.source_id WHERE p.source_id=? AND p.scan_index=?');
+    foreach ($fused as $key=>$f) {
+        if (count($out)>=30) break;
+        $row=$f['row'];$sem=$f['sem']??null;
+        if (!$row) {
+            [$sid,$scan]=explode(':',$key);
+            $page->execute([$sid,(int)$scan]);$row=$page->fetch();
+            if (!$row||!hash_equals($row['text_sha256'],$sem['hash'])) continue; // page changed after indexing
+            $label=(string)($row['printed_page']??'');$full=$row['ocr_text'];
+            if (($label!==''&&!ctype_digit($label))||n7isReferenceIndexPage($full)) continue;
+            $length=mb_strlen($full,'UTF-8');
+            if ($sem['start']<0||$sem['end']>$length||$sem['end']<=$sem['start']) continue;
+            $excerpt=trim(mb_substr($full,$sem['start'],min(560,$sem['end']-$sem['start']),'UTF-8'));
+            $row['excerpt']=($sem['start']>0?'…':'').$excerpt.($sem['start']+560<$sem['end']||$sem['end']<$length?'…':'');
+            $row['char_start']=$sem['start'];$row['char_end']=$sem['end'];
+            $row['source_type']=str_contains(strtolower((string)($row['rights_note']??'')),'historical secondary source')?'SECONDARY_HISTORIOGRAPHY':'UNCLASSIFIED_REQUIRES_REVIEW';
+            $row['evidence_state']='UNVERIFIED_SOURCE_TEXT';
+            unset($row['ocr_text']);
+        }
+        $row['retrieval']=$f['row']?($sem?'lexical+semantic':'lexical'):'semantic';
+        $row['semantic_score']=$sem?round($sem['score']/N7_SEM_SCALE,4):null;
+        $row['fused_score']=round($f['rrf'],6);
+        $out[]=$row;
+    }
+    return $out;
+}
+
+if (realpath((string)($argv[0]??''))!==realpath(__FILE__)) return; // included by a test harness
 try {
     $action=$argv[1]??'';
     if ($action==='self-test') {
@@ -149,7 +304,8 @@ try {
     elseif ($action==='search') {
         $count=(int)$db->query('SELECT COUNT(*) FROM pc_library_sources')->fetchColumn();
         $pageCount=(int)$db->query('SELECT COUNT(*) FROM pc_library_pages')->fetchColumn();
-        n7out(['matches'=>n7search($db,(string)($argv[2]??'')),
+        $semantic=n7semIndex();
+        n7out(['matches'=>n7hybridSearch($db,(string)($argv[2]??''),$semantic),'retrieval'=>$semantic?'hybrid-rrf':'lexical',
             'source_count'=>$count,'page_count'=>$pageCount]);
     }
     else {

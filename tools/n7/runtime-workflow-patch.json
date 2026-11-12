@@ -22,5 +22,37 @@
   {
     "old": "    ...history.slice(-MAX_HISTORY).map(message => ({",
     "new": "    ...history.filter(message=>message.role==='system'&&/^(?:\\nOWNER-APPROVED PROJECT: |\\nEARLIER USER MESSAGES)/.test(message.content||'')).slice(-1),\n    ...history.filter(message=>message.role!=='system').slice(-MAX_HISTORY).map(message => ({"
+  },
+  {
+    "old": "const n7PublicSearch = require('./n7-public-web-search');\n// N7_STREAM_ATTACHMENTS_ROUTE_V1: secure genuine Groq streaming endpoint.",
+    "new": "const n7PublicSearch = require('./n7-public-web-search');\nconst n7Weather = require('./n7-weather.js');\n// N7_STREAM_ATTACHMENTS_ROUTE_V1: secure genuine Groq streaming endpoint."
+  },
+  {
+    "old": "      finally{clearTimeout(timeout);}\n    }\n    if(req.method==='GET'&&p==='/api/research/capabilities')",
+    "new": "      finally{clearTimeout(timeout);}\n    }\n    // N7_WEATHER_TOOL_V1: authenticated, bounded, real provider data; failures are reported as such.\n    if(p==='/api/tools/weather'){\n      if(req.method!=='GET')return json(res,405,{error:'Method not allowed'});\n      const place=new URL(req.url,'http://local').searchParams.get('place')||'';\n      if(!n7Weather.validPlace(place))return json(res,400,{error:'Invalid place'});\n      try{return json(res,200,await n7Weather.forecast(place));}\n      catch(e){const code=String(e&&e.message||'');\n        return json(res,code==='WEATHER_PLACE_NOT_FOUND'?404:503,{error:code.startsWith('WEATHER_')?code:'WEATHER_UNAVAILABLE'});}\n    }\n    if(req.method==='GET'&&p==='/api/research/capabilities')"
+  },
+  {
+    "old": "const { createN7Relay } = require('./n7-queue-bridge');\n",
+    "new": "const { createN7Relay } = require('./n7-queue-bridge');\nconst n7Semantic = require('./n7-semantic-assets.js');\n"
+  },
+  {
+    "old": "    // Static frontend\n\n    if (",
+    "new": "    // Static frontend\n    // N7_HYBRID_SEARCH_V1: pinned public model files for on-device semantic search.\n    if(req.method==='GET'&&p.startsWith('/n7-model/'))return n7Semantic.model(res,p,__dirname);\n\n    if ("
+  },
+  {
+    "old": "    if(p==='/api/library/page'){",
+    "new": "    // N7_HYBRID_SEARCH_V1: authenticated passage vectors (no page text) for on-device semantic search.\n    if(req.method==='GET'&&p.startsWith('/api/library/semantic/'))return n7Semantic.index(res,p,__dirname,json);\n    if(p==='/api/library/page'){"
+  },
+  {
+    "old": "\"default-src 'self'; script-src 'self'; style-src 'self'; \"",
+    "new": "\"default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; \""
+  },
+  {
+    "old": "const n7Semantic = require('./n7-semantic-assets.js');\n",
+    "new": "const n7Semantic = require('./n7-semantic-assets.js');\nconst n7Coding = require('./n7-coding-agent.js');\n"
+  },
+  {
+    "old": "    // N7_HYBRID_SEARCH_V1: authenticated passage vectors",
+    "new": "    // N7_CODING_AGENT_LINK_V1: existing coding workflow (draft PRs only) and real PR/CI state.\n    if(p==='/api/coding/tasks'||p.startsWith('/api/coding/runs/')||p==='/api/coding/pr'){\n      const fail=e=>{const c=String(e&&e.message||'');return json(res,c==='CODING_TOKEN_NOT_CONFIGURED'?503:c.startsWith('CODING_GITHUB_FORBIDDEN')?502:c.startsWith('CODING_')?400:503,{error:c.startsWith('CODING_')?c:'CODING_UNAVAILABLE'});};\n      try{\n        if(p==='/api/coding/tasks'){\n          if(req.method!=='POST')return json(res,405,{error:'Method not allowed'});\n          if(!originOK(req))return json(res,403,{error:'Invalid origin'});\n          const b=await body(req);\n          return json(res,202,await n7Coding.dispatch({task:b?.task,files:b?.files,apply:b?.apply===true}));\n        }\n        if(req.method!=='GET')return json(res,405,{error:'Method not allowed'});\n        if(p==='/api/coding/pr')return json(res,200,await n7Coding.latestPr(new URL(req.url,'http://local').searchParams.get('repo')||''));\n        return json(res,200,await n7Coding.runStatus(p.slice('/api/coding/runs/'.length)));\n      }catch(e){return fail(e);}\n    }\n    // N7_HYBRID_SEARCH_V1: authenticated passage vectors"
   }
 ]

@@ -31,10 +31,17 @@ PUBLIC_MODULES = {'conversation-store.js': 'conversation-store.js',
                   'n7-stream-attachments.js': 'stream-attachments.js',
                   'owner-chat-memory.js': 'owner-chat-memory.js',
                   'source-library.js': 'source-library.js',
-                  'n7-release-info.js': 'runtime-release-info.js'}
+                  'n7-release-info.js': 'runtime-release-info.js',
+                  'n7-weather.js': 'weather-tool.js',
+                  'n7-public-web-search.js': 'public-web-search.js',
+                  'n7-semantic-assets.js': 'semantic-assets.js',
+                  'n7-coding-agent.js': 'coding-agent-tool.js'}
 for _skill in ('book-project-canon', 'document-reading-plan', 'claim-evidence-ledger', 'editorial-preservation'):
     PUBLIC_MODULES['skills/' + _skill + '/SKILL.md'] = 'skills/' + _skill + '/SKILL.md'
-WRITABLE = {'server.js', 'public/app.js', 'public/index.html', 'release-manifest.json', *PUBLIC_MODULES}
+# The engineering workflow lives only in the canonical private N7 repository.
+# Its installed runtime path is still a native, reviewed skills/ entry.
+PUBLIC_MODULES['skills/n7-verified-change/SKILL.md'] = '../../skills/n7-verified-change/SKILL.md'
+WRITABLE = {'server.js', 'public/app.js', 'public/index.html', 'public/style.css', 'release-manifest.json', *PUBLIC_MODULES}
 LIMIT = 8 * 1024 * 1024
 
 
@@ -84,6 +91,9 @@ def transform_server(original):
         source = source.replace(legacy_guide, '      const history = [\n        ...item.messages,', 1)
     for file in ('chat-storage-patch.json', 'runtime-workflow-patch.json'):
         for patch in json.loads((HERE / file).read_text()):
+            # Already-applied patches are skipped so an installed current release is not re-patched.
+            if patch['new'] and source.count(patch['new']) == 1:
+                continue
             if source.count(patch['old']) == 1:
                 source = source.replace(patch['old'], patch['new'], 1)
             elif not patch['new'] or source.count(patch['new']) != 1:
@@ -99,11 +109,41 @@ def transform_app(original):
     # plan() restricts input to the reviewed previous/current SHA256. Replace only
     # the canonical modern UI and its canonical workflow/voice suffixes.
     prefix = source[:source.index(marker)]
+    # N7_PRESENCE_API_V1: replace the approved-character block only when it is the reviewed
+    # installed revision (or already current); any other content stops the deployment.
+    start = prefix.find('/* N7_APPROVED_CHARACTER_V1')
+    owner = (HERE / 'owner-chat-ui.js').read_text().splitlines()[0]
+    end = prefix.find(owner)
+    if start < 0 or end < start or prefix.count(owner) != 1:
+        raise RuntimeError('N7_PUBLIC_APP_ANCHOR_CHANGED')
+    current = (HERE / 'n7-approved-character.js').read_text().rstrip() + '\n\n\n'
+    block = prefix[start:end]
+    if block != current and sha(block.encode()) not in PREVIOUS_CHARACTER_BLOCKS:
+        raise RuntimeError('N7_UNREVIEWED_CHARACTER_BLOCK')
+    prefix = prefix[:start] + current + prefix[end:]
     tail = (HERE / 'modern-ui.js').read_text().rstrip() + '\n\n'
     tail += (HERE / 'workspace-ui.js').read_text() + '\n'
     tail += (HERE / 'voice-protocol.js').read_text() + '\n'
     tail += (HERE / 'voice-bridge-ui.js').read_text()
+    # N7_HUMANOID_STAGE_V1: command router, NABOU map protocol and the Humanoid entry screen.
+    for name in ('n7-command-router.js', 'n7-map-protocol.js', 'humanoid-stage.js'):
+        tail += '\n' + (HERE / name).read_text()
     return (prefix + tail).encode()
+
+
+# SHA-256 of the installed approved-character block (release 483096c9…, canonical 1ba82fd/f9932e6).
+PREVIOUS_CHARACTER_BLOCKS = {'cdc734194899240f5045266863c16dbcea28f57b0907af17655be264760c0286'}
+STAGE_CSS_MARKER = '/* N7_HUMANOID_STAGE_V1'
+
+
+def transform_css(original):
+    # N7_HUMANOID_STAGE_V1: the canonical stylesheet is the installed one plus the stage styles.
+    source = original.decode('utf8')
+    stage = (HERE / 'humanoid-stage.css').read_text()
+    if source.count(STAGE_CSS_MARKER) > 1:
+        raise RuntimeError('N7_PUBLIC_CSS_ANCHOR_CHANGED')
+    prefix = source[:source.index(STAGE_CSS_MARKER)] if STAGE_CSS_MARKER in source else source + '\n'
+    return (prefix + stage).encode()
 
 
 def syntax(data):
@@ -171,6 +211,13 @@ def plan(ftp, release, canonical_commit, transformer=transform_server):
             raise RuntimeError('N7_PUBLIC_APP_OUTPUT_MISMATCH')
         syntax(app)
         payload['public/app.js'] = app
+    if 'public/style.css' in originals:
+        css = originals['public/style.css']
+        if css is None or sha(css) != release['files']['public/style.css']:
+            css = transform_css(css or b'')
+        if sha(css) != release['files']['public/style.css']:
+            raise RuntimeError('N7_PUBLIC_CSS_OUTPUT_MISMATCH')
+        payload['public/style.css'] = css
     if 'public/index.html' in originals:
         import runpy
         versioner = runpy.run_path(str(HERE / 'asset_version.py'))
