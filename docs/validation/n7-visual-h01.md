@@ -41,3 +41,10 @@ Evidence: `n7-visual-h01-evidence/`.
 - [Visual trial](https://bot.piratecartography.com/n7-apex-step5-visual/), release `0c5487071961799a`. Read after deployment: functional preview `/n7-apex-step5/` still `2c3286f6ce6b899a`, production `/n7-apex/` still `bbdc05016a211581`. The H01 figure served live has the same SHA-256 as the committed asset.
 - Fresh TLS-verified browser against the live trial, no API or rendering mocks: `test_face_menu.cjs`, `test_head_joints.cjs`, `test_head_backdrop.cjs` and `test_complete_guide.cjs` all passed.
 - Not re-run live on this trial: a real spoken conversation turn. Voice and conversation code are unchanged and their fixture suites pass in CI on this build; the last real Greek voice turn was verified on the functional preview (see `n7-head-joints.md`). Physical microphone and speaker, authenticated owner sessions and frame rate on a real GPU remain unverified.
+
+### Update — natural H01 neck and restored turn travel
+
+- Source `c40d98a70`; [validation and trial deployment passed](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/43236307821). Trial release `6f0a81a8e77640a7`; functional preview still `2c3286f6ce6b899a`, production still `bbdc05016a211581`.
+- The live H01 figure matched the committed asset only after the host's cache had refreshed: the server sends `cache-control: max-age=864000` and the asset name does not change between versions, so a browser can keep showing an older figure for up to 10 days without a hard refresh. Not yet fixed.
+- Live, TLS-verified, no mocks: `test_face_menu.cjs`, `test_head_joints.cjs`, `test_head_backdrop.cjs`, `test_complete_guide.cjs` passed. Live neck close-ups: `live-h01-neck-front-right-left-down.jpg`.
+- Known visual flaw: vertical streaks in the snow texture of the painted peaks, most visible on the right.
