@@ -197,7 +197,7 @@ def main():
     if isolated:
         # Visual trial: the designed N7 environment and the H01 second face option.
         for name,digest in (("n7-environment-v3.webp","be5e936a4fa14e3831adb8381e3f56c30b38009c2b716049eb68b21cf6ef9d8d"),
-                            ("n7-humanoid-h01-v1.webp","8e4219a1fe36b80a9de5d0f6f9634fe663a79d1c311ab05176588f0c728c6e6a")):
+                            ("n7-humanoid-h01-v2.webp","c07d6e2f063ee46984fea3dbee117b8fe467e7e5f640a6e3770f1e8787ec81a5")):
             data=(overlay/"assets"/name).read_bytes()
             if hashlib.sha256(data).hexdigest()!=digest: raise RuntimeError("wrong visual asset "+name)
             (out/"public"/name).write_bytes(data)

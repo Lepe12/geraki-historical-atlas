@@ -48,3 +48,8 @@ Evidence: `n7-visual-h01-evidence/`.
 - The live H01 figure matched the committed asset only after the host's cache had refreshed: the server sends `cache-control: max-age=864000` and the asset name does not change between versions, so a browser can keep showing an older figure for up to 10 days without a hard refresh. Not yet fixed.
 - Live, TLS-verified, no mocks: `test_face_menu.cjs`, `test_head_joints.cjs`, `test_head_backdrop.cjs`, `test_complete_guide.cjs` passed. Live neck close-ups: `live-h01-neck-front-right-left-down.jpg`.
 - Known visual flaw: vertical streaks in the snow texture of the painted peaks, most visible on the right.
+
+### Update — gold "thorn" at the left of the neck, cache-proof file name
+
+- Owner report with a phone screenshot of the live trial: a gold thorn-like spike at the left of the neck. Confirmed as part of the H01 source itself: its warm rim strands converge at the left of its neck base into a sharp gold-white glint (`local-h01-left-neck-before-glint-fix.jpg`). That spot is now softened and dimmed locally; the strands around it are kept (`local-h01-left-neck-after-glint-fix.jpg`).
+- The composed figure is now `n7-humanoid-h01-v2.webp`. The host sends `cache-control: max-age=864000`, so every change to the figure gets a new file name; a browser can no longer keep showing an older figure.

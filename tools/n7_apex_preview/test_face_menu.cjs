@@ -60,7 +60,7 @@ const LABEL='[aria-label="N7 guide artwork-tile humanoid"]';
   await p.waitForFunction(l=>{const h=document.querySelector(l);return h?.dataset.face==='h01'&&h.dataset.referenceReady==='true'&&h.dataset.rig==='n7-neck-skull-joints-v3';},LABEL);
   const h01=await surface();
   assert.deepEqual([h01.width,h01.height],[800,1200]);
-  assert(h01.url.endsWith('/n7-humanoid-h01-v1.webp'));
+  assert(h01.url.endsWith('/n7-humanoid-h01-v2.webp'));
   await d.getByRole('button',{name:'Technical details',exact:true}).click();
   await d.getByLabel('Breathing',{exact:true}).uncheck();
   await d.getByRole('button',{name:'Technical details',exact:true}).click();

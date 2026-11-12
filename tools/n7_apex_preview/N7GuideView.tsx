@@ -7,7 +7,7 @@ import { N7_HUMANOID_REFERENCE } from "./N7HumanoidReference";
 // Second face option: the owner-supplied H01 head composed onto the same body.
 // It is a different source raster for the same scene, rig, moods and voice.
 type Face="n7"|"h01";
-const H01_FIGURE=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/"))+"/n7-humanoid-h01-v1.webp";
+const H01_FIGURE=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/"))+"/n7-humanoid-h01-v2.webp";
 const H01_SCALE=2.5;
 
 export default function N7GuideView({open,onClose,activity,onWorkspace}:{open:boolean;onClose:()=>void;activity?:GuideMood|null;onWorkspace?:()=>void}){

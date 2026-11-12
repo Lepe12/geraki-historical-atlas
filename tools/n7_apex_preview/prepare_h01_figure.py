@@ -118,6 +118,14 @@ def main():
     bright = smooth(.40, .85, rgb.max(axis=2))
     downward *= 1 - smooth(212, 244, uy) * (1 - .75 * bright)
     fade = sideways * downward
+    #    H01's warm rim strands converge at the left of its neck base into a
+    #    bright gold star-like glint (owner: "a gold thorn"). Calm that spot:
+    #    compress only the brightest warm highlights there, keep the strands.
+    glint = np.exp(-(((ux - 133) / 10.0) ** 2 + ((uy - 208) / 13.0) ** 2))
+    softened = np.stack([np.array(Image.fromarray((np.clip(rgb[..., c], 0, 1) * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(3.2 * K))).astype(np.float32) / 255 for c in range(3)], axis=2)
+    rgb = rgb * (1 - glint[..., None]) + softened * glint[..., None]
+    peak = smooth(.30, .80, rgb.max(axis=2))
+    rgb = rgb * (1 - .55 * (glint * peak)[..., None])
     out = body * (1 - alpha * fade)[..., None] + rgb * (alpha * fade)[..., None]
 
     image = Image.fromarray((np.clip(out, 0, 1) * 255 + 0.5).astype(np.uint8), "RGB")
