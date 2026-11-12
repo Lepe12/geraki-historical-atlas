@@ -7,7 +7,7 @@ import { N7_HUMANOID_REFERENCE } from "./N7HumanoidReference";
 export type GuideMood="idle"|"listening"|"thinking"|"speaking";
 export type GuideMode="assembly"|"particle"|"original"|"compare";
 export type GuideFrameInfo={turn:number;breath:number;progress:number;shock:number;ignition:number;renderMs:number;particles:number;frameMs:number};
-export type GuideSceneProps={mode:GuideMode;mood:GuideMood;effects:boolean;reduced:boolean;breathing:boolean;replay:number;manualMotion:boolean;diagnostics:boolean;onComplete:()=>void;onFrame:(f:GuideFrameInfo)=>void};
+export type GuideSceneProps={mode:GuideMode;mood:GuideMood;effects:boolean;reduced:boolean;breathing:boolean;gestures?:boolean;replay:number;manualMotion:boolean;diagnostics:boolean;onComplete:()=>void;onFrame:(f:GuideFrameInfo)=>void};
 const moods:GuideMood[]=["idle","listening","thinking","speaking"];
 
 // A single Three.js scene owns source tiles, moods, assembly and breathing.
@@ -19,6 +19,10 @@ export default function N7GuideScene(props:GuideSceneProps){
   useEffect(()=>{
     const host=hostRef.current;if(!host)return;
     let disposed=false,raf=0,target=0,current=0,targetPitch=0,currentPitch=0,last=0,lastStats=0;
+    // Critically damped joint springs (no overshoot) and a separate, slower
+    // life/state gesture layer. The pointer value reported in the dataset is
+    // the pointer-following part only.
+    let velocity=0,velocityPitch=0,lastPointer=-1e9,gestureYaw=0,gesturePitch=0,gestureRoll=0,voiceNod=0;
     let surface:ReturnType<typeof createHeadSurface>|undefined;
     let mode:GuideMode|null=null,replay=-1,assemblyStart:number|null=null,completed=false,shockStart:number|null=null,breathStart=0;
     let baseMood=0,lastMood:GuideMood="idle",lastEffects=true,lastReduced=false,stillFrameKey="";
@@ -40,6 +44,7 @@ export default function N7GuideScene(props:GuideSceneProps){
       if(Math.abs(targetPitch)<.10)targetPitch=0;
       host.dataset.headTarget=target.toFixed(3);
       host.dataset.headPitchTarget=targetPitch.toFixed(3);
+      lastPointer=performance.now();
     };
     window.addEventListener("pointermove",pointer,{passive:true});window.addEventListener("blur",clearTarget);document.addEventListener("mouseleave",clearTarget);
     const image=new Image();image.decoding="async";
@@ -56,7 +61,7 @@ export default function N7GuideScene(props:GuideSceneProps){
       Object.assign(stillCanvas.style,{width:"100%",height:"100%",display:"none"});
       const stillContext=stillCanvas.getContext("2d");
       host.append(stillCanvas);
-      host.dataset.renderer="shared-edge-texture-mesh";host.dataset.engine="three-shared-scene";host.dataset.rig="apex-guide-depth-head-v2";
+      host.dataset.renderer="shared-edge-texture-mesh";host.dataset.engine="three-shared-scene";host.dataset.rig="n7-neck-skull-joints-v3";
       host.dataset.referenceReady="true";host.dataset.referenceUrl=image.src;host.dataset.headTarget="0.000";host.dataset.headPitchTarget="0.000";
       const draw=(now:number)=>{
         if(disposed)return;
@@ -84,9 +89,17 @@ export default function N7GuideScene(props:GuideSceneProps){
         }
         if(!c.effects||c.reduced){shockStart=null;clearTarget();current=0;currentPitch=0;if(c.reduced){baseMood=moods.indexOf(c.effects?c.mood:"idle");transitions=[];}}
         if(mode==="original"){clearTarget();current=0;currentPitch=0;}
-        const follow=1-Math.exp(-dt/42);
-        current+=(target-current)*follow;if(Math.abs(target-current)<.0001)current=target;
-        currentPitch+=(targetPitch-currentPitch)*follow;if(Math.abs(targetPitch-currentPitch)<.0001)currentPitch=targetPitch;
+        if(!c.effects||c.reduced||mode==="original"||mode==="assembly"&&!completed){velocity=0;velocityPitch=0;}
+        // Critically damped spring, integrated in small sub-steps so a slow
+        // frame cannot overshoot: the head eases out and back like a joint.
+        const omega=1/95;
+        for(let left=dt;left>0;left-=8){
+          const h=Math.min(8,left);
+          velocity+=(omega*omega*(target-current)-2*omega*velocity)*h;current+=velocity*h;
+          velocityPitch+=(omega*omega*(targetPitch-currentPitch)-2*omega*velocityPitch)*h;currentPitch+=velocityPitch*h;
+        }
+        if(Math.abs(target-current)<.0006&&Math.abs(velocity)<.00002){current=target;velocity=0;}
+        if(Math.abs(targetPitch-currentPitch)<.0006&&Math.abs(velocityPitch)<.00002){currentPitch=targetPitch;velocityPitch=0;}
         const desired=c.effects?c.mood:"idle";
         if(desired!==lastMood){
           if(!c.effects||c.reduced){baseMood=moods.indexOf(desired);transitions=[];}
@@ -106,8 +119,32 @@ export default function N7GuideScene(props:GuideSceneProps){
         if(shock>1)shockStart=null;
         const wave=shock>=0&&shock<=1?shock:-1;
         const ignition=c.effects&&!c.reduced?(progress<1?Math.max(0,(progress-.91)/.09):wave>=0?Math.max(0,1-wave*3):0):0;
-        const exact=mode==="original"||!c.effects||progress===1&&current===0&&currentPitch===0&&breath===0&&baseMood===0&&!transitions.length&&ignition===0;
         const voiceLevel=c.effects&&!c.reduced?readVoiceSignal(now):0;
+        // State gestures: head posture only, never a facial feature. Idle
+        // stays guide-exact (chest-only breathing, head at rest). Listening,
+        // Thinking and Speaking pose the same neck/skull joints, rest while
+        // the pointer steers the head, and ease back to exactly zero.
+        const alive=c.effects&&!c.reduced&&c.gestures!==false&&progress>=1&&mode!=="original"&&desired!=="idle";
+        const steering=target!==0||targetPitch!==0||now-lastPointer<1400;
+        let wantYaw=0,wantPitch=0,wantRoll=0;
+        if(alive){
+          const s=now/1000,calm=steering?.25:1;
+          if(desired==="listening"){wantRoll=.55;wantPitch=.12+Math.sin(s*.9)*.03;wantYaw=.10;}
+          else if(desired==="thinking"){wantYaw=.34+Math.sin(s*.4)*.06;wantPitch=.38+Math.sin(s*.27)*.04;wantRoll=-.25;}
+          else{wantYaw=Math.sin(s*1.1)*.10;wantPitch=Math.sin(s*1.7)*.05;}
+          wantYaw*=calm;wantPitch*=calm;wantRoll*=calm;
+        }
+        // Ease into a pose slowly; settle back to rest within the 1s mood bloom.
+        const ease=1-Math.exp(-dt/(alive?380:150));
+        gestureYaw+=(wantYaw-gestureYaw)*ease;gesturePitch+=(wantPitch-gesturePitch)*ease;gestureRoll+=(wantRoll-gestureRoll)*ease;
+        // Speaking: small nods carried by the real playback envelope.
+        const nodTarget=alive&&desired==="speaking"?Math.max(0,Math.min(1,voiceLevel))*-.22:0;
+        voiceNod+=(nodTarget-voiceNod)*(1-Math.exp(-dt/120));
+        if(!alive&&Math.abs(gestureYaw)+Math.abs(gesturePitch)+Math.abs(gestureRoll)+Math.abs(voiceNod)<.002){gestureYaw=0;gesturePitch=0;gestureRoll=0;voiceNod=0;}
+        if(!c.effects||c.reduced||mode==="original"){gestureYaw=0;gesturePitch=0;gestureRoll=0;voiceNod=0;}
+        const poseYaw=Math.max(-1,Math.min(1,current+gestureYaw)),posePitch=Math.max(-1,Math.min(1,currentPitch+gesturePitch+voiceNod)),poseRoll=gestureRoll;
+        const still=poseYaw===0&&posePitch===0&&poseRoll===0;
+        const exact=mode==="original"||!c.effects||progress===1&&still&&breath===0&&baseMood===0&&!transitions.length&&ignition===0;
         host.dataset.voiceLevel=voiceLevel.toFixed(4);
         const start=performance.now();
         if(exact){
@@ -118,10 +155,10 @@ export default function N7GuideScene(props:GuideSceneProps){
         }else{
           reference.style.display="none";
           const frameKey=c.reduced
-            ?[progress.toFixed(5),baseMood,current.toFixed(5),currentPitch.toFixed(5),
+            ?[progress.toFixed(5),baseMood,poseYaw.toFixed(5),posePitch.toFixed(5),
               transitions.length,c.effects].join(":"):"";
           if(!c.reduced||stillFrameKey!==frameKey){
-            surface!.render({turn:current,pitch:currentPitch,breath,assembly:progress,baseMood,states:transitions.map(t=>t.mood),ages:transitions.map(t=>Math.min(1,(now-t.start)/1000)),ignition,voiceLevel,time:c.reduced?0:now/1000});
+            surface!.render({turn:poseYaw,pitch:posePitch,roll:poseRoll,breath,assembly:progress,baseMood,states:transitions.map(t=>t.mood),ages:transitions.map(t=>Math.min(1,(now-t.start)/1000)),ignition,voiceLevel,time:c.reduced?0:now/1000});
             if(c.reduced&&stillContext){
               // Once per actual state: preserve the frame pixels, then
               // stop presenting WebGL while reduced motion is requested.
@@ -135,7 +172,7 @@ export default function N7GuideScene(props:GuideSceneProps){
           stillCanvas.style.display=useStill?"block":"none";
         }
         const renderMs=performance.now()-start;
-        host.dataset.currentTurn=current.toFixed(4);host.dataset.currentPitch=currentPitch.toFixed(4);host.dataset.assemblyProgress=progress.toFixed(4);
+        host.dataset.currentTurn=current.toFixed(4);host.dataset.currentPitch=currentPitch.toFixed(4);host.dataset.poseYaw=poseYaw.toFixed(4);host.dataset.posePitch=posePitch.toFixed(4);host.dataset.poseRoll=poseRoll.toFixed(4);host.dataset.assemblyProgress=progress.toFixed(4);
         host.dataset.breath=breath.toFixed(4);host.dataset.shock=wave.toFixed(4);
         host.dataset.referenceVisible=String(exact);host.dataset.mood=desired;
         if(c.diagnostics){host.dataset.renderMs=renderMs.toFixed(3);host.dataset.frameMs=rawDt.toFixed(3);host.dataset.moodRadius=String(transitions.length?Math.min(1,(now-transitions.at(-1)!.start)/1000)*430:430);}

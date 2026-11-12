@@ -18,7 +18,7 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
   const host=p.getByLabel('N7 guide artwork-tile humanoid',{exact:true}),canvas=host.locator('canvas:visible');
   await canvas.waitFor();
   await p.waitForFunction(()=>document.querySelector('[aria-label="N7 guide artwork-tile humanoid"]')?.dataset.renderer==='shared-edge-texture-mesh');
-  assert.equal(await host.getAttribute('data-rig'),'apex-guide-depth-head-v2','APEX depth-and-neck-pivot head geometry is not active');
+  assert.equal(await host.getAttribute('data-rig'),'n7-neck-skull-joints-v3','Jointed neck/skull head rig is not active');
   const skip=p.getByRole('button',{name:'Skip',exact:true});if(await skip.isVisible())await skip.click();
   await p.getByRole('button',{name:'Technical details',exact:true}).click();
   await p.getByLabel('Breathing',{exact:true}).uncheck();
@@ -43,6 +43,10 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
   const brightHead=px=>{let n=0;for(let i=0;i<205*320*4;i+=4)n+=px[i]+px[i+1]+px[i+2]>45;return n;};
   fs.writeFileSync(path.join(out,"reference-pixels.png"),PNG.sync.write({width:320,height:480,data:Buffer.from(reference)}));
   const referenceHead=brightHead(reference);
+  const faceCoreX=px=>{let s=0,n=0;for(let y=85;y<205;y++)for(let x=95;x<225;x++){const i=(y*320+x)*4,r=px[i],g=px[i+1],b=px[i+2];if(r>90&&r>g*1.12&&g>b*1.15){s+=x;n++;}}return n?s/n:NaN;};
+  const hairExtent=px=>{let left=320,right=0;for(let x=0;x<320;x++){let c=0;for(let y=40;y<150;y++){const i=(y*320+x)*4;if(px[i]+px[i+1]+px[i+2]>260)c++;}if(c>=8){if(x<left)left=x;if(x>right)right=x;}}return {left,right,width:right-left};};
+  const neckChange=px=>{let n=0;for(let y=204;y<250;y++)for(let x=134;x<187;x++){const i=(y*320+x)*4;if(Math.abs(px[i]-reference[i])+Math.abs(px[i+1]-reference[i+1])+Math.abs(px[i+2]-reference[i+2])>24)n++;}return n;};
+  const neutralFaceX=faceCoreX(reference),neutralOutline=hairExtent(reference);
   const results={url,poses:[],motion:{},background:{},errors};
   await move(0);
   assert.deepEqual(difference(await pixels(),reference),{count:0,max:0},'Neutral source pixels changed');
@@ -83,13 +87,23 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
    await move(t);const px=await pixels();let gaps=0;for(let i=3;i<px.length;i+=4)gaps+=px[i]!==255;
    assert.equal(gaps,0,name+' coverage');
    assert(brightHead(px)>referenceHead*.92,name+' head disappeared/darkened excessively');
-   const body=difference(px.slice(208*320*4),reference.slice(208*320*4));
+   const body=difference(px.slice(256*320*4),reference.slice(256*320*4));
    if(body.max>2)save(name+'-body-failure',await canvas.evaluate(c=>c.toDataURL()));
    assert(body.max<=2,name+' moved/repainted fixed neck/body: '+JSON.stringify(body));
    if(t===0&&difference(px,reference).count){save(name+'-neutral-failure',await canvas.evaluate(c=>c.toDataURL()));console.log('NEUTRAL FAILURE',await host.evaluate(h=>({ds:{...h.dataset},styles:[...h.querySelectorAll('canvas')].map(c=>c.style.display)})));}
    if(t===0) assert.equal(difference(px,reference).count,0,name+' reference equality');
    save(name,await canvas.evaluate(c=>c.toDataURL()));await p.screenshot({path:path.join(out,name+'-scene.png')});
-   results.poses.push({name,turn:Number(await host.getAttribute('data-current-turn')),gaps,bodyMaxDifference:body.max});
+   // A real turn is parallax, not a slide: the face core travels across a
+   // hair outline that stays almost in place, and the neck column twists
+   // with it instead of being cut off under the chin.
+   const core=faceCoreX(px)-neutralFaceX,outline=hairExtent(px),neckChanged=neckChange(px);
+   if(Math.abs(t)===1){
+    assert(Math.sign(core)===Math.sign(t)&&Math.abs(core)>9,name+' face did not turn: '+core.toFixed(2)+' px');
+    assert(Math.abs(outline.left-neutralOutline.left)<=9&&Math.abs(outline.right-neutralOutline.right)<=9,name+' whole head slid sideways: '+JSON.stringify(outline));
+    assert(outline.width/neutralOutline.width>.92&&outline.width/neutralOutline.width<1.02,name+' head grew or shrank: '+JSON.stringify(outline));
+    assert(neckChanged>60,name+' neck is cut off from the turning head: '+neckChanged);
+   }
+   results.poses.push({name,turn:Number(await host.getAttribute('data-current-turn')),gaps,bodyMaxDifference:body.max,faceCoreShiftPx:core,hairOutline:outline,neckChangedPixels:neckChanged});
   }
   console.log('Eight poses: PASS. Auditing vertical head pitch...');
    const movePitch=async pitch=>{
@@ -150,7 +164,7 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
      const px=await pixels();let gaps=0;
      for(let i=3;i<px.length;i+=4) gaps+=px[i]!==255;
      assert.equal(gaps,0,name+' vertical motion coverage');
-     const body=difference(px.slice(208*320*4),reference.slice(208*320*4));
+     const body=difference(px.slice(256*320*4),reference.slice(256*320*4));
      assert(body.max<=2,name+' fixed torso/neck changed');
      if(angle===0)assert.equal(difference(px,reference).count,0,'Pitch return neutral differs from approved artwork');
      save(name,await canvas.evaluate(c=>c.toDataURL()));
@@ -168,7 +182,7 @@ function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=M
      await p.mouse.move(bounds.x+bounds.width/2+bounds.width*.42*yaw,bounds.y+bounds.height/2-bounds.height*.42*nod);
      await p.waitForFunction(({yaw,nod})=>{const h=document.querySelector('[aria-label="N7 guide artwork-tile humanoid"]');return Math.abs(Number(h.dataset.currentTurn)-yaw)<.003&&Math.abs(Number(h.dataset.currentPitch)-nod)<.003;},{yaw,nod});
      await p.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
-     const px=await pixels(),scaleRatio=headSpread(px)/neutralSpread,body=difference(px.slice(208*320*4),reference.slice(208*320*4));
+     const px=await pixels(),scaleRatio=headSpread(px)/neutralSpread,body=difference(px.slice(256*320*4),reference.slice(256*320*4));
      assert(scaleRatio>.95&&scaleRatio<1.05,name+' diagonal collapsed/stretched head: '+scaleRatio.toFixed(3));
      assert(body.max<=2,name+' moved fixed neck/body');
      assert(brightHead(px)>referenceHead*.92,name+' lost head coverage');

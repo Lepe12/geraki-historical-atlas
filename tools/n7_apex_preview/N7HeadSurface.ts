@@ -1,9 +1,13 @@
 import * as THREE from "three";
 
-// APEX Stage 5 exact: head dots take rounded depth, all source tiles rotate
-// together around a fixed neck pivot; the approved image is untouched at rest.
-// Preview only. Require actual visual acceptance, not green tests alone.
-export type GuideFrame={turn:number;pitch?:number;breath?:number;assembly?:number;baseMood?:number;states?:number[];ages?:number[];ignition?:number;time?:number;voiceLevel?:number};
+// APEX Stage 5: the approved artwork is projected once, from the front, onto
+// a rounded head volume (face, skull/hair and neck depth). That volume is then
+// moved only by a real two-joint chain -- neck base and skull base -- with
+// linear-blend skinning along the neck. No per-pixel image warping: every head
+// point is carried by rigid joint rotations (yaw, pitch, roll); the shoulders
+// are not skinned at all. Orthographic projection, so the head never grows.
+// The approved image is untouched at rest. No eyes or facial features exist.
+export type GuideFrame={turn:number;pitch?:number;roll?:number;breath?:number;assembly?:number;baseMood?:number;states?:number[];ages?:number[];ignition?:number;time?:number;voiceLevel?:number};
 export function createHeadSurface(image:HTMLCanvasElement) {
   const renderer=new THREE.WebGLRenderer({alpha:false,antialias:false,depth:false,preserveDrawingBuffer:true});
   renderer.setSize(320,480,false);renderer.setPixelRatio(1);
@@ -18,8 +22,8 @@ export function createHeadSurface(image:HTMLCanvasElement) {
   const sources:number[]=[],positions:number[]=[],indices:number[]=[];
   // Preserve every 4px vertex that can move. Flat regions need no subdivisions:
   // they remain part of this same textured surface, not a cached body underlay.
-  const xs=[0,...Array.from({length:49},(_,i)=>64+i*4),320];
-  const ys=[...Array.from({length:53},(_,i)=>i*4),240,280,320,360,400,440,480];
+  const xs=[0,32,...Array.from({length:65},(_,i)=>48+i*3.5),320];
+  const ys=[...Array.from({length:66},(_,i)=>i*4),280,320,360,400,440,480];
   for(const y of ys) for(const x of xs){sources.push(x,y);positions.push(x,y,0);}
   for(let y=0;y<ys.length-1;y++) for(let x=0;x<xs.length-1;x++){
     const i=y*xs.length+x;indices.push(i,i+1,i+xs.length,i+1,i+xs.length+1,i+xs.length);
@@ -28,7 +32,7 @@ export function createHeadSurface(image:HTMLCanvasElement) {
   geometry.setAttribute("source",new THREE.Float32BufferAttribute(sources,2));
   geometry.setIndex(indices);
   const material=new THREE.ShaderMaterial({
-    uniforms:{turn:{value:0},pitch:{value:0},artwork:{value:texture},breath:{value:0},opacity:{value:1},
+    uniforms:{turn:{value:0},pitch:{value:0},neckMatrix:{value:new THREE.Matrix4()},headMatrix:{value:new THREE.Matrix4()},artwork:{value:texture},breath:{value:0},opacity:{value:1},
       baseMood:{value:0},states:{value:[0,0,0,0]},ages:{value:[0,0,0,0]},count:{value:0},ignition:{value:0},time:{value:0},voiceLevel:{value:-1}},
     depthTest:false,depthWrite:false,side:THREE.DoubleSide,toneMapped:false,transparent:true,
     vertexShader:`
@@ -36,52 +40,52 @@ export function createHeadSurface(image:HTMLCanvasElement) {
     uniform float turn;
     uniform float pitch;
     uniform float breath;
+    uniform mat4 neckMatrix;
+    uniform mat4 headMatrix;
     varying vec2 texUV;
     varying float shade;
     varying float rim;
+    float dome(vec2 p,vec2 c,vec2 r,float d){
+      float rho=min(1.,length((p-c)/r));
+      return d*cos(rho*1.5707963);
+    }
+    float smax(float a,float b){return .5*(a+b+sqrt((a-b)*(a-b)+36.));}
     void main(){
-      // APEX guide Step 5: *every* head image tile carries its own source UV.
-      // A rounded-head depth is attached to the original vertex, followed by
-      // ONE common yaw/pitch rotation about the neck pivot. Unlike the
-      // rejected trials, no radial skull weight can pin the chin/jaw in place.
       vec2 tile=source;
-      float neckBlend=1.-smoothstep(188.,208.,tile.y);
-      float normalizedX=clamp((tile.x-160.)/117.,-1.,1.);
-      float depth=72.*sqrt(max(0.,1.-normalizedX*normalizedX));
-      float combined=max(1.,length(vec2(turn,pitch)));
-      float yaw=turn*.32/combined;
-      // Full downward nod formerly collapsed the source hair/face height to
-      // 0.907 of neutral. Limit pitch while preserving genuine 3D depth
-      // rotation and pixel-locked jaw: APEX forbids silhouette squashing.
-      float nod=pitch*.10/combined;
-      float cy=cos(yaw),sy=sin(yaw),cp=cos(nod),sp=sin(nod);
+      // Rounded rest volume measured on the approved 320x480 artwork:
+      // face oval, skull with hair, and the neck column under the chin.
+      float face=dome(tile,vec2(160.,138.),vec2(66.,92.),64.);
+      float skull=dome(tile,vec2(160.,105.),vec2(96.,102.),46.);
+      float neck=28.*cos(min(1.,abs(tile.x-160.)/30.)*1.5707963)*smoothstep(170.,200.,tile.y);
+      float depth=smax(smax(face,skull),neck)-6.;
+      vec4 rest=vec4(tile.x,tile.y,depth,1.);
 
-      // The central face, lower jaw, hair and outline share this same
-      // rigid 3D rotation. Only the narrow NECK ATTACHMENT, below the
-      // lower face, fades to the original stationary body at row 208.
-      vec3 local=vec3(tile.x-160.,tile.y-196.,depth);
-      vec3 rotatedYaw=vec3(local.x*cy+local.z*sy,
-                           local.y,
-                           -local.x*sy+local.z*cy);
-      vec3 rotated=vec3(rotatedYaw.x,
-                        rotatedYaw.y*cp-rotatedYaw.z*sp,
-                        rotatedYaw.y*sp+rotatedYaw.z*cp);
-      vec2 p=tile+neckBlend*(rotated.xy-local.xy);
+      // Skin weights. The skull, face, jaw and loose hair are fully bound to
+      // the head joint. The neck column blends head -> neck -> fixed shoulders.
+      float lateral=smoothstep(30.,46.,abs(tile.x-160.));
+      float wHead=1.-smoothstep(mix(200.,210.,lateral),mix(226.,232.,lateral),tile.y);
+      float wNeck=1.-smoothstep(mix(222.,210.,lateral),mix(256.,232.,lateral),tile.y);
+      wNeck=max(wNeck,wHead);
+      vec3 skinned=rest.xyz*(1.-wNeck)+(neckMatrix*rest).xyz*(wNeck-wHead)+(headMatrix*rest).xyz*wHead;
+      vec2 p=skinned.xy;
 
       // The APEX breathing effect operates below the neck only.
       float chest=exp(-pow((tile.y-320.)/94.,2.))*smoothstep(208.,252.,tile.y)*(1.-smoothstep(420.,470.,tile.y));
       p.x=160.+(p.x-160.)*(1.+breath*.006*chest);
       p.y-=breath*.9*chest;
 
-      // Same-artwork tiles; far side falls into shadow, near outer edge
-      // picks up a restrained profile line. No alpha suppression or cutouts.
-      float farSide=max(0.,-sign(turn)*normalizedX);
-      float nearSide=max(0., sign(turn)*normalizedX);
-      float angle=clamp(abs(yaw)/.32,0.,1.);
-      shade=1.-neckBlend*angle*(.04+.39*farSide);
-      shade*=1.-smoothstep(.73,1.,angle)*farSide*neckBlend*.15;
-      float edge=smoothstep(.62,.98,abs(normalizedX));
-      rim=neckBlend*angle*nearSide*edge*.18;
+      // Same-artwork surface; the side turning away falls into shadow, the
+      // near outer edge picks up a restrained profile line. Light only:
+      // no alpha suppression, no cutouts, no added features.
+      float normalizedX=clamp((tile.x-160.)/92.,-1.,1.);
+      float farSide=max(0., sign(turn)*normalizedX);
+      float nearSide=max(0.,-sign(turn)*normalizedX);
+      float angle=clamp(abs(turn),0.,1.);
+      shade=1.-wHead*angle*(.02+.22*farSide);
+      float lowered=clamp(-pitch,0.,1.)*smoothstep(150.,205.,tile.y)*wHead;
+      shade*=1.-.18*lowered;
+      float edge=smoothstep(.55,.98,abs(normalizedX));
+      rim=wHead*angle*nearSide*edge*.16;
       texUV=tile/vec2(320.,480.);
       gl_Position=vec4(p.x/160.-1.,1.-p.y/240.,0.,1.);
     }
@@ -103,18 +107,21 @@ export function createHeadSurface(image:HTMLCanvasElement) {
     vec3 palette(vec3 c,float mood){
       vec3 s=linearToOutputTexel(vec4(c,1.)).rgb;
       float d=distance(texUV*vec2(320.,480.),vec2(160.,150.));
-      float visible=step(7./255.,max(max(s.r,s.g),s.b));
+      // Soft mask: mood light follows the drawn lines and fades with them, so
+      // no flat haze or hard-edged patches appear over the empty dark face.
+      float visible=smoothstep(5./255.,34./255.,max(max(s.r,s.g),s.b));
       bool cyan=s.b>s.r*1.15&&s.g>s.r*1.05;
       bool amber=s.r>s.g*1.15&&s.g>s.b*1.2;
       if(mood>.5&&mood<1.5){
-        if(cyan)s=vec3(s.r*.92,s.g*1.18+16./255.,s.b*1.25+24./255.);
+        if(cyan)s=vec3(s.r*.92,s.g*1.18+16./255.*visible,s.b*1.25+24./255.*visible);
         if(amber)s*=vec3(.86,.88,.92);
       }else if(mood>1.5&&mood<2.5){
-        if(texUV.y*480.<215.){
-          float k=max(0.,1.-d/145.);
-          s+=(cyan?vec3(34.,72.,92.):vec3(22.,34.,42.))*k*visible/255.;
-          if(amber)s+=vec3(28.,12.,4.)*k*visible/255.;
-        }else s*=vec3(.90,.94,.97);
+        // Head-lit, body slightly dimmed, blended across the neck: no seam.
+        float upper=1.-smoothstep(196.,236.,texUV.y*480.);
+        float k=max(0.,1.-d/145.)*upper;
+        s+=(cyan?vec3(34.,72.,92.):vec3(22.,34.,42.))*k*visible/255.;
+        if(amber)s+=vec3(28.,12.,4.)*k*visible/255.;
+        s*=mix(vec3(.90,.94,.97),vec3(1.),upper);
       }else if(mood>2.5){
         float k=max(0.,1.-d/92.)*(voiceLevel<0.?(.68+.32*sin(time*1000./115.)):voiceLevel);
         s+=vec3(135.,70.,-35.)*k*visible/255.;
@@ -192,12 +199,33 @@ export function createHeadSurface(image:HTMLCanvasElement) {
     fragmentShader:`uniform float strength;void main(){float d=length(gl_PointCoord-.5)*2.;gl_FragColor=vec4(1.,.55,.06,max(0.,1.-d)*max(0.,1.-d)*strength);}`});
   const glow=new THREE.Points(glowGeometry,glowMaterial);glow.frustumCulled=false;scene.add(glow);
   const camera=new THREE.OrthographicCamera(-1,1,1,-1,.1,10);camera.position.z=1;
+  // Real joint hierarchy: shoulders (fixed) -> neck base -> skull base.
+  // Angles are radians; the neck carries 30% and the skull joint 70%.
+  const NECK_BASE=new THREE.Vector3(160,252,-4),SKULL_BASE=new THREE.Vector3(160,168,0);
+  const neckJoint=new THREE.Object3D(),headJoint=new THREE.Object3D();
+  neckJoint.position.copy(NECK_BASE);headJoint.position.copy(SKULL_BASE).sub(NECK_BASE);neckJoint.add(headJoint);
+  neckJoint.rotation.order="YXZ";headJoint.rotation.order="YXZ";
+  const neckBindInverse=new THREE.Matrix4().makeTranslation(-NECK_BASE.x,-NECK_BASE.y,-NECK_BASE.z);
+  const headBindInverse=new THREE.Matrix4().makeTranslation(-SKULL_BASE.x,-SKULL_BASE.y,-SKULL_BASE.z);
+  // Only the front of the head exists as approved artwork, so the turn is
+  // bounded: at full yaw the outline foreshortens by cos(0.34), under 6%.
+  const MAX_YAW=.34,MAX_PITCH=.21,MAX_ROLL=.10;
+  const pose=(turn:number,pitch:number,roll:number)=>{
+    const budget=Math.max(1,Math.hypot(turn,pitch));
+    const yaw=turn/budget*MAX_YAW,nod=pitch/budget*MAX_PITCH,tilt=Math.max(-1,Math.min(1,roll))*MAX_ROLL;
+    neckJoint.rotation.set(nod*.3,yaw*.3,tilt*.3);headJoint.rotation.set(nod*.7,yaw*.7,tilt*.7);
+    neckJoint.updateMatrixWorld(true);
+    material.uniforms.neckMatrix.value.multiplyMatrices(neckJoint.matrixWorld,neckBindInverse);
+    material.uniforms.headMatrix.value.multiplyMatrices(headJoint.matrixWorld,headBindInverse);
+    return {yaw,nod,tilt,budget};
+  };
   const render=(frame:GuideFrame)=>{
     const p=frame.assembly??1;
     const blend=Math.max(0,Math.min(1,(p-.96)/.04));
     mesh.visible=p>=.96;particles.visible=p<1;glow.visible=p<1;
-    material.uniforms.turn.value=frame.turn;
-    material.uniforms.pitch.value=frame.pitch||0;
+    const posed=pose(frame.turn,frame.pitch||0,frame.roll||0);
+    material.uniforms.turn.value=posed.yaw/MAX_YAW;
+    material.uniforms.pitch.value=posed.nod/MAX_PITCH;
     material.uniforms.breath.value=frame.breath||0;
     material.uniforms.opacity.value=blend;
     material.uniforms.baseMood.value=frame.baseMood||0;
@@ -211,7 +239,7 @@ export function createHeadSurface(image:HTMLCanvasElement) {
   };
   return {
     canvas:renderer.domElement,vertices:sources.length/2,particles:anchors.length/3,
-    render,draw(turn:number){render({turn});},
+    render,draw(turn:number){render({turn});},limits:{yaw:MAX_YAW,pitch:MAX_PITCH,roll:MAX_ROLL},
     dispose(){geometry.dispose();material.dispose();particleGeometry.dispose();particleMaterial.dispose();glowGeometry.dispose();glowMaterial.dispose();texture.dispose();renderer.dispose();renderer.forceContextLoss();}
   };
 }

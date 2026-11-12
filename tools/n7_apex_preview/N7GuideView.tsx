@@ -5,7 +5,7 @@ import N7Backdrop,{type N7BackdropHandle} from "./N7Backdrop";
 import { N7_HUMANOID_REFERENCE } from "./N7HumanoidReference";
 
 export default function N7GuideView({open,onClose,activity,onWorkspace}:{open:boolean;onClose:()=>void;activity?:GuideMood|null;onWorkspace?:()=>void}){
-  const [reduced,setReduced]=useState(false),[effects,setEffects]=useState(true),[breathing,setBreathing]=useState(true);
+  const [reduced,setReduced]=useState(false),[effects,setEffects]=useState(true),[breathing,setBreathing]=useState(true),[gestures,setGestures]=useState(true);
   const [mode,setMode]=useState<GuideMode>("assembly"),[mood,setMood]=useState<GuideMood>("idle");
   const [replay,setReplay]=useState(0),[done,setDone]=useState(false),[manualMotion,setManualMotion]=useState(false),[details,setDetails]=useState(false);
   const [stats,setStats]=useState<GuideFrameInfo|null>(null);
@@ -83,11 +83,11 @@ export default function N7GuideView({open,onClose,activity,onWorkspace}:{open:bo
     <div className="n7-guide-main" data-details={details}>
       <div className="n7-guide-figure-slot"><div ref={figureRef} className="n7-guide-figure" aria-label={mode==="assembly"?"N7 guide particle-river assembly":undefined}>
         {(mode==="original"||mode==="compare")&&<img src={N7_HUMANOID_REFERENCE} alt="Approved N7 idle reference" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"contain",opacity:mode==="compare"?.38:1,zIndex:mode==="compare"?1:undefined}}/>}
-        <N7GuideScene mode={mode} mood={mood} effects={effects} reduced={reduced} breathing={breathing} replay={replay} manualMotion={manualMotion} diagnostics={details} onComplete={complete} onFrame={frame}/>
+        <N7GuideScene mode={mode} mood={mood} effects={effects} reduced={reduced} breathing={breathing} gestures={gestures} replay={replay} manualMotion={manualMotion} diagnostics={details} onComplete={complete} onFrame={frame}/>
         <span ref={ignitionRef} aria-label="N7 face ignition" data-active="false" style={{position:"absolute",pointerEvents:"none"}}/>
         {mode==="assembly"&&!done&&<span aria-label="N7 visible assembly source" style={{position:"absolute",left:"4.7%",top:"86.5%",width:1,height:1,pointerEvents:"none"}}/>}
       </div></div>
-      {details&&<aside className="n7-guide-details" aria-label="Technical details"><strong>Guide diagnostics</strong><p>Three.js · one humanoid scene<br/>sRGB · tone mapping OFF<br/>Sample 320×480 · assembly 6s<br/>Shockwave 2.5s · breathing 7.2s<br/>Reduced motion: {reduced?"ON":"OFF"}</p><p>Particles {stats?.particles??"loading"}<br/>Render {stats?.renderMs.toFixed(2)??"—"} ms<br/>Frame {stats?.frameMs.toFixed(2)??"—"} ms</p><label style={{display:"block"}}><input type="checkbox" checked={breathing} onChange={e=>setBreathing(e.target.checked)}/> Breathing</label><p>Listening and Speaking buttons are visual previews. Live Listening follows microphone start; live Speaking follows audio playback.</p><p>Assembly is silent: no owner-supplied audio file. Camera tracking is optional and not enabled.</p>{mode==="compare"&&<p>REFERENCE 38% + PARTICLE RECONSTRUCTION</p>}</aside>}
+      {details&&<aside className="n7-guide-details" aria-label="Technical details"><strong>Guide diagnostics</strong><p>Three.js · one humanoid scene<br/>sRGB · tone mapping OFF<br/>Sample 320×480 · assembly 6s<br/>Shockwave 2.5s · breathing 7.2s<br/>Reduced motion: {reduced?"ON":"OFF"}</p><p>Particles {stats?.particles??"loading"}<br/>Render {stats?.renderMs.toFixed(2)??"—"} ms<br/>Frame {stats?.frameMs.toFixed(2)??"—"} ms</p><label style={{display:"block"}}><input type="checkbox" checked={breathing} onChange={e=>setBreathing(e.target.checked)}/> Breathing</label><label style={{display:"block"}}><input type="checkbox" checked={gestures} onChange={e=>setGestures(e.target.checked)}/> Head gestures</label><p>Listening and Speaking buttons are visual previews. Live Listening follows microphone start; live Speaking follows audio playback.</p><p>Assembly is silent: no owner-supplied audio file. Camera tracking is optional and not enabled.</p>{mode==="compare"&&<p>REFERENCE 38% + PARTICLE RECONSTRUCTION</p>}</aside>}
     </div>
     <div id="n7-guide-voice" style={{position:"relative",zIndex:5,flex:"none"}}/>
     <footer className="n7-guide-controls">
