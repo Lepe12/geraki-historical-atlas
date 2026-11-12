@@ -9,7 +9,7 @@ export function readVoiceSignal(now:number){
   for(const value of samples)energy+=value*value;
   const rms=Math.sqrt(energy/samples.length);
   const target=Math.min(1,Math.max(0,(rms-.003)*9));
-  const dt=last?Math.min(100,Math.max(0,now-last)):16;last=now;
+  const dt=last?Math.max(0,now-last):16;last=now;
   level+=(target-level)*(1-Math.exp(-dt/(target>level?35:85)));
   if(target===0&&level<.002)level=0;
   return level;

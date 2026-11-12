@@ -181,6 +181,16 @@ def main():
         shutil.copy2(overlay/"assets/n7-head-h01.webp",out/"public/n7-head-h01.webp")
         (out/"app/head-test").mkdir(parents=True,exist_ok=True)
         (out/"app/head-test/page.tsx").write_text('import N7HeadTest from "@/components/N7HeadTest";\nexport default function HeadTest(){return <N7HeadTest/>;}\n')
+    if base_path.endswith("n7-apex-step5"):
+        for name in ("N7RealAvatar.tsx","N7RealAvatarView.tsx"):
+            shutil.copy2(overlay/name,out/"components"/name)
+        real=(overlay/"assets/n7-mpfb-v1.glb").read_bytes()
+        if hashlib.sha256(real).hexdigest()!="d3ad956f21033e43a32574fa474ac7d76d9c5d81dac432a5b5b291bea3b9638b":
+            raise RuntimeError("wrong real avatar asset")
+        (out/"public/n7-mpfb-v1.glb").write_bytes(real)
+        shutil.copy2(overlay/"assets/N7-3D-NOTICE.txt",out/"public/N7-3D-NOTICE.txt")
+        (out/"app/avatar-3d").mkdir(parents=True,exist_ok=True)
+        (out/"app/avatar-3d/page.tsx").write_text('import N7RealAvatar from "@/components/N7RealAvatar";\nexport default function RealAvatar(){return <N7RealAvatar/>;}\n')
     shutil.copy2(overlay/"assets/n7-mountain-backdrop.webp",out/"public/n7-mountain-backdrop.webp")
 
     patch_exact(out/"app/page.tsx",'import ApexWorld from "@/components/ApexWorld";','import N7ApexStage from "@/components/N7ApexStage";')
