@@ -61,7 +61,8 @@ def main():
     # 1. Remove the approved line-art head; keep its neck and shoulders.
     #    Its loose strands beside the neck go too: H01 brings its own.
     #    The cut follows the shoulder slope, just above its contour line.
-    keep_from = 204.0 + np.interp(dx, [28, 35, 45, 60, 100, 160], [0, 12, 22, 31, 45, 60])
+    #    It stays clear of that contour so the shoulder lines keep rising into the neck.
+    keep_from = 204.0 + np.interp(dx, [28, 40, 50, 62, 100, 160], [0, 3, 11, 18, 36, 56])
     body_keep = smooth(-4, 4, uy - keep_from)
     body *= body_keep[..., None]
 
@@ -69,7 +70,9 @@ def main():
     #    Carry a restrained warm key onto the left shoulder lines only.
     lum = body.max(axis=2, keepdims=True)
     warm = lum * np.array([1.0, 0.74, 0.40], np.float32)
-    amount = (smooth(165, 60, ux) * (0.50 - 0.30 * smooth(215, 430, uy)))[..., None]
+    amount = smooth(165, 60, ux) * (0.50 - 0.30 * smooth(215, 430, uy))
+    #    Stronger at the left of the neck base, where H01's warm rim hands over to the body line.
+    amount = np.clip(amount + 0.45 * np.exp(-(((ux - 125) / 22) ** 2 + ((uy - 226) / 16) ** 2)), 0, 0.9)[..., None]
     cyanish = (body[..., 2:3] > body[..., 0:1] * 1.15).astype(np.float32)
     body = body * (1 - amount * cyanish) + warm * amount * cyanish
 
@@ -90,7 +93,7 @@ def main():
     # 4. One neck. Below the chin only, the H01 neck is narrowed sideways so
     #    its own warm and cool rim lines run into the body's neck outline
     #    (half-width 34 -> 26.5 units). The face and chin are not warped.
-    ramp = smooth(196, 216, uy)
+    ramp = smooth(192, 207, uy)
     knots_out = np.array([0, 12, 26.5, 46, 400], np.float32)
     knots_src = np.array([0, 12, 34.0, 46, 400], np.float32)
     src_dx = np.interp(dx, knots_out, knots_src)
@@ -108,6 +111,10 @@ def main():
     neck_half = 26.5 + 9.0 * smooth(226, 246, uy)
     inside_neck = 1 - smooth(neck_half + 1.0, neck_half + 5.0, dx)
     fade = (1 - smooth(210, 240, uy)) * (1 - smooth(212, 222, uy) * (1 - inside_neck))
+    #    Nothing of H01's flaring bust may stick out beside the neck base; only its
+    #    loose hair, further out, is kept there.
+    flare = smooth(205, 212, uy) * smooth(neck_half + 1.0, neck_half + 5.0, dx) * (1 - smooth(44, 48, dx))
+    fade *= 1 - flare
     out = body * (1 - alpha * fade)[..., None] + warped[..., :3] * fade[..., None]
 
     image = Image.fromarray((np.clip(out, 0, 1) * 255 + 0.5).astype(np.uint8), "RGB")
