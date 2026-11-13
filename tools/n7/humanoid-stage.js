@@ -222,6 +222,10 @@ async function library(r){
  return 'done';
 }
 const CAT={base:'Ορμητήριο;',attack:'Επίθεση;',refuge:'Καταφύγιο/οχύρωση;',piracy:'Πειρατεία'};
+// N7_STAGE_CLEAR_RESULTS_V1: a new question starts on a clean stage. The map commands keep the results
+// because they act on them; everything else clears them. The owner can also clear them by hand.
+const KEEP_RESULTS=new Set(['nabou.open','nabou.focus','nabou.sources','nabou.results','humanoid.return']);
+function clearResults(){if(!S.results)return;S.results=null;save();paintResults();}
 function paintResults(){
  results.replaceChildren();const R0=S.results;stage.dataset.results=R0?.items?.length?'1':'0';if(!R0||!R0.items?.length)return;
  const table=make('table',null,'n7-results-table');table.setAttribute('aria-label','Αποσπάσματα βιβλιοθήκης');
@@ -232,7 +236,9 @@ function paintResults(){
    make('td',x.categories.map(c=>CAT[c]).join(', ')||'—'),make('td',x.places.map(p=>p.name+(p.atlas?'':' (χωρίς γεωεντοπισμό)')).join(', ')||'—'));
   const td=make('td');td.append(btn('Σελίδα',()=>showPage(x,tr),'n7-link'));tr.append(td);body.append(tr);
  }
- table.append(body);results.append(make('p','Ερώτημα: '+R0.query,'n7-note'),table,
+ table.append(body);const bar=make('div',null,'n7-results-bar');
+ bar.append(make('p','Ερώτημα: '+R0.query,'n7-note'),btn('✕ Καθαρισμός',()=>{clearResults();input.focus();},'n7-link n7-results-clear','Καθαρισμός ευρημάτων'));
+ results.append(bar,table,
   btn('Δείξε τα αποτελέσματα στο NABOU',()=>run('Δείξε μου τα αποτελέσματα στο NABOU'),'n7-secondary'));
 }
 async function showPage(x,row){
@@ -309,6 +315,7 @@ async function run(text,{voice=false}={}){
  if(running){say('Ο N7 επεξεργάζεται ήδη μια εντολή.',{error:true,speak:false});return;}
  const r=R.route(text);
  running=true;send.disabled=true;stopSpeaking();
+ if(!KEEP_RESULTS.has(r.intent))clearResults();
  // window.open must happen inside the user's gesture, before any await.
  const needsMap=['nabou.open','nabou.focus','nabou.sources','nabou.results'].includes(r.intent)&&!(r.intent==='nabou.focus'&&!r.place?.atlas);
  const opening=needsMap?openMap():null;opening?.catch(()=>{});
