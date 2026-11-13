@@ -194,12 +194,16 @@ def main():
         (out/"app/avatar-3d").mkdir(parents=True,exist_ok=True)
         (out/"app/avatar-3d/page.tsx").write_text('import N7RealAvatar from "@/components/N7RealAvatar";\nexport default function RealAvatar(){return <N7RealAvatar/>;}\n')
         # Isolated evaluation of the owner's 3D model (prepare_model_test.py); separate route.
-        for name in ("N7ModelTest.tsx","N7ModelTestView.tsx"):
+        for name in ("N7ModelTest.tsx","N7ModelTestView.tsx","N7ModelFittedView.tsx"):
             shutil.copy2(overlay/name,out/"components"/name)
         model=(overlay/"assets/n7-model-textured-v1.glb").read_bytes()
         if hashlib.sha256(model).hexdigest()!="659017150e31a797ee8743384a1ed9bd253ab5e8f1514ac595a3c3344b054837":
             raise RuntimeError("wrong model test asset")
         (out/"public/n7-model-textured-v1.glb").write_bytes(model)
+        fitted=(overlay/"assets/n7-model-fitted-v1.glb").read_bytes()
+        if hashlib.sha256(fitted).hexdigest()!="562abbfc54393751f90cd058d6e87f73aef08abd5e66cffb6b60f3ab4817ce4a":
+            raise RuntimeError("wrong fitted model asset")
+        (out/"public/n7-model-fitted-v1.glb").write_bytes(fitted)
         (out/"app/model-3d").mkdir(parents=True,exist_ok=True)
         (out/"app/model-3d/page.tsx").write_text('import N7ModelTest from "@/components/N7ModelTest";\nexport default function ModelTest(){return <N7ModelTest/>;}\n')
     shutil.copy2(overlay/"assets/n7-mountain-backdrop.webp",out/"public/n7-mountain-backdrop.webp")

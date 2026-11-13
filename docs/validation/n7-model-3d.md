@@ -49,3 +49,18 @@ Evidence: `n7-model-3d-evidence/`.
 ## Live verification
 
 Release `096db38ecccd44d9` ([run](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/43387045207)): validation, including `test_model_3d.cjs` in CI, and trial deployment passed. Live model file 2,751,892 bytes, HTTP 200, downloaded in 1.0 s from this cloud session. `test_model_3d.cjs` against the live URL, TLS-verified: ready in 2.7 s, head turn changed 22.9% of the head band and 0.08% of the shoulder band, workspace present, Humanoid page did not request the model, no errors. Functional preview `2c3286f6ce6b899a` and production `bbdc05016a211581` unchanged.
+
+## Update — the model adapted to the approved N7 (owner's intent)
+
+The owner clarified that the model was supplied to give N7 real 3D, adapted to what has been built — not to be shown as is. The page now shows **"N7 σε 3D"** by default; the unchanged model stays available as "Αρχικό μοντέλο".
+
+- **Shape fitted to the approved figure** (`prepare_model_fitted.py`, output `n7-model-fitted-v1.glb`): the mesh is placed in the approved picture's 320×480 frame (front, orthographic), the head above the chin is stretched ×1.21 so the hair tops meet, and each row is widened or narrowed (factor 0.80–1.37, smooth) so the front outline follows the approved outline. Outline overlap with the approved figure: 0.79 → **0.935** (`fit-outline-red-approved-green-model.png`). Depth is scaled by half the same factor so the volume stays rounded. The arms remain joined to the body where the picture shows a gap under the arms; the model ends just above the picture's bottom edge.
+- **Our N7 on the front**: the approved picture is projected onto the surface facing the viewer and pinned to the geometry at rest, so it turns with the head in true 3D. Seen from the front, the figure is our approved N7.
+- **Sides and back**: where the picture cannot reach, the model's own texture is reduced to the crests of its streaks (thin cyan lines, gold where warm) with a faint navy glow, plus a thin cyan contour where the surface turns away.
+- **Moods**: the owner's approved Listening, Thinking and Speaking pictures are projected the same way and bloom out of the face over one second, as in the Humanoid; Speaking follows the real voice level.
+- **Head**: same added chest → neck → skull chain, in picture units (neck base row 252, skull base row 168, as in the Humanoid). Yaw 0.55 rad, pitch ±0.24 rad measured; with a full turn 11.6% of the head band changed and 0% of the shoulder band.
+- **Views**: front, 3/4, profile, back (eased whole-body turn), mouse follow, automatic.
+
+Browser (SwiftShader, same machine): ready 1.3 s; frame interval Humanoid ~122 ms, N7 3D ~181 ms (≈1.5×, relative only). No browser or shader errors. `test_model_3d.cjs` rewritten for this page and passes; the Humanoid suites re-run here (guide, faces/menu, joints, passwordless) pass.
+
+Limits: from the side, the front picture is stretched over the curved surface near the edge of the face and body; the sides/back are the model's streaks restyled, not drawn N7 artwork (they would need owner-approved side and back pictures to match the front exactly); the face has a sculpted nose ridge that shows as a dark facet at strong turns; no assembly, breathing or living backdrop on this page yet.

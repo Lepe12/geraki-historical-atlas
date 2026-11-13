@@ -1,39 +1,47 @@
 "use client";
 import {useEffect,useState} from "react";
-import N7ModelTestView,{type ModelLook,type ModelView} from "./N7ModelTestView";
+import N7ModelFittedView,{type FittedMood,type FittedView} from "./N7ModelFittedView";
+import N7ModelTestView from "./N7ModelTestView";
 import N7Workspace from "./N7Workspace";
 import {N7_HUMANOID_REFERENCE} from "./N7HumanoidReference";
 import type {OrbState} from "./ApexHeroOrb";
 const base=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/"));
 
-// Separate test page for the owner's 3D model. The existing Humanoid is not
-// touched. Chat, voice, Agents and the N7 back end are the same N7 workspace
-// used on the main page, so their reactions also drive this model.
+// Separate test page for the owner's 3D model, adapted to the approved N7.
+// The existing Humanoid is not touched. Chat, voice, Agents and the N7 back
+// end are the same N7 workspace used on the main page; its activity drives
+// the moods here.
+type Source="n7-3d"|"raw";
 export default function N7ModelTest(){
- const [view,setView]=useState<ModelView>("follow"),[look,setLook]=useState<ModelLook>("n7"),[bloom,setBloom]=useState(true),[closeup,setCloseup]=useState(true),[compare,setCompare]=useState(false);
+ const [view,setView]=useState<FittedView>("follow"),[manual,setManual]=useState<FittedMood>("idle"),[source,setSource]=useState<Source>("n7-3d"),[compare,setCompare]=useState(false);
  const [reduced,setReduced]=useState(false),[ready,setReady]=useState(false),[progress,setProgress]=useState(0),[error,setError]=useState("");
  const [activity,setActivity]=useState<OrbState|"listening"|null>(null);
  useEffect(()=>{const q=matchMedia("(prefers-reduced-motion: reduce)"),change=()=>setReduced(q.matches);change();q.addEventListener("change",change);return()=>q.removeEventListener("change",change);},[]);
- const phase=activity==="listening"||activity==="thinking"||activity==="speaking"?activity:"idle";
- const views:[string,ModelView][]=[["Μπροστά","front"],["Προφίλ 90°","profile"],["Πίσω 180°","back"],["Ποντίκι","follow"],["Αυτόματη","auto"],["Ελεύθερη περιστροφή","orbit"]];
+ useEffect(()=>{setReady(false);setError("");setProgress(0);},[source]);
+ const live=activity==="listening"||activity==="thinking"||activity==="speaking"?activity:null;
+ const mood:FittedMood=live||manual;
+ const views:[string,FittedView][]=[["Μπροστά","front"],["3/4","three-quarter"],["Προφίλ 90°","profile"],["Πίσω 180°","back"],["Ποντίκι","follow"],["Αυτόματη","auto"]];
+ const rawView=view==="three-quarter"?"profile":view;
  return <main className="n7-model-page">
-  <header><strong>N7 · ΜΟΝΤΕΛΟ 3D <i>· ΔΟΚΙΜΗ</i></strong><a href={base+"/"}>Επιστροφή στο N7 Humanoid</a></header>
+  <header><strong>N7 · 3D <i>· ΔΟΚΙΜΗ</i></strong><a href={base+"/"}>Επιστροφή στο N7 Humanoid</a></header>
   <section className="n7-model-stage" data-compare={compare}>
-   <div className="n7-model-view"><N7ModelTestView view={view} look={look} bloom={bloom} closeup={closeup} reduced={reduced} phase={phase} onReady={()=>setReady(true)} onError={setError} onProgress={setProgress}/>
-    {!ready&&!error&&<div className="n7-model-msg" role="status">Φόρτωση μοντέλου 3D… {progress?`${progress}%`:""}</div>}
+   <div className="n7-model-view">
+    {source==="n7-3d"
+     ?<N7ModelFittedView key="fitted" view={view} mood={mood} reduced={reduced} onReady={()=>setReady(true)} onError={setError} onProgress={setProgress}/>
+     :<N7ModelTestView key="raw" view={rawView} look="original" bloom={false} closeup={false} reduced={reduced} phase={mood} onReady={()=>setReady(true)} onError={setError} onProgress={setProgress}/>}
+    {!ready&&!error&&<div className="n7-model-msg" role="status">Φόρτωση 3D… {progress?`${progress}%`:""}</div>}
     {error&&<div className="n7-model-msg" role="alert">{error}</div>}
    </div>
    {compare&&<figure className="n7-model-compare"><img src={N7_HUMANOID_REFERENCE} alt="Σημερινό εγκεκριμένο N7"/><figcaption>Σημερινό N7 (εγκεκριμένη εικόνα)</figcaption></figure>}
   </section>
   <footer>
-   <div className="n7-model-bar" aria-label="Προβολή">{views.map(([label,value])=><button key={value} type="button" aria-pressed={view===value} disabled={reduced&&(value==="auto"||value==="follow")} onClick={()=>setView(value)}>{label}</button>)}</div>
-   <div className="n7-model-bar" aria-label="Εμφάνιση">
-    <button type="button" aria-pressed={look==="original"} onClick={()=>setLook("original")}>Αρχική υφή</button>
-    <button type="button" aria-pressed={look==="n7"} onClick={()=>setLook("n7")}>Ολογραφικό N7</button>
-    <button type="button" aria-pressed={bloom} disabled={look!=="n7"} onClick={()=>setBloom(v=>!v)}>Λάμψη {bloom?"On":"Off"}</button>
-    <button type="button" aria-pressed={closeup} onClick={()=>setCloseup(v=>!v)}>{closeup?"Κεφάλι και ώμοι":"Ολόκληρο"}</button>
+   <div className="n7-model-bar" aria-label="Γωνία">{views.map(([label,value])=><button key={value} type="button" aria-pressed={view===value} disabled={reduced&&(value==="auto"||value==="follow")} onClick={()=>setView(value)}>{label}</button>)}</div>
+   <div className="n7-model-bar" aria-label="Διάθεση και εμφάνιση">
+    {(["idle","listening","thinking","speaking"] as FittedMood[]).map(m=><button key={m} type="button" aria-pressed={mood===m} disabled={!!live} onClick={()=>setManual(m)}>{m[0].toUpperCase()+m.slice(1)}</button>)}
+    <button type="button" aria-pressed={source==="n7-3d"} onClick={()=>setSource("n7-3d")}>N7 σε 3D</button>
+    <button type="button" aria-pressed={source==="raw"} onClick={()=>setSource("raw")}>Αρχικό μοντέλο</button>
     <button type="button" aria-pressed={compare} onClick={()=>setCompare(v=>!v)}>Σύγκριση με σημερινό N7</button>
-    <span role="status" aria-label="Κατάσταση μοντέλου">{phase==="listening"?"ΑΚΟΥΕΙ":phase==="thinking"?"ΣΚΕΦΤΕΤΑΙ":phase==="speaking"?"ΜΙΛΑ":"ΑΝΑΜΟΝΗ"}</span>
+    <span role="status" aria-label="Κατάσταση μοντέλου">{live?`${mood.toUpperCase()} · LIVE`:mood.toUpperCase()}</span>
    </div>
   </footer>
   <N7Workspace onActivity={setActivity} onTrace={()=>{}}/>
