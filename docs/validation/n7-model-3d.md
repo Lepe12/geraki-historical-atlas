@@ -45,3 +45,7 @@ It is a head-and-torso bust (cut below the chest), with sculpted hair and a smoo
 7. Not done: the guide's assembly, mood bloom, breathing, shockwave and living backdrop are not ported to the model; those belong to the Humanoid renderer, which stays unchanged as instructed.
 
 Evidence: `n7-model-3d-evidence/`.
+
+## Live verification
+
+Release `096db38ecccd44d9` ([run](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/43387045207)): validation, including `test_model_3d.cjs` in CI, and trial deployment passed. Live model file 2,751,892 bytes, HTTP 200, downloaded in 1.0 s from this cloud session. `test_model_3d.cjs` against the live URL, TLS-verified: ready in 2.7 s, head turn changed 22.9% of the head band and 0.08% of the shoulder band, workspace present, Humanoid page did not request the model, no errors. Functional preview `2c3286f6ce6b899a` and production `bbdc05016a211581` unchanged.
