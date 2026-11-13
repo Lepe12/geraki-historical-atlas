@@ -229,13 +229,18 @@ class GuardedDeployTest(unittest.TestCase):
         release = {'release_id': 'a'*64, 'previous_server_sha256': deploy.sha(b'other'),
                    'previous_files': {'server.js': deploy.sha(reviewed)}, 'files': {'server.js': deploy.sha(server)}}
         seen = []
-        with patch.object(deploy, 'KNOWN_UNREVIEWED_SERVERS', {deploy.sha(live)}), patch.object(deploy, 'syntax'), \
+        # Recognised by its marker, not by a fixed hash: the same insertions over a newer reviewed server.
+        with patch.object(deploy, 'KNOWN_UNREVIEWED_SERVERS', set()), patch.object(deploy, 'syntax'), \
              patch.object(deploy, 'PUBLIC_MODULES', {}):
             payload, originals = deploy.plan(self.ftp, release, 'b'*40, transformer=lambda s: seen.append(s) or server)
             self.assertEqual(seen, [reviewed])
             self.assertEqual(originals['server.js'], live)
             self.assertEqual(payload['server.js'], server)
             self.ftp.files[deploy.ROOT + '/server.js'] = live + b' '
+            with self.assertRaisesRegex(RuntimeError, 'UNREVIEWED_LIVE_SERVER'):
+                deploy.plan(self.ftp, release, 'b'*40, transformer=lambda s: server)
+            # A marker with any other change (here: a modified guard) is still refused.
+            self.ftp.files[deploy.ROOT + '/server.js'] = live.replace(b'return; }', b'return 1; }', 1)
             with self.assertRaisesRegex(RuntimeError, 'UNREVIEWED_LIVE_SERVER'):
                 deploy.plan(self.ftp, release, 'b'*40, transformer=lambda s: server)
         self.assertEqual(self.ftp.events, [])

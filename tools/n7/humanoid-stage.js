@@ -185,7 +185,7 @@ async function focusInSplit(r,text){
  presence('thinking','Επεξεργάζεται · N7 Core');
  // The short answer comes from the normal N7 chat flow, with the map record as checkable context.
  const ctx={place:rec.place,historicalNames:rec.historicalNames,modernName:rec.modernName,coordinateStatus:rec.coordinateStatus};
- return chat(text+'\n\nΑπάντησε σύντομα (2–3 προτάσεις) και ανέφερε τις πηγές σου. Πλαίσιο από τον χάρτη NABOU (εγγραφή data.json, προς έλεγχο): '+JSON.stringify(ctx));
+ return chat(text+'\n\nΑπάντησε μόνο για τον τόπο «'+rec.place+'», σε 2–3 σύντομες προτάσεις, χωρίς μακριά αυτούσια αποσπάσματα· ανέφερε τις πηγές σου σε μία γραμμή. Πλαίσιο από τον χάρτη NABOU (εγγραφή data.json, προς έλεγχο): '+JSON.stringify(ctx),{brief:true});
 }
 function placeName(id){return split.records.find(p=>p.id===id)?.place||map.places.find(p=>p.id===id)?.name||R.PLACES.find(p=>p.atlas===id)?.name||id;}
 function paintMap(note){
@@ -200,13 +200,29 @@ async function call(path,payload){
  let d={};try{d=await r.json();}catch{}
  if(!r.ok)throw Error(d.error||('HTTP '+r.status));return d;
 }
-async function chat(text){
+async function chat(text,{brief=false}={}){
  if(typeof window.N7VoiceChat?.send!=='function')throw Error('Η συνομιλία N7 δεν είναι διαθέσιμη σε αυτή τη σελίδα.');
  if(!active)await create();
  S.conversationId=active;save();
  const out=await window.N7VoiceChat.send(active,text);
  if(out.queued){presence('thinking','Σε ουρά επεξεργασίας');say('Η εντολή μπήκε σε ουρά του μοντέλου. Η απάντηση θα εμφανιστεί στη συνομιλία όταν ολοκληρωθεί.',{speak:false});return 'queued';}
- presence('done');say(out.text||'');return out.cancelled?'cancelled':'done';
+ presence('done');
+ if(brief&&out.text){sayBrief(out.text);return out.cancelled?'cancelled':'done';}
+ say(out.text||'');return out.cancelled?'cancelled':'done';
+}
+// N7_SPLIT_MAP_V1: the map panel shows the first sentences of the answer, with whitespace from quoted
+// source text normalised for display; the full, unchanged answer stays in the conversation.
+function briefText(t){
+ const flat=String(t).replace(/(\p{L})-\s*\n\s*(\p{L})/gu,'$1$2').replace(/\s*\n\s*/g,' ').replace(/\s+([,.;:·!?»)])/g,'$1').replace(/([«(])\s+/g,'$1').replace(/\s{2,}/g,' ').trim();
+ // A sentence ends at . ! ; · followed by a space (not inside data.json, 1.5 or Β΄.).
+ const parts=flat.split(/(?<=[.!;·])\s+/);
+ let out='',n=0;for(const p of parts){if(out&&(out.length+p.length+1>420))break;out+=(out?' ':'')+p;if(++n>=3)break;}
+ return {text:out.trim(),more:out.trim().length<flat.length};
+}
+function sayBrief(t){
+ const b=briefText(t);const p=make('p',b.text);reply.replaceChildren(p);
+ if(b.more)reply.append(btn('Ολόκληρη απάντηση →',()=>nav('chat'),'n7-link n7-reply-more','Ολόκληρη απάντηση στη συνομιλία'));
+ speakText(b.text);
 }
 /* ---------- N7_HYBRID_SEARCH_V1: on-device semantic leg (optional) ---------- */
 const SEM={state:'off',ext:null,index:null,error:null};

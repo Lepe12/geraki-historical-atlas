@@ -1,6 +1,6 @@
 // N7_SPLIT_MAP_V1 — NABOU side panel for the atlas embedded below N7 (html.n7-embed only).
-// Left bar: Χάρτης / Ιστορία / Μνημεία / Χρονολόγιο / Πηγές, a place cartouche and the
-// "Αποτελέσματα από το N7" badge. Every value comes from an existing data.json field of the selected
+// Left bar: Χάρτης / Ιστορία / Μνημεία / Χρονολόγιο / Πηγές (with the place name at its top) and the
+// "Αποτελέσματα από το N7" badge. No other frame is drawn over the map (owner's choice). Every value comes from an existing data.json field of the selected
 // record; a missing field stays empty. Nothing is geocoded, added or inferred. textContent only.
 (()=>{
  'use strict';
@@ -18,8 +18,8 @@
  const body=el('div',null,'n7e-body');body.id='n7eBody';body.setAttribute('role','tabpanel');
  for(const [id,label,icon] of TABS){const b=el('button',null,'n7e-tab');b.type='button';b.dataset.tab=id;b.setAttribute('role','tab');
   b.append(el('span',icon,'n7e-tab-icon'),el('span',label,'n7e-tab-label'));b.addEventListener('click',()=>{tab=id;paint();});tabs.append(b);}
- bar.append(brand,tabs,body);
- const cartouche=el('section',null,'n7e-cartouche');cartouche.id='n7eCartouche';cartouche.hidden=true;cartouche.setAttribute('aria-live','polite');
+ const placeHead=el('div',null,'n7e-placehead');placeHead.id='n7ePlace';placeHead.setAttribute('aria-live','polite');placeHead.hidden=true;
+ bar.append(brand,placeHead,tabs,body);
  const badge=el('div','✓ Αποτελέσματα από το N7','n7e-badge');badge.id='n7eBadge';badge.hidden=true;
 
  const rows=list=>{const dl=el('dl',null,'n7e-rows');let n=0;
@@ -49,19 +49,22 @@
  function paint(){
   for(const b of tabs.children){const on=b.dataset.tab===tab;b.setAttribute('aria-selected',String(on));b.classList.toggle('n7e-active',on);}
   body.replaceChildren(...section(current));
-  cartouche.hidden=!current;badge.hidden=!(current&&fromN7);
-  if(current){cartouche.replaceChildren(el('h2',current.place,'n7e-place'),el('p',current.historicalNames||current.modernName||'','n7e-alt'),
-   el('p',STATUS[current.coordinateStatus]||'','n7e-status '+(current.coordinateStatus==='VERIFIED'?'ok':'approx')));}
+  placeHead.hidden=!current;badge.hidden=!(current&&fromN7);
+  if(current){placeHead.replaceChildren(el('h2',current.place,'n7e-place'),el('p',current.historicalNames||current.modernName||'','n7e-alt'),
+   el('span',STATUS[current.coordinateStatus]||'','n7e-status '+(current.coordinateStatus==='VERIFIED'?'ok':'approx')));}
  }
  function show(id,n7=false){const m=M();if(!m)return;current=m.records.find(r=>r.id===id)||null;if(n7){fromN7=true;tab='map';}paint();}
  function mount(){
   if(bar.isConnected)return;
-  const host=document.querySelector('main')||document.body;host.append(bar,cartouche,badge);
+  // The chamber moves unknown direct children of <body> away; its shell is a stable parent.
+  const host=document.getElementById('n7Shell')||document.querySelector('main')||document.body;host.append(bar,badge);
+  const compact=()=>bar.classList.toggle('n7e-compact',innerHeight<680);compact();addEventListener('resize',compact);
   const pad=()=>{const w=innerWidth>640?bar.getBoundingClientRect().width+12:0;M()?.padding?.({left:w,bottom:innerWidth>640?0:Math.round(innerHeight*.42)});};
   pad();addEventListener('resize',pad);paint();
  }
  // The existing link reports a focus done on N7's request; marker clicks inside the map select locally.
  document.addEventListener('n7:map-focus',e=>show(e.detail?.placeId,true));
  document.addEventListener('click',e=>{const m=e.target.closest?.('[data-place-id]');if(m&&m.dataset.placeId){fromN7=false;show(m.dataset.placeId);}},true);
- let n=0;const t=setInterval(()=>{if(M()||++n>300){clearInterval(t);if(M())mount();}},100);
+ // The bar appears at once (empty state); record data is read when the map reports it is ready.
+ mount();let n=0;const t=setInterval(()=>{if(M()||++n>1200){clearInterval(t);if(M())M().padding?.({left:innerWidth>640?bar.getBoundingClientRect().width+12:0,bottom:innerWidth>640?0:Math.round(innerHeight*.42)});}},100);
 })();
