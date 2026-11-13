@@ -88,7 +88,7 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,m
       // The twist is spread over the whole neck column (APEX: the head turns
       // around the neck), so its drawn lines curve instead of kinking.
       float wHead=1.-smoothstep(mix(194.,looseFrom,lateral),mix(240.,looseTo,lateral),tile.y);
-      float wNeck=1.-smoothstep(mix(214.,looseFrom,lateral),mix(270.,looseTo,lateral),tile.y);
+      float wNeck=1.-smoothstep(mix(212.,looseFrom,lateral),mix(256.,looseTo,lateral),tile.y);
       wNeck=max(wNeck,wHead);
       vec3 skinned=rest.xyz*(1.-wNeck)+(neckMatrix*rest).xyz*(wNeck-wHead)+(headMatrix*rest).xyz*wHead;
       vec2 p=skinned.xy;
