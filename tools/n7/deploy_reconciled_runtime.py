@@ -245,7 +245,7 @@ def plan(ftp, release, canonical_commit, transformer=transform_server):
     if 'public/index.html' in originals:
         import runpy
         versioner = runpy.run_path(str(HERE / 'asset_version.py'))
-        html = versioner['version_html'](originals['public/index.html'], payload['public/app.js'])
+        html = versioner['version_html'](originals['public/index.html'], payload['public/app.js'], payload.get('public/style.css', originals.get('public/style.css')))
         if sha(html) != release['files']['public/index.html']:
             raise RuntimeError('N7_PUBLIC_HTML_OUTPUT_MISMATCH')
         payload['public/index.html'] = html
