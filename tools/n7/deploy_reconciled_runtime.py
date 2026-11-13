@@ -423,13 +423,37 @@ def public_preview(ftp, release, payload, destination):
     print('N7_PUBLIC_PREVIEW_VERIFIED source_hashes=true private_files_exported=0')
 
 
+def diagnose_server(source, release):
+    """Dry-run only, when the live server is not a reviewed release: structural facts, never code text."""
+    text = source.decode('utf8', 'replace')
+    print('N7_DIAG_SERVER sha256=' + sha(source) + ' bytes=' + str(len(source)) + ' lines=' + str(text.count('\n')))
+    print('N7_DIAG_SERVER previous=' + release.get('previous_files', {}).get('server.js', '')[:12] +
+          ' previous_server=' + release.get('previous_server_sha256', '')[:12] + ' target=' + release['files']['server.js'][:12])
+    print('N7_DIAG_MARKERS ' + ','.join(sorted(set(re.findall(r'N7_[A-Z0-9_]+_V[0-9]+', text)))))
+    print('N7_DIAG_ROUTES ' + ','.join(sorted(set(re.findall(r"p\s*===?\s*'(/[a-z0-9/_.-]{1,60})'", text)))))
+    for file in ('chat-storage-patch.json', 'runtime-workflow-patch.json'):
+        for i, patch in enumerate(json.loads((HERE / file).read_text())):
+            print('N7_DIAG_PATCH %s#%d old=%d new=%d id=%s' % (file, i, text.count(patch['old']), text.count(patch['new']) if patch['new'] else -1,
+                                                           hashlib.sha256(patch['old'].encode()).hexdigest()[:8]))
+    try:
+        out = transform_server(source)
+        print('N7_DIAG_TRANSFORM sha256=' + sha(out) + ' equals_target=' + str(sha(out) == release['files']['server.js']))
+    except RuntimeError as error:
+        print('N7_DIAG_TRANSFORM error=' + str(error))
+
+
 def main():
     release = contract()
     commit = os.environ['N7_CANONICAL_COMMIT']
     dry = os.getenv('N7_DRY_RUN', '1') != '0'
     ftp = connect()
     try:
-        payload, originals = plan(ftp, release, commit)
+        try:
+            payload, originals = plan(ftp, release, commit)
+        except RuntimeError as error:
+            if dry and str(error) == 'N7_UNREVIEWED_LIVE_SERVER':
+                diagnose_server(read(ftp, 'server.js'), release)
+            raise
         verify(release, commit, active=False)
         print('N7_CANONICAL_PREFLIGHT_OK dry_run=' + str(dry) + ' runtime_files=' + str(len(release['files'])))
         preview = os.getenv('N7_PREVIEW_PUBLIC_DIR')
