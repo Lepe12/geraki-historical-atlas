@@ -133,14 +133,16 @@ def transform_app(original):
 
 # SHA-256 of the installed approved-character block (release 483096c9…, canonical 1ba82fd/f9932e6).
 PREVIOUS_CHARACTER_BLOCKS = {'cdc734194899240f5045266863c16dbcea28f57b0907af17655be264760c0286'}
-# Owner decision 2026-11-13: remove the unreviewed password-free public chat that atlas PR #347
-# (tools/n7_apex_preview/deploy_public_chat.py) installed directly on the live server. Only this
-# exact live variant is accepted, and only if removing those two insertions yields the installed
-# reviewed release byte for byte.
+# Owner decision 2026-11-13 (confirmed again the same evening): remove the unreviewed password-free public
+# chat that tools/n7_apex_preview/deploy_public_chat.py installs directly on the live server (atlas PR #347,
+# later again from preview/n7-visual-h01). A live server carrying its marker is accepted ONLY if removing
+# exactly those two insertions yields a reviewed server (the installed or the target release) byte for byte;
+# any other difference is still refused as unreviewed.
 APEX_PUBLIC_SHIM = ("// N7_APEX_PASSWORDLESS_CHAT_V1\nconst n7ApexPublic=require('./n7-apex-public-chat.cjs')"
                     ".createApexPublicChat({apiKey:API_KEY,model:MODEL,base:BASE});\n")
 APEX_PUBLIC_GUARD = ("\n  try { if(await n7ApexPublic.handle(req,res)) return; } catch { res.writeHead(500,{'Content-Type':"
                      "'application/json','Cache-Control':'no-store'});res.end(JSON.stringify({error:'Η συνομιλία δεν ολοκληρώθηκε.'}));return; }\n")
+APEX_MARKER = b'N7_APEX_PASSWORDLESS_CHAT_V1'
 KNOWN_UNREVIEWED_SERVERS = {'2a4d6c8a6003a13f6b040ff25482516113a90b692372d89baaef7d3298eb05cd'}
 
 
@@ -198,9 +200,10 @@ def plan(ftp, release, canonical_commit, transformer=transform_server):
             allowed = {expected, previous_files.get(name)} - {None}
             if name == 'server.js':
                 allowed.add(release['previous_server_sha256'])
-            if name == 'server.js' and current is not None and sha(current) in KNOWN_UNREVIEWED_SERVERS:
+            if name == 'server.js' and current is not None and (sha(current) in KNOWN_UNREVIEWED_SERVERS
+                                                                 or APEX_MARKER in current):
                 reverted = remove_apex_public(current)
-                if sha(reverted) != previous_files.get('server.js'):
+                if sha(reverted) not in {previous_files.get('server.js'), expected}:
                     raise RuntimeError('N7_UNREVIEWED_LIVE_SERVER')
                 server_input = reverted
             elif current is not None and sha(current) not in allowed:
