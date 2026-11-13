@@ -133,6 +133,24 @@ def transform_app(original):
 
 # SHA-256 of the installed approved-character block (release 483096c9…, canonical 1ba82fd/f9932e6).
 PREVIOUS_CHARACTER_BLOCKS = {'cdc734194899240f5045266863c16dbcea28f57b0907af17655be264760c0286'}
+# Owner decision 2026-11-13: remove the unreviewed password-free public chat that atlas PR #347
+# (tools/n7_apex_preview/deploy_public_chat.py) installed directly on the live server. Only this
+# exact live variant is accepted, and only if removing those two insertions yields the installed
+# reviewed release byte for byte.
+APEX_PUBLIC_SHIM = ("// N7_APEX_PASSWORDLESS_CHAT_V1\nconst n7ApexPublic=require('./n7-apex-public-chat.cjs')"
+                    ".createApexPublicChat({apiKey:API_KEY,model:MODEL,base:BASE});\n")
+APEX_PUBLIC_GUARD = ("\n  try { if(await n7ApexPublic.handle(req,res)) return; } catch { res.writeHead(500,{'Content-Type':"
+                     "'application/json','Cache-Control':'no-store'});res.end(JSON.stringify({error:'Η συνομιλία δεν ολοκληρώθηκε.'}));return; }\n")
+KNOWN_UNREVIEWED_SERVERS = {'2a4d6c8a6003a13f6b040ff25482516113a90b692372d89baaef7d3298eb05cd'}
+
+
+def remove_apex_public(source):
+    text = source.decode('utf8')
+    if text.count(APEX_PUBLIC_SHIM) != 1 or text.count(APEX_PUBLIC_GUARD) != 1:
+        raise RuntimeError('N7_UNREVIEWED_LIVE_SERVER')
+    return text.replace(APEX_PUBLIC_SHIM, '', 1).replace(APEX_PUBLIC_GUARD, '', 1).encode()
+
+
 STAGE_CSS_MARKER = '/* N7_HUMANOID_STAGE_V1'
 
 
@@ -172,6 +190,7 @@ def plan(ftp, release, canonical_commit, transformer=transform_server):
         raise RuntimeError('N7_CANONICAL_COMMIT_REQUIRED')
     originals = {}
     previous_files = release.get('previous_files', {})
+    server_input = None
     for name, expected in release['files'].items():
         mutable = name in WRITABLE
         current = read(ftp, name, optional=mutable and name not in previous_files and name != 'server.js')
@@ -179,12 +198,17 @@ def plan(ftp, release, canonical_commit, transformer=transform_server):
             allowed = {expected, previous_files.get(name)} - {None}
             if name == 'server.js':
                 allowed.add(release['previous_server_sha256'])
-            if current is not None and sha(current) not in allowed:
+            if name == 'server.js' and current is not None and sha(current) in KNOWN_UNREVIEWED_SERVERS:
+                reverted = remove_apex_public(current)
+                if sha(reverted) != previous_files.get('server.js'):
+                    raise RuntimeError('N7_UNREVIEWED_LIVE_SERVER')
+                server_input = reverted
+            elif current is not None and sha(current) not in allowed:
                 raise RuntimeError('N7_UNREVIEWED_LIVE_SERVER' if name == 'server.js' else 'N7_RUNTIME_DRIFT ' + name)
             originals[name] = current
         elif current is None or sha(current) != expected:
             raise RuntimeError('N7_RUNTIME_DRIFT ' + name)
-    previous = originals['server.js']
+    previous = server_input if server_input is not None else originals['server.js']
     server = previous if sha(previous) == release['files']['server.js'] else transformer(previous)
     payload = {}
     for name, source in PUBLIC_MODULES.items():
