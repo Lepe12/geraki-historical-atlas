@@ -38,9 +38,9 @@ PUBLIC_MODULES = {'conversation-store.js': 'conversation-store.js',
                   'n7-coding-agent.js': 'coding-agent-tool.js'}
 for _skill in ('book-project-canon', 'document-reading-plan', 'claim-evidence-ledger', 'editorial-preservation'):
     PUBLIC_MODULES['skills/' + _skill + '/SKILL.md'] = 'skills/' + _skill + '/SKILL.md'
-# The engineering workflow lives only in the canonical private N7 repository.
-# Its installed runtime path is still a native, reviewed skills/ entry.
-PUBLIC_MODULES['skills/n7-verified-change/SKILL.md'] = '../../skills/n7-verified-change/SKILL.md'
+# The engineering workflow is distributed with the other reviewed skills (owner decision, no secrets);
+# skills/n7-verified-change/SKILL.md in the canonical repository is kept byte-identical by a test.
+PUBLIC_MODULES['skills/n7-verified-change/SKILL.md'] = 'skills/n7-verified-change/SKILL.md'
 WRITABLE = {'server.js', 'public/app.js', 'public/index.html', 'public/style.css', 'release-manifest.json', *PUBLIC_MODULES}
 LIMIT = 8 * 1024 * 1024
 
