@@ -22,8 +22,8 @@
    const o=JSON.parse(raw);return o&&o.schema===SCHEMA&&o.origin===BOT&&nonceOK(o.nonce)?{nonce:o.nonce,embed:o.embed===true}:null;}catch{return null;}
  }
  function openUrl(nonce){if(!nonceOK(nonce))throw Error('invalid nonce');return ATLAS_URL+'#n7map='+encodeURIComponent(JSON.stringify({schema:SCHEMA,nonce,origin:BOT}));}
- // The NABOU chamber chart in 3D (the owner's choice); the map loads data.json records onto it.
- function embedUrl(nonce){if(!nonceOK(nonce))throw Error('invalid nonce');return ATLAS_URL+'?map3d=1#n7map='+encodeURIComponent(JSON.stringify({schema:SCHEMA,nonce,origin:BOT,embed:true}));}
+ // The MapLibre atlas with relief (owner's choice for a clear close view of a place, 2026-11-13).
+ function embedUrl(nonce){if(!nonceOK(nonce))throw Error('invalid nonce');return ATLAS_ROOT_URL+'#n7map='+encodeURIComponent(JSON.stringify({schema:SCHEMA,nonce,origin:BOT,embed:true}));}
  // N7 -> map: focus one existing data.json record. Nothing but a record id crosses.
  function mapFocus(data){return data&&data.type==='map_focus'&&idOK(data.id)&&recordIdOK(data.placeId)?{id:data.id,placeId:data.placeId}:null;}
  // Map -> N7: the names of the records that exist, for matching. No coordinates are sent.

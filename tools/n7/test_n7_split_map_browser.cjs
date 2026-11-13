@@ -1,7 +1,7 @@
 'use strict';
-// N7_SPLIT_MAP_V1 browser test: «Δείξε μου την Κέρκυρα» -> N7 rises into a strip, the NABOU chamber chart
-// in 3D (atlas checkout, vendored three.js, WebGL via SwiftShader) opens below in an iframe with the real
-// data.json records on it, and the 3D camera centres on the stored record. Real assembled N7 runtime with a loopback model fixture. No network is used:
+// N7_SPLIT_MAP_V1 browser test: «Δείξε μου την Κέρκυρα» -> N7 rises into a strip, the NABOU atlas (MapLibre
+// with relief, atlas checkout, real data.json) opens below in an iframe and flies to a close view of the
+// stored record; no answer panel, no model call (owner's design). Real assembled N7 runtime with a loopback model fixture. No network is used:
 // MapLibre is served from the npm package; base tiles are replaced by a local Natural Earth land layer
 // (world-atlas), a TEST FIXTURE only — the live atlas keeps its own tiles.
 // Env: N7_ATLAS_DIR (atlas checkout), N7_MAPLIBRE_DIR (node_modules with maplibre-gl@4.7.1, world-atlas,
@@ -128,26 +128,26 @@ function fixtureAsset(url){
   await page.waitForSelector('#n7Stage[data-split="1"] #n7MapFrame',{timeout:10000});
   await page.waitForTimeout(350);await shot('split-2-transition.png');
   await page.waitForFunction(()=>!document.getElementById('n7StageSend').disabled,null,{timeout:60000});
-  const reply=(await page.textContent('#n7StageReply')).trim();
+  const promptsBefore=prompts.length;
   const cam=await camera();
   const st=await page.evaluate(()=>JSON.parse(localStorage.getItem('n7-shared-state-v1')).place);
   assert.equal(st.record,corfu.id);
-  assert.ok(Math.abs(cam.lng-corfu.lon)<0.001&&Math.abs(cam.lat-corfu.lat)<0.001,'camera '+JSON.stringify(cam));
-  // The real 3D scene moved: closer and tilted, as the hook asked through NABOU_MAP3D.camera.
-  const pose=await frame().evaluate(()=>{const p=window.NABOU_MAP3D.camera();return {on:window.NABOU_MAP3D.enabled,dist:p.dist,tilt:p.tilt};});
-  assert.ok(pose.on&&Math.abs(pose.dist-2.4)<0.05&&Math.abs(pose.tilt-48)<1,'3D pose '+JSON.stringify(pose));
-  if(process.env.N7_DEBUG)console.log('evalpanel:',await frame().evaluate(async()=>{try{const t=await (await fetch('../tools/n7/atlas-embed-panel.js?x='+Date.now())).text();(0,eval)(t);return 'ok bars='+document.querySelectorAll('.n7e-bar').length+' len='+t.length;}catch(e){return 'ERR '+e.message;}}));
-  const head=(await frame().textContent('#n7ePlace')).replace(/\s+/g,' ');assert.ok(head.includes('Corfu')&&head.includes('κατά προσέγγιση'),head);
-  assert.equal(await frame().locator('.n7e-cartouche').count(),0,'no frame over the map on the right');
-  assert.ok(!reply.includes('Τέταρτη πρόταση')&&await page.isVisible('.n7-reply-more'),'panel shows the first sentences, the full answer is one click away');
-  const title=await page.textContent('#n7MapDockTitle');
-  assert.match(title,/κατά προσέγγιση/);
-  assert.match(reply,/Corfu/);
-  const sent=prompts.at(-1);assert.ok(sent.includes('Corfù / Κέρκυρα')&&!/39\.62|19\.92/.test(sent),'the model gets names and status, never coordinates');
-  const layout=await page.evaluate(()=>{const r=id=>document.getElementById(id).getBoundingClientRect();return {fig:r('n7StageFigure'),dock:r('n7MapDock'),reply:r('n7StageReply'),vh:innerHeight};});
+  // A close view that fills the frame with the place, centred on the stored record.
+  assert.ok(Math.abs(cam.lng-corfu.lon)<0.01&&Math.abs(cam.lat-corfu.lat)<0.01&&cam.zoom>=9.5,'camera '+JSON.stringify(cam));
+  // Owner's design: no answer panel; the model is not asked; the quick actions stay on the right.
+  assert.equal(await page.isVisible('#n7StageReply'),false,'no answer panel in the strip');
+  assert.equal(prompts.length,promptsBefore,'a place command does not call the model');
+  assert.ok(await page.isVisible('.n7-stage-quick'),'quick actions visible on the right');
+  // Parchment cartouche with the Greek name stored in historicalNames, the Latin record name and status.
+  const head=(await frame().textContent('#n7ePlace')).replace(/\s+/g,' ');
+  assert.ok(head.includes('Κέρκυρα')&&head.includes('Corfu')&&head.includes('κατά προσέγγιση'),head);
+  const title=await page.textContent('#n7MapDockTitle');assert.equal(title,'Με εντολή: Δείξε μου την Κέρκυρα');
+  const routes=await frame().evaluate(()=>{try{return atlasMap.getLayoutProperty('atlas-routes','visibility')}catch(e){return 'n/a'}});
+  assert.equal(routes,'none','voyage routes hidden in the close view');
+  const layout=await page.evaluate(()=>{const r=id=>document.getElementById(id).getBoundingClientRect();return {fig:r('n7StageFigure'),dock:r('n7MapDock'),vh:innerHeight};});
   assert.ok(layout.fig.bottom<=layout.dock.top&&layout.dock.height>layout.vh*0.4,'N7 strip above, map below '+JSON.stringify(layout));
-  await page.waitForTimeout(600);await shot('split-3-final.png');
-  record('S2','«Δείξε μου την Κέρκυρα» → split, 3D χάρτης στην Κέρκυρα','PASS',`εγγραφή ${corfu.id} (${corfu.coordinateStatus}); στόχος κάμερας ${cam.lng},${cam.lat} = data.json ${corfu.lon},${corfu.lat}; 3D: κλίση ${pose.tilt.toFixed(0)}°, απόσταση ${pose.dist.toFixed(2)}; καρτέλα «${title}»; απάντηση: «${reply.slice(0,90)}»`);
+  await page.waitForTimeout(800);await shot('split-3-final.png');
+  record('S2','«Δείξε μου την Κέρκυρα» → split, κοντινό στην Κέρκυρα','PASS',`εγγραφή ${corfu.id} (${corfu.coordinateStatus}); κάμερα ${cam.lng.toFixed(4)},${cam.lat.toFixed(4)} z${cam.zoom.toFixed(1)}; καρτέλα «${head.trim()}»; χωρίς πλαίσιο απάντησης, χωρίς κλήση μοντέλου, διαδρομές κρυφές`);
 
   // Unknown place: said, not placed; the camera does not move.
   const before=await camera();
@@ -161,10 +161,11 @@ function fixtureAsset(url){
   await page.waitForTimeout(1500);
   assert.deepEqual(await camera(),after);
   // The map hook exists only inside the N7 frame: an ordinary visit loads no N7 script.
-  const plain=await context.newPage();await plain.goto(ATLAS+'/geraki-historical-atlas/jarvis-intelligence-chamber/');await plain.waitForTimeout(2500);
-  const plainN7=await plain.evaluate(()=>({hook:!!window.NABOU_MAP,embed:document.documentElement.classList.contains('n7-embed'),bar:!!document.querySelector('.n7e-bar')}));
-  assert.deepEqual(plainN7,{hook:false,embed:false,bar:false});await plain.close();
-  record('S4','Ασφάλεια πρωτοκόλλου','PASS','map_focus με λάθος nonce αγνοήθηκε· κανονική επίσκεψη στο chamber χωρίς τη λειτουργία ενσωμάτωσης');
+  const plain=await context.newPage();await plain.goto(ATLAS+'/geraki-historical-atlas/');await plain.waitForTimeout(2500);
+  // The read-only NABOU_MAP hook is part of the atlas page; embed mode, N7 scripts and the bar are not.
+  const plainN7=await plain.evaluate(()=>({link:!!window.N7MapProtocol,embed:document.documentElement.classList.contains('n7-embed'),bar:!!document.querySelector('.n7e-bar')}));
+  assert.deepEqual(plainN7,{link:false,embed:false,bar:false});await plain.close();
+  record('S4','Ασφάλεια πρωτοκόλλου','PASS','map_focus με λάθος nonce αγνοήθηκε· κανονική επίσκεψη στον άτλαντα χωρίς τη λειτουργία ενσωμάτωσης');
 
   // Side bar tabs: every value is an existing data.json field; missing fields stay empty.
   const fr=frame();
