@@ -8,7 +8,7 @@
 .n7-rail-item:hover,.n7-rail-item[aria-current="true"]{color:var(--n7-text);background:var(--n7-cyan-soft)}
 .n7-rail-item[aria-current="true"] .n7-rail-icon{color:var(--n7-cyan)}
 .n7-rail-icon{font-size:19px;line-height:1}
-.n7-rail-label{max-width:100%;text-align:center;overflow-wrap:anywhere}
+.n7-rail-label{max-width:100%;text-align:center;font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .n7-rail-item[data-nav="settings"]{margin-top:auto}
 .n7-stage-main{min-width:0;min-height:0;display:flex;flex-direction:column;align-items:center;overflow:auto;padding:12px 24px 18px}
 .n7-stage-figure{flex:0 0 auto;width:min(62vh,72vw,720px);aspect-ratio:1;position:relative}
@@ -25,6 +25,11 @@
 .n7-stage-reply{width:min(760px,100%);margin:8px 0 0;font-size:16px;line-height:1.6;color:var(--n7-text);white-space:pre-wrap;max-height:30vh;overflow:auto}
 .n7-stage-reply p{margin:0}.n7-stage-reply .n7-error{color:#ffb4a6}
 .n7-stage-results{width:min(1100px,100%);margin-top:10px;overflow:auto}
+/* With results the figure steps back, the answer stays readable and the table scrolls on its own. */
+.n7-stage[data-results="1"] .n7-stage-figure{width:min(30vh,38vw,300px)}
+.n7-stage[data-results="1"] .n7-stage-results{flex:1 1 auto;min-height:120px;max-height:52vh;padding-bottom:8px}
+.n7-stage[data-results="1"] .n7-stage-reply{max-height:18vh}
+.n7-stage-figure,.n7-stage-state,.n7-stage-reply,.n7-stage-compose,.n7-stage-map{flex-shrink:0}
 .n7-results-table{width:100%;border-collapse:collapse;font-size:13px;line-height:1.45}
 .n7-results-table th{position:sticky;top:0;background:var(--n7-panel);color:var(--n7-dim);font-weight:600;text-align:left;padding:7px 8px;border-bottom:1px solid var(--n7-line)}
 .n7-results-table td{padding:8px;border-bottom:1px solid var(--n7-line);vertical-align:top}
