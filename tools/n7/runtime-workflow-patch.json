@@ -54,5 +54,17 @@
   {
     "old": "    // N7_HYBRID_SEARCH_V1: authenticated passage vectors",
     "new": "    // N7_CODING_AGENT_LINK_V1: existing coding workflow (draft PRs only) and real PR/CI state.\n    if(p==='/api/coding/tasks'||p.startsWith('/api/coding/runs/')||p==='/api/coding/pr'){\n      const fail=e=>{const c=String(e&&e.message||'');return json(res,c==='CODING_TOKEN_NOT_CONFIGURED'?503:c.startsWith('CODING_GITHUB_FORBIDDEN')?502:c.startsWith('CODING_')?400:503,{error:c.startsWith('CODING_')?c:'CODING_UNAVAILABLE'});};\n      try{\n        if(p==='/api/coding/tasks'){\n          if(req.method!=='POST')return json(res,405,{error:'Method not allowed'});\n          if(!originOK(req))return json(res,403,{error:'Invalid origin'});\n          const b=await body(req);\n          return json(res,202,await n7Coding.dispatch({task:b?.task,files:b?.files,apply:b?.apply===true}));\n        }\n        if(req.method!=='GET')return json(res,405,{error:'Method not allowed'});\n        if(p==='/api/coding/pr')return json(res,200,await n7Coding.latestPr(new URL(req.url,'http://local').searchParams.get('repo')||''));\n        return json(res,200,await n7Coding.runStatus(p.slice('/api/coding/runs/'.length)));\n      }catch(e){return fail(e);}\n    }\n    // N7_HYBRID_SEARCH_V1: authenticated passage vectors"
+  },
+  {
+    "old": "    expires: Date.now() + 7 * 24 * 3600 * 1000\n  });\n\n  return (\n    `sid=${id}; HttpOnly; SameSite=Strict; Path=/; Max-Age=604800` +",
+    "new": "    expires: Date.now() + SESSION_DAYS * 24 * 3600 * 1000, renewed: Date.now()\n  });\n\n  return (\n    `sid=${id}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${SESSION_DAYS * 24 * 3600}` +"
+  },
+  {
+    "old": "// Create persistent login session\n",
+    "new": "// N7_REMEMBER_DEVICE_V1: one login per device. A session lasts 365 days from its last use; the\n// server-side expiry (not the cookie) is authoritative, and the cookie is re-issued at most daily\n// because browsers cap cookie lifetimes (Chrome: 400 days). Logout still deletes the session.\nconst SESSION_DAYS = 365;\nfunction renewSession(req) {\n  const token = cookies(req).sid;\n  const current = sessions.get(token);\n  const now = Date.now();\n  if (!current || current.expires < now || now - (current.renewed || 0) < 24 * 3600 * 1000) return null;\n  const filename = sessions.file(token), temporary = filename + '.' + process.pid + '.tmp';\n  try {\n    fs.writeFileSync(temporary, JSON.stringify({ ...current, expires: now + SESSION_DAYS * 24 * 3600 * 1000, renewed: now }), { mode: 0o600 });\n    fs.renameSync(temporary, filename);\n  } catch (error) {\n    try { fs.unlinkSync(temporary); } catch (_) {}\n    console.error('N7 session renew error:', error.code || 'renew_failed');\n    return null;\n  }\n  return `sid=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${SESSION_DAYS * 24 * 3600}` + (COOKIE_SECURE ? '; Secure' : '');\n}\n\n// Create persistent login session\n"
+  },
+  {
+    "old": "    if (await n7Relay.handle(req, res)) {",
+    "new": "    const renewedCookie = renewSession(req);\n    if (renewedCookie) res.setHeader('Set-Cookie', renewedCookie);\n    if (await n7Relay.handle(req, res)) {"
   }
 ]
