@@ -56,6 +56,8 @@ async function main(){
   await page.locator('#login:not(.hidden)').waitFor();
   await page.locator('#loginform input').fill('local-ui-test');await page.locator('#loginform button[type=submit]').click();
   await page.locator('#application:not(.hidden)').waitFor();
+  // The Humanoid stage is the default view; these checks cover the classic conversation view.
+  if(await page.locator('#n7Stage:not([hidden])').count())await page.locator('.n7-rail-item[data-nav="chat"]').click();
   await page.getByRole('button',{name:'Επιμέλεια',exact:true}).click();
   await page.locator('#message').fill('Το πλοίο έγερνε, μα κρατούσε.');
   await page.locator('#send').click();

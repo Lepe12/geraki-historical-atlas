@@ -5,6 +5,10 @@
 (()=>{'use strict';
 if(window.__N7_HUMANOID_STAGE_V1)return;window.__N7_HUMANOID_STAGE_V1=true;
 const R=window.N7CommandRouter,M=window.N7MapProtocol;if(!R||!M)return;
+// A window opened by the atlas for the voice link (#n7voice) or a map handoff (#atlas) needs the classic
+// view, where the voice-connection card and the handoff appear; it starts there instead of the stage.
+// voice-bridge-ui / workspace-ui clear the fragment and set N7_CLASSIC_START before this is read.
+const classicStart=()=>window.N7_CLASSIC_START===true||/[#&](?:n7voice|atlas)=/.test(location.hash);
 const $=id=>document.getElementById(id);
 const make=(tag,text,cls)=>{const e=document.createElement(tag);if(text!=null)e.textContent=text;if(cls)e.className=cls;return e;};
 const btn=(text,fn,cls,label)=>{const b=make('button',text,cls);b.type='button';b.addEventListener('click',fn);if(label)b.setAttribute('aria-label',label);return b;};
@@ -32,13 +36,32 @@ const stateLine=make('p','Έτοιμος','n7-stage-state');stateLine.id='n7Stag
 const reply=make('div',null,'n7-stage-reply');reply.id='n7StageReply';reply.setAttribute('aria-live','polite');
 const results=make('div',null,'n7-stage-results');results.id='n7StageResults';
 const form=make('form',null,'n7-stage-compose');form.id='n7StageForm';
-const mic=btn('',()=>toggleMic(),'n7-stage-mic','Μικρόφωνο');mic.id='n7StageMic';mic.setAttribute('aria-pressed','false');mic.append(make('span','●','n7-mic-dot'));
-const input=make('textarea',null,'n7-stage-input');input.id='n7StageInput';input.rows=1;input.placeholder='Μίλησε ή γράψε στον N7…';input.setAttribute('aria-label','Εντολή προς τον N7');
+const mic=btn('',()=>toggleMic(),'n7-stage-mic','Μικρόφωνο');mic.id='n7StageMic';mic.setAttribute('aria-pressed','false');{const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('class','n7-mic-icon');svg.setAttribute('aria-hidden','true');
+ for(const d of ['M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z','M5 11a7 7 0 0 0 14 0','M12 18v3']){const p=document.createElementNS(ns,'path');p.setAttribute('d',d);svg.append(p);}
+ mic.append(svg,make('span','●','n7-mic-dot'));}
+const input=make('textarea',null,'n7-stage-input');input.id='n7StageInput';input.rows=1;input.placeholder='Γράψε ή μίλησε στο N7…';input.setAttribute('aria-label','Εντολή προς τον N7');
 const send=make('button','➤','n7-stage-send');send.type='submit';send.setAttribute('aria-label','Αποστολή');send.id='n7StageSend';
 const hush=btn('■',()=>stopSpeaking(),'n7-stage-hush','Διακοπή εκφώνησης');hush.id='n7StageHush';hush.hidden=true;
 form.append(mic,input,hush,send);
 const mapLine=make('p','NABOU: κλειστό','n7-stage-map');mapLine.id='n7StageMap';
-main.append(figure,stateLine,reply,results,form,mapLine);
+// N7_SPLIT_MAP_V1: quick actions (right), and the NABOU map docked below N7 in an iframe.
+const quick=make('nav',null,'n7-stage-quick');quick.setAttribute('aria-label','Γρήγορες ενέργειες');
+const QUICK=[['search','⌕','Αναζήτηση',()=>{input.focus();}],
+ ['research','▥','Ιστορική Έρευνα',()=>{input.value='Αναζήτησε στη βιβλιοθήκη: ';input.focus();}],
+ ['places','⌖','Τόποι & Μνημεία',()=>openSplit().then(()=>presence('done','Ο χάρτης NABOU είναι ανοιχτός.')).catch(fail)],
+ ['maps','◈','Χάρτες NABOU',()=>openMap().then(()=>presence('done','Ο χάρτης NABOU άνοιξε σε νέο παράθυρο.')).catch(fail)]];
+for(const [id,icon,label,fn] of QUICK){const b=btn('',fn,'n7-quick-item',label);b.dataset.quick=id;b.append(make('span',icon,'n7-quick-icon'),make('span',label,'n7-quick-label'));quick.append(b);}
+const dock=make('section',null,'n7-stage-mapdock');dock.id='n7MapDock';dock.setAttribute('aria-label','Χάρτης NABOU');
+const dockBar=make('div',null,'n7-mapdock-bar');
+const dockTitle=make('p','','n7-mapdock-title');dockTitle.id='n7MapDockTitle';
+const dockClose=btn('⌃',()=>closeSplit(),'n7-mapdock-close','Κλείσιμο χάρτη');dockClose.id='n7MapDockClose';dockClose.title='Κλείσιμο χάρτη';
+dockBar.append(dockTitle,dockClose);dock.append(dockBar);
+// Brand and clock (style guide: N7 · research companion of NABOU). The clock is the device's own time.
+const brandBox=make('div',null,'n7-stage-brand');brandBox.setAttribute('aria-hidden','true');
+brandBox.append(make('span','N7','n7-sb-mark'),make('span','Έρευνα · Ιστορία · Πολιτισμός','n7-sb-tag'),make('span','Ερευνητικός σύνοδος του NABOU','n7-sb-role'));
+const clock=make('time',null,'n7-stage-clock');clock.id='n7StageClock';
+const tick=()=>{const d=new Date();clock.dateTime=d.toISOString();clock.textContent=d.toLocaleTimeString('el-GR',{hour:'2-digit',minute:'2-digit'});};tick();setInterval(tick,15000);
+main.append(brandBox,clock,figure,stateLine,quick,reply,results,form,mapLine,dock);
 const settings=make('aside',null,'n7-stage-settings');settings.id='n7StageSettings';settings.hidden=true;settings.setAttribute('aria-label','Ρυθμίσεις N7');
 const logList=make('ol',null,'n7-stage-log');logList.id='n7StageLog';
 function toggle(label,key){const l=make('label',null,'n7-switch');const c=make('input');c.type='checkbox';c.checked=!!S.prefs[key];c.addEventListener('change',()=>{S.prefs[key]=c.checked;save();});l.append(c,make('span',label));return l;}
@@ -59,7 +82,7 @@ function nav(id){
  settings.hidden=id!=='settings'||!settings.hidden;
  if(id==='humanoid'){showStage(true);input.focus();return;}
  if(id==='settings'){showStage(true);return;}
- if(id==='nabou'){openMap().then(()=>presence('done','Ο χάρτης NABOU είναι ανοιχτός.')).catch(fail);return;}
+ if(id==='nabou'){showStage(true);(split.open?Promise.resolve(closeSplit()):openSplit().then(()=>presence('done','Ο χάρτης NABOU είναι ανοιχτός.'))).catch(fail);return;}
  showStage(false);
  if(id==='library')$('n7-library-button')?.click();
  if(id==='agents')$('taskview')?.click();
@@ -115,10 +138,59 @@ window.addEventListener('message',e=>{
  if(d.type==='closed'){map.ready=false;paintMap('κλειστό');}
 });
 setInterval(()=>{if(map.win&&map.win.closed&&map.ready){map.ready=false;paintMap('κλειστό');}},1500);
-function placeName(id){return map.places.find(p=>p.id===id)?.name||R.PLACES.find(p=>p.atlas===id)?.name||id;}
+/* ---------- N7_SPLIT_MAP_V1: embedded NABOU atlas below N7 (same n7-map/v1 checks) ---------- */
+const split={frame:null,nonce:'',ready:false,records:[],waiters:[],pending:new Map(),open:false};
+function setSplit(on){split.open=on;stage.dataset.split=on?'1':'0';if(!on)dockTitle.textContent='';}
+function openSplit(){
+ setSplit(true);
+ if(split.frame&&split.ready)return Promise.resolve();
+ if(!split.frame){
+  split.nonce=hex(16);
+  const f=document.createElement('iframe');f.className='n7-mapdock-frame';f.id='n7MapFrame';f.title='Χάρτης NABOU';
+  f.setAttribute('sandbox','allow-scripts allow-same-origin allow-popups');f.referrerPolicy='no-referrer';f.loading='eager';
+  f.src=M.embedUrl(split.nonce);dock.append(f);split.frame=f;
+ }
+ paintMap('ο χάρτης φορτώνει…');
+ return new Promise((resolve,reject)=>{const t=setTimeout(()=>{split.waiters=split.waiters.filter(w=>w!==done);paintMap('χωρίς απόκριση');
+   reject(Error('Ο χάρτης NABOU δεν επιβεβαίωσε τη σύνδεση N7. Η δημοσιευμένη έκδοση του άτλαντα ίσως δεν περιέχει ακόμη την ενσωμάτωση.'));},30000);
+  const done=()=>{clearTimeout(t);resolve();};split.waiters.push(done);});
+}
+function closeSplit(){setSplit(false);paintMap();log('nabou','Κλείσιμο χάρτη','done');input.focus();}
+function splitFocus(placeId){
+ const id=crypto.randomUUID();
+ return new Promise((resolve,reject)=>{
+  const t=setTimeout(()=>{split.pending.delete(id);reject(Error('Ο χάρτης NABOU δεν επιβεβαίωσε την εστίαση.'));},15000);
+  split.pending.set(id,a=>{clearTimeout(t);resolve(a);});
+  split.frame.contentWindow.postMessage({schema:M.SCHEMA,nonce:split.nonce,type:'map_focus',id,placeId},M.ATLAS);
+ });
+}
+window.addEventListener('message',e=>{
+ if(e.origin!==M.ATLAS||!split.frame||e.source!==split.frame.contentWindow||!M.envelope(e.data,split.nonce))return;
+ const d=e.data;
+ if(d.type==='ready'){split.ready=true;split.records=M.records(d.records);paintMap();const w=split.waiters;split.waiters=[];w.forEach(x=>x());return;}
+ if(d.type==='ack'&&M.idOK(d.id)){const f=split.pending.get(d.id);if(f){split.pending.delete(d.id);f({ok:d.ok===true,error:typeof d.error==='string'?d.error.slice(0,80):null,state:M.state(d.state)});}return;}
+ if(d.type==='error'){paintMap('σφάλμα χάρτη');}
+});
+const STATUS_TEXT={VERIFIED:'επαληθευμένο σημείο',APPROXIMATE:'σημείο κατά προσέγγιση','NEEDS RESEARCH':'σημείο που χρειάζεται έρευνα'};
+async function focusInSplit(r,text){
+ await openSplit();
+ const m=R.matchRecord(text,split.records);
+ if(!m){presence('done');say('Δεν βρήκα «'+(r.place?.name||text.replace(/^\S+\s+(?:μου\s+)?(?:(?:την|τη|τον|το|τα|τις|τους|στην|στη|στον|στο)\s+)?/u,'').replace(/[;?.!]+$/,'').slice(0,60))+'» στις εγγραφές του NABOU. Δεν τοποθετώ τόπο που δεν υπάρχει στον χάρτη.');return 'not_in_nabou';}
+ const a=await splitFocus(m.id);
+ if(!a.ok||a.state?.selected!==m.id)throw Error('Ο χάρτης δεν επιβεβαίωσε την εστίαση στο '+m.name+(a.error?' ('+a.error+')':'')+'.');
+ S.place={id:m.id,name:m.name,atlas:r.place?.atlas||null,record:m.id,coordinateStatus:m.coordinateStatus};save();
+ dockTitle.textContent='Με εντολή: «'+text.slice(0,60)+'» · '+m.name+' · '+(STATUS_TEXT[m.coordinateStatus]||'');
+ paintMap();
+ const rec=split.records.find(x=>x.id===m.id);
+ presence('thinking','Επεξεργάζεται · N7 Core');
+ // The short answer comes from the normal N7 chat flow, with the map record as checkable context.
+ const ctx={place:rec.place,historicalNames:rec.historicalNames,modernName:rec.modernName,coordinateStatus:rec.coordinateStatus};
+ return chat(text+'\n\nΑπάντησε σύντομα (2–3 προτάσεις) και ανέφερε τις πηγές σου. Πλαίσιο από τον χάρτη NABOU (εγγραφή data.json, προς έλεγχο): '+JSON.stringify(ctx));
+}
+function placeName(id){return split.records.find(p=>p.id===id)?.place||map.places.find(p=>p.id===id)?.name||R.PLACES.find(p=>p.atlas===id)?.name||id;}
 function paintMap(note){
- const sel=S.map?.selected?placeName(S.map.selected):null;
- mapLine.textContent='NABOU: '+(note||(map.ready?'συνδεδεμένο':'κλειστό'))+(sel?' · επιλεγμένος τόπος: '+sel:'')+(S.map?.sourcesOpen?' · πηγές ανοιχτές':'');
+ const sel=split.open&&S.place?.record?S.place.name:S.map?.selected?placeName(S.map.selected):null;
+ mapLine.textContent='NABOU: '+(note||(split.open&&split.ready?'ανοιχτό κάτω':map.ready?'συνδεδεμένο':'κλειστό'))+(sel?' · επιλεγμένος τόπος: '+sel:'')+(S.map?.sourcesOpen?' · πηγές ανοιχτές':'');
 }
 
 /* ---------- capabilities ---------- */
@@ -317,16 +389,21 @@ async function run(text,{voice=false}={}){
  running=true;send.disabled=true;stopSpeaking();
  if(!KEEP_RESULTS.has(r.intent))clearResults();
  // window.open must happen inside the user's gesture, before any await.
- const needsMap=['nabou.open','nabou.focus','nabou.sources','nabou.results'].includes(r.intent)&&!(r.intent==='nabou.focus'&&!r.place?.atlas);
+ // N7_SPLIT_MAP_V1: places open the map below N7; only an explicit «νέο παράθυρο» uses a separate window.
+ const inWindow=/παραθυρ|window/u.test(R.fold(text));
+ const needsMap=['nabou.sources','nabou.results'].includes(r.intent)||(['nabou.open','nabou.focus'].includes(r.intent)&&inWindow&&!!(r.intent==='nabou.open'||r.place?.atlas));
  const opening=needsMap?openMap():null;opening?.catch(()=>{});
  presence('thinking','Επεξεργάζεται · '+(r.agent||'N7'));stage.dataset.agent=r.intent;
  log(r.intent,text,'started');
  try{
   let status='done';
   if(r.intent==='invalid')throw Error(r.error);
-  else if(r.intent==='humanoid.return'){nav('humanoid');presence('done');say('Είσαι στον Humanoid. Η συνομιλία και η κατάσταση του χάρτη διατηρούνται.');}
+  else if(r.intent==='humanoid.return'){nav('humanoid');if(split.open)setSplit(false);presence('done');say('Είσαι στον Humanoid. Η συνομιλία και η κατάσταση του χάρτη διατηρούνται.');}
+  else if(r.intent==='nabou.open'&&!inWindow){await openSplit();presence('done');say('Ο ιστορικός χάρτης NABOU είναι ανοιχτός κάτω.');}
+  else if(r.intent==='nabou.focus'&&!inWindow)status=await focusInSplit(r,text);
   else if(r.intent==='nabou.open'){await opening;presence('done');say('Ο ιστορικός χάρτης NABOU είναι ανοιχτός.');}
   else if(r.intent==='nabou.focus'){
+   if(!r.place){presence('done');say('Ο τόπος δεν αναγνωρίστηκε στο NABOU.');status='unlocated';}else
    if(!r.place.atlas){presence('done');say('Το τοπωνύμιο «'+r.place.name+'» αναγνωρίστηκε, αλλά δεν υπάρχει εγκεκριμένο σημείο αναφοράς στο NABOU. Δεν τοποθετείται σε αυθαίρετες συντεταγμένες.');status='unlocated';}
    else{await opening;const a=await mapCommand({action:'focus',place:r.place.atlas});
     if(!a.ok||a.state?.selected!==r.place.atlas)throw Error('Το NABOU δεν επιβεβαίωσε την εστίαση στο '+r.place.name+(a.error?' ('+a.error+')':'')+'.');
@@ -391,7 +468,7 @@ function mountStage(){
  if(stage.isConnected)return;
  document.body.append(stage,back);
  window.N7Presence?.mountStage(figure);
- paintAll();showStage(true);presence('idle');
+ paintAll();showStage(!classicStart());presence('idle');
  if(S.conversationId&&!active&&/^[a-f0-9-]{36}$/.test(S.conversationId))open(S.conversationId).catch(()=>{S.conversationId=null;save();});
  if(S.results)stateLine.textContent='Έτοιμος · διατηρήθηκαν τα αποτελέσματα: '+S.results.query.slice(0,80);
 }

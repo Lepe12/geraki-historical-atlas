@@ -40,6 +40,30 @@
   for(const p of PLACES)if(p.keys.some(k=>f.includes(k)))return {id:p.id,name:p.name,atlas:p.atlas};
   return null;
  }
+ // N7_SPLIT_MAP_V1: match a command against the records the map itself reported (data.json:
+ // place / historicalNames / modernName). Only an existing record id is returned; never a coordinate.
+ function recordNames(r){
+  const out=[];
+  const add=(v,rank)=>{for(const part of String(v||'').split(/[\/(),;]+/)){const n=fold(part).replace(/[^\p{L}\p{N} ]+/gu,' ').replace(/\s+/g,' ').trim();if(n.length>=4&&!out.some(x=>x.n===n))out.push({n,rank});}};
+  add(r.place,0);add(r.historicalNames,1);add(String(r.modernName||'').split(',')[0],2);add(r.modernName,3);
+  return out;
+ }
+ // Greek names inflect (Κέρκυρα / Κέρκυρας / Κέρκυρα): compare a stem without the final vowel(s)/σ.
+ const stem=n=>n.length>=6&&/[\u0370-\u03ff]/.test(n)?n.replace(/[αεηιουω]+σ?$|σ$/u,''):n;
+ function matchRecord(text,records){
+  const f=' '+fold(text).replace(/[^\p{L}\p{N} ]+/gu,' ').replace(/\s+/g,' ')+' ';
+  let best=null;
+  for(const r of Array.isArray(records)?records:[]){
+   for(const {n,rank} of recordNames(r)){
+    const k=stem(n);
+    const hit=k===n?f.includes(' '+n+' '):new RegExp('(?<![\\p{L}])'+k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'[\\p{L}]{0,3}(?![\\p{L}])','u').test(f);
+    if(!hit)continue;
+    const score=n.length*10-rank;
+    if(!best||score>best.score)best={score,record:r};
+   }
+  }
+  return best?{id:best.record.id,name:best.record.place,coordinateStatus:best.record.coordinateStatus}:null;
+ }
  function linkPlaces(text){
   const f=fold(text),out=[];
   for(const p of PLACES){const k=p.keys.find(k=>f.includes(k));if(k)out.push({id:p.id,name:p.name,atlas:p.atlas,matched:k,method:'NAME_MATCH_IN_SOURCE_TEXT'});}
@@ -118,6 +142,8 @@
   if(/διαδικτυ|στο web|στον ιστο|google|online|δημοσιευσ|επιστημονικ/u.test(f))return pick('web.search');
   if(mapWord&&!place)return pick('nabou.open');
   if(place&&(mapWord||/^(?:n7[ ,]*)?(δειξε|ανοιξε|εστιασε|πηγαινε|εμφανισε)/u.test(f)))return pick('nabou.focus');
+  // A show-command followed by a proper name: the map decides from its own records whether it exists.
+  if(/^(?:n7[ ,]*)?(?:δειξε|εστιασε|πηγαινε|show)\s/u.test(f)&&/\s\p{Lu}/u.test(text.trim().replace(/^\S+/,'')))return pick('nabou.focus');
   if(/ιστορικ|πηγεσ|πειρατ|κουρσαρ|ορμητηρι|επιδρομ/u.test(f))return pick('historical.research');
   return pick('chat');
  }
@@ -125,6 +151,6 @@
   const m=String(text).match(/(?:στην|στη|στον|στο|in)\s+([\p{Lu}][\p{L}\s'-]{1,50})/u);
   return m?m[1].trim().replace(/[;?.!]+$/,''):null;
  }
- const api={classify,CATEGORIES,fold,PLACES,REGIONS,AGENTS,route,findPlace,linkPlaces,years,libraryTerms};
+ const api={classify,CATEGORIES,fold,PLACES,REGIONS,AGENTS,route,findPlace,linkPlaces,matchRecord,years,libraryTerms};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.N7CommandRouter=api;
 })(typeof window==='undefined'?globalThis:window);

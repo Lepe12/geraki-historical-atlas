@@ -74,5 +74,7 @@ const openButton=action('Έργα & βιβλία',async()=>{await refresh();dial
  const title=document.createElement('p');title.textContent='Από τον άτλαντα: '+data.place+' · '+data.from+'–'+data.to+'. Διάλεξε συνομιλία και έργο πριν στείλεις.';card.append(title);
  const prepare=document.createElement('button');prepare.type='button';prepare.textContent='Προσθήκη στο μήνυμα';prepare.onclick=()=>{const input=document.getElementById('message');if(!input)return;const sources=(Array.isArray(data.sources)?data.sources:[]).filter(s=>s&&typeof s.title==='string'&&typeof s.url==='string'&&/^https:\/\//.test(s.url)&&s.url.length<1000).slice(0,8);const text='Ιστορική έρευνα για '+data.place+', '+data.from+'–'+data.to+'. Ξεχώρισε τεκμήρια και υποθέσεις.'+(sources.length?'\nΠηγές επιλεγμένες στον άτλαντα (προς έλεγχο):\n'+sources.map(s=>s.title.slice(0,160)+' '+s.url).join('\n'):'');input.value=(input.value?input.value+'\n\n':'')+text;input.dispatchEvent(new Event('input',{bubbles:true}));input.focus();};
  const close=document.createElement('button');close.type='button';close.textContent='Απόρριψη';close.onclick=()=>card.remove();card.append(prepare,close);document.getElementById('chat')?.before(card);
+ // The Humanoid stage reads this to open the window in the classic view, where this card is.
+ window.N7_CLASSIC_START=true;
  history.replaceState(null,'',location.pathname+location.search);
 })();

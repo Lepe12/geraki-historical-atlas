@@ -66,5 +66,9 @@
   {
     "old": "    if (await n7Relay.handle(req, res)) {",
     "new": "    const renewedCookie = renewSession(req);\n    if (renewedCookie) res.setHeader('Set-Cookie', renewedCookie);\n    if (await n7Relay.handle(req, res)) {"
+  },
+  {
+    "old": "      \"frame-ancestors 'none'\",",
+    "new": "      // N7_SPLIT_MAP_V1: the public NABOU atlas may be embedded below N7; nothing else may be framed.\n      \"frame-src 'self' https://lepe12.github.io; frame-ancestors 'none'\","
   }
 ]

@@ -1,0 +1,55 @@
+/* N7_SPLIT_MAP_V1 — the atlas as N7 embeds it (html.n7-embed only; ordinary visits are unchanged).
+   Palette from atlas-theme.css: ink, gold, parchment. N7 above supplies the command bar, so the
+   atlas header, filters and its own side panel give way to the tabbed NABOU bar. */
+html.n7-embed{
+  --atlas-ink:#211b16;--atlas-ink-2:#3b2d22;--atlas-gold:#caa56a;--atlas-gold-soft:#e6cf9f;
+  --atlas-paper:#ead8ae;--atlas-paper-2:#d9bf8d;--atlas-shadow:rgba(30,20,12,.28)}
+html.n7-embed body>header,html.n7-embed body>footer,html.n7-embed #sidePanel{display:none!important}
+html.n7-embed main>.absolute.top-5.left-5{left:auto!important;right:18px;top:auto!important;bottom:96px}
+html.n7-embed main>.absolute.bottom-5.left-6{left:272px!important}
+
+.n7e-bar{position:absolute;z-index:1400;left:12px;top:12px;bottom:12px;width:244px;display:flex;flex-direction:column;
+  border:1px solid rgba(202,165,106,.55);border-radius:10px;background:linear-gradient(180deg,rgba(28,22,16,.95),rgba(18,14,10,.95));
+  box-shadow:0 10px 30px rgba(0,0,0,.45),inset 0 0 0 1px rgba(202,165,106,.12);color:#eadcbb;overflow:hidden}
+.n7e-brand{display:grid;grid-template-columns:auto 1fr;column-gap:10px;align-items:center;padding:14px 16px 12px;border-bottom:1px solid rgba(202,165,106,.3)}
+.n7e-brand-mark{grid-row:span 2;color:var(--atlas-gold);font-size:24px;line-height:1}
+.n7e-brand-name{font:700 20px/1.1 "Cinzel",Georgia,serif;letter-spacing:.14em;color:var(--atlas-gold-soft)}
+.n7e-brand-sub{font:500 9px/1.3 "Cinzel",Georgia,serif;letter-spacing:.2em;text-transform:uppercase;color:#b9975e}
+.n7e-tabs{display:flex;flex-direction:column;gap:4px;padding:10px}
+.n7e-tab{display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid transparent;border-radius:7px;background:none;color:#d9c7a1;
+  font:500 14px/1.2 "IM Fell English",Georgia,serif;cursor:pointer;text-align:left}
+.n7e-tab:hover{background:rgba(202,165,106,.1)}
+.n7e-tab.n7e-active{border-color:rgba(230,207,159,.75);background:linear-gradient(90deg,rgba(202,165,106,.24),rgba(202,165,106,.06));color:#f6e7c4;box-shadow:0 0 12px rgba(202,165,106,.18)}
+.n7e-tab-icon{width:18px;text-align:center;color:var(--atlas-gold)}
+.n7e-tab:focus-visible,.n7e-link:focus-visible{outline:2px solid var(--atlas-gold-soft);outline-offset:2px}
+.n7e-body{flex:1;min-height:0;overflow:auto;margin:0 10px 10px;padding:12px;border-radius:8px;
+  background:linear-gradient(180deg,#ead8ae,#dcc28f);color:#2a2017;font:14px/1.5 Georgia,"Times New Roman",serif;box-shadow:inset 0 0 0 1px rgba(110,80,40,.35)}
+.n7e-rows{margin:0}.n7e-rows dt{font:700 10px/1.3 "Cinzel",Georgia,serif;letter-spacing:.12em;text-transform:uppercase;color:#7a5a2c;margin-top:8px}
+.n7e-rows dt:first-child{margin-top:0}.n7e-rows dd{margin:2px 0 0}
+.n7e-text{margin:0 0 8px;white-space:pre-wrap}.n7e-empty{margin:0;color:#6d5a3e;font-style:italic}
+.n7e-list{list-style:none;margin:0;padding:0}.n7e-list li+li{margin-top:6px}
+.n7e-link{width:100%;text-align:left;padding:6px 8px;border:1px solid rgba(110,80,40,.35);border-radius:6px;background:rgba(255,248,230,.45);color:#2a2017;cursor:pointer;font:inherit}
+.n7e-meta{color:#6d5a3e;font-size:12px}
+
+.n7e-cartouche{position:absolute;z-index:1400;right:16px;top:14px;min-width:220px;max-width:min(360px,40%);padding:14px 22px 12px;text-align:center;
+  border:2px solid #8a6a36;border-radius:6px;background:radial-gradient(ellipse at 50% 40%,#f3e4bf,#dcc08a 85%);color:#2a2017;
+  box-shadow:0 8px 24px rgba(0,0,0,.4),inset 0 0 0 4px #ecd9ad,inset 0 0 0 5px #9b7a43}
+.n7e-place{margin:0;font:400 32px/1.1 "GFS Didot","IM Fell English",Georgia,serif;font-style:italic;color:#2a1d10}
+.n7e-alt{margin:4px 0 0;font:italic 15px/1.3 "IM Fell English",Georgia,serif;color:#5a4428}
+.n7e-status{display:inline-block;margin:8px 0 0;padding:2px 10px;border-radius:999px;font:700 10px/1.6 "Cinzel",Georgia,serif;letter-spacing:.1em;text-transform:uppercase}
+.n7e-status.ok{background:#3e5a3a;color:#eef3df}.n7e-status.approx{background:transparent;color:#6b4a1c;border:1px dashed #8a6a36}
+.n7e-badge{position:absolute;z-index:1400;right:16px;bottom:44px;padding:8px 16px;border:1px solid #caa56a;border-radius:999px;background:rgba(20,15,10,.92);
+  color:#f0deb5;font:600 13px/1.2 "IM Fell English",Georgia,serif;box-shadow:0 0 16px rgba(202,165,106,.25)}
+
+/* A stored APPROXIMATE point is shown as approximate; the point N7 focused is highlighted. */
+html.n7-embed [data-coordinate-status="APPROXIMATE"] .settlement-img{outline:2px dashed rgba(138,106,54,.95);outline-offset:3px;border-radius:50%}
+html.n7-embed [data-coordinate-status="APPROXIMATE"] .settlement-label::after{content:" ≈";color:#7a5a2c}
+html.n7-embed [data-n7-focus] .settlement-label{background:#f6e7c4!important;border-color:#8a6a36!important;box-shadow:0 0 0 2px rgba(202,165,106,.6),0 0 18px rgba(255,214,140,.55)}
+
+@media (max-width:640px){
+  .n7e-bar{left:8px;right:8px;top:auto;bottom:8px;width:auto;max-height:42%}
+  .n7e-brand{display:none}.n7e-tabs{flex-direction:row;overflow-x:auto;padding:6px}.n7e-tab{padding:6px 8px;font-size:12.5px;white-space:nowrap}.n7e-tab-icon{display:none}
+  .n7e-cartouche{left:8px;right:8px;max-width:none;top:8px;padding:8px 12px}.n7e-place{font-size:22px}
+  .n7e-badge{bottom:auto;top:96px;right:10px;font-size:11.5px;padding:5px 10px}
+  html.n7-embed main>.absolute.top-5.left-5{bottom:auto!important;top:150px!important}
+}
