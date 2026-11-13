@@ -219,6 +219,36 @@ class GuardedDeployTest(unittest.TestCase):
         self.assertEqual(self.ftp.events, [])
         self.assertFalse(self.ftp.lock)
 
+    def test_only_the_known_public_chat_variant_is_removed_back_to_the_reviewed_server(self):
+        reviewed = b"const API_KEY=1,MODEL=2,BASE=3;\nconst server = http.createServer(async (req, res) => {\n  route();\n});\n"
+        live = reviewed.replace(b'const server', deploy.APEX_PUBLIC_SHIM.encode() + b'const server', 1)
+        live = live.replace(b'(req, res) => {', b'(req, res) => {' + deploy.APEX_PUBLIC_GUARD.encode(), 1)
+        self.assertEqual(deploy.remove_apex_public(live), reviewed)
+        self.ftp.files[deploy.ROOT + '/server.js'] = live
+        server = b'// new server'
+        release = {'release_id': 'a'*64, 'previous_server_sha256': deploy.sha(b'other'),
+                   'previous_files': {'server.js': deploy.sha(reviewed)}, 'files': {'server.js': deploy.sha(server)}}
+        seen = []
+        with patch.object(deploy, 'KNOWN_UNREVIEWED_SERVERS', {deploy.sha(live)}), patch.object(deploy, 'syntax'), \
+             patch.object(deploy, 'PUBLIC_MODULES', {}):
+            payload, originals = deploy.plan(self.ftp, release, 'b'*40, transformer=lambda s: seen.append(s) or server)
+            self.assertEqual(seen, [reviewed])
+            self.assertEqual(originals['server.js'], live)
+            self.assertEqual(payload['server.js'], server)
+            self.ftp.files[deploy.ROOT + '/server.js'] = live + b' '
+            with self.assertRaisesRegex(RuntimeError, 'UNREVIEWED_LIVE_SERVER'):
+                deploy.plan(self.ftp, release, 'b'*40, transformer=lambda s: server)
+        self.assertEqual(self.ftp.events, [])
+
+    def test_stage_styles_are_appended_once_and_only_to_the_reviewed_stylesheet(self):
+        stage = (deploy.HERE / 'humanoid-stage.css').read_bytes()
+        installed = b'body{color:#000}\n\n'
+        target = deploy.transform_css(installed)
+        self.assertEqual(target, installed + b'\n' + stage)
+        self.assertEqual(deploy.transform_css(target), target)
+        with self.assertRaisesRegex(RuntimeError, 'CSS_ANCHOR_CHANGED'):
+            deploy.transform_css(target + stage)
+
     def test_upgrade_accepts_only_exact_previous_modules_and_rejects_drift(self):
         modules = {name: (deploy.HERE / source).read_bytes() for name, source in deploy.PUBLIC_MODULES.items()}
         previous = {name: b'// previous approved ' + name.encode() for name in modules if name != 'conversation-store.js'}
@@ -230,7 +260,7 @@ class GuardedDeployTest(unittest.TestCase):
                    'files': {'server.js': deploy.sha(server), **{name: deploy.sha(data) for name, data in modules.items()}}}
         with patch.object(deploy, 'syntax'):
             payload, originals = deploy.plan(self.ftp, release, 'b'*40, transformer=lambda _: server)
-        self.assertEqual(set(payload), deploy.WRITABLE - {'public/app.js', 'public/index.html'})
+        self.assertEqual(set(payload), deploy.WRITABLE - {'public/app.js', 'public/index.html', 'public/style.css'})
         self.assertIsNone(originals['conversation-store.js'])
         self.assertEqual(list(payload)[0], 'conversation-store.js')
         self.assertEqual(list(payload)[-1], 'server.js')

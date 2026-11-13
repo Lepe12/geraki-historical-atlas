@@ -31,10 +31,17 @@ PUBLIC_MODULES = {'conversation-store.js': 'conversation-store.js',
                   'n7-stream-attachments.js': 'stream-attachments.js',
                   'owner-chat-memory.js': 'owner-chat-memory.js',
                   'source-library.js': 'source-library.js',
-                  'n7-release-info.js': 'runtime-release-info.js'}
+                  'n7-release-info.js': 'runtime-release-info.js',
+                  'n7-weather.js': 'weather-tool.js',
+                  'n7-public-web-search.js': 'public-web-search.js',
+                  'n7-semantic-assets.js': 'semantic-assets.js',
+                  'n7-coding-agent.js': 'coding-agent-tool.js'}
 for _skill in ('book-project-canon', 'document-reading-plan', 'claim-evidence-ledger', 'editorial-preservation'):
     PUBLIC_MODULES['skills/' + _skill + '/SKILL.md'] = 'skills/' + _skill + '/SKILL.md'
-WRITABLE = {'server.js', 'public/app.js', 'public/index.html', 'release-manifest.json', *PUBLIC_MODULES}
+# The engineering workflow is distributed with the other reviewed skills (owner decision, no secrets);
+# skills/n7-verified-change/SKILL.md in the canonical repository is kept byte-identical by a test.
+PUBLIC_MODULES['skills/n7-verified-change/SKILL.md'] = 'skills/n7-verified-change/SKILL.md'
+WRITABLE = {'server.js', 'public/app.js', 'public/index.html', 'public/style.css', 'release-manifest.json', *PUBLIC_MODULES}
 LIMIT = 8 * 1024 * 1024
 
 
@@ -84,6 +91,9 @@ def transform_server(original):
         source = source.replace(legacy_guide, '      const history = [\n        ...item.messages,', 1)
     for file in ('chat-storage-patch.json', 'runtime-workflow-patch.json'):
         for patch in json.loads((HERE / file).read_text()):
+            # Already-applied patches are skipped so an installed current release is not re-patched.
+            if patch['new'] and source.count(patch['new']) == 1:
+                continue
             if source.count(patch['old']) == 1:
                 source = source.replace(patch['old'], patch['new'], 1)
             elif not patch['new'] or source.count(patch['new']) != 1:
@@ -99,11 +109,59 @@ def transform_app(original):
     # plan() restricts input to the reviewed previous/current SHA256. Replace only
     # the canonical modern UI and its canonical workflow/voice suffixes.
     prefix = source[:source.index(marker)]
+    # N7_PRESENCE_API_V1: replace the approved-character block only when it is the reviewed
+    # installed revision (or already current); any other content stops the deployment.
+    start = prefix.find('/* N7_APPROVED_CHARACTER_V1')
+    owner = (HERE / 'owner-chat-ui.js').read_text().splitlines()[0]
+    end = prefix.find(owner)
+    if start < 0 or end < start or prefix.count(owner) != 1:
+        raise RuntimeError('N7_PUBLIC_APP_ANCHOR_CHANGED')
+    current = (HERE / 'n7-approved-character.js').read_text().rstrip() + '\n\n\n'
+    block = prefix[start:end]
+    if block != current and sha(block.encode()) not in PREVIOUS_CHARACTER_BLOCKS:
+        raise RuntimeError('N7_UNREVIEWED_CHARACTER_BLOCK')
+    prefix = prefix[:start] + current + prefix[end:]
     tail = (HERE / 'modern-ui.js').read_text().rstrip() + '\n\n'
     tail += (HERE / 'workspace-ui.js').read_text() + '\n'
     tail += (HERE / 'voice-protocol.js').read_text() + '\n'
     tail += (HERE / 'voice-bridge-ui.js').read_text()
+    # N7_HUMANOID_STAGE_V1: command router, NABOU map protocol and the Humanoid entry screen.
+    for name in ('n7-command-router.js', 'n7-map-protocol.js', 'humanoid-stage.js'):
+        tail += '\n' + (HERE / name).read_text()
     return (prefix + tail).encode()
+
+
+# SHA-256 of the installed approved-character block (release 483096c9…, canonical 1ba82fd/f9932e6).
+PREVIOUS_CHARACTER_BLOCKS = {'cdc734194899240f5045266863c16dbcea28f57b0907af17655be264760c0286'}
+# Owner decision 2026-11-13: remove the unreviewed password-free public chat that atlas PR #347
+# (tools/n7_apex_preview/deploy_public_chat.py) installed directly on the live server. Only this
+# exact live variant is accepted, and only if removing those two insertions yields the installed
+# reviewed release byte for byte.
+APEX_PUBLIC_SHIM = ("// N7_APEX_PASSWORDLESS_CHAT_V1\nconst n7ApexPublic=require('./n7-apex-public-chat.cjs')"
+                    ".createApexPublicChat({apiKey:API_KEY,model:MODEL,base:BASE});\n")
+APEX_PUBLIC_GUARD = ("\n  try { if(await n7ApexPublic.handle(req,res)) return; } catch { res.writeHead(500,{'Content-Type':"
+                     "'application/json','Cache-Control':'no-store'});res.end(JSON.stringify({error:'Η συνομιλία δεν ολοκληρώθηκε.'}));return; }\n")
+KNOWN_UNREVIEWED_SERVERS = {'2a4d6c8a6003a13f6b040ff25482516113a90b692372d89baaef7d3298eb05cd'}
+
+
+def remove_apex_public(source):
+    text = source.decode('utf8')
+    if text.count(APEX_PUBLIC_SHIM) != 1 or text.count(APEX_PUBLIC_GUARD) != 1:
+        raise RuntimeError('N7_UNREVIEWED_LIVE_SERVER')
+    return text.replace(APEX_PUBLIC_SHIM, '', 1).replace(APEX_PUBLIC_GUARD, '', 1).encode()
+
+
+STAGE_CSS_MARKER = '/* N7_HUMANOID_STAGE_V1'
+
+
+def transform_css(original):
+    # N7_HUMANOID_STAGE_V1: the canonical stylesheet is the installed one plus the stage styles.
+    source = original.decode('utf8')
+    stage = (HERE / 'humanoid-stage.css').read_text()
+    if source.count(STAGE_CSS_MARKER) > 1:
+        raise RuntimeError('N7_PUBLIC_CSS_ANCHOR_CHANGED')
+    prefix = source[:source.index(STAGE_CSS_MARKER)] if STAGE_CSS_MARKER in source else source + '\n'
+    return (prefix + stage).encode()
 
 
 def syntax(data):
@@ -132,6 +190,7 @@ def plan(ftp, release, canonical_commit, transformer=transform_server):
         raise RuntimeError('N7_CANONICAL_COMMIT_REQUIRED')
     originals = {}
     previous_files = release.get('previous_files', {})
+    server_input = None
     for name, expected in release['files'].items():
         mutable = name in WRITABLE
         current = read(ftp, name, optional=mutable and name not in previous_files and name != 'server.js')
@@ -139,12 +198,17 @@ def plan(ftp, release, canonical_commit, transformer=transform_server):
             allowed = {expected, previous_files.get(name)} - {None}
             if name == 'server.js':
                 allowed.add(release['previous_server_sha256'])
-            if current is not None and sha(current) not in allowed:
+            if name == 'server.js' and current is not None and sha(current) in KNOWN_UNREVIEWED_SERVERS:
+                reverted = remove_apex_public(current)
+                if sha(reverted) != previous_files.get('server.js'):
+                    raise RuntimeError('N7_UNREVIEWED_LIVE_SERVER')
+                server_input = reverted
+            elif current is not None and sha(current) not in allowed:
                 raise RuntimeError('N7_UNREVIEWED_LIVE_SERVER' if name == 'server.js' else 'N7_RUNTIME_DRIFT ' + name)
             originals[name] = current
         elif current is None or sha(current) != expected:
             raise RuntimeError('N7_RUNTIME_DRIFT ' + name)
-    previous = originals['server.js']
+    previous = server_input if server_input is not None else originals['server.js']
     server = previous if sha(previous) == release['files']['server.js'] else transformer(previous)
     payload = {}
     for name, source in PUBLIC_MODULES.items():
@@ -171,6 +235,13 @@ def plan(ftp, release, canonical_commit, transformer=transform_server):
             raise RuntimeError('N7_PUBLIC_APP_OUTPUT_MISMATCH')
         syntax(app)
         payload['public/app.js'] = app
+    if 'public/style.css' in originals:
+        css = originals['public/style.css']
+        if css is None or sha(css) != release['files']['public/style.css']:
+            css = transform_css(css or b'')
+        if sha(css) != release['files']['public/style.css']:
+            raise RuntimeError('N7_PUBLIC_CSS_OUTPUT_MISMATCH')
+        payload['public/style.css'] = css
     if 'public/index.html' in originals:
         import runpy
         versioner = runpy.run_path(str(HERE / 'asset_version.py'))
@@ -376,13 +447,37 @@ def public_preview(ftp, release, payload, destination):
     print('N7_PUBLIC_PREVIEW_VERIFIED source_hashes=true private_files_exported=0')
 
 
+def diagnose_server(source, release):
+    """Dry-run only, when the live server is not a reviewed release: structural facts, never code text."""
+    text = source.decode('utf8', 'replace')
+    print('N7_DIAG_SERVER sha256=' + sha(source) + ' bytes=' + str(len(source)) + ' lines=' + str(text.count('\n')))
+    print('N7_DIAG_SERVER previous=' + release.get('previous_files', {}).get('server.js', '')[:12] +
+          ' previous_server=' + release.get('previous_server_sha256', '')[:12] + ' target=' + release['files']['server.js'][:12])
+    print('N7_DIAG_MARKERS ' + ','.join(sorted(set(re.findall(r'N7_[A-Z0-9_]+_V[0-9]+', text)))))
+    print('N7_DIAG_ROUTES ' + ','.join(sorted(set(re.findall(r"p\s*===?\s*'(/[a-z0-9/_.-]{1,60})'", text)))))
+    for file in ('chat-storage-patch.json', 'runtime-workflow-patch.json'):
+        for i, patch in enumerate(json.loads((HERE / file).read_text())):
+            print('N7_DIAG_PATCH %s#%d old=%d new=%d id=%s' % (file, i, text.count(patch['old']), text.count(patch['new']) if patch['new'] else -1,
+                                                           hashlib.sha256(patch['old'].encode()).hexdigest()[:8]))
+    try:
+        out = transform_server(source)
+        print('N7_DIAG_TRANSFORM sha256=' + sha(out) + ' equals_target=' + str(sha(out) == release['files']['server.js']))
+    except RuntimeError as error:
+        print('N7_DIAG_TRANSFORM error=' + str(error))
+
+
 def main():
     release = contract()
     commit = os.environ['N7_CANONICAL_COMMIT']
     dry = os.getenv('N7_DRY_RUN', '1') != '0'
     ftp = connect()
     try:
-        payload, originals = plan(ftp, release, commit)
+        try:
+            payload, originals = plan(ftp, release, commit)
+        except RuntimeError as error:
+            if dry and str(error) == 'N7_UNREVIEWED_LIVE_SERVER':
+                diagnose_server(read(ftp, 'server.js'), release)
+            raise
         verify(release, commit, active=False)
         print('N7_CANONICAL_PREFLIGHT_OK dry_run=' + str(dry) + ' runtime_files=' + str(len(release['files'])))
         preview = os.getenv('N7_PREVIEW_PUBLIC_DIR')

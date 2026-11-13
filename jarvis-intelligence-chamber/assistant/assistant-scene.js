@@ -278,8 +278,9 @@ export async function createHologram(canvas, opts = {}) {
   return {
     get active() { return st.target === 1; },
     get morph() { return st.morph; },
-    show(seconds) { st.target = 1; st.morphDur = seconds > 0 ? seconds : 2.4; }, hide() { st.target = 0; st.morphDur = 2.4; },
-    jump(v) { st.morph = st.target = v; },
+    // The cartographer portrait is withdrawn: N7's presence is the approved Humanoid. Only the orb remains.
+    show() { st.target = 0; }, hide() { st.target = 0; st.morphDur = 2.4; },
+    jump() { st.morph = st.target = 0; },
     turn(dir) { st.tYaw = Math.max(-0.45, Math.min(0.45, dir === 0 ? 0 : st.tYaw + dir * 0.3)); },
     look(pitch) { st.tPitch = pitch; },
     nod() { st.nodUntil = performance.now() + 1200; },

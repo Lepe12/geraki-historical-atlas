@@ -65,7 +65,7 @@ function classify(messages,at=new Date()){
   const isContinuation=last.length<95 && /^(?:και\s+(?:τι|αυτό|για|πώς|ποιος|ποια)|τι\s+έγινε\s+με\s+αυτό|συνέχισε|τι\s+εννοείς|δηλαδή|από\s+πού|ποιες\s+πηγές|δώσε\s+μου\s+πηγές|εννοώ\s+τις|εννοώ\s+τα|εννοώ\s+αυτ|more\s+on\s+that|and\s+what)/iu.test(last);
   const context=isContinuation?compact(prior+' '+last,550):last;
   const explicit=/(?:ψάξε|αναζήτησε|βρες\s+(?:στο\s+)?(?:διαδίκτυο|πηγές|online)|έλεγξε\s+(?:στο\s+)?(?:ίντερνετ|διαδίκτυο)|search\s+(?:the\s+)?web|look\s+up|πηγές\s+στο\s+διαδίκτυο)/iu.test(last);
-  const current=/(?:χθεσιν|χθες|σήμερα|προχθές|φέτος|πρόσφατ|τελευταί|τρέχον|τωριν|αυτή\s+την\s+εβδομάδα|εξελίξε|είδησ|νέα\s+για|εκλογ|πρόεδρ|κυβέρνησ|αποτελέσματ|latest|recent|breaking|yesterday|today|now|current|election|midterm|president|news|result)/iu.test(context);
+  const current=/(?:χθεσιν|χθες|σήμερα|σημεριν|προχθές|ειδήσ|ειδησ|φέτος|πρόσφατ|τελευταί|τρέχον|τωριν|αυτή\s+την\s+εβδομάδα|εξελίξε|είδησ|νέα\s+για|εκλογ|πρόεδρ|κυβέρνησ|αποτελέσματ|latest|recent|breaking|yesterday|today|now|current|election|midterm|president|news|result)/iu.test(context);
   const history=/(?:τι\s+ξέρεις\s+για|ποιος\s+(?:ήταν|είναι)|ποια\s+(?:ήταν|είναι)|ιστορικ|κουρσάρ|πειρατ|μεσαιων|αναγέννησ|16(?:ος|ου)|17(?:ος|ου)|archiv|historical|corsair|pirat|history|lanz|lantz|λάντζ|πετρο\s+λαντζ|pietro\s+lanza|πέτρο\s+λάντζ)/iu.test(context);
   const directUrls=[...last.matchAll(/https:\/\/[^\s<>"'\[\]]+/gu)].map(x=>safeLink(x[0].replace(/[).,;]+$/,''))).filter(Boolean).slice(0,3);
   if(!explicit&&!current&&!history&&!directUrls.length)return null;
@@ -84,7 +84,12 @@ function classify(messages,at=new Date()){
   }else if(kind==='news'&&!/\b20\d{2}\b/.test(query)){
     query=compact(query+' '+year,MAX_QUERY);
   }
-  return {query,kind,userText:last,historicalLanza:lanza,directUrls};
+  // N7_GENERIC_NEWS_V1: "today's news" with no subject reads the Greek top-stories feed.
+  const subject=context.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/ς/g,'σ')
+    .replace(/(?<![\p{L}])(?:πεσ|δωσε|δειξε|θελω|ποιεσ|ποια|ποιοι|τι|μου|μασ|τισ|τα|οι|ειναι|υπαρχουν|σημεριν\p{L}*|σημερα|ειδησ\p{L}*|νεα|τελευται\p{L}*|news|today|latest|the|ν7|n7)(?![\p{L}])/gu,' ')
+    .replace(/[^\p{L}\p{N}]+/gu,'');
+  const generic=kind==='news'&&!election&&subject.length<3;
+  return {query,kind,userText:last,historicalLanza:lanza,directUrls,generic};
 }
 async function boundedFetch(url,{transport=fetch,timeout=TIMEOUT}={}){
   const uri=new URL(url);
@@ -137,7 +142,9 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
   const request=classify(messages,now);
   if(!request)return {searched:false,items:[],reason:'not_needed'};
   const q=encodeURIComponent(request.query);
-  const targets=request.kind==='news'?[
+  const targets=request.generic?[
+    {name:'Google News (Ελλάδα)',url:'https://news.google.com/rss?hl=el&gl=GR&ceid=GR:el',rss:true}
+  ]:request.kind==='news'?[
     {name:'Bing News',url:'https://www.bing.com/news/search?q='+q+'&format=rss',rss:true},
     {name:'Google News',url:'https://news.google.com/rss/search?q='+q+'&hl=en-US&gl=US&ceid=US:en',rss:true},
     {name:'Bing Web',url:'https://www.bing.com/search?q='+q+'&format=rss',rss:true}
