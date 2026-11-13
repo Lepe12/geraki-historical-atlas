@@ -185,10 +185,10 @@ async function library(r){
    places:R.linkPlaces(m.excerpt).map(p=>({id:p.id,name:p.name,atlas:p.atlas}))});return k;};
  // 1. Exact names, toponyms and historical spellings: one lexical list ordered by match count.
  const lexScore=new Map();
- for(const term of (r.terms||[]).slice(0,4)){
+ for(const term of (r.terms||[]).slice(0,8)){
   stateLine.textContent='Βιβλιοθήκη · αναζήτηση «'+term+'»';
   try{const d=await call('/api/library/search',{query:term});counts={sources:d.source_count,pages:d.page_count};layers.lexical=true;
-   for(const m of d.matches||[]){const k=keep(m,'lexical');rows.get(k).terms.push(term);lexScore.set(k,Math.max(lexScore.get(k)||0,m.relevance_score||0));}}
+   for(const m of d.matches||[]){const k=keep(m,'lexical');rows.get(k).terms.push(term);lexScore.set(k,(lexScore.get(k)||0)+(m.relevance_score||0));}}
   catch(e){errors.push('«'+term+'»: '+e.message);}
  }
  const lexical=[...lexScore].sort((a,b)=>b[1]-a[1]).map(x=>x[0]);
