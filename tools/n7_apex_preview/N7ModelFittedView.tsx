@@ -95,8 +95,10 @@ export default function N7ModelFittedView(props:Props){
       float b=smoothstep(d-28.,d+28.,age*430.);
       vec3 front=mix(pick(from),pick(mood),b);
       vec3 sideCol=texture2D(side,clamp(sideUV,0.,1.)).rgb;
-      // The profile's gold face curve belongs to the face only, not to the hair or neck.
-      float sideFace=smoothstep(186.,200.,sideUV.x*320.)*(1.-smoothstep(205.,225.,sideUV.y*480.));
+      // On the head the face's gold comes from the front picture only; the
+      // profile's gold face curve would land on the temples, so there it turns
+      // cyan. Below the jaw the profile keeps its gold neck and chest lines.
+      float sideFace=smoothstep(200.,214.,sideUV.y*480.);
       sideCol=mix(sideCol,vec3(dot(sideCol,vec3(.10,.45,.45)))*vec3(.4,.9,1.1),(1.-sideFace)*step(sideCol.b*1.15,sideCol.r));
       vec3 backCol=texture2D(back,clamp(backUV,0.,1.)).rgb;
       vec3 col=front*wts.x+sideCol*wts.y+backCol*wts.z;
