@@ -27,6 +27,23 @@
         if (/[?&]welcome=1/.test(location.search)) document.documentElement.classList.add("v2-welcome-on");
       })();
     </script>
+    <script>
+      /* N7_SPLIT_MAP_V1: only when the authenticated N7 page embeds this chart with its #n7map link.
+         Ordinary visits are unchanged. The N7 link itself verifies origin, source and nonce. */
+      (function () {
+        if (window.parent === window || !/[#&]n7map=/.test(location.hash)) return;
+        window.N7_EMBED = true;
+        document.documentElement.classList.add("n7-embed");
+        for (const href of ["../nabou-embed.css?v=n7-split-3d-1", "./n7-embed.css?v=n7-split-3d-1"]) {
+          const l = document.createElement("link"); l.rel = "stylesheet"; l.href = href; document.head.append(l);
+        }
+        addEventListener("DOMContentLoaded", function () {
+          for (const src of ["./n7-embed-map.js?v=n7-split-3d-1", "../tools/n7/atlas-embed-panel.js?v=n7-split-3d-1"]) {
+            const sc = document.createElement("script"); sc.src = src; sc.async = false; document.body.append(sc);
+          }
+        });
+      })();
+    </script>
     <link rel="preload" href="./assets/nautical/fonts/EBGaramond.woff2" as="font" type="font/woff2" crossorigin />
     <script type="importmap">
       { "imports": { "./live-bridge.js": "./live-bridge.js?v=research-progress-1", "./my-research.js": "./my-research.js?v=research-progress-1", "./research-overview.js": "./research-overview.js?v=research-progress-1", "./research-narrative-view.js": "./research-narrative-view.js?v=research-progress-1", "./research-narrative-panel.js": "./research-narrative-panel.js?v=research-progress-1" } }

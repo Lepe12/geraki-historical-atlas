@@ -1,7 +1,7 @@
 'use strict';
-// N7_SPLIT_MAP_V1 browser test: «Δείξε μου την Κέρκυρα» -> N7 rises into a strip, the real NABOU atlas
-// (atlas checkout, real data.json, real MapLibre 4.7.1) opens below in an iframe and the camera flies to
-// the data.json record. Real assembled N7 runtime with a loopback model fixture. No network is used:
+// N7_SPLIT_MAP_V1 browser test: «Δείξε μου την Κέρκυρα» -> N7 rises into a strip, the NABOU chamber chart
+// in 3D (atlas checkout, vendored three.js, WebGL via SwiftShader) opens below in an iframe with the real
+// data.json records on it, and the 3D camera centres on the stored record. Real assembled N7 runtime with a loopback model fixture. No network is used:
 // MapLibre is served from the npm package; base tiles are replaced by a local Natural Earth land layer
 // (world-atlas), a TEST FIXTURE only — the live atlas keeps its own tiles.
 // Env: N7_ATLAS_DIR (atlas checkout), N7_MAPLIBRE_DIR (node_modules with maplibre-gl@4.7.1, world-atlas,
@@ -56,7 +56,7 @@ function fixtureAsset(url){
   const all=JSON.stringify(r.messages||[]);prompts.push(all);
   const m=all.match(/Πλαίσιο από τον χάρτη NABOU[^{]*(\{[^}]*\})/);
   let answer='Γεια σου. Είμαι ο N7 (απάντηση δοκιμαστικού μοντέλου).';
-  if(m){const c=JSON.parse(JSON.parse('"'+m[1]+'"'));answer='[Δοκιμαστικό μοντέλο] '+c.place+' ('+c.historicalNames+'): το σημείο στον χάρτη είναι '+c.coordinateStatus+'. Πηγή: εγγραφή NABOU (data.json).';}
+  if(m){const c=JSON.parse(JSON.parse('"'+m[1]+'"'));answer='[Δοκιμαστικό μοντέλο] '+c.place+' ('+c.historicalNames+'): το σημείο στον χάρτη είναι '+c.coordinateStatus+'. Πηγή: εγγραφή NABOU (data.json). Τρίτη πρόταση. Τέταρτη πρόταση, μόνο στη συνομιλία.';}
   if(r.stream){res.writeHead(200,{'Content-Type':'text/event-stream'});return res.end('data: '+JSON.stringify({choices:[{delta:{content:answer},finish_reason:null}]})+'\n\ndata: [DONE]\n\n');}
   res.writeHead(200,{'Content-Type':'application/json'});res.end(JSON.stringify({choices:[{message:{content:answer},finish_reason:'stop'}]}));});
  await new Promise(r=>provider.listen(0,'127.0.0.1',r));
@@ -71,9 +71,12 @@ function fixtureAsset(url){
  const style=JSON.stringify(fixtureStyle());
  const viaRuntime=(req,url)=>new Promise((resolve,reject)=>{
   const r=http.request({host:'127.0.0.1',port,method:req.method(),path:url.pathname+url.search,headers:{...req.headers(),host:'bot.piratecartography.com'}},x=>{const ch=[];x.on('data',c=>ch.push(c));
-   x.on('end',()=>{const h={};for(const [k,v] of Object.entries(x.headers))h[k]=Array.isArray(v)?v.join('\n'):String(v);resolve({status:x.statusCode,headers:h,body:Buffer.concat(ch)});});});
+   x.on('end',()=>{const h={};for(const [k,v] of Object.entries(x.headers))h[k]=Array.isArray(v)?v.join('\n'):String(v);
+    // N7_STATIC_CSP_V1: N7_SIMULATE_NGINX_STATIC=1 serves non-API files without the server's CSP header,
+    // as nginx does on the host, so only the policy inside the page applies.
+    if(process.env.N7_SIMULATE_NGINX_STATIC==='1'&&!url.pathname.startsWith('/api/'))delete h['content-security-policy'];resolve({status:x.statusCode,headers:h,body:Buffer.concat(ch)});});});
   r.on('error',reject);const b=req.postDataBuffer();if(b)r.write(b);r.end();});
- const browser=await chromium.launch();
+ const browser=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const external=new Set();
  async function newContext(viewport){
   const context=await browser.newContext({viewport,locale:'el-GR'});
@@ -95,10 +98,13 @@ function fixtureAsset(url){
    const fx=fixtureAsset(url);if(fx)return route.fulfill({status:200,...fx});
    external.add(url.host);return route.abort(); // hermetic: no other host is reached
   });
+  // Hermetic: the chamber's live bridge WebSocket never leaves the browser.
+  await context.routeWebSocket(/.*/,ws=>ws.close());
   return context;
  }
  const context=await newContext({width:1440,height:900});
  const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(String(e)));
+ if(process.env.N7_DEBUG)page.on('console',m=>console.log('console:',m.type(),m.text().slice(0,200)));
  const shot=async(name,p=page)=>{if(shots){fs.mkdirSync(shots,{recursive:true});await p.screenshot({path:path.join(shots,name)});}};
  const frame=()=>page.frames().find(f=>f.url().startsWith(ATLAS));
  const camera=async()=>frame().evaluate(()=>window.NABOU_MAP.camera());
@@ -126,7 +132,14 @@ function fixtureAsset(url){
   const cam=await camera();
   const st=await page.evaluate(()=>JSON.parse(localStorage.getItem('n7-shared-state-v1')).place);
   assert.equal(st.record,corfu.id);
-  assert.ok(Math.abs(cam.lng-corfu.lon)<0.01&&Math.abs(cam.lat-corfu.lat)<0.01&&cam.zoom>=7,'camera '+JSON.stringify(cam));
+  assert.ok(Math.abs(cam.lng-corfu.lon)<0.001&&Math.abs(cam.lat-corfu.lat)<0.001,'camera '+JSON.stringify(cam));
+  // The real 3D scene moved: closer and tilted, as the hook asked through NABOU_MAP3D.camera.
+  const pose=await frame().evaluate(()=>{const p=window.NABOU_MAP3D.camera();return {on:window.NABOU_MAP3D.enabled,dist:p.dist,tilt:p.tilt};});
+  assert.ok(pose.on&&Math.abs(pose.dist-2.4)<0.05&&Math.abs(pose.tilt-48)<1,'3D pose '+JSON.stringify(pose));
+  if(process.env.N7_DEBUG)console.log('evalpanel:',await frame().evaluate(async()=>{try{const t=await (await fetch('../tools/n7/atlas-embed-panel.js?x='+Date.now())).text();(0,eval)(t);return 'ok bars='+document.querySelectorAll('.n7e-bar').length+' len='+t.length;}catch(e){return 'ERR '+e.message;}}));
+  const head=(await frame().textContent('#n7ePlace')).replace(/\s+/g,' ');assert.ok(head.includes('Corfu')&&head.includes('κατά προσέγγιση'),head);
+  assert.equal(await frame().locator('.n7e-cartouche').count(),0,'no frame over the map on the right');
+  assert.ok(!reply.includes('Τέταρτη πρόταση')&&await page.isVisible('.n7-reply-more'),'panel shows the first sentences, the full answer is one click away');
   const title=await page.textContent('#n7MapDockTitle');
   assert.match(title,/κατά προσέγγιση/);
   assert.match(reply,/Corfu/);
@@ -134,7 +147,7 @@ function fixtureAsset(url){
   const layout=await page.evaluate(()=>{const r=id=>document.getElementById(id).getBoundingClientRect();return {fig:r('n7StageFigure'),dock:r('n7MapDock'),reply:r('n7StageReply'),vh:innerHeight};});
   assert.ok(layout.fig.bottom<=layout.dock.top&&layout.dock.height>layout.vh*0.4,'N7 strip above, map below '+JSON.stringify(layout));
   await page.waitForTimeout(600);await shot('split-3-final.png');
-  record('S2','«Δείξε μου την Κέρκυρα» → split, zoom στην Κέρκυρα','PASS',`εγγραφή ${corfu.id} (${corfu.coordinateStatus}); κάμερα ${cam.lng.toFixed(4)},${cam.lat.toFixed(4)} z${cam.zoom.toFixed(2)} ≈ data.json ${corfu.lon},${corfu.lat}; καρτέλα «${title}»; απάντηση: «${reply.slice(0,90)}»`);
+  record('S2','«Δείξε μου την Κέρκυρα» → split, 3D χάρτης στην Κέρκυρα','PASS',`εγγραφή ${corfu.id} (${corfu.coordinateStatus}); στόχος κάμερας ${cam.lng},${cam.lat} = data.json ${corfu.lon},${corfu.lat}; 3D: κλίση ${pose.tilt.toFixed(0)}°, απόσταση ${pose.dist.toFixed(2)}; καρτέλα «${title}»; απάντηση: «${reply.slice(0,90)}»`);
 
   // Unknown place: said, not placed; the camera does not move.
   const before=await camera();
@@ -148,10 +161,10 @@ function fixtureAsset(url){
   await page.waitForTimeout(1500);
   assert.deepEqual(await camera(),after);
   // The map hook exists only inside the N7 frame: an ordinary visit loads no N7 script.
-  const plain=await context.newPage();await plain.goto(ATLAS+'/geraki-historical-atlas/');await plain.waitForTimeout(1500);
-  const plainN7=await plain.evaluate(()=>({link:!!window.N7MapProtocol,embed:document.documentElement.classList.contains('n7-embed')}));
-  assert.deepEqual(plainN7,{link:false,embed:false});await plain.close();
-  record('S4','Ασφάλεια πρωτοκόλλου','PASS','map_focus με λάθος nonce αγνοήθηκε· κανονική επίσκεψη στον άτλαντα χωρίς N7 scripts');
+  const plain=await context.newPage();await plain.goto(ATLAS+'/geraki-historical-atlas/jarvis-intelligence-chamber/');await plain.waitForTimeout(2500);
+  const plainN7=await plain.evaluate(()=>({hook:!!window.NABOU_MAP,embed:document.documentElement.classList.contains('n7-embed'),bar:!!document.querySelector('.n7e-bar')}));
+  assert.deepEqual(plainN7,{hook:false,embed:false,bar:false});await plain.close();
+  record('S4','Ασφάλεια πρωτοκόλλου','PASS','map_focus με λάθος nonce αγνοήθηκε· κανονική επίσκεψη στο chamber χωρίς τη λειτουργία ενσωμάτωσης');
 
   // Side bar tabs: every value is an existing data.json field; missing fields stay empty.
   const fr=frame();

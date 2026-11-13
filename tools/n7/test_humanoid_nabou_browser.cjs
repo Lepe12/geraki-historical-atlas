@@ -65,7 +65,10 @@ const allPages=()=>bookPages.split(',').flatMap(f=>{const d=JSON.parse(fs.readFi
  const frontPort=front.address().port,FRONT='http://127.0.0.1:'+frontPort;
  const viaFront=(req,url)=>new Promise((resolve,reject)=>{
   const r=http.request({host:'127.0.0.1',port:frontPort,method:req.method(),path:url.pathname+url.search,headers:{...req.headers(),host:'bot.piratecartography.com'}},x=>{const ch=[];x.on('data',c=>ch.push(c));
-   x.on('end',()=>{const h={};for(const [k,v] of Object.entries(x.headers))h[k]=Array.isArray(v)?v.join('\n'):String(v);resolve({status:x.statusCode,headers:h,body:Buffer.concat(ch)});});});
+   x.on('end',()=>{const h={};for(const [k,v] of Object.entries(x.headers))h[k]=Array.isArray(v)?v.join('\n'):String(v);
+    // N7_STATIC_CSP_V1: N7_SIMULATE_NGINX_STATIC=1 serves non-API files without the server's CSP header,
+    // as nginx does on the host, so only the policy inside the page applies.
+    if(process.env.N7_SIMULATE_NGINX_STATIC==='1'&&!url.pathname.startsWith('/api/'))delete h['content-security-policy'];resolve({status:x.statusCode,headers:h,body:Buffer.concat(ch)});});});
   r.on('error',reject);const b=req.postDataBuffer();if(b)r.write(b);r.end();});
  const browser=await chromium.launch();
  const context=await browser.newContext({viewport:{width:1440,height:900},locale:'el-GR'});
