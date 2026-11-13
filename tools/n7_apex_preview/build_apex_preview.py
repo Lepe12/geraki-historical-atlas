@@ -193,6 +193,15 @@ def main():
         shutil.copy2(overlay/"assets/N7-3D-NOTICE.txt",out/"public/N7-3D-NOTICE.txt")
         (out/"app/avatar-3d").mkdir(parents=True,exist_ok=True)
         (out/"app/avatar-3d/page.tsx").write_text('import N7RealAvatar from "@/components/N7RealAvatar";\nexport default function RealAvatar(){return <N7RealAvatar/>;}\n')
+        # Isolated evaluation of the owner's 3D model (prepare_model_test.py); separate route.
+        for name in ("N7ModelTest.tsx","N7ModelTestView.tsx"):
+            shutil.copy2(overlay/name,out/"components"/name)
+        model=(overlay/"assets/n7-model-textured-v1.glb").read_bytes()
+        if hashlib.sha256(model).hexdigest()!="659017150e31a797ee8743384a1ed9bd253ab5e8f1514ac595a3c3344b054837":
+            raise RuntimeError("wrong model test asset")
+        (out/"public/n7-model-textured-v1.glb").write_bytes(model)
+        (out/"app/model-3d").mkdir(parents=True,exist_ok=True)
+        (out/"app/model-3d/page.tsx").write_text('import N7ModelTest from "@/components/N7ModelTest";\nexport default function ModelTest(){return <N7ModelTest/>;}\n')
     shutil.copy2(overlay/"assets/n7-mountain-backdrop.webp",out/"public/n7-mountain-backdrop.webp")
     if isolated:
         # Visual trial: the designed N7 environment and the H01 second face option.

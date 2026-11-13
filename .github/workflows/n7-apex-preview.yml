@@ -320,6 +320,13 @@ jobs:
           N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
           N7_FACE_OUT: ${{ runner.temp }}/n7-apex-evidence/face-menu
         run: node tools/n7_apex_preview/test_face_menu.cjs
+      - name: Verify the owner's 3D model test page beside the unchanged Humanoid
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        env:
+          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
+          N7_MODEL_OUT: ${{ runner.temp }}/n7-apex-evidence/model-3d
+        run: node tools/n7_apex_preview/test_model_3d.cjs
       - name: Preserve visual evidence
         if: always() && startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
         uses: actions/upload-artifact@v4
