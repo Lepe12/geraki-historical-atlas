@@ -13,7 +13,7 @@ const FIT='[aria-label="N7 3D προσαρμοσμένο"]',RAW='[aria-label="N7
   const t0=Date.now();await p.goto(base+'/model-3d/',{waitUntil:'domcontentloaded'});
   await p.waitForFunction(s=>document.querySelector(s)?.dataset.ready==='true',FIT,{timeout:120000});
   const v=p.locator(FIT),ds=await v.evaluate(e=>({...e.dataset}));const result={url:base+'/model-3d/',readyMs:Date.now()-t0,model:ds,errors};
-  assert.equal(ds.rig,'added-chest-neck-skull');assert.equal(ds.style,'approved-art-projected');
+  assert.equal(ds.rig,'added-chest-neck-skull');assert.equal(ds.style,'approved-front-profile-back');
   const grab=async()=>PNG.sync.read(Buffer.from((await v.evaluate(h=>h.querySelector('canvas').toDataURL())).split(',')[1],'base64'));
   const frac=(a,z,y0,y1)=>{let d=0,n=0;for(let y=Math.floor(a.height*y0);y<Math.floor(a.height*y1);y++)for(let x=0;x<a.width;x++){const i=(y*a.width+x)*4;n++;if(Math.abs(a.data[i]-z.data[i])+Math.abs(a.data[i+1]-z.data[i+1])+Math.abs(a.data[i+2]-z.data[i+2])>30)d++;}return d/n;};
   const box=await v.boundingBox();

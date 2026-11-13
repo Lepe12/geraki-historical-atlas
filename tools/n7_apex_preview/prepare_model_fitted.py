@@ -10,7 +10,8 @@ mesh, UVs and its own texture (used only for the sides and back), and:
 2. Stretches the head above the chin so the hair tops meet, then reshapes it row by row so its front outline follows the approved figure's
    outline (hair, head, neck, shoulders), with a smooth width curve; depth is
    scaled with half the same factor so the volume stays rounded.
-3. Leaves everything else, including the figure's proportions in the picture,
+3. With --profile, maps each row's depth onto the owner's approved profile outline.
+4. Leaves everything else, including the figure's proportions in the picture,
    to the picture itself, which the viewer projects onto the front.
 
 Output: a GLB with Y-up positions in picture units (1 unit = 1 picture pixel,
@@ -40,7 +41,7 @@ def smooth_rows(v, k=9):
 
 
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument("--out", required=True); args = ap.parse_args()
+    ap = argparse.ArgumentParser(); ap.add_argument("--out", required=True); ap.add_argument("--profile"); args = ap.parse_args()
     src = HERE / "assets/n7-model-textured-v1.glb"; b = src.read_bytes()
     if hashlib.sha256(b).hexdigest() != SRC_SHA: raise SystemExit("unexpected source model")
     clen = struct.unpack("<I", b[12:16])[0]; j = json.loads(b[20:20 + clen]); bin0 = 20 + clen + 8
@@ -84,6 +85,55 @@ def main():
     yi = np.clip(py, 0, 479); s = np.interp(yi, rows, sx); c = np.interp(yi, rows, cx)
     nx = 160 + (px - 160) * s + c
     depth = P[:, 2] * SCALE * (1 + (s - 1) * .5)
+    report_side = {}
+    if args.profile:
+        # 4. Side shape from the owner's approved profile picture (facing right,
+        #    so its right edge is the front). Each row's depth range is mapped
+        #    onto the profile's outline in that row; rows are aligned on the
+        #    hair top and the neck, measured in both pictures.
+        prof = np.array(Image.open(args.profile).convert("RGB").resize((320, 480), Image.LANCZOS)).astype(float).max(axis=2) > 70
+        def edges(mask):
+            L = np.full(480, np.nan); R = L.copy()
+            for y in range(480):
+                xs = np.where(mask[y])[0]
+                if len(xs) > 1: L[y], R[y] = xs.min(), xs.max()
+            return L, R
+        pL, pR = edges(prof)
+        ptop = int(np.where(~np.isnan(pL))[0].min()); atop = int(np.where((art > 70).any(1))[0].min())
+        pw = np.where(np.isnan(pL), 999, pR - pL); pneck = 150 + int(np.argmin(pw[150:260]))
+        aw = np.array([((art[y] > 70).sum()) for y in range(480)]); aneck = 207
+        # picture row -> profile row
+        to_prof = lambda r: ptop + (r - atop) * (pneck - ptop) / (aneck - atop)
+        valid = ~np.isnan(pL)
+        pL = smooth_rows(np.interp(rows, rows[valid], pL[valid]), 6); pR = smooth_rows(np.interp(rows, rows[valid], pR[valid]), 6)
+        centre = float(np.mean((pL[215:246] + pR[215:246]) / 2))   # neck column centre -> depth 0
+        # model depth range per picture row (vertex based)
+        zmin = np.full(480, np.nan); zmax = zmin.copy(); r_i = np.clip(np.round(py).astype(int), 0, 479)
+        for r in range(480):
+            sel = r_i == r
+            if sel.sum() > 3: zmin[r], zmax[r] = depth[sel].min(), depth[sel].max()
+        ok = ~np.isnan(zmin)
+        zmin = smooth_rows(np.interp(rows, rows[ok], zmin[ok]), 8); zmax = smooth_rows(np.interp(rows, rows[ok], zmax[ok]), 8)
+        pr = np.clip(to_prof(py), 0, 479)
+        back, front = np.interp(pr, rows, pL) - centre, np.interp(pr, rows, pR) - centre
+        lo, hi = np.interp(py, rows, zmin), np.interp(py, rows, zmax)
+        f = np.clip((depth - lo) / np.maximum(1, hi - lo), 0, 1)
+        depth = back + f * (front - back)
+        # 5. Smooth N7 face. The model's own nose, lips and cheeks are replaced
+        #    by a smooth mask inside the approved face oval (centre 160,140;
+        #    half-axes 62 x 92 px): depth follows the profile's front edge in
+        #    the centre and falls off smoothly to the sides, blended out at the
+        #    oval's rim so it joins the rest of the head.
+        fx = (nx - 160) / 62.0; fy = (py - 140) / 92.0; rho = np.sqrt(fx ** 2 + fy ** 2)
+        frontish = depth > (back + front) / 2
+        mask_w = np.clip((1.0 - rho) / .22, 0, 1); mask_w = mask_w * mask_w * (3 - 2 * mask_w) * frontish
+        # Stop above the jaw line so the chin and neck keep the model's shape (no folds).
+        mask_w *= 1 - np.clip((py - 178) / 18.0, 0, 1)
+        face_front = np.interp(np.clip(to_prof(np.full_like(py, 150.0)), 0, 479), rows, pR) - centre
+        smooth_face = face_front - 30.0 * fx ** 2 - 10.0 * np.clip(fy, 0, None) ** 2
+        depth = depth * (1 - mask_w) + smooth_face * mask_w
+        report_side["face_vertices_smoothed"] = int((mask_w > .5).sum())
+        report_side = {"profile_centre_px": round(centre, 1), "profile_rows": {"top": ptop, "neck": pneck}, "art_rows": {"top": atop, "neck": aneck}}
     out = np.stack([nx - 160, -(py), depth], 1).astype("<f4")   # picture units, y up, origin at picture (160,0)
     binary[poff:poff + pa["count"] * 12] = out.tobytes()
     pa["min"] = out.min(0).tolist(); pa["max"] = out.max(0).tolist()
@@ -102,7 +152,7 @@ def main():
     tgt2 = np.zeros_like(tgt)
     for y in rows:
         if not np.isnan(tL[y]): tgt2[y, int(tL[y]):int(tR[y]) + 1] = True
-    print(json.dumps({"out": args.out, "bytes": len(glb), "sha256": hashlib.sha256(glb).hexdigest(), "iou_before": round(iou(m), 3), "iou_after": round(iou(m2), 3), "rows": [int(lo), int(hi)], "width_factor_range": [round(float(sx.min()), 3), round(float(sx.max()), 3)], "head_height_factor": round(head_stretch, 3)}))
+    print(json.dumps({"out": args.out, "bytes": len(glb), "sha256": hashlib.sha256(glb).hexdigest(), "iou_before": round(iou(m), 3), "iou_after": round(iou(m2), 3), "rows": [int(lo), int(hi)], "width_factor_range": [round(float(sx.min()), 3), round(float(sx.max()), 3)], "head_height_factor": round(head_stretch, 3), **report_side}))
     viz = np.zeros((480, 320, 3), np.uint8); viz[..., 0] = tgt2 * 200; viz[..., 1] = m2 * 200; viz[..., 2] = (art > 70) * 255
     Image.fromarray(viz).resize((640, 960)).save(pathlib.Path(args.out).with_suffix(".fit.png"))
 

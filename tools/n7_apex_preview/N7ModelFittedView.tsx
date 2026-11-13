@@ -6,20 +6,23 @@ import {N7_HUMANOID_REFERENCE} from "./N7HumanoidReference";
 import {readVoiceSignal} from "./N7VoiceSignal";
 
 // The owner's 3D model adapted to the approved N7 (prepare_model_fitted.py):
-// its outline is fitted to the approved figure, the approved picture is
-// projected onto the front of the real geometry, and the sides and back
-// continue in the same light-line style from the model's own texture. A
+// its front outline is fitted to the approved figure and its depth to the
+// approved profile; the approved front, profile and back pictures are
+// projected onto the real geometry from their own directions. A
 // chest -> neck -> skull bone chain is added here so the whole head turns and
 // nods in true 3D. Separate test page; the Humanoid renderer is unchanged.
 export type FittedView="front"|"three-quarter"|"profile"|"back"|"follow"|"auto";
 export type FittedMood="idle"|"listening"|"thinking"|"speaking";
 type Props={view:FittedView;mood:FittedMood;reduced:boolean;onReady:()=>void;onError:(s:string)=>void;onProgress:(n:number)=>void};
 const folder=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/")+1);
-export const FITTED_URL=folder+"n7-model-fitted-v1.glb";
+export const FITTED_URL=folder+"n7-model-fitted-v2.glb";
+// The owner's approved profile and back pictures, aligned to the front frame
+// (prepare_side_back_art.py). PROFILE_CENTRE: profile column of depth 0.
+const SIDE_URL=folder+"n7-art-profile-v1.webp",BACK_URL=folder+"n7-art-back-v1.webp",PROFILE_CENTRE=143.5;
 const ART=[N7_HUMANOID_REFERENCE,folder+"n7-mood-listening-v1.webp",folder+"n7-mood-thinking-v1.webp",folder+"n7-mood-speaking-v1.webp"];
 const MOODS:FittedMood[]=["idle","listening","thinking","speaking"];
 // Picture units (1 = 1 pixel of the approved 320x480 figure), y up = -row.
-const CHEST=new THREE.Vector3(0,-300,-10),NECK=new THREE.Vector3(0,-252,-8),SKULL=new THREE.Vector3(0,-168,-6);
+const CHEST=new THREE.Vector3(0,-300,0),NECK=new THREE.Vector3(0,-252,0),SKULL=new THREE.Vector3(0,-168,0);
 const MAX_YAW=.55,MAX_PITCH=.28;
 const smooth=(a:number,b:number,x:number)=>{const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t);};
 
@@ -47,13 +50,13 @@ export default function N7ModelFittedView(props:Props){
   const observer=new ResizeObserver(fit);observer.observe(h);fit();
   const pointer=(e:PointerEvent)=>{const r=h.getBoundingClientRect();mx=Math.max(-1,Math.min(1,(e.clientX-r.left-r.width/2)/(r.width*.35)));my=Math.max(-1,Math.min(1,(r.top+r.height*.30-e.clientY)/(r.height*.35)));};
   const leave=()=>{mx=0;my=0;};h.addEventListener("pointermove",pointer,{passive:true});h.addEventListener("pointerleave",leave);window.addEventListener("blur",leave);
-  const uniforms={art:{value:[null,null,null,null] as (THREE.Texture|null)[]},own:{value:null as THREE.Texture|null},mood:{value:0},from:{value:0},age:{value:1},level:{value:0},speaking:{value:0}};
+  const uniforms={art:{value:[null,null,null,null] as (THREE.Texture|null)[]},side:{value:null as THREE.Texture|null},back:{value:null as THREE.Texture|null},mood:{value:0},from:{value:0},age:{value:1},level:{value:0},speaking:{value:0}};
   const material=new THREE.ShaderMaterial({uniforms,side:THREE.DoubleSide,
    vertexShader:`
     #include <common>
     #include <skinning_pars_vertex>
     attribute vec3 rest;attribute vec3 restNormal;
-    varying vec2 artUV;varying vec2 ownUV;varying float facing;varying float rimV;
+    varying vec2 artUV;varying vec2 sideUV;varying vec2 backUV;varying vec3 wts;varying float rimV;
     void main(){
       #include <beginnormal_vertex>
       #include <skinbase_vertex>
@@ -61,17 +64,27 @@ export default function N7ModelFittedView(props:Props){
       #include <begin_vertex>
       #include <skinning_vertex>
       // The approved picture is pinned to the surface at rest, so it turns with the head.
+      // Three of the owner's pictures, each pinned to the surface at rest from
+      // its own direction: front (z), sides (x, from the profile), back (-z).
       artUV=vec2((rest.x+160.)/320.,(-rest.y)/480.);
-      ownUV=uv;
-      facing=restNormal.z;
+      sideUV=vec2((${PROFILE_CENTRE.toFixed(1)}+rest.z)/320.,(-rest.y)/480.);
+      backUV=vec2((160.-rest.x)/320.,(-rest.y)/480.);
+      vec3 n=normalize(restNormal);
+      // Each picture owns its side; the front dominates wherever the surface
+      // still faces the viewer, so no profile or back lines double the front.
+      vec3 w=vec3(2.5*pow(max(n.z,0.),4.),pow(abs(n.x),4.),pow(max(-n.z,0.),4.));
+      // The face and front of the head always show the approved front picture.
+      float faceZone=1.-smoothstep(.85,1.05,length(vec2((rest.x)/62.,(-rest.y-140.)/92.)));
+      w.x=mix(w.x*1.6,1.,faceZone*step(.05,n.z));w.y*=1.-faceZone*step(.05,n.z);
+      wts=w/max(1e-4,w.x+w.y+w.z);
       vec4 mv=modelViewMatrix*vec4(transformed,1.);
-      vec3 n=normalize(normalMatrix*objectNormal);
-      rimV=1.-abs(n.z);
+      vec3 vn=normalize(normalMatrix*objectNormal);
+      rimV=1.-abs(vn.z);
       gl_Position=projectionMatrix*mv;
     }`,
    fragmentShader:`
-    uniform sampler2D art[4];uniform sampler2D own;uniform float mood;uniform float from;uniform float age;uniform float level;uniform float speaking;
-    varying vec2 artUV;varying vec2 ownUV;varying float facing;varying float rimV;
+    uniform sampler2D art[4];uniform sampler2D side;uniform sampler2D back;uniform float mood;uniform float from;uniform float age;uniform float level;uniform float speaking;
+    varying vec2 artUV;varying vec2 sideUV;varying vec2 backUV;varying vec3 wts;varying float rimV;
     vec3 pick(float m){vec2 q=clamp(artUV,0.,1.);
       if(m<.5)return texture2D(art[0],q).rgb;if(m<1.5)return texture2D(art[1],q).rgb;if(m<2.5)return texture2D(art[2],q).rgb;
       return mix(texture2D(art[0],q).rgb,texture2D(art[3],q).rgb,.32+.68*level);}
@@ -80,21 +93,12 @@ export default function N7ModelFittedView(props:Props){
       float d=distance(artUV*vec2(320.,480.),vec2(160.,150.));
       float b=smoothstep(d-28.,d+28.,age*430.);
       vec3 front=mix(pick(from),pick(mood),b);
-      // Sides and back: the model's own bright streaks become thin N7 lines.
-      // Only the crest of each streak is kept (its edges are cut by the local
-      // texture slope), so the lines stay thin; a faint glow keeps the volume.
-      vec3 t=texture2D(own,ownUV).rgb;float l=max(max(t.r,t.g),t.b);
-      vec2 px=vec2(1./2048.);
-      float ln=max(max(texture2D(own,ownUV+vec2(px.x,0.)).r,texture2D(own,ownUV+vec2(px.x,0.)).b),texture2D(own,ownUV+vec2(px.x,0.)).g);
-      float lu=max(max(texture2D(own,ownUV+vec2(0.,px.y)).r,texture2D(own,ownUV+vec2(0.,px.y)).b),texture2D(own,ownUV+vec2(0.,px.y)).g);
-      float slope=length(vec2(ln-l,lu-l))*40.;
-      float line=smoothstep(.84,.97,l)*(1.-smoothstep(.35,1.,slope)*.75);
-      bool warm=t.r>t.b*1.2&&t.r>.25;
-      vec3 side=(warm?vec3(1.,.60,.14):vec3(.20,.78,1.))*line*.85+vec3(.02,.09,.13)*smoothstep(.2,.8,l);
-      float w=smoothstep(.18,.55,facing);
-      vec3 col=mix(side,front,w);
-      // A thin cyan contour where the surface turns away, like the drawn outline.
-      col+=vec3(.25,.80,1.)*pow(rimV,5.)*.55*(1.-w*.6);
+      vec3 sideCol=texture2D(side,clamp(sideUV,0.,1.)).rgb;
+      // The profile's gold face curve belongs to the face only, not to the hair or neck.
+      float sideFace=smoothstep(186.,200.,sideUV.x*320.)*(1.-smoothstep(205.,225.,sideUV.y*480.));
+      sideCol=mix(sideCol,vec3(dot(sideCol,vec3(.10,.45,.45)))*vec3(.4,.9,1.1),(1.-sideFace)*step(sideCol.b*1.15,sideCol.r));
+      vec3 backCol=texture2D(back,clamp(backUV,0.,1.)).rgb;
+      vec3 col=front*wts.x+sideCol*wts.y+backCol*wts.z;
       gl_FragColor=vec4(col,1.);
       #include <colorspace_fragment>
     }`});
@@ -110,7 +114,10 @@ export default function N7ModelFittedView(props:Props){
    const bytes=new Uint8Array(loaded);let offset=0;for(const p of parts){bytes.set(p,offset);offset+=p.length;}
    const gltf=await new GLTFLoader().parseAsync(bytes.buffer,folder);if(disposed)return;
    let source:THREE.Mesh|undefined;gltf.scene.traverse(o=>{if(!source&&o instanceof THREE.Mesh)source=o;});if(!source)throw Error("mesh_missing");
-   const own=(source.material as THREE.MeshStandardMaterial).map;if(own){textures.push(own);uniforms.own.value=own;}
+   const [sideTex,backTex]=await Promise.all([SIDE_URL,BACK_URL].map(url=>loader.loadAsync(url)));
+   for(const tex of [sideTex,backTex]){tex.colorSpace=THREE.SRGBColorSpace;tex.flipY=false;tex.minFilter=THREE.LinearFilter;tex.generateMipmaps=false;textures.push(tex);}
+   uniforms.side.value=sideTex;uniforms.back.value=backTex;
+   (source.material as THREE.MeshStandardMaterial).map?.dispose();
    const geometry=source.geometry.clone();geometry.computeVertexNormals();
    geometry.setAttribute("rest",geometry.attributes.position.clone());geometry.setAttribute("restNormal",geometry.attributes.normal.clone());
    const pos=geometry.attributes.position,count=pos.count,skinIndex=new Uint16Array(count*4),skinWeight=new Float32Array(count*4);
@@ -121,7 +128,7 @@ export default function N7ModelFittedView(props:Props){
    const mesh=new THREE.SkinnedMesh(geometry,material);mesh.frustumCulled=false;mesh.add(chest);mesh.bind(new THREE.Skeleton([chest,neck,head]));
    root=new THREE.Group();root.add(mesh);scene.add(root);
    (source.material as THREE.Material).dispose();
-   Object.assign(h.dataset,{ready:"true",asset:"n7-model-fitted-v1",rig:"added-chest-neck-skull",style:"approved-art-projected",triangles:String((geometry.index?geometry.index.count:count)/3),loadMs:(performance.now()-t0).toFixed(0)});
+   Object.assign(h.dataset,{ready:"true",asset:"n7-model-fitted-v2",rig:"added-chest-neck-skull",style:"approved-front-profile-back",triangles:String((geometry.index?geometry.index.count:count)/3),loadMs:(performance.now()-t0).toFixed(0)});
    config.current.onProgress(100);config.current.onReady();
   }catch(e){if(!disposed&&(e as Error).name!=="AbortError")config.current.onError("Δεν φορτώθηκε το μοντέλο 3D. Δοκίμασε ανανέωση της σελίδας.");}})();
   const draw=(now:number)=>{

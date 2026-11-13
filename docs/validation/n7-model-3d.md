@@ -72,3 +72,13 @@ Live — release `c5fa39ec47e3d5ff` ([run](https://github.com/Lepe12/geraki-hist
 ## Owner review — the face is wrong
 
 Close-up (`face-problem-approved-front-left-right.jpg`: approved face, then the 3D front, left and right): the supplied model was not made from the approved N7 picture, so its sculpted shapes do not sit under the picture's drawn lines. The model's own hair lumps and face relief (nose, cheeks, chin) show through as extra glassy edges on top of the drawn hair and face outline, and when the head turns the picture slides across mismatched geometry and the model's hair covers part of the face. Outline fitting cannot fix this: it matches only the silhouette, not the inner shapes. Not yet fixed.
+
+## Face fixed with the owner's front, profile and back pictures
+
+The owner supplied a front, a 90° profile (facing right) and a back picture in the N7 style (`docs/validation/n7-reference-pack/N7-*-supplied.png`; all 1024×1536, hair top rows 11–14, necks 207–221 of 480). The approved v4 stays the front picture, because the mood pictures are aligned to it; the new front is kept as reference only.
+
+- **Side shape** (`prepare_model_fitted.py --profile`, output `n7-model-fitted-v2.glb`): each row's depth range is mapped onto the profile outline, rows aligned on hair top and neck (profile 15/210 → front 13/207); depth 0 at the profile's neck centre (column 143.5).
+- **Smooth N7 face**: inside the approved face oval (centre 160,140; half-axes 62×92 px) the model's nose, lips and cheeks are replaced by a smooth mask following the profile's front edge, blended out at the rim and stopped above the jaw line (rows 178–196) so the chin and neck keep their shape.
+- **Three pictures on the model** (`prepare_side_back_art.py`, `n7-art-profile-v1.webp`, `n7-art-back-v1.webp`): front, profile and back are each pinned to the surface from their own direction and blended by the surface direction; the front dominates wherever the surface faces the viewer and always on the face; the profile's gold face curve is kept only on the face. Back fitted to the front by outline correlation 0.78 (scale 1.10, squash 0.98).
+
+Close-up (`face-fixed-approved-front-left-right.jpg`): the front face now matches the approved one. Remaining: at strong turns the model's own hair lumps and hanging strands beside the neck still show as uneven shapes; faint warm marks remain at the temples; the model is a bust and ends above the picture's bottom edge. `test_model_3d.cjs` updated and passes locally.

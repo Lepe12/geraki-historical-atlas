@@ -200,10 +200,10 @@ def main():
         if hashlib.sha256(model).hexdigest()!="659017150e31a797ee8743384a1ed9bd253ab5e8f1514ac595a3c3344b054837":
             raise RuntimeError("wrong model test asset")
         (out/"public/n7-model-textured-v1.glb").write_bytes(model)
-        fitted=(overlay/"assets/n7-model-fitted-v1.glb").read_bytes()
-        if hashlib.sha256(fitted).hexdigest()!="562abbfc54393751f90cd058d6e87f73aef08abd5e66cffb6b60f3ab4817ce4a":
-            raise RuntimeError("wrong fitted model asset")
-        (out/"public/n7-model-fitted-v1.glb").write_bytes(fitted)
+        for name,digest in (("n7-model-fitted-v2.glb","f1b2604625a845d0d378836775fda89e851eb68a4b15a2faebc7290b02150291"),("n7-art-profile-v1.webp","0e6dd7b82af3514a5f0d68b01b4e9ef0839fd48c058866238ae7c9781f32e81f"),("n7-art-back-v1.webp","e98ba44928f0d76335eb99f264828e1ad12dd9fcf4a640003e080c33da49dbe5")):
+            data=(overlay/"assets"/name).read_bytes()
+            if hashlib.sha256(data).hexdigest()!=digest: raise RuntimeError("wrong 3D asset "+name)
+            (out/"public"/name).write_bytes(data)
         (out/"app/model-3d").mkdir(parents=True,exist_ok=True)
         (out/"app/model-3d/page.tsx").write_text('import N7ModelTest from "@/components/N7ModelTest";\nexport default function ModelTest(){return <N7ModelTest/>;}\n')
     shutil.copy2(overlay/"assets/n7-mountain-backdrop.webp",out/"public/n7-mountain-backdrop.webp")
