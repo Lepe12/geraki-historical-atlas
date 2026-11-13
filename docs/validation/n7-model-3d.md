@@ -94,3 +94,9 @@ Limits: cross-sections are smooth ovals, so the 3D hair has the drawn hair's out
 Live — release `7ee06a6b48db493e` ([run](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/43425880263)): all CI suites (including the Humanoid guide suite) and deployment passed; `test_model_3d.cjs` passed against the live page with asset `n7-model-from-art-v1`. Functional preview `2c3286f6ce6b899a` and production `bbdc05016a211581` unchanged.
 
 Temples: on the head the profile's gold face curve is turned cyan (it landed on the temples); the face's gold comes only from the front picture. Below the jaw the profile keeps its gold neck and chest lines (`from-art-face-approved-front-left-right.jpg`).
+
+## Live conversation check — blocked by the back end (2026-11-13)
+
+Release `59ac3ab7b4aa17b3` (temples fix) deployed and passed CI. A real, unmocked conversation turn on the live 3D page then failed before any model reply: the page's passwordless chat call `POST /api/n7-apex/chat` returned **401 `{"error":"Authentication required"}`**; `GET /api/n7-apex/status` also returns 401. On 2026-11-12 the same route returned 200 with real Greek replies. The page itself behaved correctly (mood went idle → thinking → idle on the error; no browser errors).
+
+This affects every page that uses passwordless chat, including the functional preview `/n7-apex-step5/`, not only the trial. The visual branch does not touch the back end (its workflow skips the public-chat and voice deployment steps). Likely cause, not verified: today's back-end installations from `main` ("N7 canonical runtime — guarded installation", runs 43413473221, 43417149496, 43419753728 between 11:00 and 11:46 UTC) replaced the N7 server files and with them the public-chat patch that `deploy_public_chat.py` adds. Restoring it means re-running that back-end patch on the live server, which is outside this task's scope and was not done.
