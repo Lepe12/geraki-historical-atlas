@@ -54,15 +54,44 @@
   if(y.length===1)return {from:y[0],to:y[0]};
   return null;
  }
+ // N7_HISTORY_GLOSSARY_V1: Greek names and historical subjects -> the exact words the (often English,
+ // Italian or Spanish) sources use. Only adds search terms; matches are still exact words in real pages.
+ // Generic words (battle, fleet, author, expedition) were measured to push unrelated pages up, so they are not mapped.
+ const NAMES=[
+  {keys:['ναυπακτ','lepanto','λεπαντ'],terms:['Lepanto']},
+  {keys:['τζερμπ','τζερβ','djerba','jerba','gerba'],terms:['Djerba','Jerba','Gerba']},
+  {keys:['πρεβεζ','preveza','prevesa'],terms:['Prevesa','Preveza']},
+  {keys:['μπαρμπαροσ','barbaross','χαιρεντιν','hayreddin','kheyr'],terms:['Barbarossa','Kheyr-ed-Din']},
+  {keys:['τουργκουτ','ντραγκουτ','ντραγουτ','dragut','turgut'],terms:['Dragut','Turgut']},
+  {keys:['ντορια','doria'],terms:['Doria']},
+  {keys:['θερβαντ','σερβαντ','cervantes','κιχωτ','quixote'],terms:['Cervantes','Quixote']},
+  {keys:['καρολο','charles v'],terms:['Charles','Emperor']},
+  {keys:['πενιον','penon','peñon'],terms:['Peñon','Penon']},
+  {keys:['ουλουτζ','ουλουζ','uluj','ochiali','occhiali'],terms:['Uluj','Ochiali']}
+ ];
+ const SUBJECTS=[
+  {keys:['γαλερ','κατεργ','galley'],terms:['galley','galleys']},
+  {keys:['κωπηλατ','κουπι','κωπηλασ'],terms:['oars','rowers']},
+  {keys:['σκλαβ','δουλ'],terms:['slaves','slave']},
+  {keys:['αιχμαλωτ','αιχμαλωσ'],terms:['captives','captivity']},
+  {keys:['κουρσαρ','πειρατ'],terms:['corsairs','pirates']},
+  {keys:['φρουρι','καστρ','οχυρ'],terms:['fortress','castle']},
+  {keys:['επιδρομ','λεηλασ'],terms:['raid','sacked']},
+  {keys:['πολιορκ'],terms:['siege','besieged']},
+  {keys:['λυτρ'],terms:['ransom']},
+  {keys:['φυλακ','μπανιο'],terms:['bagnio','bagnios']}
+ ];
  function libraryTerms(text){
   const f=fold(text),out=[];
-  for(const p of [...PLACES,...REGIONS])if(p.keys.some(k=>f.includes(k)))out.push(...p.terms);
+  for(const p of [...PLACES,...REGIONS,...NAMES])if(p.keys.some(k=>f.includes(k)))out.push(...p.terms);
+  // Subject words fill the remaining slots after specific names and places.
+  for(const g of SUBJECTS)if(g.keys.some(k=>f.includes(k)))out.push(...g.terms);
   const quoted=String(text).match(/[«"“]([^»"”]{2,80})[»"”]/);if(quoted)out.unshift(quoted[1].trim());
   if(!out.length){
    const words=(String(text).match(/[\p{L}\p{N}-]{5,}/gu)||[]).filter(w=>!STOP.has(fold(w)));
    out.push(...words.sort((a,b)=>b.length-a.length).slice(0,2));
   }
-  return [...new Set(out)].filter(x=>x.length>=2&&x.length<=150).slice(0,6);
+  return [...new Set(out)].filter(x=>x.length>=2&&x.length<=150).slice(0,8);
  }
  // Section 9E categories. A keyword hit marks an excerpt for human reading; it proves nothing.
  const CATEGORIES=[
