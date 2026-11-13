@@ -200,7 +200,7 @@ def main():
         if hashlib.sha256(model).hexdigest()!="659017150e31a797ee8743384a1ed9bd253ab5e8f1514ac595a3c3344b054837":
             raise RuntimeError("wrong model test asset")
         (out/"public/n7-model-textured-v1.glb").write_bytes(model)
-        for name,digest in (("n7-model-fitted-v2.glb","f1b2604625a845d0d378836775fda89e851eb68a4b15a2faebc7290b02150291"),("n7-art-profile-v1.webp","0e6dd7b82af3514a5f0d68b01b4e9ef0839fd48c058866238ae7c9781f32e81f"),("n7-art-back-v1.webp","e98ba44928f0d76335eb99f264828e1ad12dd9fcf4a640003e080c33da49dbe5")):
+        for name,digest in (("n7-model-from-art-v1.glb","614b6360527484b5ab9823b026dd248a9621b11a12958b0c0b1464d007840e6b"),("n7-art-profile-v1.webp","0e6dd7b82af3514a5f0d68b01b4e9ef0839fd48c058866238ae7c9781f32e81f"),("n7-art-back-v1.webp","e98ba44928f0d76335eb99f264828e1ad12dd9fcf4a640003e080c33da49dbe5")):
             data=(overlay/"assets"/name).read_bytes()
             if hashlib.sha256(data).hexdigest()!=digest: raise RuntimeError("wrong 3D asset "+name)
             (out/"public"/name).write_bytes(data)

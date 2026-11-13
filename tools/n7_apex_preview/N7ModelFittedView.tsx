@@ -5,17 +5,18 @@ import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader.js";
 import {N7_HUMANOID_REFERENCE} from "./N7HumanoidReference";
 import {readVoiceSignal} from "./N7VoiceSignal";
 
-// The owner's 3D model adapted to the approved N7 (prepare_model_fitted.py):
-// its front outline is fitted to the approved figure and its depth to the
-// approved profile; the approved front, profile and back pictures are
-// projected onto the real geometry from their own directions. A
+// N7 in 3D built from the owner's own pictures: the volume comes from the
+// approved front and profile outlines (prepare_model_from_art.py) and the
+// approved front, profile and back pictures are projected onto it from their
+// own directions. A
 // chest -> neck -> skull bone chain is added here so the whole head turns and
 // nods in true 3D. Separate test page; the Humanoid renderer is unchanged.
 export type FittedView="front"|"three-quarter"|"profile"|"back"|"follow"|"auto";
 export type FittedMood="idle"|"listening"|"thinking"|"speaking";
 type Props={view:FittedView;mood:FittedMood;reduced:boolean;onReady:()=>void;onError:(s:string)=>void;onProgress:(n:number)=>void};
 const folder=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/")+1);
-export const FITTED_URL=folder+"n7-model-fitted-v2.glb";
+// Shape built only from the owner's approved front and profile pictures (prepare_model_from_art.py).
+export const FITTED_URL=folder+"n7-model-from-art-v1.glb";
 // The owner's approved profile and back pictures, aligned to the front frame
 // (prepare_side_back_art.py). PROFILE_CENTRE: profile column of depth 0.
 const SIDE_URL=folder+"n7-art-profile-v1.webp",BACK_URL=folder+"n7-art-back-v1.webp",PROFILE_CENTRE=143.5;
@@ -128,7 +129,7 @@ export default function N7ModelFittedView(props:Props){
    const mesh=new THREE.SkinnedMesh(geometry,material);mesh.frustumCulled=false;mesh.add(chest);mesh.bind(new THREE.Skeleton([chest,neck,head]));
    root=new THREE.Group();root.add(mesh);scene.add(root);
    (source.material as THREE.Material).dispose();
-   Object.assign(h.dataset,{ready:"true",asset:"n7-model-fitted-v2",rig:"added-chest-neck-skull",style:"approved-front-profile-back",triangles:String((geometry.index?geometry.index.count:count)/3),loadMs:(performance.now()-t0).toFixed(0)});
+   Object.assign(h.dataset,{ready:"true",asset:"n7-model-from-art-v1",rig:"added-chest-neck-skull",style:"approved-front-profile-back",triangles:String((geometry.index?geometry.index.count:count)/3),loadMs:(performance.now()-t0).toFixed(0)});
    config.current.onProgress(100);config.current.onReady();
   }catch(e){if(!disposed&&(e as Error).name!=="AbortError")config.current.onError("Δεν φορτώθηκε το μοντέλο 3D. Δοκίμασε ανανέωση της σελίδας.");}})();
   const draw=(now:number)=>{
