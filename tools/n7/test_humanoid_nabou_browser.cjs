@@ -190,9 +190,19 @@ const allPages=()=>bookPages.split(',').flatMap(f=>{const d=JSON.parse(fs.readFi
    await c2.close();
   }
 
+  // T13: N7_STAGE_CLEAR_RESULTS_V1 — results clear by hand and when a new non-map question starts
+  const rowsNow=()=>page.evaluate(()=>({rows:document.querySelectorAll('#n7StageResults tbody tr').length,stored:!!JSON.parse(localStorage.getItem('n7-shared-state-v1')||'{}').results,flag:document.getElementById('n7Stage').dataset.results}));
+  const c0=await rowsNow();assert.ok(c0.rows>0,'results present before clearing');
+  await page.click('.n7-results-clear');const c1=await rowsNow();
+  assert.ok(c1.rows===0&&!c1.stored&&c1.flag==='0',JSON.stringify(c1));
+  await run('Αναζήτησε στη βιβλιοθήκη αναφορές στην Κέρκυρα');const c2=await rowsNow();assert.ok(c2.rows>0,'new search shows results');
+  await run('Δείξε μου τα αποτελέσματα στο NABOU');const c3=await rowsNow();assert.ok(c3.rows===c2.rows,'map command keeps results');
+  const clearedBy='Έλεγξε το τελευταίο GitHub PR';
   // T12: coding agent — real PR state needs the server token; code changes need explicit confirmation
   const codingCalls=[];page.on('request',q=>{if(q.url().includes('/api/coding/tasks'))codingCalls.push(q.method());});
-  const rp=await run('Έλεγξε το τελευταίο GitHub PR');
+  const rp=await run(clearedBy);
+  const c4=await rowsNow();assert.ok(c4.rows===0&&!c4.stored,'a new question clears the results');
+  record('T13','Καθαρισμός ευρημάτων','PASS',`κουμπί «Καθαρισμός»: ${c0.rows}→${c1.rows} γραμμές· νέα αναζήτηση: ${c2.rows}· «Δείξε στο NABOU» τα κρατά: ${c3.rows}· νέα ερώτηση «${clearedBy}»: ${c4.rows}`);
   assert.ok(await page.$('#n7StageReply .n7-error')&&/CODING_TOKEN_NOT_CONFIGURED/.test(rp),rp);
   const rcf=await run('Άλλαξε τον κώδικα του NABOU ώστε οι ετικέτες του navigation rail να είναι μεγαλύτερες');
   assert.ok(await page.$('#n7CodingConfirm')&&codingCalls.length===0,rcf);
