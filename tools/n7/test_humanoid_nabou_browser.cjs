@@ -102,21 +102,22 @@ const allPages=()=>bookPages.split(',').flatMap(f=>{const d=JSON.parse(fs.readFi
   record('T9a','Humanoid κεντρικό, μεγάλο, χωρίς παραμόρφωση','PASS',`πλαίσιο ${Math.round(fig.w)}×${Math.round(fig.h)} px σε viewport 1440×900, canvas 650×650 (1:1)`);
   if(shots)await page.screenshot({path:path.join(shots,'humanoid-desktop.png')});
 
-  // Test 1: Humanoid -> NABOU, focus Corfu
+  // Test 1: Humanoid -> NABOU in a separate window («σε νέο παράθυρο»), focus Corfu. Without that phrase
+  // places open in the map below N7 (N7_SPLIT_MAP_V1, covered by test_n7_split_map_browser.cjs).
   const popupWait=context.waitForEvent('page');
-  const r1=await run('N7, άνοιξε τον ιστορικό χάρτη');const atlas=await popupWait;
+  const r1=await run('N7, άνοιξε τον ιστορικό χάρτη σε νέο παράθυρο');const atlas=await popupWait;
   atlas.on('pageerror',e=>errors.push('atlas: '+e));
   assert.match(r1,/NABOU είναι ανοιχτός/);
   await atlas.waitForFunction(()=>window.NABOU_PRO_ATLAS&&document.getElementById('n7MapBack'));
   const before=await atlas.evaluate(()=>({sel:NABOU_PRO_ATLAS.selected,view:NABOU_PRO_ATLAS.view()}));
-  const r2=await run('Δείξε μου την Κέρκυρα');
+  const r2=await run('Δείξε μου την Κέρκυρα σε νέο παράθυρο');
   const after=await atlas.evaluate(()=>({sel:NABOU_PRO_ATLAS.selected,view:NABOU_PRO_ATLAS.view(),card:document.getElementById('proPlaceInfo')?.innerText||''}));
   assert.equal(after.sel,'corfu');assert.match(after.card,/Κέρκυρα/);assert.match(r2,/εστίασε στο Κέρκυρα/);
   record('T1','Humanoid → NABOU → Κέρκυρα','PASS',`NABOU selected: ${before.sel} → ${after.sel}; view ${JSON.stringify(before.view)} → ${JSON.stringify(after.view)}; κάρτα τόπου περιέχει «Κέρκυρα»`);
   const r3=await run('Δείξε μου τις πηγές');
   const open=await atlas.evaluate(()=>document.querySelector('#proPlaceInfo details.n7-sources')?.open===true);
   assert.ok(open);record('T1b','«Δείξε μου τις πηγές» → πάνελ πηγών NABOU','PASS','details.n7-sources open=true · '+r3);
-  const noMap=await run('Άνοιξε την Αστυπάλαια στον χάρτη');
+  const noMap=await run('Άνοιξε την Αστυπάλαια στον χάρτη σε νέο παράθυρο');
   assert.match(noMap,/δεν υπάρχει εγκεκριμένο σημείο/);
   record('T6b','Αβέβαιο τοπωνύμιο δεν τοποθετείται αυθαίρετα','PASS',noMap.slice(0,140));
   if(shots)await atlas.screenshot({path:path.join(shots,'nabou-corfu.png')});

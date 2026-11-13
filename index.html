@@ -272,6 +272,7 @@ function initMap(){
     updateMarkerHierarchy();
     render();
     fitAll();
+    n7MapLoaded=true;
   });
 
   atlasMap.on("click","atlas-routes",e=>{
@@ -434,6 +435,8 @@ function markerFor(p){
     lab.textContent=p.place||"";
     el.append(img,lab);
   }
+  // Lets the map show a stored APPROXIMATE point as approximate (styling only).
+  el.dataset.placeId=p.id||"";el.dataset.coordinateStatus=p.coordinateStatus||"";
   el.addEventListener("click",ev=>{ev.stopPropagation();showPlace(p)});
   return new maplibregl.Marker({
     element:el,
@@ -610,6 +613,26 @@ function focusPlace(id){
   showPlace(p);
   document.getElementById("searchResults").classList.add("hidden");
 }
+// N7_SPLIT_MAP_V1: read-only hook used by the embedded N7 link (tools/n7/atlas-map-link.js).
+// It exposes the stored records and the existing focusPlace(); it adds no place or coordinate.
+let n7Selected=null,n7MapLoaded=false;
+window.NABOU_MAP={
+  get records(){return DATA.places},
+  ready:()=>!!atlasMap&&n7MapLoaded&&DATA.places.length>0,
+  selected:()=>n7Selected,
+  camera:()=>{if(!atlasMap)return null;const c=atlasMap.getCenter();return {lng:c.lng,lat:c.lat,zoom:atlasMap.getZoom()}},
+  // Keeps the focused place visible beside the embedded side bar.
+  padding:p=>{if(atlasMap)atlasMap.setPadding({top:0,right:0,left:Math.max(0,p.left|0),bottom:Math.max(0,p.bottom|0)})},
+  focus(id){
+    const p=byId.get(id);if(!p||!atlasMap||!Number.isFinite(p.lat)||!Number.isFinite(p.lon))return Promise.resolve(false);
+    n7Selected=id;
+    document.querySelectorAll("[data-n7-focus]").forEach(e=>e.removeAttribute("data-n7-focus"));
+    document.querySelectorAll('[data-place-id="'+CSS.escape(id)+'"]').forEach(e=>e.setAttribute("data-n7-focus","1"));
+    // flyTo stops any running animation (which emits its own moveend) before it starts, so the
+    // listener is attached afterwards and resolves when the camera reaches this place.
+    return new Promise(res=>{focusPlace(id);atlasMap.once("moveend",()=>res(true))});
+  }
+};
 
 document.querySelectorAll(".book-btn").forEach(b=>b.onclick=()=>{
   document.querySelectorAll(".book-btn").forEach(x=>x.classList.remove("active"));
@@ -625,6 +648,13 @@ document.querySelectorAll(".year-btn").forEach(b=>b.onclick=()=>{
   DATA.places.forEach(p=>byId.set(p.id,p));
   initMap();
 })();
+</script>
+<script>
+// N7_SPLIT_MAP_V1: only when N7 embeds this page with its #n7map link. Ordinary visits are unchanged.
+if(window.parent!==window&&/[#&]n7map=/.test(location.hash)){
+  const v="n7-split-1",css=document.createElement("link");css.rel="stylesheet";css.href="./nabou-embed.css?v="+v;document.head.append(css);
+  for(const f of ["n7-map-protocol.js","atlas-map-link.js","atlas-embed-panel.js"]){const sc=document.createElement("script");sc.src="./tools/n7/"+f+"?v="+v;sc.async=false;document.body.append(sc);}
+}
 </script>
 </body>
 </html>

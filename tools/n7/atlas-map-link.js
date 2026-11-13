@@ -1,17 +1,28 @@
 // N7_ATLAS_MAP_LINK_V1 — NABOU side of n7-map/v1. Active only when this page was opened by the
 // authenticated N7 window with a valid #n7map fragment. Uses only the existing public atlas APIs
 // (NABOU_PRO_ATLAS.select / NABOU_ATLAS.setPage); renderers, camera and zoom are untouched.
+// N7_SPLIT_MAP_V1: the same link also runs inside an iframe of the N7 page (embed flag, parent
+// window) on the public MapLibre atlas, through its read-only window.NABOU_MAP hook.
 (()=>{
  'use strict';
- const P=window.N7MapProtocol;if(!P||!window.opener)return;
+ const P=window.N7MapProtocol;if(!P)return;
  const opened=P.opening(location.hash);if(!opened)return;
- const opener=window.opener,seen=new Set();let nonce=opened.nonce;
+ const embedded=window.parent!==window;
+ // An embed link is honoured only inside a frame, a window link only in an opened window.
+ if(opened.embed!==embedded||(!embedded&&!window.opener))return;
+ const opener=embedded?window.parent:window.opener,seen=new Set();let nonce=opened.nonce;
+ const M=()=>embedded&&window.NABOU_MAP?.ready?.()?window.NABOU_MAP:null;
+ if(embedded)document.documentElement.classList.add('n7-embed');
  history.replaceState(null,'',location.pathname+location.search);
  const post=data=>{try{if(!opener.closed)opener.postMessage({schema:P.SCHEMA,nonce,...data},P.BOT);}catch{}};
  const el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!=null)e.textContent=text;if(cls)e.className=cls;return e;};
- const atlas=()=>window.NABOU_PRO_ATLAS;
+ // The MapLibre atlas exposes records; this adapter gives them the shape the commands below use.
+ const atlas=()=>{const m=M();if(!m)return embedded?null:window.NABOU_PRO_ATLAS;
+  return {places:m.records.map(r=>({id:r.id,name:r.place})),get selected(){return m.selected();},select:id=>m.focus(id)};};
+ const record=id=>M()?.records.find(r=>r.id===id)||null;
  function current(){
   const a=atlas(),card=document.querySelector('#proPlaceInfo details.n7-sources');
+  if(M()){const sel=M().selected();return P.state({selected:sel,page:'map',camera:M().camera(),coordinateStatus:record(sel)?.coordinateStatus||null});}
   let view=null;try{view=a?.view?.()||null;}catch{}
   return P.state({selected:a?.selected||null,page:window.NABOU_ATLAS?.page?.()||null,
    sourcesOpen:!!card?.open,view,map3d:!!window.NABOU_MAP3D?.enabled});
@@ -22,7 +33,8 @@
  const back=el('button','← N7','n7-map-back');back.setAttribute('aria-label','Επιστροφή στον Humanoid N7');back.title='Επιστροφή στον Humanoid N7';back.type='button';back.id='n7MapBack';
  back.addEventListener('click',()=>{post({type:'return'});try{opener.focus();}catch{}});
  const css=el('style','.n7-map-back{position:fixed;left:18px;bottom:84px;z-index:9000;padding:8px 14px;border:1px solid #2b6d7d;border-radius:999px;background:rgba(6,14,20,.92);color:#bff6ff;font:600 13px system-ui,sans-serif;letter-spacing:.04em;cursor:pointer;box-shadow:0 0 18px rgba(0,214,240,.18)}.n7-map-back:focus-visible,.n7-map-results button:focus-visible{outline:2px solid #5be7f6;outline-offset:2px}.n7-map-results{position:fixed;right:12px;top:60px;bottom:12px;z-index:8999;width:min(380px,calc(100vw - 24px));overflow:auto;padding:14px 16px;border:1px solid #24525e;border-radius:12px;background:rgba(5,11,16,.96);color:#dfeef2;font:14px/1.5 system-ui,sans-serif}.n7-map-results-head{display:flex;justify-content:space-between;align-items:center}.n7-map-results h2{font-size:15px;margin:0;color:#7fe9f6;letter-spacing:.05em}.n7-map-results h3{font-size:12px;margin:16px 0 6px;color:#8aa3ad;text-transform:uppercase;letter-spacing:.08em}.n7-map-results button{background:none;border:1px solid #2b5562;border-radius:7px;color:#bff6ff;cursor:pointer;padding:3px 9px}.n7-map-place{border-top:1px solid #1d3740;padding:10px 0}.n7-map-place-name{font-weight:600;font-size:14px}.n7-map-note{color:#8aa3ad;font-size:12px;margin:4px 0}.n7-map-results blockquote{margin:8px 0 2px;padding-left:9px;border-left:2px solid #2fc6dc;white-space:pre-wrap}.n7-map-results cite{display:block;color:#93aab3;font-size:12px;font-style:normal}@media(max-width:640px){.n7-map-back{left:auto;right:10px;bottom:auto;top:64px}.n7-map-results{left:8px;right:8px;width:auto;top:auto;max-height:55vh}}');
- function mount(){if(!css.isConnected)document.head.append(css);if(!panel.isConnected)document.body.append(panel);if(!back.isConnected)document.body.append(back);}
+ // Embedded, N7 is directly above the map: no separate return button.
+ function mount(){if(!css.isConnected)document.head.append(css);if(!panel.isConnected)document.body.append(panel);if(!back.isConnected&&!embedded)document.body.append(back);}
  function cite(x){return [x.author,x.title,x.year].filter(Boolean).join(', ')+(x.printed_page?', σ. '+x.printed_page:'')+(x.scan_index?' (σάρωση '+x.scan_index+')':'');}
  function renderResults(r){
   panel.replaceChildren();
@@ -62,6 +74,14 @@
  }
  window.addEventListener('message',event=>{
   if(event.origin!==P.BOT||event.source!==opener||!P.envelope(event.data,nonce))return;
+  const f=P.mapFocus(event.data);
+  if(f){if(seen.has(f.id))return;seen.add(f.id);
+   // Only a record that exists in data.json is focused; the ack reports where the camera really is.
+   const m=M();if(!m){post({type:'ack',id:f.id,ok:false,error:'NABOU_MAP_NOT_READY',state:current()});return;}
+   if(!record(f.placeId)){post({type:'ack',id:f.id,ok:false,error:'PLACE_NOT_IN_NABOU_DATA',state:current()});return;}
+   Promise.resolve(m.focus(f.placeId)).then(ok=>{document.dispatchEvent(new CustomEvent('n7:map-focus',{detail:{placeId:f.placeId}}));
+    post({type:'ack',id:f.id,ok:ok===true&&m.selected()===f.placeId,state:current()});},()=>post({type:'ack',id:f.id,ok:false,error:'NABOU_COMMAND_FAILED',state:current()}));
+   return;}
   const c=P.command(event.data);if(!c||seen.has(c.id))return;
   if(seen.size>=500){post({type:'closed'});return;}
   seen.add(c.id);mount();
@@ -71,8 +91,8 @@
  });
  let last='';
  setInterval(()=>{const s=current(),k=JSON.stringify(s);if(k!==last){last=k;post({type:'state',state:s});}if(opener.closed)back.hidden=true;},1000);
- const ready=()=>{mount();post({type:'ready',places:(atlas()?.places||[]).map(({id,name})=>({id,name})),state:current()});};
- if(atlas())ready();else{let n=0;const t=setInterval(()=>{if(atlas()||++n>100){clearInterval(t);if(atlas())ready();else post({type:'error',message:'NABOU_ATLAS_NOT_READY'});}},100);}
+ const ready=()=>{mount();post({type:'ready',places:(atlas()?.places||[]).map(({id,name})=>({id,name})),records:M()?P.records(M().records):[],state:current()});};
+ if(atlas())ready();else{let n=0;const t=setInterval(()=>{if(atlas()||++n>300){clearInterval(t);if(atlas())ready();else post({type:'error',message:'NABOU_ATLAS_NOT_READY'});}},100);}
  window.addEventListener('pagehide',()=>post({type:'closed'}));
  // A reloaded N7 window re-targets this same named window: re-bind without reloading the map.
  window.addEventListener('hashchange',()=>{const o=P.opening(location.hash);if(!o)return;nonce=o.nonce;seen.clear();last='';

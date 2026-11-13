@@ -14,6 +14,8 @@
  connect.onclick=async()=>{try{const s=await api('/api/status');if(!s.authenticated){status.textContent='Συνδέσου πρώτα στο N7.';post({type:'auth_required'});return;}if(busy)throw Error('Περίμενε να ολοκληρωθεί η τρέχουσα απάντηση.');if(!active)await create();bound=active;status.textContent='Η φωνή χρησιμοποιεί αυτή τη συνομιλία και τη συνδεδεμένη μνήμη έργου.';post({type:'ready'});}catch(e){status.textContent=e.message;}};
  disconnect.onclick=()=>{if(inflight)document.getElementById('n7-stop-reply')?.click();revoke();};
  card.append(label,status,connect,disconnect);document.getElementById('chat')?.before(card);
+ // The Humanoid stage reads this to open the window in the classic view, where this card is.
+ window.N7_CLASSIC_START=true;
  history.replaceState(null,'',location.pathname+location.search);
  window.addEventListener('message',async event=>{
   if(event.origin!==P.ATLAS||event.source!==opener||!P.envelope(event.data,nonce))return;const data=event.data;
