@@ -17,7 +17,7 @@ export type GuideFrame={turn:number;pitch?:number;roll?:number;talk?:number;brea
 // pictures, aligned to the idle frame. When given, each mood shows its own
 // picture instead of a colour variation computed from the idle.
 export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,moodArt?:HTMLCanvasElement[]) {
-  const renderer=new THREE.WebGLRenderer({alpha:false,antialias:false,depth:false,preserveDrawingBuffer:true});
+  const renderer=new THREE.WebGLRenderer({alpha:false,antialias:false,depth:true,preserveDrawingBuffer:true});
   renderer.setSize(Math.round(320*scale),Math.round(480*scale),false);renderer.setPixelRatio(1);
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   renderer.toneMapping=THREE.NoToneMapping;
@@ -42,7 +42,9 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,m
   const material=new THREE.ShaderMaterial({
     uniforms:{turn:{value:0},pitch:{value:0},neckMatrix:{value:new THREE.Matrix4()},headMatrix:{value:new THREE.Matrix4()},faceRelief:{value:faceRelief},talk:{value:0},useArt:{value:moodArt?.length===3?1:0},artListening:{value:null as THREE.Texture|null},artThinking:{value:null as THREE.Texture|null},artSpeaking:{value:null as THREE.Texture|null},artwork:{value:texture},breath:{value:0},opacity:{value:1},
       baseMood:{value:0},states:{value:[0,0,0,0]},ages:{value:[0,0,0,0]},count:{value:0},ignition:{value:0},time:{value:0},voiceLevel:{value:-1}},
-    depthTest:false,depthWrite:false,side:THREE.DoubleSide,toneMapped:false,transparent:true,
+    // Depth test on the head surface only: when the deeper face turns over the
+    // far cheek and hair, the nearer surface wins instead of drawing order.
+    depthTest:true,depthWrite:true,side:THREE.DoubleSide,toneMapped:false,transparent:true,
     vertexShader:`
     attribute vec2 source;
     uniform float turn;
@@ -59,16 +61,22 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,m
       return d*cos(rho*1.5707963);
     }
     float smax(float a,float b){return .5*(a+b+sqrt((a-b)*(a-b)+36.));}
-    void main(){
-      vec2 tile=source;
-      // Rounded rest volume measured on the approved 320x480 artwork:
-      // face oval, skull with hair, and the neck column under the chin.
-      float face=dome(tile,vec2(160.,138.),vec2(66.,92.),64.);
-      float skull=dome(tile,vec2(160.,105.),vec2(96.,102.),mix(46.,40.,faceRelief));
+    // Rounded rest volume measured on the approved 320x480 artwork:
+    // face oval, skull with hair, and the neck column under the chin.
+    float restDepth(vec2 tile){
+      float face=dome(tile,vec2(160.,138.),vec2(66.,92.),mix(76.,64.,faceRelief));
+      float skull=dome(tile,vec2(160.,105.),vec2(96.,102.),mix(62.,40.,faceRelief));
       float plateRho=min(1.,length((tile-vec2(160.,140.))/vec2(72.,98.)));
       face=mix(face,58.*(1.-pow(plateRho,3.0)),faceRelief);
       float neck=28.*cos(min(1.,abs(tile.x-160.)/30.)*1.5707963)*smoothstep(170.,200.,tile.y);
-      float depth=smax(smax(face,skull),neck)-6.;
+      return smax(smax(face,skull),neck)-6.;
+    }
+    void main(){
+      vec2 tile=source;
+      float depth=restDepth(tile);
+      // Surface normal of the volume (layout y points down). Used only for
+      // light that changes with the pose, so the rest frame is untouched.
+      vec3 normal=normalize(vec3(restDepth(tile-vec2(3.,0.))-restDepth(tile+vec2(3.,0.)),restDepth(tile-vec2(0.,3.))-restDepth(tile+vec2(0.,3.)),6.));
       vec4 rest=vec4(tile.x,tile.y,depth,1.);
 
       // Skin weights. The skull, face, jaw and loose hair are fully bound to
@@ -77,8 +85,10 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,m
       // With H01 the shoulder lines rise higher beside the neck, so the loose
       // hair there lets go earlier and the raised shoulders stay fixed.
       float looseFrom=mix(210.,204.,faceRelief),looseTo=mix(232.,217.,faceRelief);
-      float wHead=1.-smoothstep(mix(200.,looseFrom,lateral),mix(226.,looseTo,lateral),tile.y);
-      float wNeck=1.-smoothstep(mix(222.,looseFrom,lateral),mix(256.,looseTo,lateral),tile.y);
+      // The twist is spread over the whole neck column (APEX: the head turns
+      // around the neck), so its drawn lines curve instead of kinking.
+      float wHead=1.-smoothstep(mix(194.,looseFrom,lateral),mix(240.,looseTo,lateral),tile.y);
+      float wNeck=1.-smoothstep(mix(214.,looseFrom,lateral),mix(270.,looseTo,lateral),tile.y);
       wNeck=max(wNeck,wHead);
       vec3 skinned=rest.xyz*(1.-wNeck)+(neckMatrix*rest).xyz*(wNeck-wHead)+(headMatrix*rest).xyz*wHead;
       vec2 p=skinned.xy;
@@ -88,20 +98,28 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,m
       p.x=160.+(p.x-160.)*(1.+breath*.006*chest);
       p.y-=breath*.9*chest;
 
-      // Same-artwork surface; the side turning away falls into shadow, the
-      // near outer edge picks up a restrained profile line. Light only:
-      // no alpha suppression, no cutouts, no added features.
-      float normalizedX=clamp((tile.x-160.)/92.,-1.,1.);
-      float farSide=max(0., sign(turn)*normalizedX);
-      float nearSide=max(0.,-sign(turn)*normalizedX);
-      float angle=clamp(abs(turn),0.,1.);
-      shade=1.-wHead*angle*(.02+.22*farSide);
+      // APEX step 5: shading completes the depth illusion. The rest normal is
+      // carried by the same joints; dots that turn away darken and at a hard
+      // turn the far side falls into clean shadow, while the near silhouette
+      // brightens into a glowing profile line. Everything is relative to the
+      // rest normal, so at rest the front view is the untouched picture.
+      vec3 posedNormal=normalize(normal*(1.-wNeck)+mat3(neckMatrix)*normal*(wNeck-wHead)+mat3(headMatrix)*normal*wHead);
+      float angle=clamp(max(abs(turn),abs(pitch)),0.,1.);
+      // A surface facing the viewer loses a little light on any turn; only the
+      // extra loss beyond that marks the side truly turning away.
+      vec3 front=vec3(0.,0.,1.);
+      float frontZ=normalize(front*(1.-wNeck)+mat3(neckMatrix)*front*(wNeck-wHead)+mat3(headMatrix)*front*wHead).z;
+      float away=max(0.,normal.z-posedNormal.z-(1.-frontZ));
+      float toward=max(0.,posedNormal.z-normal.z);
+      float side=clamp(abs(tile.x-160.)/96.,0.,1.);
+      shade=clamp(1.-away*6.5*wNeck,.10,1.);
       float lowered=clamp(-pitch,0.,1.)*smoothstep(150.,205.,tile.y)*wHead;
       shade*=1.-.18*lowered;
-      float edge=smoothstep(.55,.98,abs(normalizedX));
-      rim=wHead*angle*nearSide*edge*.16;
+      // Near-side profile line: strongest on the steep outer rim of the volume.
+      float steep=1.-normal.z;
+      rim=wHead*angle*smoothstep(.05,.45,steep)*smoothstep(.0,.10,toward)*(.55+.75*side);
       texUV=tile/vec2(320.,480.);
-      gl_Position=vec4(p.x/160.-1.,1.-p.y/240.,0.,1.);
+      gl_Position=vec4(p.x/160.-1.,1.-p.y/240.,-skinned.z/400.,1.);
     }
   `,
     fragmentShader:`
