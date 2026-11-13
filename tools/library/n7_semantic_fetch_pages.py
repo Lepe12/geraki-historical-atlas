@@ -41,9 +41,8 @@ def main():
     a = ap.parse_args()
     key = ftp_key()
     sources, reported = set(), None
-    for word in (w for w in PROBES if 2 <= len(w) <= 150):  # the library rejects shorter queries
+    for word in PROBES:
         status, data = post(key, 'search', {'query': word})
-        if status == 400: continue
         if status != 200 or not data: raise SystemExit(f'SEARCH_FAILED_{status}')
         reported = data.get('source_count', reported)
         sources.update(m['source_id'] for m in data.get('matches', []))
