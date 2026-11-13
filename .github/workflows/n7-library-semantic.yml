@@ -69,7 +69,8 @@ jobs:
           node-version: '22'
       - name: Install offline-only tools (never deployed)
         run: |
-          python3 -m pip install --disable-pip-version-check 'wordfreq==3.1.1'
+          # beautifulsoup4: the reused, reviewed importer module (signing-key retrieval) imports it.
+          python3 -m pip install --disable-pip-version-check 'wordfreq==3.1.1' 'beautifulsoup4==4.13.4'
           mkdir -p "$RUNNER_TEMP/n7sem" && cd "$RUNNER_TEMP/n7sem" && npm init -y >/dev/null && npm install --no-audit --no-fund @huggingface/transformers@3.7.5
       - name: Read library pages through the existing signed bridge
         run: python3 tools/library/n7_semantic_fetch_pages.py "$RUNNER_TEMP/pages.jsonl"
