@@ -630,6 +630,13 @@ window.NABOU_MAP={
     document.querySelectorAll('[data-place-id="'+CSS.escape(id)+'"]').forEach(e=>e.setAttribute("data-n7-focus","1"));
     // flyTo stops any running animation (which emits its own moveend) before it starts, so the
     // listener is attached afterwards and resolves when the camera reaches this place.
+    if(document.documentElement.classList.contains("n7-embed")){
+      // Embedded below N7: a close view that fills the frame with the place (owner's design), routes off.
+      const z={Island:9.5,City:9.8,Port:11.5,Village:11.5,Fortress:11.5,Region:8,"Sea / Strait":8}[p.type]||9.5;
+      try{if(atlasMap.getLayer("atlas-routes"))atlasMap.setLayoutProperty("atlas-routes","visibility","none")}catch(e){}
+      showPlace(p);
+      return new Promise(res=>{atlasMap.flyTo({center:[p.lon,p.lat],zoom:z,pitch:30,bearing:0,duration:1600});atlasMap.once("moveend",()=>res(true))});
+    }
     return new Promise(res=>{focusPlace(id);atlasMap.once("moveend",()=>res(true))});
   }
 };
@@ -652,6 +659,8 @@ document.querySelectorAll(".year-btn").forEach(b=>b.onclick=()=>{
 <script>
 // N7_SPLIT_MAP_V1: only when N7 embeds this page with its #n7map link. Ordinary visits are unchanged.
 if(window.parent!==window&&/[#&]n7map=/.test(location.hash)){
+  // Decoration only (not a map object): the atlas's own ship art beside the compass.
+  addEventListener("DOMContentLoaded",()=>{const d=document.createElement("img");d.src=SHIP_ART_1;d.alt="";d.setAttribute("aria-hidden","true");d.className="n7e-ornament-ship";document.querySelector("main")?.append(d);});
   const v="n7-split-1",css=document.createElement("link");css.rel="stylesheet";css.href="./nabou-embed.css?v="+v;document.head.append(css);
   for(const f of ["n7-map-protocol.js","atlas-map-link.js","atlas-embed-panel.js"]){const sc=document.createElement("script");sc.src="./tools/n7/"+f+"?v="+v;sc.async=false;document.body.append(sc);}
 }

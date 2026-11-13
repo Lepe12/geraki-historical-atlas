@@ -173,19 +173,19 @@ window.addEventListener('message',e=>{
 });
 const STATUS_TEXT={VERIFIED:'επαληθευμένο σημείο',APPROXIMATE:'σημείο κατά προσέγγιση','NEEDS RESEARCH':'σημείο που χρειάζεται έρευνα'};
 async function focusInSplit(r,text){
- await openSplit();
+ await openSplit();delete reply.dataset.show;
  const m=R.matchRecord(text,split.records);
- if(!m){presence('done');say('Δεν βρήκα «'+(r.place?.name||text.replace(/^\S+\s+(?:μου\s+)?(?:(?:την|τη|τον|το|τα|τις|τους|στην|στη|στον|στο)\s+)?/u,'').replace(/[;?.!]+$/,'').slice(0,60))+'» στις εγγραφές του NABOU. Δεν τοποθετώ τόπο που δεν υπάρχει στον χάρτη.');return 'not_in_nabou';}
+ if(!m){presence('done');reply.dataset.show='1';say('Δεν βρήκα «'+(r.place?.name||text.replace(/^\S+\s+(?:μου\s+)?(?:(?:την|τη|τον|το|τα|τις|τους|στην|στη|στον|στο)\s+)?/u,'').replace(/[;?.!]+$/,'').slice(0,60))+'» στις εγγραφές του NABOU. Δεν τοποθετώ τόπο που δεν υπάρχει στον χάρτη.');return 'not_in_nabou';}
  const a=await splitFocus(m.id);
  if(!a.ok||a.state?.selected!==m.id)throw Error('Ο χάρτης δεν επιβεβαίωσε την εστίαση στο '+m.name+(a.error?' ('+a.error+')':'')+'.');
  S.place={id:m.id,name:m.name,atlas:r.place?.atlas||null,record:m.id,coordinateStatus:m.coordinateStatus};save();
- dockTitle.textContent='Με εντολή: «'+text.slice(0,60)+'» · '+m.name+' · '+(STATUS_TEXT[m.coordinateStatus]||'');
+ dockTitle.textContent='Με εντολή: '+text.slice(0,80);
  paintMap();
- const rec=split.records.find(x=>x.id===m.id);
- presence('thinking','Επεξεργάζεται · N7 Core');
- // The short answer comes from the normal N7 chat flow, with the map record as checkable context.
- const ctx={place:rec.place,historicalNames:rec.historicalNames,modernName:rec.modernName,coordinateStatus:rec.coordinateStatus};
- return chat(text+'\n\nΑπάντησε μόνο για τον τόπο «'+rec.place+'», σε 2–3 σύντομες προτάσεις, χωρίς μακριά αυτούσια αποσπάσματα· ανέφερε τις πηγές σου σε μία γραμμή. Πλαίσιο από τον χάρτη NABOU (εγγραφή data.json, προς έλεγχο): '+JSON.stringify(ctx),{brief:true});
+ // Owner's design: a place command shows the map only. No answer panel; the place card and the side
+ // bar on the map carry the record's own fields.
+ reply.replaceChildren();delete reply.dataset.show;
+ presence('done','Ο χάρτης δείχνει: '+m.name);
+ return 'done';
 }
 function placeName(id){return split.records.find(p=>p.id===id)?.place||map.places.find(p=>p.id===id)?.name||R.PLACES.find(p=>p.atlas===id)?.name||id;}
 function paintMap(note){
@@ -200,29 +200,14 @@ async function call(path,payload){
  let d={};try{d=await r.json();}catch{}
  if(!r.ok)throw Error(d.error||('HTTP '+r.status));return d;
 }
-async function chat(text,{brief=false}={}){
+async function chat(text){
  if(typeof window.N7VoiceChat?.send!=='function')throw Error('Η συνομιλία N7 δεν είναι διαθέσιμη σε αυτή τη σελίδα.');
  if(!active)await create();
  S.conversationId=active;save();
  const out=await window.N7VoiceChat.send(active,text);
  if(out.queued){presence('thinking','Σε ουρά επεξεργασίας');say('Η εντολή μπήκε σε ουρά του μοντέλου. Η απάντηση θα εμφανιστεί στη συνομιλία όταν ολοκληρωθεί.',{speak:false});return 'queued';}
  presence('done');
- if(brief&&out.text){sayBrief(out.text);return out.cancelled?'cancelled':'done';}
  say(out.text||'');return out.cancelled?'cancelled':'done';
-}
-// N7_SPLIT_MAP_V1: the map panel shows the first sentences of the answer, with whitespace from quoted
-// source text normalised for display; the full, unchanged answer stays in the conversation.
-function briefText(t){
- const flat=String(t).replace(/(\p{L})-\s*\n\s*(\p{L})/gu,'$1$2').replace(/\s*\n\s*/g,' ').replace(/\s+([,.;:·!?»)])/g,'$1').replace(/([«(])\s+/g,'$1').replace(/\s{2,}/g,' ').trim();
- // A sentence ends at . ! ; · followed by a space (not inside data.json, 1.5 or Β΄.).
- const parts=flat.split(/(?<=[.!;·])\s+/);
- let out='',n=0;for(const p of parts){if(out&&(out.length+p.length+1>420))break;out+=(out?' ':'')+p;if(++n>=3)break;}
- return {text:out.trim(),more:out.trim().length<flat.length};
-}
-function sayBrief(t){
- const b=briefText(t);const p=make('p',b.text);reply.replaceChildren(p);
- if(b.more)reply.append(btn('Ολόκληρη απάντηση →',()=>nav('chat'),'n7-link n7-reply-more','Ολόκληρη απάντηση στη συνομιλία'));
- speakText(b.text);
 }
 /* ---------- N7_HYBRID_SEARCH_V1: on-device semantic leg (optional) ---------- */
 const SEM={state:'off',ext:null,index:null,error:null};
