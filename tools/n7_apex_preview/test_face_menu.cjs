@@ -12,6 +12,10 @@ const LABEL='[aria-label="N7 guide artwork-tile humanoid"]';
  try{
   const p=await b.newPage({viewport:{width:1440,height:900},deviceScaleFactor:Number(process.env.N7_FACE_SCALE||1)}),errors=[];
   p.on('pageerror',e=>errors.push(e.message));
+  // Production (/n7-apex/) keeps owner login: stand in for a signed-in owner
+  // locally so the open conversation layout can be measured. Previews use the
+  // real passwordless chat and are not routed.
+  if(new URL(url).pathname==='/n7-apex/')await p.route('**/api/**',r=>{const n=new URL(r.request().url()).pathname;r.fulfill({contentType:'application/json',body:JSON.stringify(n==='/api/status'?{authenticated:true}:n==='/api/conversations'?{conversations:[]}:n==='/api/tasks'?{tasks:[]}:{})});});
   p.on('console',m=>{if(m.type()==='error'&&m.text().includes('THREE.WebGLProgram'))errors.push(m.text());});
   await p.goto(url,{waitUntil:'networkidle'});
   const d=p.getByRole('dialog',{name:'N7 Humanoid preview'}),host=p.getByLabel('N7 guide artwork-tile humanoid',{exact:true});
