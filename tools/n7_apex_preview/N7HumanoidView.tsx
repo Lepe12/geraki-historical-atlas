@@ -2,10 +2,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { N7_HUMANOID_REFERENCE } from "./N7HumanoidReference";
+import { createHeadSurface } from "./N7HeadSurface";
+import N7Backdrop from "./N7Backdrop";
+import N7GuideView from "./N7GuideView";
+import { N7_GUIDE } from "./N7BuildFlags";
 
 type ViewMode = "assembly" | "particle" | "original" | "compare";
 type Mood = "idle" | "listening" | "thinking" | "speaking";
-type N7Activity = "thinking" | "speaking" | null;
+type N7Activity = "listening" | "thinking" | "speaking" | null;
 type Stats = { particles:number; sampleW:number; sampleH:number; renderMs:number; assembly:number };
 
 const VERT = `
@@ -40,11 +44,94 @@ const FRAG = `
 function clamp01(v:number){ return Math.max(0,Math.min(1,v)); }
 function smooth01(v:number){ const x=clamp01(v); return x*x*(3-2*x); }
 
+
+// Step 5: one continuous source-artwork surface, exact source frame at rest.
+function GuideHeadTileCanvas({enabled,reduced,onStats}:{enabled:boolean;reduced:boolean;onStats:(s:Stats)=>void}) {
+  const hostRef=useRef<HTMLDivElement>(null);
+  useEffect(()=>{
+    const host=hostRef.current;
+    if(!host) return;
+    let disposed=false,raf=0,target=0,current=0,last=0,lastStats=0;
+    let surface:ReturnType<typeof createHeadSurface>|undefined;
+    let wake=()=>{};
+    const canvas=document.createElement("canvas");
+    canvas.width=320;canvas.height=480;
+    Object.assign(canvas.style,{width:"100%",height:"100%",display:"block"});
+    const ctx=canvas.getContext("2d");
+    if(!ctx) return;
+    host.replaceChildren(canvas);
+    const image=new Image();image.decoding="async";
+    const pointer=(e:PointerEvent)=>{
+      if(!enabled||reduced) return;
+      const rect=host.getBoundingClientRect();
+      if(!rect.width) return;
+      target=Math.max(-1,Math.min(1,(e.clientX-rect.left-rect.width/2)/(rect.width*.42)));
+      if(Math.abs(target)<.10) target=0;
+      host.dataset.headTarget=target.toFixed(3);wake();
+    };
+    const clear=()=>{target=0;host.dataset.headTarget="0.000";wake();};
+    window.addEventListener("pointermove",pointer,{passive:true});
+    window.addEventListener("blur",clear);document.addEventListener("mouseleave",clear);
+    image.onload=()=>{
+      if(disposed) return;
+      // Freeze the decoded reference once. Re-decoding/drawing lossy WebP after
+      // GPU use can choose a different accelerated color-rounding path in Chrome.
+      ctx.drawImage(image,0,0);
+      const referencePixels=ctx.getImageData(0,0,320,480);
+      ctx.putImageData(referencePixels,0,0);
+      try{surface=createHeadSurface(canvas);}catch(error){
+        host.dataset.renderError=String(error);
+        // The frozen approved reference remains usable without WebGL.
+        return;
+      }
+      Object.assign(surface.canvas.style,{width:"100%",height:"100%",display:"none"});
+      host.append(surface.canvas);
+      host.dataset.renderer="shared-edge-texture-mesh";
+      const draw=(now:number)=>{
+        raf=0;
+        if(disposed) return;
+        const started=performance.now();
+        const dt=last?now-last:16.67;last=now;
+        current+=(target-current)*(1-Math.exp(-Math.min(100,dt)/42));
+        if(Math.abs(target-current)<.0001) current=target;
+        if(current===0){
+          // The static reference is the sole visible surface at neutral.
+          // During motion it is hidden, never an underlay or a head overlay.
+          surface!.canvas.style.display="none";canvas.style.display="block";
+        }else{
+          canvas.style.display="none";surface!.canvas.style.display="block";
+          surface!.draw(current); // Present directly: no GPU-to-2D copy each frame.
+        }
+        const renderMs=performance.now()-started;
+        host.dataset.currentTurn=current.toFixed(4);
+        host.dataset.renderMs=renderMs.toFixed(3);
+        host.dataset.frameMs=dt.toFixed(3);
+        // Report stats at most twice a second; no React updates per frame.
+        if(now-lastStats>500){
+          lastStats=now;
+          onStats({particles:surface!.vertices,sampleW:320,sampleH:480,renderMs:+renderMs.toFixed(2),assembly:100});
+        }
+        if(current!==target) raf=requestAnimationFrame(draw);
+      };
+      wake=()=>{if(!raf&&!disposed)raf=requestAnimationFrame(draw);};
+      wake();
+    };
+    image.src=N7_HUMANOID_REFERENCE;
+    return()=>{
+      disposed=true;cancelAnimationFrame(raf);surface?.dispose();
+      window.removeEventListener("pointermove",pointer);window.removeEventListener("blur",clear);
+      document.removeEventListener("mouseleave",clear);host.replaceChildren();
+    };
+  },[enabled,reduced,onStats]);
+  return <div ref={hostRef} aria-label="N7 guide artwork-tile humanoid" style={{position:"absolute",inset:0}} />;
+}
+
 function ParticleReference({
   enabled,
   assembly,
   replayKey,
   reduced,
+  headTurnEnabled,
   onStats,
   onAssemblyDone,
 }:{
@@ -52,6 +139,7 @@ function ParticleReference({
   assembly:boolean;
   replayKey:number;
   reduced:boolean;
+  headTurnEnabled:boolean;
   onStats:(s:Stats)=>void;
   onAssemblyDone:()=>void;
 }) {
@@ -65,6 +153,7 @@ function ParticleReference({
     let geometry:THREE.BufferGeometry|null=null;
     let material:THREE.ShaderMaterial|null=null;
     let positionAttr:THREE.BufferAttribute|null=null;
+    let colorAttr:THREE.BufferAttribute|null=null;
     let alphaAttr:THREE.BufferAttribute|null=null;
     let ro:ResizeObserver|null=null;
     let raf=0;
@@ -72,6 +161,11 @@ function ParticleReference({
     let lastFrame=0;
     let completed=false;
     let currentProgress=assembly&&!reduced ? 0 : 1;
+    let targetTurn=0;
+    let currentTurn=0;
+    let turnClock=performance.now();
+    let pointerMove:(e:PointerEvent)=>void=()=>{};
+    let clearTarget:()=>void=()=>{};
 
     const image=new Image();
     image.decoding="async";
@@ -97,6 +191,10 @@ function ParticleReference({
       const colors:number[]=[];
       const launchDelays:number[]=[];
       const jitter:number[]=[];
+      const headWeights:number[]=[];
+      const headDepths:number[]=[];
+      const headEdges:number[]=[];
+      const sourceYs:number[]=[];
 
       // One point = one sampled artwork pixel/color.
       for(let y=0;y<sampleH;y++){
@@ -115,6 +213,20 @@ function ParticleReference({
           const fy=sampleH/2-y-.5;
           finals.push(fx,fy,0);
           colors.push(r,g,b);
+
+          // Guide Step 5: the SAME sampled head particles gain synthetic depth.
+          // Motion fades naturally to zero at the neck so the neck itself stays fixed.
+          const hx=(x+.5-sampleW/2)/112;
+          const hy=(y+.5-110)/108;
+          const dome=Math.max(0,1-hx*hx-hy*hy);
+          const inHead=y<205 && y>4 && Math.abs(x+.5-sampleW/2)<122;
+          const neckBase=inHead?smooth01(clamp01((202-y)/38)):0;
+          // Strong falloff near the pivot: upper head turns clearly, lower head/neck stays anchored.
+          const neckWeight=neckBase*neckBase*neckBase*neckBase;
+          headWeights.push(neckWeight);
+          headDepths.push(inHead?Math.sqrt(dome)*58:0);
+          headEdges.push(inHead?clamp01((Math.abs(hx)-.72)/.28):0);
+          sourceYs.push(y);
 
           // Guide Step 4: the body completes left-to-right.
           let delay=((fx+sampleW/2)/sampleW)*.66;
@@ -159,7 +271,9 @@ function ParticleReference({
       alphaAttr=new THREE.BufferAttribute(alphaArray,1);
       alphaAttr.setUsage(THREE.DynamicDrawUsage);
       geometry.setAttribute("position",positionAttr);
-      geometry.setAttribute("color",new THREE.Float32BufferAttribute(colors,3));
+      colorAttr=new THREE.BufferAttribute(new Float32Array(colors),3);
+      colorAttr.setUsage(THREE.DynamicDrawUsage);
+      geometry.setAttribute("color",colorAttr);
       geometry.setAttribute("alpha",alphaAttr);
 
       material=new THREE.ShaderMaterial({
@@ -180,6 +294,19 @@ function ParticleReference({
       renderer.toneMapping=THREE.NoToneMapping;
       renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
       host.replaceChildren(renderer.domElement);
+
+      pointerMove=(e:PointerEvent)=>{
+        if(!headTurnEnabled){ targetTurn=0; host.dataset.headTarget="0.000"; return; }
+        const rect=host.getBoundingClientRect();
+        if(rect.width<=0) return;
+        const raw=Math.max(-1,Math.min(1,(e.clientX-(rect.left+rect.width/2))/(rect.width*.42)));
+        targetTurn=Math.abs(raw)<.18?0:raw;
+        host.dataset.headTarget=targetTurn.toFixed(3);
+      };
+      clearTarget=()=>{ targetTurn=0; host.dataset.headTarget="0.000"; };
+      window.addEventListener("pointermove",pointerMove,{passive:true});
+      window.addEventListener("blur",clearTarget);
+      document.addEventListener("mouseleave",clearTarget);
 
       const applyAssembly=(progress:number)=>{
         currentProgress=progress;
@@ -238,9 +365,80 @@ function ParticleReference({
         alphaAttr.needsUpdate=true;
       };
 
+      const applyHeadTurn=()=>{
+        if(assembly||!positionAttr||!colorAttr) return;
+        const arr=positionAttr.array as Float32Array;
+        const cc=colorAttr.array as Float32Array;
+        const amount=Math.abs(currentTurn);
+        let maxShift=0;
+        let neckShift=0;
+        let neutralError=0;
+
+        if(amount<.0005){
+          arr.set(finalArray);
+          cc.set(colors);
+          host.dataset.currentTurn="0.000";
+          host.dataset.headMaxShift="0.000";
+          host.dataset.neckMaxShift="0.000";
+          host.dataset.neutralError="0.000";
+          positionAttr.needsUpdate=true;
+          colorAttr.needsUpdate=true;
+          return;
+        }
+
+        const sign=Math.sign(currentTurn)||1;
+        for(let n=0;n<headWeights.length;n++){
+          const j=n*3;
+          const w=headWeights[n];
+          const fx=finalArray[j], fy=finalArray[j+1];
+          const br=colors[j], bg=colors[j+1], bb=colors[j+2];
+          if(w<=0){
+            arr[j]=fx; arr[j+1]=fy; arr[j+2]=0;
+            cc[j]=br; cc[j+1]=bg; cc[j+2]=bb;
+            // True neck/body region begins below the guide's head cap.
+            if(sourceYs[n]>=205) neckShift=Math.max(neckShift,0);
+            continue;
+          }
+
+          // Isolated preview deploy marker: bounded head warp with head-region visibility gate.
+          // Safe bounded 2.5D warp: never rotate the point cloud in 3D.
+          // Facial/upper-head particles slide a few pixels laterally, with the
+          // strongest movement near the centre of the face and zero at the neck.
+          const centreWeight=1-Math.min(1,Math.abs(fx)/112);
+          const offset=currentTurn*w*(7+5*centreWeight);
+          const tx=fx+offset;
+          arr[j]=tx;
+          arr[j+1]=fy;
+          arr[j+2]=0;
+
+          const shift=Math.abs(tx-fx);
+          maxShift=Math.max(maxShift,shift);
+          if(sourceYs[n]>=205) neckShift=Math.max(neckShift,shift);
+
+          // Guide shading: far side darkens; only the near silhouette gets a restrained rim.
+          const side=fx/112;
+          const far=Math.max(0,-sign*side);
+          const near=Math.max(0,sign*side);
+          const shade=1-amount*w*(.08+.43*far);
+          const rim=headEdges[n]*near*amount*w;
+          cc[j]=Math.min(1,br*shade+.015*rim);
+          cc[j+1]=Math.min(1,bg*shade+.075*rim);
+          cc[j+2]=Math.min(1,bb*shade+.12*rim);
+        }
+
+        for(let i=0;i<finalArray.length;i++) neutralError=Math.max(neutralError,Math.abs((positionAttr.array as Float32Array)[i]-finalArray[i]));
+        host.dataset.currentTurn=currentTurn.toFixed(3);
+        host.dataset.headMaxShift=maxShift.toFixed(3);
+        host.dataset.neckMaxShift=neckShift.toFixed(3);
+        host.dataset.neutralError=neutralError.toFixed(3);
+        positionAttr.needsUpdate=true;
+        colorAttr.needsUpdate=true;
+      };
+
       const renderFrame=(progress:number)=>{
         if(!renderer||!material) return;
         applyAssembly(progress);
+        if(!assembly) applyHeadTurn();
 
         const rect=host.getBoundingClientRect();
         renderer.setSize(Math.max(1,rect.width),Math.max(1,rect.height),false);
@@ -290,6 +488,18 @@ function ParticleReference({
         }
       }else{
         renderFrame(1);
+        const turnTick=(now:number)=>{
+          if(disposed) return;
+          const dt=Math.min(300,Math.max(0,now-turnClock));
+          turnClock=now;
+          if(!headTurnEnabled) targetTurn=0;
+          const ease=1-Math.exp(-dt/110);
+          currentTurn+=(targetTurn-currentTurn)*ease;
+          if(targetTurn===0&&Math.abs(currentTurn)<.006) currentTurn=0;
+          renderFrame(1);
+          raf=requestAnimationFrame(turnTick);
+        };
+        raf=requestAnimationFrame(turnTick);
       }
 
       ro=new ResizeObserver(()=>renderFrame(currentProgress));
@@ -300,12 +510,15 @@ function ParticleReference({
       disposed=true;
       cancelAnimationFrame(raf);
       ro?.disconnect();
+      window.removeEventListener("pointermove",pointerMove);
+      window.removeEventListener("blur",clearTarget);
+      document.removeEventListener("mouseleave",clearTarget);
       geometry?.dispose();
       material?.dispose();
       renderer?.dispose();
       host.replaceChildren();
     };
-  },[enabled,assembly,replayKey,reduced,onStats,onAssemblyDone]);
+  },[enabled,assembly,replayKey,reduced,headTurnEnabled,onStats,onAssemblyDone]);
 
   return <div
     ref={hostRef}
@@ -647,13 +860,15 @@ function AssemblyCanvas({
   />;
 }
 
-export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onClose:()=>void;activity?:N7Activity}) {
+function LegacyHumanoidView({open,onClose,activity}:{open:boolean;onClose:()=>void;activity?:N7Activity}) {
   const systemReduced=useMemo(()=>typeof window!=="undefined"&&window.matchMedia?.("(prefers-reduced-motion: reduce)").matches,[]);
   const [allowMotion,setAllowMotion]=useState(false);
   const reduced=systemReduced&&!allowMotion;
 
+  const isolatedStep5=N7_GUIDE;
   const [mode,setMode]=useState<ViewMode>("particle");
   const [details,setDetails]=useState(false);
+  const [effects,setEffects]=useState(true);
   const [mood,setMood]=useState<Mood>("idle");
   const autoThinkingRef=useRef(false);
   const [replayKey,setReplayKey]=useState(0);
@@ -689,32 +904,40 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
 
   return <section role="dialog" aria-modal="true" aria-label="N7 Humanoid preview"
     style={{position:"fixed",inset:0,zIndex:120,background:"#000",color:"#e9fbff",fontFamily:"system-ui,sans-serif",overflow:"hidden"}}>
+    {isolatedStep5&&<N7Backdrop effects={effects} reduced={systemReduced} />}
     <header style={{position:"absolute",top:14,left:18,right:18,zIndex:5,display:"flex",justifyContent:"space-between",alignItems:"center",gap:12}}>
       <div>
         <strong style={{letterSpacing:4,color:"#62e8f7"}}>N7 · HUMANOID</strong>
-        <div style={{fontSize:11,opacity:.62}}>Guide Step 3 + 4 · face-bloom moods + real Thinking state + particle-river Assembly</div>
+        <div style={{fontSize:11,opacity:.62}}>Guide Steps 3–6 · moods · Assembly · head turn · living landscape</div>
       </div>
       <button type="button" onClick={onClose} style={{padding:"9px 13px",border:"1px solid #2c6c7e",background:"#091823",color:"#dffbff",borderRadius:7,cursor:"pointer"}}>Exit</button>
     </header>
 
     <div style={{position:"absolute",inset:"58px 0 104px",display:"grid",placeItems:"center"}}>
-      <div style={{position:"relative",height:"100%",aspectRatio:"2/3",maxWidth:"94vw",overflow:"hidden"}}>
+      <div style={{position:"relative",height:"100%",aspectRatio:"2/3",maxWidth:"94vw",overflow:"hidden",mixBlendMode:isolatedStep5?"screen":undefined}}>
         {(mode==="original"||mode==="compare")&&<img
           src={N7_HUMANOID_REFERENCE}
           alt="Approved N7 idle reference"
           style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"contain",opacity:mode==="compare"?.38:1}}
         />}
 
-        {(mode==="particle"||mode==="compare")&&<ParticleReference
-          enabled
-          assembly={false}
-          replayKey={replayKey}
-          reduced={false}
-          onStats={setStats}
-          onAssemblyDone={handleAssemblyDone}
-        />}
+        {(mode==="particle"||mode==="compare")&&(isolatedStep5
+          ? <GuideHeadTileCanvas enabled={mood==="idle"} reduced={systemReduced} onStats={setStats} />
+          : <ParticleReference
+              enabled
+              assembly={false}
+              replayKey={replayKey}
+              reduced={false}
+              headTurnEnabled={mood==="idle"}
+              onStats={setStats}
+              onAssemblyDone={handleAssemblyDone}
+            />
+        )}
 
         {(mode==="particle"||mode==="compare")&&<MoodCanvas mood={mood} />}
+        {mode==="particle"&&mood==="idle"&&<div aria-label="N7 Step 5 preview hint" style={{position:"absolute",bottom:10,left:"50%",transform:"translateX(-50%)",padding:"5px 8px",background:"#03111dcc",border:"1px solid #285d70",borderRadius:5,fontSize:10,opacity:.72,pointerEvents:"none"}}>
+          MOVE POINTER · GUIDE STEP 5
+        </div>}
 
         {mode==="assembly"&&<AssemblyCanvas
           replayKey={replayKey}
@@ -773,6 +996,7 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
         <button type="button" onClick={()=>setMode("original")} style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:mode==="original"?"#115068":"#07131b",cursor:"pointer"}}>Original</button>
         <button type="button" onClick={()=>setMode("particle")} style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:mode==="particle"?"#115068":"#07131b",cursor:"pointer"}}>Particles</button>
         <button type="button" onClick={()=>setMode("compare")} style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:mode==="compare"?"#115068":"#07131b",cursor:"pointer"}}>Compare</button>
+        {isolatedStep5&&<button type="button" aria-pressed={effects} onClick={()=>setEffects(x=>!x)} style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:"#07131b",cursor:"pointer"}}>Effects {effects?"On":"Off"}</button>}
         <button type="button" onClick={()=>setDetails(x=>!x)} style={{padding:"8px 11px",border:"1px solid #28667a",borderRadius:6,color:"#defaff",background:"#07131b",cursor:"pointer"}}>Technical details</button>
       </div>
 
@@ -782,4 +1006,8 @@ export default function N7HumanoidView({open,onClose,activity}:{open:boolean;onC
       </div>}
     </div>
   </section>;
+}
+
+export default function N7HumanoidView(props:{open:boolean;onClose:()=>void;activity?:N7Activity;onWorkspace?:()=>void}){
+  return N7_GUIDE?<N7GuideView {...props}/>:<LegacyHumanoidView {...props}/>;
 }
