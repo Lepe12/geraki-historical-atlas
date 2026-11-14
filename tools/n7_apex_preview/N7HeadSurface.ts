@@ -85,10 +85,16 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,m
       // With H01 the shoulder lines rise higher beside the neck, so the loose
       // hair there lets go earlier and the raised shoulders stay fixed.
       float looseFrom=mix(210.,204.,faceRelief),looseTo=mix(232.,217.,faceRelief);
-      // The twist is spread over the whole neck column (APEX: the head turns
-      // around the neck), so its drawn lines curve instead of kinking.
-      float wHead=1.-smoothstep(mix(194.,looseFrom,lateral),mix(240.,looseTo,lateral),tile.y);
-      float wNeck=1.-smoothstep(mix(212.,looseFrom,lateral),mix(256.,looseTo,lateral),tile.y);
+      // APEX step 5: the head turns around a fixed neck. Everything above the
+      // drawn jaw line is carried rigidly by the head joint; the neck column
+      // under the jaw stays still, so its lines never bend or break. The jaw
+      // is measured on the artwork: chin at row 203 (N7) / 199 (H01).
+      float chinY=mix(203.,199.,faceRelief),jawK=mix(.0275,.0215,faceRelief);
+      float jaw=chinY-jawK*(tile.x-160.)*(tile.x-160.);
+      float wCentre=1.-smoothstep(jaw+2.,jaw+14.,tile.y);
+      float wLoose=1.-smoothstep(looseFrom,looseTo,tile.y);
+      float wHead=mix(wCentre,wLoose,lateral);
+      float wNeck=wHead;
       wNeck=max(wNeck,wHead);
       vec3 skinned=rest.xyz*(1.-wNeck)+(neckMatrix*rest).xyz*(wNeck-wHead)+(headMatrix*rest).xyz*wHead;
       vec2 p=skinned.xy;
@@ -112,7 +118,7 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,m
       float away=max(0.,normal.z-posedNormal.z-(1.-frontZ));
       float toward=max(0.,posedNormal.z-normal.z);
       float side=clamp(abs(tile.x-160.)/96.,0.,1.);
-      shade=clamp(1.-away*6.5*wNeck,.10,1.);
+      shade=clamp(1.-away*4.5*wNeck,.25,1.);
       float lowered=clamp(-pitch,0.,1.)*smoothstep(150.,205.,tile.y)*wHead;
       shade*=1.-.18*lowered;
       // Near-side profile line: strongest on the steep outer rim of the volume.
@@ -295,7 +301,9 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,m
   const camera=new THREE.OrthographicCamera(-1,1,1,-1,.1,10);camera.position.z=1;
   // Real joint hierarchy: shoulders (fixed) -> neck base -> skull base.
   // Angles are radians; the neck carries 30% and the skull joint 70%.
-  const NECK_BASE=new THREE.Vector3(160,252,-4),SKULL_BASE=new THREE.Vector3(160,168,0);
+  // The turning axis runs inside the neck, level with the chin surface, so the
+  // chin stays on the neck while the face and the hair behind it turn about it.
+  const NECK_BASE=new THREE.Vector3(160,252,24),SKULL_BASE=new THREE.Vector3(160,168,24);
   const neckJoint=new THREE.Object3D(),headJoint=new THREE.Object3D();
   neckJoint.position.copy(NECK_BASE);headJoint.position.copy(SKULL_BASE).sub(NECK_BASE);neckJoint.add(headJoint);
   neckJoint.rotation.order="YXZ";headJoint.rotation.order="YXZ";
