@@ -616,6 +616,28 @@ function focusPlace(id){
 // N7_SPLIT_MAP_V1: read-only hook used by the embedded N7 link (tools/n7/atlas-map-link.js).
 // It exposes the stored records and the existing focusPlace(); it adds no place or coordinate.
 let n7Selected=null,n7MapLoaded=false;
+// N7_SPLIT_MAP_V1 (embed only): the painted look of the owner's reference image — olive and green land,
+// deep teal sea, light shore line, stronger relief. Colours and relief only; geography and data unchanged.
+let n7Painted=false;
+function n7PaintedLook(){
+  if(n7Painted||!atlasMap)return;n7Painted=true;
+  const set=(id,k,v)=>{try{atlasMap.setPaintProperty(id,k,v)}catch(e){}};
+  for(const layer of atlasMap.getStyle()?.layers||[]){
+    const id=(layer.id||"").toLowerCase();
+    if(layer.type==="background")set(layer.id,"background-color","#8f8a4e");
+    if(layer.type==="fill"){
+      if(/water|ocean|sea|lake|riverbank/.test(id))set(layer.id,"fill-color","#1d4b58");
+      else if(/wood|forest|scrub|vegetation/.test(id)){set(layer.id,"fill-color","#4e6a34");set(layer.id,"fill-opacity",.85)}
+      else if(/grass|park|green|meadow/.test(id)){set(layer.id,"fill-color","#6f8240");set(layer.id,"fill-opacity",.75)}
+      else if(/farmland|farm|agric|crop|orchard|vineyard/.test(id)){set(layer.id,"fill-color","#a39150");set(layer.id,"fill-opacity",.6)}
+      else if(/sand|beach|dune/.test(id))set(layer.id,"fill-color","#d8c38a");
+      else if(/land|earth|landcover|landuse/.test(id)){set(layer.id,"fill-color","#9a8d52");set(layer.id,"fill-opacity",.55)}
+    }
+    if(layer.type==="line"&&/coast|shore/.test(id)){set(layer.id,"line-color","#e3cf96");set(layer.id,"line-width",1.6);set(layer.id,"line-opacity",.9)}
+    if(layer.type==="hillshade"){set(layer.id,"hillshade-exaggeration",1);set(layer.id,"hillshade-shadow-color","#1e2a14");
+      set(layer.id,"hillshade-highlight-color","#efe2a8");set(layer.id,"hillshade-accent-color","#5a4a2a")}
+  }
+}
 window.NABOU_MAP={
   get records(){return DATA.places},
   ready:()=>!!atlasMap&&n7MapLoaded&&DATA.places.length>0,
@@ -631,6 +653,7 @@ window.NABOU_MAP={
     // flyTo stops any running animation (which emits its own moveend) before it starts, so the
     // listener is attached afterwards and resolves when the camera reaches this place.
     if(document.documentElement.classList.contains("n7-embed")){
+      n7PaintedLook();
       // Embedded below N7: a close view that fills the frame with the place (owner's design), routes off.
       const z={Island:9.5,City:9.8,Port:11.5,Village:11.5,Fortress:11.5,Region:8,"Sea / Strait":8}[p.type]||9.5;
       try{if(atlasMap.getLayer("atlas-routes"))atlasMap.setLayoutProperty("atlas-routes","visibility","none")}catch(e){}
