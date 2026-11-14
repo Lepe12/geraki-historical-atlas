@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import argparse, pathlib, shutil, subprocess, base64, hashlib
+import argparse, pathlib, shutil, subprocess, base64, hashlib, os
 
 UPSTREAM="https://github.com/RubenM1990/APEX-UI.git"
 COMMIT="a8732fad1078a809cadfa810cb0d89cf4445dbed"
@@ -128,6 +128,13 @@ def main():
     ap.add_argument("--out",required=True)
     args=ap.parse_args()
     out=pathlib.Path(args.out).resolve()
+    base_path=os.getenv("N7_APEX_BASE_PATH","/n7-apex").rstrip("/") or "/n7-apex"
+    # Isolated guide previews: /n7-apex-step5 and its visual trial /n7-apex-step5-visual.
+    isolated=base_path.rsplit("/",1)[-1].startswith("n7-apex-step5")
+    # The owner approved the guide Humanoid for production (/n7-apex). Production
+    # gets the same figure, environment, moods and voice; only the test pages and
+    # the passwordless guest chat stay in the isolated previews.
+    guide=isolated or base_path=="/n7-apex"
     if out.exists(): shutil.rmtree(out)
     out.mkdir(parents=True)
     run("git","init",str(out))
@@ -139,12 +146,28 @@ def main():
     overlay=pathlib.Path(__file__).resolve().parent
     shutil.copy2(overlay/"N7Workspace.tsx",out/"components/N7Workspace.tsx")
     shutil.copy2(overlay/"N7ApexStage.tsx",out/"components/N7ApexStage.tsx")
+    (out/"components/N7BuildFlags.ts").write_text(f"export const N7_GUIDE = {str(guide).lower()};\nexport const N7_GUEST_CHAT = {str(isolated).lower()};\n")
+    # Step 5/6 stays isolated; retain the normal production entry point.
+    # The isolated Step 5 route must present the humanoid immediately.
+    # Production /n7-apex keeps the normal button-controlled workflow.
+    # isolated auto-open deployment marker
+    if guide:
+        patch_exact(out/"components/N7ApexStage.tsx",
+            "const [humanoidOpen,setHumanoidOpen]=useState(false);",
+            "const [humanoidOpen,setHumanoidOpen]=useState(true);")
     shutil.copy2(overlay/"N7HumanoidView.tsx",out/"components/N7HumanoidView.tsx")
+    shutil.copy2(overlay/"N7Backdrop.tsx",out/"components/N7Backdrop.tsx")
+    shutil.copy2(overlay/"N7HeadSurface.ts",out/"components/N7HeadSurface.ts")
+    for name in ("N7GuideScene.tsx","N7GuideView.tsx","N7GuideFx.ts","useN7Voice.ts","N7FemaleVoice.ts","N7VoiceSignal.ts"):
+        shutil.copy2(overlay/name,out/"components"/name)
+    (out/"components/N7BackdropReference.ts").write_text(f'export const N7_BACKDROP_REFERENCE = "{base_path}/n7-mountain-backdrop.webp";\n')
     shutil.copy2(overlay/"N7HumanoidReference.ts",out/"components/N7HumanoidReference.ts")
+    (out/"components/N7HumanoidReference.ts").write_text(f'export const N7_HUMANOID_REFERENCE = "{base_path}/n7-humanoid-idle-v3.webp";\n')
     for part in overlay.glob("N7HumanoidReferencePart*.ts"):
         shutil.copy2(part, out/"components"/part.name)
     shutil.copy2(overlay/"N7HumanoidIdle.ts",out/"components/N7HumanoidIdle.ts")
     (out/"public").mkdir(parents=True, exist_ok=True)
+    shutil.copy2(overlay/"N7FemaleVoiceWorker.js",out/"public/n7-female-voice-worker-v2.js")
     chunks = sorted((overlay/"assets_v3").glob("chunk*.b64"))
     if len(chunks) != 15:
         raise RuntimeError(f"expected 15 humanoid asset chunks, found {len(chunks)}")
@@ -154,6 +177,54 @@ def main():
     if humanoid_sha != "bdba288c56230908e1c6abd1a199e5a895159730faf27c672916b03d51a5c7e5":
         raise RuntimeError(f"wrong N7 humanoid asset sha256: {humanoid_sha}")
     (out/"public/n7-humanoid-idle-v3.webp").write_bytes(humanoid_bytes)
+    if guide:
+        face_bytes=(overlay/"assets/n7-humanoid-face-v4.webp").read_bytes()
+        if hashlib.sha256(face_bytes).hexdigest()!="1abf41530c4253962a46fe426c107eb2f776f54ad5c2c5e594b8765bd569ea68":
+            raise RuntimeError("wrong N7 face artwork")
+        (out/"public/n7-humanoid-face-v4.webp").write_bytes(face_bytes)
+        (out/"components/N7HumanoidReference.ts").write_text(f'export const N7_HUMANOID_REFERENCE = "{base_path}/n7-humanoid-face-v4.webp";\n')
+    if isolated:
+        shutil.copy2(overlay/"N7HeadTest.tsx",out/"components/N7HeadTest.tsx")
+        shutil.copy2(overlay/"assets/n7-head-h01.webp",out/"public/n7-head-h01.webp")
+        (out/"app/head-test").mkdir(parents=True,exist_ok=True)
+        (out/"app/head-test/page.tsx").write_text('import N7HeadTest from "@/components/N7HeadTest";\nexport default function HeadTest(){return <N7HeadTest/>;}\n')
+    if isolated:
+        for name in ("N7RealAvatar.tsx","N7RealAvatarView.tsx"):
+            shutil.copy2(overlay/name,out/"components"/name)
+        real=(overlay/"assets/n7-mpfb-v1.glb").read_bytes()
+        if hashlib.sha256(real).hexdigest()!="d3ad956f21033e43a32574fa474ac7d76d9c5d81dac432a5b5b291bea3b9638b":
+            raise RuntimeError("wrong real avatar asset")
+        (out/"public/n7-mpfb-v1.glb").write_bytes(real)
+        shutil.copy2(overlay/"assets/N7-3D-NOTICE.txt",out/"public/N7-3D-NOTICE.txt")
+        (out/"app/avatar-3d").mkdir(parents=True,exist_ok=True)
+        (out/"app/avatar-3d/page.tsx").write_text('import N7RealAvatar from "@/components/N7RealAvatar";\nexport default function RealAvatar(){return <N7RealAvatar/>;}\n')
+        # Isolated evaluation of the owner's 3D model (prepare_model_test.py); separate route.
+        for name in ("N7ModelTest.tsx","N7ModelTestView.tsx","N7ModelFittedView.tsx"):
+            shutil.copy2(overlay/name,out/"components"/name)
+        model=(overlay/"assets/n7-model-textured-v1.glb").read_bytes()
+        if hashlib.sha256(model).hexdigest()!="659017150e31a797ee8743384a1ed9bd253ab5e8f1514ac595a3c3344b054837":
+            raise RuntimeError("wrong model test asset")
+        (out/"public/n7-model-textured-v1.glb").write_bytes(model)
+        for name,digest in (("n7-model-from-art-v1.glb","614b6360527484b5ab9823b026dd248a9621b11a12958b0c0b1464d007840e6b"),("n7-art-profile-v1.webp","0e6dd7b82af3514a5f0d68b01b4e9ef0839fd48c058866238ae7c9781f32e81f"),("n7-art-back-v1.webp","e98ba44928f0d76335eb99f264828e1ad12dd9fcf4a640003e080c33da49dbe5")):
+            data=(overlay/"assets"/name).read_bytes()
+            if hashlib.sha256(data).hexdigest()!=digest: raise RuntimeError("wrong 3D asset "+name)
+            (out/"public"/name).write_bytes(data)
+        (out/"app/model-3d").mkdir(parents=True,exist_ok=True)
+        (out/"app/model-3d/page.tsx").write_text('import N7ModelTest from "@/components/N7ModelTest";\nexport default function ModelTest(){return <N7ModelTest/>;}\n')
+    shutil.copy2(overlay/"assets/n7-mountain-backdrop.webp",out/"public/n7-mountain-backdrop.webp")
+    if guide:
+        # Visual trial: the designed N7 environment and the H01 second face option.
+        for name,digest in (("n7-environment-v4.webp","aaeef66b5d40b284562d1739894075953d91db4120fa0691e9d046617920ca3a"),
+                            ("n7-humanoid-h01-v2.webp","c07d6e2f063ee46984fea3dbee117b8fe467e7e5f640a6e3770f1e8787ec81a5")):
+            data=(overlay/"assets"/name).read_bytes()
+            if hashlib.sha256(data).hexdigest()!=digest: raise RuntimeError("wrong visual asset "+name)
+            (out/"public"/name).write_bytes(data)
+        (out/"components/N7BackdropReference.ts").write_text(f'export const N7_BACKDROP_REFERENCE = "{base_path}/n7-environment-v4.webp";\n')
+        # The owner's approved mood pictures, aligned to the idle frame (prepare_mood_art.py).
+        for name in ("listening","thinking","speaking"):
+            data=(overlay/"assets"/f"n7-mood-{name}-v1.webp").read_bytes()
+            if hashlib.sha256(data).hexdigest()!={'listening': '1842217c1bbbc2fca5836ad243954b2291a80420876db64d7820a7da6d4c5ea8', 'thinking': '480713cb170db59e98f1fb7939e7cea6f097c75843fa3cf1bc92ecaf058821df', 'speaking': '41124f09f0493bb123e5744592341e5fd93c19b7f839a8e10c150637bd5452e0'}[name]: raise RuntimeError("wrong mood picture "+name)
+            (out/"public"/f"n7-mood-{name}-v1.webp").write_bytes(data)
 
     patch_exact(out/"app/page.tsx",'import ApexWorld from "@/components/ApexWorld";','import N7ApexStage from "@/components/N7ApexStage";')
     patch_exact(out/"app/page.tsx",'''<section style={{ position: "relative", height: "100vh", minHeight: 620 }}>
@@ -191,13 +262,13 @@ def main():
       (out/"components/ApexWorld.tsx").write_text(txt.replace(old,new))
     txt=(out/"components/ReasoningWeb.jsx").read_text().replace("lab.textContent = 'Apex'","lab.textContent = 'N7'").replace('aria-label="Apex reasoning web"','aria-label="N7 reasoning web"')
     (out/"components/ReasoningWeb.jsx").write_text(txt)
-    txt=(out/"components/ApexOverviewPanel.tsx").read_text().replace('fetch("/api/weather")','fetch("/n7-apex/api/weather/")')
+    txt=(out/"components/ApexOverviewPanel.tsx").read_text().replace('fetch("/api/weather")',f'fetch("{base_path}/api/weather/")')
     (out/"components/ApexOverviewPanel.tsx").write_text(txt)
     (out/"app/api/weather/route.ts").write_text('''import { NextResponse } from "next/server";
 export const dynamic = "force-static";
 export function GET(){ return NextResponse.json({current:null,city:"Athens"}); }
 ''')
-    (out/"next.config.mjs").write_text('''const nextConfig={output:"export",trailingSlash:true,basePath:"/n7-apex",assetPrefix:"/n7-apex",images:{unoptimized:true}}; export default nextConfig;
+    (out/"next.config.mjs").write_text(f'''const nextConfig={{output:"export",trailingSlash:true,basePath:"{base_path}",assetPrefix:"{base_path}",images:{{unoptimized:true}}}}; export default nextConfig;
 ''')
     print("N7_APEX_SOURCE_READY="+head)
 

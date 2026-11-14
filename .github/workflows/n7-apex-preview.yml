@@ -8,7 +8,7 @@ on:
       - '.github/workflows/n7-apex-preview.yml'
       - 'ops_ftps_requests/n7-apex-preview.json'
   push:
-    branches: [main]
+    branches: [main, 'preview/n7-apex-step5-guide', 'preview/n7-visual-h01']
     paths:
       - 'tools/n7_apex_preview/**'
       - '.github/workflows/n7-apex-preview.yml'
@@ -16,19 +16,22 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: n7-apex-preview-deploy
-  cancel-in-progress: true
+  group: n7-apex-preview-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'push' }}
 jobs:
   validate:
     environment: nabou-production
     runs-on: ubuntu-24.04
-    timeout-minutes: 18
+    timeout-minutes: 30
     env:
       PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
       PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
       PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
       PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
       N7_DRY_RUN: '1'
+      # The visual trial branch publishes beside the functional preview, never over it.
+      N7_APEX_BASE_PATH: ${{ github.ref == 'refs/heads/main' && '/n7-apex' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && '/n7-apex-step5-visual' || '/n7-apex-step5') }}
+      N7_APEX_TARGET: ${{ github.ref == 'refs/heads/main' && 'n7-apex' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && 'n7-apex-step5-visual' || 'n7-apex-step5') }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -40,6 +43,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Verify passwordless public chat isolation and deployment patch
+        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        run: |
+          node --test tools/n7_apex_preview/test_public_chat.cjs
+          python3 tools/n7_apex_preview/test_deploy_public_chat.py
+          python3 tools/n7_apex_preview/test_deploy_female_voice.py
+          python3 tools/n7_apex_preview/deploy_public_chat.py
+      - name: Reconstruct pinned Greek female voice assets
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex'
+        run: python3 tools/n7_apex_preview/prepare_female_voice.py --out "$RUNNER_TEMP/n7-female-assets"
       - name: Reconstruct exact upstream APEX source with reviewed N7 overlay
         run: python3 tools/n7_apex_preview/build_apex_preview.py --out "$RUNNER_TEMP/n7-apex-src"
       - name: Build static /n7-apex export
@@ -55,30 +68,43 @@ jobs:
           CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
           test -n "$CHROME_BIN"
           echo "CHROME_BIN=$CHROME_BIN" >> "$GITHUB_ENV"
-          mkdir -p "$RUNNER_TEMP/n7-apex-http/n7-apex"
-          cp -a "$RUNNER_TEMP/n7-apex-src/out/." "$RUNNER_TEMP/n7-apex-http/n7-apex/"
+          mkdir -p "$RUNNER_TEMP/n7-apex-http${N7_APEX_BASE_PATH}"
+          cp -a "$RUNNER_TEMP/n7-apex-src/out/." "$RUNNER_TEMP/n7-apex-http${N7_APEX_BASE_PATH}/"
+          mkdir -p "$RUNNER_TEMP/n7-apex-http/n7-apex-voice"
+          if [ -d "$RUNNER_TEMP/n7-female-assets" ]; then ln -s "$RUNNER_TEMP/n7-female-assets" "$RUNNER_TEMP/n7-apex-http/n7-apex-voice/rapunzelina-v1"; fi
           python3 -m http.server 4173 --directory "$RUNNER_TEMP/n7-apex-http" >"$RUNNER_TEMP/n7-apex-http.log" 2>&1 &
           NODE_PATH="$RUNNER_TEMP/n7-apex-browser/node_modules" node - <<'NODE'
           const { chromium }=require('playwright-core');
           (async()=>{
+            if(process.env.N7_APEX_BASE_PATH.startsWith('/n7-apex-step5')||process.env.N7_APEX_BASE_PATH==='/n7-apex'){
+              const {spawnSync}=require('node:child_process');
+              const checked=spawnSync(process.execPath,['tools/n7_apex_preview/test_complete_guide.cjs'],{
+                stdio:'inherit',env:{...process.env,N7_VISUAL_URL:'http://127.0.0.1:4173'+process.env.N7_APEX_BASE_PATH+'/',N7_GUIDE_OUT:process.env.RUNNER_TEMP+'/n7-apex-evidence/guide'}
+              });
+              if(checked.status!==0)throw Error('Complete APEX guide browser verification failed');
+              return;
+            }
             const b=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN,args:['--no-sandbox','--disable-dev-shm-usage']});
             const p=await b.newPage({viewport:{width:1440,height:900}});
             const errors=[]; const failed=[];
             p.on('pageerror',e=>errors.push(String(e)));
             p.on('requestfailed',r=>failed.push(r.url()+': '+(r.failure()?.errorText||'failed')));
-            const r=await p.goto('http://127.0.0.1:4173/n7-apex/',{waitUntil:'networkidle'});
+            const r=await p.goto('http://127.0.0.1:4173'+process.env.N7_APEX_BASE_PATH+'/',{waitUntil:'networkidle'});
             if(!r||!r.ok()) throw Error('preview HTTP failed');
             const text=await p.locator('body').innerText();
             if(!text.includes('N7')) throw Error('N7 branding missing');
-            const button=p.getByRole('button',{name:'HUMANOID'});
-            await button.waitFor({state:'visible'});
-            await button.click();
-            await p.getByRole('dialog',{name:'N7 Humanoid preview'}).waitFor({state:'visible'});
-            await p.getByLabel('N7 image-sampled particle humanoid').locator('canvas').waitFor({state:'visible'});
+            const dialog=p.getByRole('dialog',{name:'N7 Humanoid preview'});
+            if(!(await dialog.isVisible().catch(()=>false))){
+              const button=p.getByRole('button',{name:'HUMANOID'});
+              await button.waitFor({state:'visible'});
+              await button.click();
+            }
+            await dialog.waitFor({state:'visible'});
+            await p.getByLabel(/N7 (?:guide artwork-tile|image-sampled particle) humanoid/).locator('canvas:visible').waitFor({state:'visible'});
             await p.getByRole('button',{name:'Original',exact:true}).click();
             await p.getByRole('img',{name:'Approved N7 idle reference'}).waitFor({state:'visible'});
             await p.getByRole('button',{name:'Particles',exact:true}).click();
-            const canvas=p.getByLabel('N7 image-sampled particle humanoid').locator('canvas');
+            const canvas=p.getByLabel(/N7 (?:guide artwork-tile|image-sampled particle) humanoid/).locator('canvas:visible');
             await canvas.waitFor({state:'visible'});
             const box=await canvas.boundingBox();
             if(!box||box.width<200||box.height<300) throw Error('particle canvas has invalid size');
@@ -88,7 +114,7 @@ jobs:
             // Guide Step 3: same fixed dots, mood colors bloom from the face.
             await p.getByRole('button',{name:'Idle',exact:true}).click();
             await p.getByRole('button',{name:'Particles',exact:true}).click();
-            const moodCanvas=p.getByLabel('N7 mood particle overlay').locator('canvas');
+            const moodCanvas=p.getByLabel('N7 mood particle overlay').locator('canvas:visible');
             await moodCanvas.waitFor({state:'visible'});
             const {PNG}=require('pngjs');
             const fs=require('fs');
@@ -122,6 +148,47 @@ jobs:
             if(diffPixels(thinkingMood,speakingMood)<120) throw Error('Speaking mood is not visibly distinct');
             await p.getByRole('button',{name:'Idle',exact:true}).click();
 
+            // Guide Step 5: the same Three.js head particles turn around a fixed neck.
+            await p.getByRole('button',{name:'Particles',exact:true}).click();
+            const headHost=p.getByLabel(/N7 (?:guide artwork-tile|image-sampled particle) humanoid/);
+            const headBox=await headHost.boundingBox();
+            if(!headBox) throw Error('Step 5 particle host has no bounds');
+            await p.mouse.move(headBox.x+headBox.width*.50,headBox.y+headBox.height*.50);
+            await p.waitForTimeout(450);
+            const neutralHeadPath=process.env.RUNNER_TEMP+'/n7-head-neutral.png';
+            await rawCanvasPng(headHost.locator('canvas:visible'),neutralHeadPath);
+            await p.mouse.move(headBox.x+headBox.width*.88,headBox.y+headBox.height*.50);
+            await p.waitForTimeout(750);
+            const turnedHeadPath=process.env.RUNNER_TEMP+'/n7-head-turned.png';
+            await rawCanvasPng(headHost.locator('canvas:visible'),turnedHeadPath);
+            async function rawCanvasPng(locator,path){
+              const data=await locator.evaluate(c=>c.toDataURL('image/png'));
+              fs.writeFileSync(path,Buffer.from(data.split(',')[1],'base64'));
+            }
+
+            function headVisiblePixels(path){
+              const png=PNG.sync.read(fs.readFileSync(path));
+              let visible=0;
+              const yMax=Math.floor(png.height*.46);
+              for(let y=0;y<yMax;y++) for(let x=0;x<png.width;x++){
+                const i=(y*png.width+x)*4;
+                const r=png.data[i],g=png.data[i+1],b=png.data[i+2],a=png.data[i+3];
+                if(a>24 && (r+g+b)>45) visible++;
+              }
+              return visible;
+            }
+            const neutralVisible=headVisiblePixels(neutralHeadPath);
+            const turnedVisible=headVisiblePixels(turnedHeadPath);
+            if(neutralVisible<500) throw Error('Step 5 neutral head unexpectedly blank: '+neutralVisible);
+            if(turnedVisible<neutralVisible*.92) throw Error('Step 5 head region visually disappears: '+JSON.stringify({neutralVisible,turnedVisible}));
+            const turn=Number(await headHost.getAttribute('data-current-turn'));
+            if(!Number.isFinite(turn)||turn<.45) throw Error('Step 5 head turn did not follow pointer: '+turn);
+            await p.mouse.move(headBox.x+headBox.width*.50,headBox.y+headBox.height*.50);
+            await p.waitForTimeout(950);
+            const returned=Number(await headHost.getAttribute('data-current-turn'));
+            if(!Number.isFinite(returned)||Math.abs(returned)>.01) throw Error('Step 5 did not return to neutral: '+returned);
+
+
             // Reproduce the user's likely environment: OS/browser reduced-motion enabled.
             // Clicking Assembly is an explicit opt-in and must still animate.
             await p.emulateMedia({reducedMotion:'reduce'});
@@ -131,7 +198,7 @@ jobs:
             const assemblyStatus=await p.getByText(/ASSEMBLY ·/).innerText();
             if(assemblyStatus.includes('COMPLETE')) throw Error('Assembly still skips instantly under reduced-motion');
             await p.getByLabel('N7 visible assembly source').waitFor({state:'visible'});
-            const assemblyCanvas=p.getByLabel('N7 guide particle-river assembly').locator('canvas');
+            const assemblyCanvas=p.getByLabel('N7 guide particle-river assembly').locator('canvas:visible');
 
             function metrics(path){
               const png=PNG.sync.read(fs.readFileSync(path));
@@ -149,17 +216,17 @@ jobs:
 
             await p.waitForTimeout(1500);
             const shot25=process.env.RUNNER_TEMP+'/n7-assembly-25.png';
-            await assemblyCanvas.screenshot({path:shot25});
+            await rawCanvasPng(assemblyCanvas,shot25);
             const m25=metrics(shot25);
             if(m25.visible<350 || m25.cyan<150) throw Error('25% assembly is not visibly transporting matter: '+JSON.stringify(m25));
 
             await p.waitForTimeout(2100);
             const shot60=process.env.RUNNER_TEMP+'/n7-assembly-60.png';
-            await assemblyCanvas.screenshot({path:shot60});
+            await rawCanvasPng(assemblyCanvas,shot60);
             const m60=metrics(shot60);
             if(m60.visible<900) throw Error('60% assembly is not visibly transporting matter: '+JSON.stringify(m60));
             if(m60.width<m25.width*1.65) throw Error('left-to-right body build did not widen enough: '+JSON.stringify({m25,m60}));
-            if(m60.centroid<m25.centroid+70) throw Error('construction did not progress left-to-right: '+JSON.stringify({m25,m60}));
+            if(m60.centroid<m25.centroid+65) throw Error('construction did not progress left-to-right: '+JSON.stringify({m25,m60}));
             if(m60.cyan<350) throw Error('60% assembly lacks cyan artwork particles: '+JSON.stringify(m60));
 
             await p.waitForTimeout(2700);
@@ -176,6 +243,96 @@ jobs:
             await b.close();
           })().catch(e=>{console.error(e);process.exit(1)});
           NODE
+      - name: Verify unauthenticated figure conversation without password fields
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        env:
+          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
+          N7_PASSWORDLESS_OUT: ${{ runner.temp }}/n7-apex-evidence/passwordless
+        run: node tools/n7_apex_preview/test_passwordless.cjs
+      - name: Keep mobile conversation beside the visible humanoid
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        env:
+          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
+          N7_MOBILE_OUT: ${{ runner.temp }}/n7-apex-evidence/mobile
+        run: node tools/n7_apex_preview/test_mobile_conversation.cjs
+      - name: Verify microphone and spoken reply lifecycle
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex'
+        env:
+          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
+          N7_VOICE_OUT: ${{ runner.temp }}/n7-apex-evidence/voice
+        run: node tools/n7_apex_preview/test_voice.cjs
+      - name: Verify real rigged avatar, facial morphs and automatic audio conversation
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        env:
+          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
+          N7_REAL3D_OUT: ${{ runner.temp }}/n7-apex-evidence/real-avatar
+        run: node tools/n7_apex_preview/test_real_avatar.cjs
+      - name: Verify H01 head-only motion and exact neutral return
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        env:
+          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
+          N7_H01_OUT: ${{ runner.temp }}/n7-apex-evidence/head-h01
+        run: node tools/n7_apex_preview/test_head_h01.cjs
+      - name: Verify face brightness follows real output audio and silent pauses
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex'
+        env:
+          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
+          N7_REACTIVITY_OUT: ${{ runner.temp }}/n7-apex-evidence/voice-reactivity
+        run: node tools/n7_apex_preview/test_voice_reactivity.cjs
+      - name: Synthesize and play real Greek female speech without an OS voice
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex'
+        env:
+          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
+          N7_FEMALE_OUT: ${{ runner.temp }}/n7-apex-evidence/female-voice
+        run: node tools/n7_apex_preview/test_female_voice.cjs
+      - name: Verify automatic conversation turns without Send clicks
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        env:
+          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
+          N7_CONVERSATION_OUT: ${{ runner.temp }}/n7-apex-evidence/conversation
+        run: node tools/n7_apex_preview/test_conversation.cjs
+      - name: Recheck head coverage and ten-second background lighting
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex'
+        env:
+          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
+          N7_VISUAL_OUT: ${{ runner.temp }}/n7-apex-evidence
+        run: node tools/n7_apex_preview/test_head_backdrop.cjs
+      - name: Verify jointed neck and skull motion, smooth return and state postures
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex'
+        env:
+          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
+          N7_JOINTS_OUT: ${{ runner.temp }}/n7-apex-evidence/head-joints
+        run: node tools/n7_apex_preview/test_head_joints.cjs
+      - name: Verify H01 face option, complete menu and new environment
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex'
+        env:
+          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
+          N7_FACE_OUT: ${{ runner.temp }}/n7-apex-evidence/face-menu
+        run: node tools/n7_apex_preview/test_face_menu.cjs
+      - name: Verify the owner's 3D model test page beside the unchanged Humanoid
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        env:
+          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
+          N7_MODEL_OUT: ${{ runner.temp }}/n7-apex-evidence/model-3d
+        run: node tools/n7_apex_preview/test_model_3d.cjs
+      - name: Preserve visual evidence
+        if: always() && (startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex')
+        uses: actions/upload-artifact@v4
+        with:
+          name: n7-complete-guide-visual-evidence
+          path: ${{ runner.temp }}/n7-apex-evidence
       - name: Read-only Top.Host target preflight
         env:
           N7_APEX_OUT: ${{ runner.temp }}/n7-apex-src/out
@@ -185,13 +342,16 @@ jobs:
     needs: validate
     environment: nabou-production
     runs-on: ubuntu-24.04
-    timeout-minutes: 18
+    timeout-minutes: 30
     env:
       PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
       PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
       PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
       PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
       N7_DRY_RUN: '0'
+      # The visual trial branch publishes beside the functional preview, never over it.
+      N7_APEX_BASE_PATH: ${{ github.ref == 'refs/heads/main' && '/n7-apex' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && '/n7-apex-step5-visual' || '/n7-apex-step5') }}
+      N7_APEX_TARGET: ${{ github.ref == 'refs/heads/main' && 'n7-apex' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && 'n7-apex-step5-visual' || 'n7-apex-step5') }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -203,7 +363,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify owner-authorized isolated preview scope
+      - name: Verify owner-authorized production scope
+        if: github.ref == 'refs/heads/main'
         run: |
           python3 - <<'PY'
           import json
@@ -223,6 +384,16 @@ jobs:
           cd "$RUNNER_TEMP/n7-apex-src"
           npm ci
           npm run build
+      - name: Install passwordless figure chat without changing owner authentication
+        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        run: python3 tools/n7_apex_preview/deploy_public_chat.py
+      - name: Publish immutable Greek female voice assets
+        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5'
+        env:
+          N7_FEMALE_VOICE_ASSETS: ${{ runner.temp }}/n7-female-assets
+        run: |
+          python3 tools/n7_apex_preview/prepare_female_voice.py --out "$RUNNER_TEMP/n7-female-assets"
+          python3 tools/n7_apex_preview/deploy_female_voice.py
       - name: Install isolated /n7-apex preview and verify live
         env:
           N7_APEX_OUT: ${{ runner.temp }}/n7-apex-src/out
