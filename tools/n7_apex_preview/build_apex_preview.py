@@ -131,6 +131,10 @@ def main():
     base_path=os.getenv("N7_APEX_BASE_PATH","/n7-apex").rstrip("/") or "/n7-apex"
     # Isolated guide previews: /n7-apex-step5 and its visual trial /n7-apex-step5-visual.
     isolated=base_path.rsplit("/",1)[-1].startswith("n7-apex-step5")
+    # The owner approved the guide Humanoid for production (/n7-apex). Production
+    # gets the same figure, environment, moods and voice; only the test pages and
+    # the passwordless guest chat stay in the isolated previews.
+    guide=isolated or base_path=="/n7-apex"
     if out.exists(): shutil.rmtree(out)
     out.mkdir(parents=True)
     run("git","init",str(out))
@@ -142,11 +146,12 @@ def main():
     overlay=pathlib.Path(__file__).resolve().parent
     shutil.copy2(overlay/"N7Workspace.tsx",out/"components/N7Workspace.tsx")
     shutil.copy2(overlay/"N7ApexStage.tsx",out/"components/N7ApexStage.tsx")
+    (out/"components/N7BuildFlags.ts").write_text(f"export const N7_GUIDE = {str(guide).lower()};\nexport const N7_GUEST_CHAT = {str(isolated).lower()};\n")
     # Step 5/6 stays isolated; retain the normal production entry point.
     # The isolated Step 5 route must present the humanoid immediately.
     # Production /n7-apex keeps the normal button-controlled workflow.
     # isolated auto-open deployment marker
-    if isolated:
+    if guide:
         patch_exact(out/"components/N7ApexStage.tsx",
             "const [humanoidOpen,setHumanoidOpen]=useState(false);",
             "const [humanoidOpen,setHumanoidOpen]=useState(true);")
@@ -172,7 +177,7 @@ def main():
     if humanoid_sha != "bdba288c56230908e1c6abd1a199e5a895159730faf27c672916b03d51a5c7e5":
         raise RuntimeError(f"wrong N7 humanoid asset sha256: {humanoid_sha}")
     (out/"public/n7-humanoid-idle-v3.webp").write_bytes(humanoid_bytes)
-    if isolated:
+    if guide:
         face_bytes=(overlay/"assets/n7-humanoid-face-v4.webp").read_bytes()
         if hashlib.sha256(face_bytes).hexdigest()!="1abf41530c4253962a46fe426c107eb2f776f54ad5c2c5e594b8765bd569ea68":
             raise RuntimeError("wrong N7 face artwork")
@@ -207,7 +212,7 @@ def main():
         (out/"app/model-3d").mkdir(parents=True,exist_ok=True)
         (out/"app/model-3d/page.tsx").write_text('import N7ModelTest from "@/components/N7ModelTest";\nexport default function ModelTest(){return <N7ModelTest/>;}\n')
     shutil.copy2(overlay/"assets/n7-mountain-backdrop.webp",out/"public/n7-mountain-backdrop.webp")
-    if isolated:
+    if guide:
         # Visual trial: the designed N7 environment and the H01 second face option.
         for name,digest in (("n7-environment-v4.webp","aaeef66b5d40b284562d1739894075953d91db4120fa0691e9d046617920ca3a"),
                             ("n7-humanoid-h01-v2.webp","c07d6e2f063ee46984fea3dbee117b8fe467e7e5f640a6e3770f1e8787ec81a5")):

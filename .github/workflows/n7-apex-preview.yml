@@ -51,7 +51,7 @@ jobs:
           python3 tools/n7_apex_preview/test_deploy_female_voice.py
           python3 tools/n7_apex_preview/deploy_public_chat.py
       - name: Reconstruct pinned Greek female voice assets
-        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex'
         run: python3 tools/n7_apex_preview/prepare_female_voice.py --out "$RUNNER_TEMP/n7-female-assets"
       - name: Reconstruct exact upstream APEX source with reviewed N7 overlay
         run: python3 tools/n7_apex_preview/build_apex_preview.py --out "$RUNNER_TEMP/n7-apex-src"
@@ -76,7 +76,7 @@ jobs:
           NODE_PATH="$RUNNER_TEMP/n7-apex-browser/node_modules" node - <<'NODE'
           const { chromium }=require('playwright-core');
           (async()=>{
-            if(process.env.N7_APEX_BASE_PATH.startsWith('/n7-apex-step5')){
+            if(process.env.N7_APEX_BASE_PATH.startsWith('/n7-apex-step5')||process.env.N7_APEX_BASE_PATH==='/n7-apex'){
               const {spawnSync}=require('node:child_process');
               const checked=spawnSync(process.execPath,['tools/n7_apex_preview/test_complete_guide.cjs'],{
                 stdio:'inherit',env:{...process.env,N7_VISUAL_URL:'http://127.0.0.1:4173'+process.env.N7_APEX_BASE_PATH+'/',N7_GUIDE_OUT:process.env.RUNNER_TEMP+'/n7-apex-evidence/guide'}
@@ -258,7 +258,7 @@ jobs:
           N7_MOBILE_OUT: ${{ runner.temp }}/n7-apex-evidence/mobile
         run: node tools/n7_apex_preview/test_mobile_conversation.cjs
       - name: Verify microphone and spoken reply lifecycle
-        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex'
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
           N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
@@ -272,21 +272,21 @@ jobs:
           N7_REAL3D_OUT: ${{ runner.temp }}/n7-apex-evidence/real-avatar
         run: node tools/n7_apex_preview/test_real_avatar.cjs
       - name: Verify H01 head-only motion and exact neutral return
-        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex'
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
           N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
           N7_H01_OUT: ${{ runner.temp }}/n7-apex-evidence/head-h01
         run: node tools/n7_apex_preview/test_head_h01.cjs
       - name: Verify face brightness follows real output audio and silent pauses
-        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex'
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
           N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
           N7_REACTIVITY_OUT: ${{ runner.temp }}/n7-apex-evidence/voice-reactivity
         run: node tools/n7_apex_preview/test_voice_reactivity.cjs
       - name: Synthesize and play real Greek female speech without an OS voice
-        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex'
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
           N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
@@ -300,21 +300,21 @@ jobs:
           N7_CONVERSATION_OUT: ${{ runner.temp }}/n7-apex-evidence/conversation
         run: node tools/n7_apex_preview/test_conversation.cjs
       - name: Recheck head coverage and ten-second background lighting
-        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex'
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
           N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
           N7_VISUAL_OUT: ${{ runner.temp }}/n7-apex-evidence
         run: node tools/n7_apex_preview/test_head_backdrop.cjs
       - name: Verify jointed neck and skull motion, smooth return and state postures
-        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex'
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
           N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
           N7_JOINTS_OUT: ${{ runner.temp }}/n7-apex-evidence/head-joints
         run: node tools/n7_apex_preview/test_head_joints.cjs
       - name: Verify H01 face option, complete menu and new environment
-        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex'
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
           N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
@@ -328,7 +328,7 @@ jobs:
           N7_MODEL_OUT: ${{ runner.temp }}/n7-apex-evidence/model-3d
         run: node tools/n7_apex_preview/test_model_3d.cjs
       - name: Preserve visual evidence
-        if: always() && startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        if: always() && (startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex')
         uses: actions/upload-artifact@v4
         with:
           name: n7-complete-guide-visual-evidence

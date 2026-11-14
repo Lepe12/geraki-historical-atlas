@@ -130,10 +130,9 @@ def main():
                 print("N7_APEX_ROLLBACK_RESTORED=true")
             raise
         if existing and exists_dir(ftp,backup):
-            if TARGET.startswith("n7-apex-step5"):
-                print("N7_APEX_ROLLBACK_POINT="+PARENT+"/"+backup)
-            else:
-                remove_tree(ftp,backup)
+            # Every target keeps its previous release as a rollback point
+            # (owner requirement before replacing production).
+            print("N7_APEX_ROLLBACK_POINT="+PARENT+"/"+backup)
         print("N7_APEX_DEPLOY_SUCCESS=true target=/"+TARGET+"/ backendUntouched=true upgraded="+str(existing).lower())
     except BaseException:
         if stage and exists_dir(ftp,stage):

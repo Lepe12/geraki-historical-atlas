@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {createPortal} from "react-dom";
 import useN7Voice from "./useN7Voice";
 import {FEMALE_VOICE_ID} from "./N7FemaleVoice";
-import {N7_HUMANOID_REFERENCE} from "./N7HumanoidReference";
+import {N7_GUIDE,N7_GUEST_CHAT} from "./N7BuildFlags";
 import type { OrbState } from "./ApexHeroOrb";
 
 type Msg = { role: string; content: string };
@@ -55,7 +55,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   const [tab, setTab] = useState<Tab>("chat");
   const [online, setOnline] = useState<boolean | null>(null);
   const [authenticated, setAuthenticated] = useState(false);
-  const guest=!authenticated&&N7_HUMANOID_REFERENCE.includes("/n7-apex-step5");
+  const guest=!authenticated&&N7_GUEST_CHAT;
   const wasAuthenticated=useRef(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [conversationId, setConversationId] = useState("");
@@ -265,7 +265,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
         <button type="button" aria-expanded={voiceOpen} onClick={()=>{setVoiceOpen(x=>!x);if(voiceOpen)voice.suspend();}}>Φωνητική συνομιλία</button>
         {voiceOpen&&voiceControls}
       </div>,voiceHost)}
-      <button type="button" onClick={() => {if(onOpenFigure&&N7_HUMANOID_REFERENCE.includes("/n7-apex-step5")&&window.matchMedia("(max-width:700px), (max-width:1000px) and (max-height:500px)").matches){setVoiceOpen(true);onOpenFigure();return;}setOpen(x => !x);}}
+      <button type="button" onClick={() => {if(onOpenFigure&&N7_GUIDE&&window.matchMedia("(max-width:700px), (max-width:1000px) and (max-height:500px)").matches){setVoiceOpen(true);onOpenFigure();return;}setOpen(x => !x);}}
         aria-expanded={open} aria-controls="n7-workspace"
         style={{ position:"fixed",right:18,bottom:18,zIndex:80,...buttonStyle,
           boxShadow:"0 0 22px #00dafa45",fontWeight:700,letterSpacing:2 }}>

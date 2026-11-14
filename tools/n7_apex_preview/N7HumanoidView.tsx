@@ -5,6 +5,7 @@ import { N7_HUMANOID_REFERENCE } from "./N7HumanoidReference";
 import { createHeadSurface } from "./N7HeadSurface";
 import N7Backdrop from "./N7Backdrop";
 import N7GuideView from "./N7GuideView";
+import { N7_GUIDE } from "./N7BuildFlags";
 
 type ViewMode = "assembly" | "particle" | "original" | "compare";
 type Mood = "idle" | "listening" | "thinking" | "speaking";
@@ -864,7 +865,7 @@ function LegacyHumanoidView({open,onClose,activity}:{open:boolean;onClose:()=>vo
   const [allowMotion,setAllowMotion]=useState(false);
   const reduced=systemReduced&&!allowMotion;
 
-  const isolatedStep5=N7_HUMANOID_REFERENCE.includes("/n7-apex-step5");
+  const isolatedStep5=N7_GUIDE;
   const [mode,setMode]=useState<ViewMode>("particle");
   const [details,setDetails]=useState(false);
   const [effects,setEffects]=useState(true);
@@ -1008,5 +1009,5 @@ function LegacyHumanoidView({open,onClose,activity}:{open:boolean;onClose:()=>vo
 }
 
 export default function N7HumanoidView(props:{open:boolean;onClose:()=>void;activity?:N7Activity;onWorkspace?:()=>void}){
-  return N7_HUMANOID_REFERENCE.includes("/n7-apex-step5")?<N7GuideView {...props}/>:<LegacyHumanoidView {...props}/>;
+  return N7_GUIDE?<N7GuideView {...props}/>:<LegacyHumanoidView {...props}/>;
 }

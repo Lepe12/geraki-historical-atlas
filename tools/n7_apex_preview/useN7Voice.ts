@@ -1,7 +1,7 @@
 "use client";
 import {useCallback,useEffect,useRef,useState} from "react";
 import {createFemaleVoice,FEMALE_VOICE_ID} from "./N7FemaleVoice";
-import {N7_HUMANOID_REFERENCE} from "./N7HumanoidReference";
+import {N7_GUIDE} from "./N7BuildFlags";
 
 type RecognitionResult={isFinal:boolean;0:{transcript:string}};
 type Recognition={lang:string;continuous:boolean;interimResults:boolean;onstart:(()=>void)|null;onend:(()=>void)|null;onerror:((e:{error:string})=>void)|null;onresult:((e:{results:ArrayLike<RecognitionResult>})=>void)|null;start:()=>void;abort:()=>void};
@@ -38,7 +38,7 @@ export default function useN7Voice(onTranscript:(text:string)=>void,onTurn?:(tex
     return()=>{active.current=false;current.current.enabled=false;stop();female.current?.dispose();window.speechSynthesis?.removeEventListener("voiceschanged",refresh);document.removeEventListener("visibilitychange",hidden);window.removeEventListener("pagehide",suspend);};
   },[stop,suspend]);
   useEffect(()=>{
-    if(!N7_HUMANOID_REFERENCE.includes("/n7-apex-step5"))return;
+    if(!N7_GUIDE)return;
     const net=(navigator as Navigator&{connection?:{saveData?:boolean;effectiveType?:string}}).connection;
     if(net?.saveData||/(^|-)2g$/.test(net?.effectiveType||""))return;
     if(!(window.Worker&&window.AudioContext))return;
