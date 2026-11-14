@@ -118,7 +118,7 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,m
       float away=max(0.,normal.z-posedNormal.z-(1.-frontZ));
       float toward=max(0.,posedNormal.z-normal.z);
       float side=clamp(abs(tile.x-160.)/96.,0.,1.);
-      shade=clamp(1.-away*4.5*wNeck,.25,1.);
+      shade=clamp(1.-away*3.5*wNeck,.55,1.);
       float lowered=clamp(-pitch,0.,1.)*smoothstep(150.,205.,tile.y)*wHead;
       shade*=1.-.18*lowered;
       // Near-side profile line: strongest on the steep outer rim of the volume.
