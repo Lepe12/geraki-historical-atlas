@@ -64,8 +64,8 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,m
     // Rounded rest volume measured on the approved 320x480 artwork:
     // face oval, skull with hair, and the neck column under the chin.
     float restDepth(vec2 tile){
-      float face=dome(tile,vec2(160.,138.),vec2(66.,92.),mix(76.,64.,faceRelief));
-      float skull=dome(tile,vec2(160.,105.),vec2(96.,102.),mix(62.,40.,faceRelief));
+      float face=dome(tile,vec2(160.,138.),vec2(66.,92.),mix(96.,64.,faceRelief));
+      float skull=dome(tile,vec2(160.,105.),vec2(96.,102.),mix(72.,40.,faceRelief));
       float plateRho=min(1.,length((tile-vec2(160.,140.))/vec2(72.,98.)));
       face=mix(face,58.*(1.-pow(plateRho,3.0)),faceRelief);
       float neck=28.*cos(min(1.,abs(tile.x-160.)/30.)*1.5707963)*smoothstep(170.,200.,tile.y);
@@ -303,7 +303,7 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,m
   // Angles are radians; the neck carries 30% and the skull joint 70%.
   // The turning axis runs inside the neck, level with the chin surface, so the
   // chin stays on the neck while the face and the hair behind it turn about it.
-  const NECK_BASE=new THREE.Vector3(160,252,24),SKULL_BASE=new THREE.Vector3(160,168,24);
+  const NECK_BASE=new THREE.Vector3(160,252,18),SKULL_BASE=new THREE.Vector3(160,168,18);
   const neckJoint=new THREE.Object3D(),headJoint=new THREE.Object3D();
   neckJoint.position.copy(NECK_BASE);headJoint.position.copy(SKULL_BASE).sub(NECK_BASE);neckJoint.add(headJoint);
   neckJoint.rotation.order="YXZ";headJoint.rotation.order="YXZ";
