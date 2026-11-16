@@ -158,3 +158,52 @@ test('long answer prioritizes bibliography in system context before first model 
   assert.match(db[0].messages[1].content,/Βιβλιογραφία/);
  }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });
+// N7_SPECIALIST_AGENTS_V1: the web page sends every message to this streaming route (modern-ui.js turns
+// /chat into /stream), so the specialist agents must answer here, in the same conversation.
+test('stream route: a recognised request is answered by its agent; everything else keeps the normal path',async()=>{
+ const {Readable}=require('node:stream');
+ const id='22222222-2222-4222-8222-222222222222';
+ async function run({message,agents,projectId,attachments}){
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'n7-stream-agent-'));
+  try{
+   const db=[{id,title:'Νέα συνομιλία',messages:[],updated:'',...(projectId?{projectId}:{})}];
+   let modelCalls=0,text='';
+   const res={destroyed:false,writableEnded:false,writeHead(){},write(x){text+=x;},end(){this.writableEnded=true;}};
+   const handler=makeHandler({API_KEY:'test',MODEL:'local-model',BASE:'https://api.groq.com/openai/v1',DATA_DIR:dir,
+    promptMessages:h=>[{role:'system',content:'date 2026-11-16'},...h],load:()=>db,save:()=>{},agents,
+    publicSearch:{researchMessages:async()=>({searched:false,items:[]}),contextForResearch:()=>'',sourceFooter:()=>''},
+    fetcher:async()=>{modelCalls++;return new Response('data: {"choices":[{"delta":{"content":"Κανονική απάντηση"},"finish_reason":"stop"}]}\n\ndata: [DONE]\n\n');}});
+   await handler(Readable.from([Buffer.from(JSON.stringify({message,...(attachments?{attachments}:{})}))]),res,id);
+   const events=text.trim().split('\n').map(JSON.parse);
+   return {events,db,modelCalls,reply:events.filter(e=>e.type==='delta').map(e=>e.text).join('')};
+  }finally{fs.rmSync(dir,{recursive:true,force:true});}
+ }
+ const seen=[];let dispatched=0;
+ const agents={detect:(content,{previousAssistant})=>{seen.push({content,previousAssistant});return /καιρ|ειδήσ/u.test(content);},
+  dispatch:async(history,options)=>{dispatched++;
+   assert.equal(options.model,'local-model');assert.equal(typeof options.modelFetcher,'function');
+   return {agent:{id:'weather',label:'Weather',greek:'Καιρός'},status:'ok',reply:'[Weather Agent]\nΑπάντηση δοκιμής για '+history.at(-1).content};}};
+ // 1. recognised: answered by the agent, stored in the conversation, no model call
+ const hit=await run({message:'Τι καιρό κάνει στην Αθήνα;',agents});
+ assert.ok(hit.events.some(e=>e.type==='status'&&e.stage==='agent'));
+ assert.equal(hit.reply,'[Weather Agent]\nΑπάντηση δοκιμής για Τι καιρό κάνει στην Αθήνα;');
+ const done=hit.events.find(e=>e.type==='done');assert.equal(done.agent.id,'weather');assert.equal(hit.events.at(-1).type,'done');
+ assert.equal(hit.modelCalls,0);
+ assert.deepEqual(hit.db[0].messages.map(m=>m.role),['user','assistant']);
+ assert.equal(hit.db[0].messages[1].content,hit.reply);assert.equal(hit.db[0].messages[1].agent.id,'weather');
+ // 2. not recognised: the normal path
+ const miss=await run({message:'Γράψε ένα δίστιχο',agents});
+ assert.equal(miss.reply,'Κανονική απάντηση','miss reply: '+JSON.stringify(miss.events));assert.equal(miss.modelCalls,1,'miss modelCalls');assert.equal(miss.db[0].messages[1].agent,undefined);
+ // 3. an agent that throws never loses the message: the normal path answers
+ const broken=await run({message:'Τι καιρό κάνει;',agents:{detect:()=>true,dispatch:async()=>{throw Error('boom');}}});
+ assert.equal(broken.reply,'Κανονική απάντηση','broken reply');assert.equal(broken.modelCalls,1,'broken modelCalls');
+ // 4. project conversations and messages with attachments are never diverted
+ const project=await run({message:'Τι καιρό κάνει;',agents,projectId:'project-1'});
+ const before=dispatched;
+ assert.equal(project.events.some(e=>e.stage==='agent'),false,'a project conversation is never diverted');assert.equal(dispatched,before);assert.equal(project.db[0].messages.some(m=>m.agent),false);
+ const attached=await run({message:'Τι καιρό κάνει; Περιέγραψε την εικόνα',agents,attachments:[{name:'photo.png',base64:img.toString('base64')}]});
+ assert.equal(attached.events.some(e=>e.stage==='agent'),false,'a message with an attachment is never diverted');assert.equal(dispatched,before);
+ // 5. without the agents module nothing changes
+ const none=await run({message:'Τι καιρό κάνει;',agents:null});
+ assert.equal(none.modelCalls,1,'none modelCalls');
+});

@@ -86,5 +86,9 @@
   {
     "old": "    if(p==='/api/library/search'){",
     "new": "    // N7_SPECIALIST_AGENTS_V1: the registry of specialist agents (authenticated, read only).\n    if(p==='/api/agents'){\n      if(req.method!=='GET')return json(res,405,{error:'Method not allowed'});\n      const agentStatus=require('./n7-agents.js').status({env:process.env,dir:__dirname});return json(res,200,{schema:'n7-agents-v1',agents:agentStatus.agents,summary:agentStatus.summary});\n    }\n    if(p==='/api/library/search'){"
+  },
+  {
+    "old": "const n7StreamChat=require('./n7-stream-attachments').makeHandler({\n API_KEY,MODEL,BASE,DATA_DIR,",
+    "new": "const n7StreamChat=require('./n7-stream-attachments').makeHandler({\n agents:require('./n7-agents.js'),\n API_KEY,MODEL,BASE,DATA_DIR,"
   }
 ]
