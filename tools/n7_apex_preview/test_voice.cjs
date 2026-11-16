@@ -1,6 +1,6 @@
 // Deterministic browser integration fixtures; never presented as real audio/model proof.
 const {chromium}=require('playwright-core'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
-const url=process.env.N7_VISUAL_URL||'http://127.0.0.1:4177/n7-apex-step5/',out=process.env.N7_VOICE_OUT||'/tmp/n7-voice';fs.mkdirSync(out,{recursive:true});
+const url=(process.env.N7_VISUAL_URL||'http://127.0.0.1:4177/n7-apex-step5/')+'?controls=1',out=process.env.N7_VOICE_OUT||'/tmp/n7-voice';fs.mkdirSync(out,{recursive:true});
 (async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/chromium',...(process.env.N7_BROWSER_PROXY?{proxy:{server:process.env.N7_BROWSER_PROXY}}:{}),args:['--no-sandbox','--disable-dev-shm-usage','--use-angle=swiftshader','--enable-unsafe-swiftshader']});try{
  const p=await b.newPage({viewport:{width:1440,height:900}}),errors=[];p.on('pageerror',e=>errors.push(e.message));
  await p.addInitScript(()=>{

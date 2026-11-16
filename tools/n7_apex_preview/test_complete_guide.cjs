@@ -1,5 +1,5 @@
 const {chromium}=require('playwright-core'),{PNG}=require('pngjs'),fs=require('fs'),path=require('path'),assert=require('node:assert/strict');
-const url=process.env.N7_VISUAL_URL||'http://127.0.0.1:4176/n7-apex-step5/',out=process.env.N7_GUIDE_OUT||'/tmp/n7-complete-guide';fs.mkdirSync(out,{recursive:true});
+const url=(process.env.N7_VISUAL_URL||'http://127.0.0.1:4176/n7-apex-step5/')+'?controls=1',out=process.env.N7_GUIDE_OUT||'/tmp/n7-complete-guide';fs.mkdirSync(out,{recursive:true});
 const hostSelector='[aria-label="N7 guide artwork-tile humanoid"]';
 const result={url,scope:'unmocked rendering; separate local-only API lifecycle fixture',checks:[],limitations:['No owner-supplied assembly audio; silent timeline.','Browser voice/microphone have a separate lifecycle suite; manual mood buttons are visual previews.','Webcam is optional and not enabled.']};
 function diff(a,b,region){let n=0,max=0;for(let y=region?.y??0;y<(region?.bottom??a.height);y++)for(let x=region?.x??0;x<(region?.right??a.width);x++){const i=(y*a.width+x)*4;let d=0;for(let c=0;c<3;c++){let v=Math.abs(a.data[i+c]-b.data[i+c]);max=Math.max(max,v);d+=v;}n+=d>9;}return {pixels:n,max};}

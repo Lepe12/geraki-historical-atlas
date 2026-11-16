@@ -2,7 +2,7 @@
 const {chromium}=require('playwright-core');
 const {PNG}=require('pngjs');
 const fs=require('fs'),path=require('path'),assert=require('node:assert/strict');
-const url=process.env.N7_VISUAL_URL||'http://127.0.0.1:4173/n7-apex-step5/';
+const url=(process.env.N7_VISUAL_URL||'http://127.0.0.1:4173/n7-apex-step5/')+'?controls=1';
 const out=process.env.N7_VISUAL_OUT||'/tmp/n7-apex-visual';fs.mkdirSync(out,{recursive:true});
 function save(name,data){fs.writeFileSync(path.join(out,name+'.png'),Buffer.from(data.split(',')[1],'base64'));}
 function difference(a,b){let count=0,max=0;for(let i=0;i<a.length;i++){const d=Math.abs(a[i]-b[i]);count+=d>0;max=Math.max(max,d);}return {count,max};}
