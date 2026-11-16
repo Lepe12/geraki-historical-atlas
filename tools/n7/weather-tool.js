@@ -33,11 +33,13 @@ async function forecast(place,{fetcher=fetch,now=()=>new Date()}={}){
  const current=c?{time:c.time,summary:CODES[c.weather_code]??(Number.isFinite(c.weather_code)?'Κωδικός '+c.weather_code:null),
   temperature_c:num(c.temperature_2m),apparent_c:num(c.apparent_temperature),humidity_percent:num(c.relative_humidity_2m),
   precipitation_mm:num(c.precipitation),wind_kmh:num(c.wind_speed_10m),wind_gust_kmh:num(c.wind_gusts_10m),wind_direction_deg:num(c.wind_direction_10m)}:null;
- return {schema:'n7-weather-v1',place:{name:hit.name,country:hit.country||'',admin:hit.admin1||'',latitude:hit.latitude,longitude:hit.longitude,timezone:data.timezone||''},
+ const report={schema:'n7-weather-v1',place:{name:hit.name,country:hit.country||'',admin:hit.admin1||'',latitude:hit.latitude,longitude:hit.longitude,timezone:data.timezone||''},
   current,days,
   // The Open-Meteo forecast API carries no official warnings, so none are reported or derived.
   warnings:{available:false,items:[],reason:'PROVIDER_HAS_NO_WARNINGS'},
   provider:'Open-Meteo',sources:[geoUrl,fUrl],retrieved_at:now().toISOString()};
+ report.presentation=presentation(report);
+ return report;
 }
 const num=v=>typeof v==='number'&&Number.isFinite(v)?v:null;
 // Greek presentation of a report. Every figure comes from the report; a null field is left out.
@@ -46,18 +48,47 @@ const fmt=v=>String(Math.round(v*10)/10).replace('.',',');
 function greekDate(iso){const m=String(iso).match(/^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?/);if(!m)return String(iso);
  const day=['Κυρ','Δευ','Τρί','Τετ','Πέμ','Παρ','Σάβ'][new Date(Date.UTC(+m[1],+m[2]-1,+m[3])).getUTCDay()];
  return day+' '+m[3]+'/'+m[2]+'/'+m[1]+(m[4]?' '+m[4]+':'+m[5]:'');}
-function describe(report){
- const p=report.place,where=[p.name,p.admin&&p.admin!==p.name?p.admin:'',p.country].filter(Boolean).join(', ');
- const lines=['Καιρός — '+where],c=report.current;
+// N7_WEATHER_PRESENTATION_V1: the same facts, worded once, for every place that shows or speaks them
+// (the agent's answer, and the Humanoid screen through `presentation` in the tool's response).
+function nowText(report){
+ const p=report.place,c=report.current;
+ if(!c)return 'Τρέχουσες συνθήκες: ο πάροχος δεν επέστρεψε μέτρηση.';
+ const parts=[];
+ if(c.temperature_c!==null)parts.push(fmt(c.temperature_c)+'°C'+(c.apparent_c!==null?' (αίσθηση '+fmt(c.apparent_c)+'°C)':''));
+ if(c.summary)parts.push(c.summary);
+ if(c.wind_kmh!==null)parts.push('άνεμος '+fmt(c.wind_kmh)+' km/h'+(c.wind_direction_deg!==null?' από '+WIND[Math.round(c.wind_direction_deg/45)%8]:'')+(c.wind_gust_kmh!==null?', ριπές '+fmt(c.wind_gust_kmh)+' km/h':''));
+ if(c.precipitation_mm!==null)parts.push('βροχόπτωση '+fmt(c.precipitation_mm)+' mm');
+ if(c.humidity_percent!==null)parts.push('υγρασία '+fmt(c.humidity_percent)+'%');
+ return parts.length?'Τώρα ('+greekDate(c.time)+(p.timezone?', ώρα '+p.timezone:'')+'): '+parts.join(' · ')+'.':'';
+}
+function warningText(report){
+ return report.warnings?.available&&report.warnings.items.length?'Προειδοποιήσεις: '+report.warnings.items.join(' · ')
+  :'Προειδοποιήσεις: ο πάροχος δεν δίνει επίσημες προειδοποιήσεις, άρα δεν αναφέρω καμία. Για έκτακτα δελτία ισχύει η ΕΜΥ.';
+}
+// For speech: units and figures as Greek words, today's conditions and tomorrow's forecast.
+function spokenText(report){
+ const p=report.place,c=report.current,t=report.days[1]||report.days[0],deg=v=>fmt(v)+' βαθμούς Κελσίου',say=['Καιρός, '+p.name+'.'];
  if(c){
   const parts=[];
-  if(c.temperature_c!==null)parts.push(fmt(c.temperature_c)+'°C'+(c.apparent_c!==null?' (αίσθηση '+fmt(c.apparent_c)+'°C)':''));
-  if(c.summary)parts.push(c.summary);
-  if(c.wind_kmh!==null)parts.push('άνεμος '+fmt(c.wind_kmh)+' km/h'+(c.wind_direction_deg!==null?' από '+WIND[Math.round(c.wind_direction_deg/45)%8]:'')+(c.wind_gust_kmh!==null?', ριπές '+fmt(c.wind_gust_kmh)+' km/h':''));
-  if(c.precipitation_mm!==null)parts.push('βροχόπτωση '+fmt(c.precipitation_mm)+' mm');
-  if(c.humidity_percent!==null)parts.push('υγρασία '+fmt(c.humidity_percent)+'%');
-  if(parts.length)lines.push('Τώρα ('+greekDate(c.time)+(p.timezone?', ώρα '+p.timezone:'')+'): '+parts.join(' · ')+'.');
- }else lines.push('Τρέχουσες συνθήκες: ο πάροχος δεν επέστρεψε μέτρηση.');
+  if(c.temperature_c!==null)parts.push('τώρα '+deg(c.temperature_c));
+  if(c.summary)parts.push(c.summary.toLowerCase());
+  if(c.wind_kmh!==null)parts.push('άνεμος '+fmt(c.wind_kmh)+' χιλιόμετρα την ώρα');
+  if(parts.length)say.push(parts.join(', ')+'.');
+ }
+ if(t){
+  const parts=[];
+  if(t.summary)parts.push(t.summary.toLowerCase());
+  if(t.min_c!==null&&t.max_c!==null)parts.push('από '+deg(t.min_c)+' έως '+deg(t.max_c));
+  if(t.precipitation_probability!==null)parts.push('πιθανότητα βροχής '+fmt(t.precipitation_probability)+' τοις εκατό');
+  if(parts.length)say.push((report.days[1]?'Αύριο':'Σήμερα')+': '+parts.join(', ')+'.');
+ }
+ return say.join(' ');
+}
+function presentation(report){return {now:nowText(report),warnings:warningText(report),spoken:spokenText(report)};}
+function describe(report){
+ const p=report.place,where=[p.name,p.admin&&p.admin!==p.name?p.admin:'',p.country].filter(Boolean).join(', ');
+ const lines=['Καιρός — '+where];
+ const now=nowText(report);if(now)lines.push(now);
  lines.push('Πρόγνωση:');
  for(const d of report.days){
   const parts=[d.summary];
@@ -67,11 +98,10 @@ function describe(report){
   if(d.wind_max_kmh!==null)parts.push('άνεμος έως '+fmt(d.wind_max_kmh)+' km/h'+(d.wind_gust_max_kmh!==null&&d.wind_gust_max_kmh!==undefined?' (ριπές έως '+fmt(d.wind_gust_max_kmh)+')':''));
   lines.push('• '+greekDate(d.date)+': '+parts.filter(Boolean).join(' · '));
  }
- lines.push(report.warnings?.available&&report.warnings.items.length?'Προειδοποιήσεις: '+report.warnings.items.join(' · ')
-  :'Προειδοποιήσεις: ο πάροχος δεν δίνει επίσημες προειδοποιήσεις, άρα δεν αναφέρω καμία. Για έκτακτα δελτία ισχύει η ΕΜΥ.');
+ lines.push(warningText(report));
  const at=new Intl.DateTimeFormat('el-GR',{timeZone:'Europe/Athens',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(report.retrieved_at));
  lines.push('Πηγή: '+report.provider+' · ανάκτηση '+at+' (ώρα Ελλάδας)');
  lines.push(...report.sources);
  return lines.join('\n');
 }
-module.exports={forecast,validPlace,describe,greekDate,HOSTS};
+module.exports={forecast,validPlace,describe,presentation,nowText,warningText,spokenText,greekDate,HOSTS};

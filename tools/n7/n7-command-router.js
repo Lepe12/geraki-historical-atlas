@@ -151,6 +151,45 @@
   const m=String(text).match(/(?:στην|στη|στον|στο|in)\s+([\p{Lu}][\p{L}\s'-]{1,50})/u);
   return m?m[1].trim().replace(/[;?.!]+$/,''):null;
  }
- const api={classify,CATEGORIES,fold,PLACES,REGIONS,AGENTS,route,findPlace,linkPlaces,matchRecord,years,libraryTerms};
+ // N7_AGENT_SPEECH_V1: the spoken version of an answer from the News & Geopolitics or Weather agent, for the
+ // Humanoid screen's device voice. The text on screen is not changed. Figures, units and dates are said as Greek
+ // words; addresses, citation marks and error codes are left out; speech stops at about half a minute and says
+ // where the rest is. Text that is not from an agent is returned unchanged. The same rules (and the same test
+ // sentences) are used by the /n7-apex Humanoid (tools/n7_apex_preview/N7AgentSpeech.ts in the atlas repository).
+ const SPEECH_MONTHS=['Ιανουαρίου','Φεβρουαρίου','Μαρτίου','Απριλίου','Μαΐου','Ιουνίου','Ιουλίου','Αυγούστου','Σεπτεμβρίου','Οκτωβρίου','Νοεμβρίου','Δεκεμβρίου'];
+ const SPEECH_DAYS={'Δευ':'Δευτέρα','Τρί':'Τρίτη','Τετ':'Τετάρτη','Πέμ':'Πέμπτη','Παρ':'Παρασκευή','Σάβ':'Σάββατο','Κυρ':'Κυριακή'};
+ const SPEECH_WIND={'Β':'βόρεια','ΒΑ':'βορειοανατολικά','Α':'ανατολικά','ΝΑ':'νοτιοανατολικά','Ν':'νότια','ΝΔ':'νοτιοδυτικά','Δ':'δυτικά','ΒΔ':'βορειοδυτικά'};
+ const SPEECH_SECTION={'ΓΕΓΟΝΟΤΑ ΜΕ ΔΙΑΣΤΑΥΡΩΣΗ':'Γεγονότα που διασταυρώθηκαν από περισσότερα μέσα.','ΑΝΑΦΟΡΕΣ ΧΩΡΙΣ ΔΙΑΣΤΑΥΡΩΣΗ':'Αναφορές που δεν έχουν διασταυρωθεί.','ΙΣΧΥΡΙΣΜΟΙ, ΔΗΛΩΣΕΙΣ':'Ισχυρισμοί και δηλώσεις.','ΑΝΑΛΥΣΕΙΣ ΚΑΙ ΣΧΟΛΙΑ':'Αναλύσεις και σχόλια, δηλαδή γνώμες.'};
+ const MAX_SPOKEN_CHARACTERS=700;
+ function spokenGreek(line){
+  return String(line)
+   .replace(/^[•·\-]\s*/,'')
+   .replace(/(?<![\p{L}])(Δευ|Τρί|Τετ|Πέμ|Παρ|Σάβ|Κυρ)\s+(?=\d)/gu,(_,d)=>SPEECH_DAYS[d]+' ')
+   .replace(/\b(\d{1,2})\/(\d{2})\/(\d{4})\b/g,(_,d,m,y)=>String(Number(d))+' '+(SPEECH_MONTHS[Number(m)-1]||'')+' '+y)
+   .replace(/,?\s*ώρα [A-Za-z]+\/[A-Za-z_]+/g,'')
+   .replace(/από (ΒΑ|ΒΔ|ΝΑ|ΝΔ|Β|Α|Ν|Δ)(?![\p{L}])/gu,(_,w)=>'από '+SPEECH_WIND[w])
+   .replace(/(\d)\s?°C/g,'$1 βαθμούς Κελσίου').replace(/(\d)\s?km\/h/g,'$1 χιλιόμετρα την ώρα')
+   .replace(/(\d)\s?mm\b/g,'$1 χιλιοστά').replace(/(\d)\s?%/g,'$1 τοις εκατό')
+   .replace(/\s*\([A-Z][A-Z0-9_]{5,}\)/g,'')
+   .replace(/\s*[·•]\s*/g,', ').replace(/\s—\s/g,', ').replace(/https?:\/\/\S+/g,'').replace(/\[S\d{1,2}\]\s?/g,'').replace(/\s{2,}/g,' ').trim();
+ }
+ function speakAgent(text){
+  const input=String(text||''),agent=input.match(/^\[(Weather|News & Geopolitics) Agent\]\n/);
+  if(!agent)return input;
+  const lines=input.slice(agent[0].length).split('\n').map(l=>l.trim()).filter(Boolean),out=[];
+  for(const line of lines){
+   if(/^(?:[^:\n]{1,90}: )?https:\/\/\S+$/.test(line)||/^(?:Πηγή|Σημείωση):/.test(line)||/^Ενημέρωση:/.test(line))continue;
+   const header=Object.keys(SPEECH_SECTION).find(k=>line.startsWith(k));
+   if(header){out.push(SPEECH_SECTION[header]);continue;}
+   const headline=line.match(/^\[S\d+\]\s+(.+?)\s+—\s+\d{2}\/\d{2}\/\d{4}\s+—\s+(.+)$/);
+   out.push(headline?headline[1]+', σύμφωνα με '+headline[2]:line);
+  }
+  let spoken='',cut=false;
+  for(const raw of out){const line=spokenGreek(raw);if(!line)continue;if(spoken.length+line.length>MAX_SPOKEN_CHARACTERS){cut=true;break;}spoken+=(spoken?' ':'')+(/[.;!:]$/.test(line)?line:line+'.');}
+  const sources=/https:\/\//.test(input);
+  if(cut)return spoken+(sources?' Η πλήρης απάντηση με τις πηγές είναι γραμμένη στη συνομιλία.':' Η πλήρης απάντηση είναι γραμμένη στη συνομιλία.');
+  return spoken+(sources?' Οι πηγές είναι γραμμένες στη συνομιλία.':'');
+ }
+ const api={classify,CATEGORIES,fold,PLACES,REGIONS,AGENTS,route,findPlace,linkPlaces,matchRecord,years,libraryTerms,speakAgent,spokenGreek};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.N7CommandRouter=api;
 })(typeof window==='undefined'?globalThis:window);
