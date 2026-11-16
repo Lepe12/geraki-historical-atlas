@@ -1,0 +1,22 @@
+name: N7 live GET audit
+on:
+  push:
+    branches: [audit/n7-live-readonly-20261116]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: GET-only status checks
+        shell: bash
+        run: |
+          set +e
+          for url in https://bot.piratecartography.com/ https://bot.piratecartography.com/n7-apex/ https://bot.piratecartography.com/api/status https://pct-live.piratecartography.com/health https://n7-agent.piratecartography.com/health; do
+            host="${url#https://}"; host="${host%%/*}"
+            echo "CHECK $url DNS=$(getent ahostsv4 "$host" | head -1 | awk '{print $1}')"
+            curl -sS -L --max-redirs 2 --connect-timeout 8 --max-time 18 -o /dev/null -w 'HTTP=%{http_code} IP=%{remote_ip} BYTES=%{size_download} CONTENT_TYPE=%{content_type}\n' "$url"
+          done
+          echo "Unauthenticated GET only; this does not test shared chat memory, run deployment, or authenticate."
