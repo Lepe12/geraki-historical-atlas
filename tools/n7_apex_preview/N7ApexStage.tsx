@@ -4,12 +4,14 @@ import ApexWorld from "./ApexWorld";
 import N7Workspace from "./N7Workspace";
 import N7HumanoidView from "./N7HumanoidView";
 import type { OrbState } from "./ApexHeroOrb";
-import { N7_GUIDE } from "./N7BuildFlags";
+import { N7_GUIDE, N7_GUEST_CHAT } from "./N7BuildFlags";
+import { go } from "./N7Navigation";
 
 export type N7Trace = { n: number; trace: Array<{ helper: string }> };
 
 export default function N7ApexStage() {
   const isolatedGuide=N7_GUIDE;
+  const home=N7_GUIDE&&!N7_GUEST_CHAT; // N7_APEX_HOME_V1: the authenticated Humanoid home
   const [n7Activity, setN7Activity] = useState<OrbState | "listening" | null>(null);
   const [workspaceRequest,setWorkspaceRequest]=useState(0);
   const [n7Trace, setN7Trace] = useState<N7Trace | null>(null);
@@ -27,7 +29,7 @@ export default function N7ApexStage() {
           boxShadow:"0 0 20px #00dafa38"}}>HUMANOID</button>
       <N7Workspace onOpenFigure={()=>setHumanoidOpen(true)} guideOpen={humanoidOpen&&isolatedGuide} openSignal={workspaceRequest} onActivity={setN7Activity} onTrace={setN7Trace} />
       </div>
-      <N7HumanoidView onWorkspace={openConversation} open={humanoidOpen} onClose={()=>setHumanoidOpen(false)} activity={n7Activity==="thinking"||n7Activity==="listening"||n7Activity==="speaking"?n7Activity:null} />
+      <N7HumanoidView onWorkspace={openConversation} onNavigate={home?target=>go(target):undefined} open={humanoidOpen} onClose={()=>{if(home){go("chat");return;}setHumanoidOpen(false);}} activity={n7Activity==="thinking"||n7Activity==="listening"||n7Activity==="speaking"?n7Activity:null} />
     </>
   );
 }

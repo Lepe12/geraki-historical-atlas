@@ -5,6 +5,7 @@ import useN7Voice from "./useN7Voice";
 import {FEMALE_VOICE_ID} from "./N7FemaleVoice";
 import {N7_GUIDE,N7_GUEST_CHAT} from "./N7BuildFlags";
 import {speakable} from "./N7AgentSpeech";
+import {GREETING,GREETED_KEY,describeAgents,go,isAgentsStatus,markGreeted,navCommand,readConversationId,wasGreeted,writeConversationId} from "./N7Navigation";
 import type { OrbState } from "./ApexHeroOrb";
 
 type Msg = { role: string; content: string };
@@ -85,6 +86,16 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   useEffect(()=>{const show=()=>setVoiceOpen(true);window.addEventListener("n7:open-voice",show);return()=>window.removeEventListener("n7:open-voice",show);},[]);
   const [loginBusy,setLoginBusy]=useState(false);
   useEffect(()=>{setVoiceHost(guideOpen?document.getElementById("n7-guide-voice"):null);if(!guideOpen)voiceRef.current.suspend();},[guideOpen]);
+  useEffect(()=>{
+    // One welcome per login (this browser tab session). Where the browser blocks automatic audio, the
+    // visible «Έναρξη N7» button starts it with the visitor's click.
+    if(!authenticated||guest||!guideOpen||!voiceHost||wasGreeted()||!voice.supported.output)return;
+    let locked=true;
+    try{const AudioCtor=window.AudioContext;if(AudioCtor){const probe=new AudioCtor();locked=probe.state!=="running";void probe.close();}}catch{locked=true;}
+    if(locked){setGreetGate(true);return;}
+    markGreeted();voiceRef.current.speak(GREETING,true);
+  },[authenticated,guest,guideOpen,voiceHost,voice.supported.output]);
+  const startGreeting=()=>{markGreeted();setGreetGate(false);voiceRef.current.speak(GREETING,true);};
   const [taskPrompt, setTaskPrompt] = useState("");
   const [kind, setKind] = useState("analysis");
   const [missionTarget, setMissionTarget] = useState("");
@@ -95,7 +106,14 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   const [busy, setBusy] = useState(false);
   const [pendingJobs,setPendingJobs]=useState<{id:string;conversationId:string}[]>([]);
   const activeConversation=useRef(conversationId);
+  // N7_APEX_HOME_V1: the Humanoid and the written Chat share ONE active conversation. On arrival the
+  // conversation the Chat (or an earlier visit here) was using is opened, with its history; a new one
+  // is created only when the user sends the first message and none exists.
+  const adopt=useRef<(list:Conversation[])=>void>(()=>{});
+  const [greetGate,setGreetGate]=useState(false);
+  const [notice,setNotice]=useState("");
   useEffect(()=>{activeConversation.current=conversationId;},[conversationId]);
+  useEffect(()=>{if(conversationId&&!guest)writeConversationId(conversationId);},[conversationId,guest]);
   useEffect(()=>{onActivity(voice.phase||(busy||pendingJobs.some(j=>j.conversationId===conversationId)?"thinking":null));},[busy,pendingJobs,conversationId,onActivity,voice.phase]);
   useEffect(()=>{
     if(!pendingJobs.length)return;
@@ -124,12 +142,14 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
     try {
       const s = await n7("/api/status");
       setOnline(true);
-      if(wasAuthenticated.current&&s.authenticated!==true){voiceRef.current.suspend();setMessages([]);setConversations([]);setTasks([]);setPendingJobs([]);setConversationId("");}
+      if(wasAuthenticated.current&&s.authenticated!==true){try{window.sessionStorage.removeItem(GREETED_KEY);}catch{/* ignore */}voiceRef.current.suspend();setMessages([]);setConversations([]);setTasks([]);setPendingJobs([]);setConversationId("");}
       wasAuthenticated.current=s.authenticated===true;setAuthenticated(s.authenticated === true);
       if (s.authenticated === true) {
         const [c, t] = await Promise.all([n7("/api/conversations"), n7("/api/tasks")]);
-        setConversations(Array.isArray(c.conversations) ? c.conversations as Conversation[] : []);
+        const list = Array.isArray(c.conversations) ? c.conversations as Conversation[] : [];
+        setConversations(list);
         setTasks(Array.isArray(t.tasks) ? t.tasks as Task[] : []);
+        adopt.current(list);
       }
     } catch (e) {
       setOnline(false);
@@ -160,6 +180,11 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
     return () => window.clearInterval(timer);
   }, [missionId, open]);
 
+  adopt.current=list=>{
+    if(guest||activeConversation.current)return;
+    const shared=readConversationId();
+    if(shared&&list.some(item=>item.id===shared))void chooseConversation(shared);
+  };
   async function chooseConversation(id: string) {
     voice.suspend();setError("");
     try {
@@ -191,6 +216,21 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
       try{const result=await n7("/api/n7-apex/chat",{messages:rows});if(typeof result.reply!=="string"||!result.reply.trim())throw Error("Το N7 δεν επέστρεψε απάντηση.");setMessages(previous=>[...previous,{role:"assistant",content:String(result.reply)}]);voiceRef.current.speak(result.reply);setMessage(current=>current.trim()===prompt?"":current);}
       catch(e){const error=e instanceof Error?e.message:String(e);setError(error);voiceRef.current.failConversation(error);}
       finally{sending.current=false;setBusy(false);}
+      return;
+    }
+    if(isAgentsStatus(draft)){
+      // Real report of this installation: nothing is invented and the model is not asked.
+      voice.stop();setMessage("");setError("");
+      try{const text=describeAgents(await n7("/api/agents") as never);setNotice(text);voiceRef.current.speak(text,true);}
+      catch(e){const reason=e instanceof Error?e.message:String(e);setNotice("Η κατάσταση των Agents δεν διαβάστηκε: "+reason);}
+      return;
+    }
+    const requested=navCommand(draft);
+    if(requested){
+      // Moving between the Humanoid, the Chat and NABOU is not a question for the model. The shared
+      // conversation ID is saved first, so the other screen opens the same conversation.
+      voice.stop();setMessage("");
+      if(requested!=="humanoid")go(requested,conversationId||undefined);
       return;
     }
     const prompt=draft.trim();sending.current=true;voice.stop();setBusy(true); setError(""); trace("orchestrator","memory","model_runtime");
@@ -265,6 +305,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
       <p style={{margin:"5px 0"}}>Πάτησε Έναρξη συζήτησης μία φορά. Μετά μιλάς και το N7 απαντά αυτόματα. Για διακοπή πες «τέλος συζήτησης» όταν σε ακούει. Το μικρόφωνο κλείνει όσο μιλά το N7. Ο browser μπορεί να χρησιμοποιεί την υπηρεσία αναγνώρισής του.</p>
       <p role="status" aria-label="Κατάσταση φωνής">{voice.status||"Πάτησε Δοκιμή φωνής για να ακούσεις το N7."}</p>
       {guideOpen&&<>
+        {notice&&<div role="status" aria-label="Ενημέρωση N7" style={{maxHeight:90,overflow:"auto",whiteSpace:"pre-wrap",color:"#cdf9ff"}}>{notice}</div>}
         {lastAnswer&&<div aria-label="Τελευταία απάντηση N7" style={{maxHeight:70,overflow:"auto",whiteSpace:"pre-wrap"}}>{richText(lastAnswer)}</div>}
         <textarea aria-label="Φωνητικό μήνυμα" readOnly={voice.conversation} rows={2} value={message} onChange={e=>setMessage(e.target.value)} placeholder="Μίλησε ή γράψε εδώ…" style={inputStyle}/>
         {!voice.conversation&&<button type="button" style={buttonStyle} onClick={()=>void send()} disabled={busy||!message.trim()}>Αποστολή στη φιγούρα</button>}
@@ -276,6 +317,10 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   return (
     <>
       {guideOpen&&voiceHost&&createPortal(<div style={{position:"relative",zIndex:5,padding:"6px 12px",background:"#04121beb",flex:"none",maxHeight:"38dvh",overflow:"auto"}}>
+        {greetGate&&<div role="status" aria-label="Καλωσόρισμα N7" style={{textAlign:"center",padding:"4px 0 8px"}}>
+          <p style={{margin:"0 0 6px",color:"#cdf9ff",fontSize:13}}>{GREETING}</p>
+          <button type="button" data-n7-start="" style={{...buttonStyle,fontWeight:700,letterSpacing:1.5}} onClick={startGreeting}>Έναρξη N7</button>
+        </div>}
         <button type="button" aria-expanded={voiceOpen} onClick={()=>{setVoiceOpen(x=>!x);if(voiceOpen)voice.suspend();}}>Φωνητική συνομιλία</button>
         {voiceOpen&&voiceControls}
       </div>,voiceHost)}

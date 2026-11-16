@@ -11,7 +11,7 @@ type Face="n7"|"h01";
 const H01_FIGURE=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/"))+"/n7-humanoid-h01-v2.webp";
 const H01_SCALE=2.5;
 
-export default function N7GuideView({open,onClose,activity,onWorkspace}:{open:boolean;onClose:()=>void;activity?:GuideMood|null;onWorkspace?:()=>void}){
+export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigate}:{open:boolean;onClose:()=>void;activity?:GuideMood|null;onWorkspace?:()=>void;onNavigate?:(target:"chat"|"nabou")=>void}){
   const [reduced,setReduced]=useState(false),[effects,setEffects]=useState(true),[breathing,setBreathing]=useState(true),[gestures,setGestures]=useState(true);
   const [mode,setMode]=useState<GuideMode>("assembly"),[mood,setMood]=useState<GuideMood>("idle");
   const [replay,setReplay]=useState(0),[done,setDone]=useState(false),[manualMotion,setManualMotion]=useState(false),[details,setDetails]=useState(false);
@@ -120,12 +120,14 @@ export default function N7GuideView({open,onClose,activity,onWorkspace}:{open:bo
       #n7-guide-voice>div{background:rgba(3,11,18,.86)!important;border:1px solid rgba(120,220,240,.14);border-radius:16px;margin:0 auto;width:min(880px,calc(100% - 24px));box-sizing:border-box;padding:8px 12px!important}
       #n7-guide-voice>div:has(>button:only-child){width:fit-content;background:transparent!important;border:0;overflow:visible!important;padding:0!important}
       #n7-guide-voice p{font-size:12px;line-height:1.5;margin:6px 0;color:#a9cfd9}
+      /* N7_APEX_HOME_V1: the two navigation buttons must fit a phone beside the existing ones. */
+      @media(max-width:480px){.n7-guide-header{padding:10px 10px;gap:6px}.n7-guide-brand{letter-spacing:.12em;font-size:12px}.n7-guide-header>div{gap:4px!important}.n7-guide-header button{padding:5px 6px}}
       .n7-guide-details{padding:14px;background:rgba(2,9,14,.88);border:1px solid rgba(120,220,240,.16);border-radius:12px;overflow:auto;font-size:12px;line-height:1.6;min-height:0}
       @media(max-width:700px), (max-width:1000px) and (max-height:500px){.n7-guide-main[data-details=true]{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) 115px}.n7-guide-controls{align-self:stretch;margin:0;max-width:none;border-radius:0;border-width:1px 0 0;padding:6px 8px;gap:4px 10px;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;min-height:42px}#n7-guide-voice>div{width:100%;border-radius:0;border-width:1px 0 0}.n7-guide-controls>*{flex-shrink:0}.n7-guide-cluster{flex-wrap:nowrap}.n7-guide-group{padding-left:10px}.n7-guide-view button{padding:6px 8px;font-size:11px}}
     `}</style>
     <N7Backdrop ref={backdrop} effects={effects} reduced={reduced}/>
     <div ref={waveRef} aria-label="N7 completion shockwave" data-progress="-1" style={{display:"none",position:"fixed",pointerEvents:"none",border:"2px solid #ffe0a6",boxShadow:"0 0 12px #63ddff88",borderRadius:"50%",zIndex:3}}/>
-    <header className="n7-guide-header"><strong className="n7-guide-brand">N7 <i>·</i> HUMANOID</strong><div style={{display:"flex",gap:8}}>{onWorkspace&&<button type="button" onClick={onWorkspace}>Συνομιλία</button>}<button type="button" data-exit="" onClick={onClose}>Exit</button></div></header>
+    <header className="n7-guide-header"><strong className="n7-guide-brand">N7 <i>·</i> HUMANOID</strong><div style={{display:"flex",gap:8}}>{onWorkspace&&<button type="button" onClick={onWorkspace}>Συνομιλία</button>}{onNavigate&&<button type="button" data-nav="chat" onClick={()=>onNavigate("chat")}>Chat</button>}{onNavigate&&<button type="button" data-nav="nabou" onClick={()=>onNavigate("nabou")}>NABOU</button>}<button type="button" data-exit="" onClick={onClose}>Exit</button></div></header>
     <div className="n7-guide-main" data-details={details}>
       <div className="n7-guide-figure-slot"><div ref={figureRef} className="n7-guide-figure" aria-label={mode==="assembly"?"N7 guide particle-river assembly":undefined}>
         {(mode==="original"||mode==="compare")&&<img src={figureUrl} alt="Approved N7 idle reference" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"contain",opacity:mode==="compare"?.38:1,zIndex:mode==="compare"?1:undefined}}/>}
