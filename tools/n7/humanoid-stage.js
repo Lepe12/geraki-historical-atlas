@@ -333,9 +333,13 @@ async function weather(r){
  const d=await call('/api/tools/weather?place='+encodeURIComponent(r.location));
  results.replaceChildren();const t=make('table',null,'n7-results-table');const h=make('tr');for(const x of ['Ημέρα','Καιρός','Μέγ.','Ελάχ.','Βροχή','Άνεμος'])h.append(make('th',x));t.append(h);
  for(const x of d.days){const tr=make('tr');tr.append(make('td',x.date),make('td',x.summary),make('td',x.max_c+' °C'),make('td',x.min_c+' °C'),make('td',(x.precipitation_probability??'—')+'%'),make('td',(x.wind_max_kmh??'—')+' km/h'));t.append(tr);}
- results.append(t,make('p','Πηγή: '+d.provider+' · '+d.place.name+(d.place.country?', '+d.place.country:'')+' · ανακτήθηκε '+new Date(d.retrieved_at).toLocaleString('el-GR'),'n7-note'));
+ // N7_WEATHER_PRESENTATION_V1: the server words the current conditions, the notice about warnings and the
+ // spoken text once; an older server without `presentation` leaves this screen exactly as it was.
+ const view=d.presentation&&typeof d.presentation==='object'?d.presentation:{};
+ const notes=[view.now,view.warnings].filter(x=>typeof x==='string'&&x).map(x=>make('p',x,'n7-note'));
+ results.append(t,...notes,make('p','Πηγή: '+d.provider+' · '+d.place.name+(d.place.country?', '+d.place.country:'')+' · ανακτήθηκε '+new Date(d.retrieved_at).toLocaleString('el-GR'),'n7-note'));
  const tomorrow=d.days[1]||d.days[0];
- presence('done');say(d.place.name+': '+tomorrow.date+' — '+tomorrow.summary+', από '+tomorrow.min_c+' έως '+tomorrow.max_c+' °C, πιθανότητα βροχής '+(tomorrow.precipitation_probability??'άγνωστη')+'%. Πηγή: Open-Meteo.');
+ presence('done');say(typeof view.spoken==='string'&&view.spoken?view.spoken:d.place.name+': '+tomorrow.date+' — '+tomorrow.summary+', από '+tomorrow.min_c+' έως '+tomorrow.max_c+' °C, πιθανότητα βροχής '+(tomorrow.precipitation_probability??'άγνωστη')+'%. Πηγή: Open-Meteo.');
  return 'done';
 }
 
@@ -452,7 +456,9 @@ function speakText(text){
  if(!S.prefs.tts||!text)return;
  if(!window.speechSynthesis){stateLine.textContent='Η φωνητική απάντηση δεν υποστηρίζεται σε αυτόν τον browser.';return;}
  const v=greekVoice();if(!v){stateLine.textContent='Δεν υπάρχει ελληνική φωνή στη συσκευή· η απάντηση εμφανίζεται μόνο ως κείμενο.';return;}
- const clean=String(text).replace(/[*_#`>|⟦⟧]/g,' ').replace(/https?:\/\/\S+/g,'').replace(/\s+/g,' ').trim().slice(0,1400);
+ // N7_AGENT_SPEECH_V1: answers of the news and weather agents are spoken in Greek words, without marks or addresses.
+ const spoken=typeof R.speakAgent==='function'?R.speakAgent(text):text;
+ const clean=String(spoken).replace(/[*_#`>|⟦⟧]/g,' ').replace(/https?:\/\/\S+/g,'').replace(/\s+/g,' ').trim().slice(0,1400);
  utter=new SpeechSynthesisUtterance(clean);utter.voice=v;utter.lang=v.lang;
  utter.onstart=()=>{hush.hidden=false;presence('speaking');};
  const end=()=>{hush.hidden=true;utter=null;if(stage.dataset.state==='speaking')presence('idle');if(S.prefs.continuous&&lastVoice&&!stage.hidden)setTimeout(()=>{if(!listening&&!running)toggleMic();},350);};

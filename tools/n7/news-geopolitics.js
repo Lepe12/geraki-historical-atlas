@@ -102,7 +102,9 @@ function cluster(items){
 const TOPICS={
  geopolitics:{label:'Γεωπολιτική και διεθνείς σχέσεις',
   el:'γεωπολιτική OR διπλωματία OR "διεθνείς σχέσεις" OR εκεχειρία OR κυρώσεις OR "σύνοδος κορυφής" OR πόλεμος',
-  en:'geopolitics OR diplomacy OR ceasefire OR sanctions OR summit OR conflict'},
+  // Not the bare words "summit" or "conflict": they match company names (a drug maker called Summit)
+  // and climate or business "summits". Specific phrases keep the results on international affairs.
+  en:'geopolitics OR diplomacy OR ceasefire OR sanctions OR "peace talks" OR "leaders summit" OR "foreign minister" OR "security council"'},
  economy:{label:'Οικονομικές εξελίξεις',
   el:'οικονομία OR πληθωρισμός OR αγορές OR επιτόκια OR ενέργεια',
   en:'economy OR inflation OR markets OR "central bank" OR energy prices'},
