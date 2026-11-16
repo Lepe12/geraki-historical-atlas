@@ -1,0 +1,57 @@
+name: N7 EVE preview — build and verify (no deploy)
+on:
+  pull_request:
+    paths:
+      - 'tools/n7_eve_preview/**'
+      - '.github/workflows/n7-eve-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: n7-eve-preview-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    # Build and browser checks only: no secrets, no environment, no upload to any server.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7_apex_preview
+            tools/n7_eve_preview
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build the production configuration (absolute pct-live endpoint)
+        run: |
+          python3 tools/n7_eve_preview/build_eve_preview.py --out "$RUNNER_TEMP/n7-eve-prod"
+          cd "$RUNNER_TEMP/n7-eve-prod"
+          npm ci --no-audit --no-fund
+          npm run build
+          test -s out/index.html
+          grep -q 'pct-live.piratecartography.com/pct-api/live' -r out/_next/static/chunks
+      - name: Build the local-preview configuration (same-origin proxy paths)
+        run: |
+          N7_EVE_PCT_API=/pct-api/live python3 tools/n7_eve_preview/build_eve_preview.py --out "$RUNNER_TEMP/n7-eve-src"
+          mv "$RUNNER_TEMP/n7-eve-prod/node_modules" "$RUNNER_TEMP/n7-eve-src/node_modules"
+          cd "$RUNNER_TEMP/n7-eve-src"
+          npm run build
+          mkdir -p "$RUNNER_TEMP/n7-eve-http"
+          cp -a out "$RUNNER_TEMP/n7-eve-http/n7-eve"
+      - name: Browser checks against the live library, N7 status and NABOU (read-only)
+        env:
+          N7_EVE_OUT: ${{ runner.temp }}/n7-eve-evidence
+        run: |
+          npm install --prefix "$RUNNER_TEMP/n7-eve-browser" --ignore-scripts --no-audit --no-fund playwright-core@1.56.1
+          export CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          python3 tools/n7_eve_preview/serve_preview.py --root "$RUNNER_TEMP/n7-eve-http" --port 4180 >"$RUNNER_TEMP/serve.log" 2>&1 &
+          sleep 2
+          NODE_PATH="$RUNNER_TEMP/n7-eve-browser/node_modules" node tools/n7_eve_preview/test_eve_preview.cjs
+      - name: Keep screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n7-eve-preview-screenshots
+          path: ${{ runner.temp }}/n7-eve-evidence
