@@ -294,7 +294,7 @@ jobs:
         run: node tools/n7_apex_preview/test_female_voice.cjs
       - name: Navigation phrases, shared conversation and greeting flag (unit)
         if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || (env.N7_APEX_BASE_PATH == '/n7-apex' || env.N7_APEX_BASE_PATH == '/n7-apex-home')
-        run: node --test tools/n7_apex_preview/test_navigation.mjs
+        run: node --test tools/n7_apex_preview/test_navigation.mjs tools/n7_apex_preview/test_pronunciation.mjs
       - name: Spoken answers of the news and weather agents (unit)
         if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || (env.N7_APEX_BASE_PATH == '/n7-apex' || env.N7_APEX_BASE_PATH == '/n7-apex-home')
         run: node --test tools/n7_apex_preview/test_agent_speech.mjs
