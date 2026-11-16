@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Ingest two rights-verified historical *secondary* works from Project Gutenberg.
+"""Ingest rights-verified historical works from Project Gutenberg.
 All sources have independent bibliographic provenance and actual HTML page markers.
 No unpublished user sources are sent to or fetched from GitHub.
 """
@@ -7,12 +7,11 @@ import ftplib,hashlib,hmac,json,os,re,socket,ssl,time,urllib.request,urllib.erro
 from bs4 import BeautifulSoup
 
 BOOKS=[
- {"id":"22169","title":"The Story of the Barbary Corsairs",
-  "author":"Stanley Lane-Poole; J. D. Jerrold Kelley","year":"1890",
-  "url":"https://www.gutenberg.org/cache/epub/22169/pg22169-images.html"},
- {"id":"13689","title":"Sea-Wolves of the Mediterranean",
-  "author":"E. Hamilton Currey","year":"1910",
-  "url":"https://www.gutenberg.org/cache/epub/13689/pg13689-images.html"}
+ # Already imported earlier (22169 Lane-Poole, 13689 Currey); not listed again so they are not re-sent.
+ # 43849 (Doublet, French) was tried and rejected: its HTML has no printed-page markers.
+ {"id":"36475","title":"Privateers and Privateering",
+  "author":"E. P. Statham","year":"1910",
+  "url":"https://www.gutenberg.org/cache/epub/36475/pg36475-images.html"}
 ]
 def download(url):
     request=urllib.request.Request(url,headers={"User-Agent":"N7 Historical Library/1.0 (non-commercial bibliographic research)"})
@@ -111,6 +110,6 @@ def main():
     hits=reply.get("matches")
     if http!=200 or not isinstance(sources,int) or sources<2 or not isinstance(total,int) or total<imported or not isinstance(hits,list) or not hits:
         raise RuntimeError("END_TO_END_SEARCH_NOT_VERIFIED")
-    print(json.dumps({"status":"VERIFIED","mariadb_sources":sources,"mariadb_pages":total,"books_imported":2,
+    print(json.dumps({"status":"VERIFIED","mariadb_sources":sources,"mariadb_pages":total,"books_imported":len(BOOKS),
                       "search":"Barbarossa","matches_found":len(hits),"source_text_logged":False}))
 if __name__=="__main__":main()
