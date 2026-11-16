@@ -70,5 +70,21 @@
   {
     "old": "      \"frame-ancestors 'none'\",",
     "new": "      // N7_SPLIT_MAP_V1: the public NABOU atlas may be embedded below N7; nothing else may be framed.\n      \"frame-src 'self' https://lepe12.github.io; frame-ancestors 'none'\","
+  },
+  {
+    "old": "      let researchData=null,reply;\n      if(historicalResearch.historicalIntent(content)){",
+    "new": "      let researchData=null,reply,n7AgentRun=null;\n      // N7_SPECIALIST_AGENTS_V1: a recognised news/geopolitics or weather request goes to its agent and is\n      // answered in this same conversation. Agents use real provider data only; on an internal fault the\n      // normal chat path continues.\n      try{n7AgentRun=await require('./n7-agents.js').dispatch(history,{apiKey:API_KEY,model:MODEL,base:BASE});}\n      catch(_){console.warn('N7_AGENT_DISPATCH_FAILED');n7AgentRun=null;}\n      if(n7AgentRun){reply=n7AgentRun.reply;console.log('N7_AGENT agent='+n7AgentRun.agent.id+' status='+n7AgentRun.status);}\n      else if(historicalResearch.historicalIntent(content)){"
+  },
+  {
+    "old": "      }else{\n        try{reply=await answer(history);}catch(e){return json(res,502,{error:e.message});}",
+    "new": "      }else if(!n7AgentRun){\n        try{reply=await answer(history);}catch(e){return json(res,502,{error:e.message});}"
+  },
+  {
+    "old": "      return json(res, 200, {\n        reply,",
+    "new": "      return json(res, 200, {\n        agent: n7AgentRun ? n7AgentRun.agent : undefined,\n        reply,"
+  },
+  {
+    "old": "    if(p==='/api/library/search'){",
+    "new": "    // N7_SPECIALIST_AGENTS_V1: the registry of specialist agents (authenticated, read only).\n    if(p==='/api/agents'){\n      if(req.method!=='GET')return json(res,405,{error:'Method not allowed'});\n      const agentStatus=require('./n7-agents.js').status({env:process.env,dir:__dirname});return json(res,200,{schema:'n7-agents-v1',agents:agentStatus.agents,summary:agentStatus.summary});\n    }\n    if(p==='/api/library/search'){"
   }
 ]
