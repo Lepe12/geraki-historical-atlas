@@ -72,6 +72,7 @@ const allPages=()=>bookPages.split(',').flatMap(f=>{const d=JSON.parse(fs.readFi
   r.on('error',reject);const b=req.postDataBuffer();if(b)r.write(b);r.end();});
  const browser=await chromium.launch();
  const context=await browser.newContext({viewport:{width:1440,height:900},locale:'el-GR'});
+ await context.addInitScript(()=>{window.N7_LEGACY_STAGE_ENTRY=true;}); // N7_APEX_HOME_V1: these tests exercise the stage itself
  const csp=[],errors=[];
  await context.route('**/*',async route=>{
   const req=route.request(),url=new URL(req.url());
@@ -174,6 +175,7 @@ const allPages=()=>bookPages.split(',').flatMap(f=>{const d=JSON.parse(fs.readFi
   if(semIndex&&modelDir){
    const pagesAll=allPages();
    const c2=await browser.newContext({viewport:{width:1440,height:900},locale:'el-GR'});
+   await c2.addInitScript(()=>{window.N7_LEGACY_STAGE_ENTRY=true;});
    await c2.route('**/*',r=>new URL(r.request().url()).origin===FRONT?r.continue():r.abort());
    const p2=await c2.newPage();p2.on('pageerror',e=>errors.push('front: '+e));p2.on('console',m=>{if(/Content Security Policy/i.test(m.text()))csp.push(m.text().slice(0,200));});
    await p2.goto(FRONT+'/');await p2.waitForSelector('#login:not(.hidden) #loginform input[name=password]');

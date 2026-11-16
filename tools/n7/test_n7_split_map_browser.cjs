@@ -80,6 +80,7 @@ function fixtureAsset(url){
  const external=new Set();
  async function newContext(viewport){
   const context=await browser.newContext({viewport,locale:'el-GR'});
+  await context.addInitScript(()=>{window.N7_LEGACY_STAGE_ENTRY=true;}); // N7_APEX_HOME_V1: these tests exercise the stage itself
   await context.route('**/*',async route=>{
    const req=route.request(),url=new URL(req.url());
    if(url.origin===BOT)return route.fulfill(await viaRuntime(req,url));
