@@ -16,7 +16,8 @@ jobs:
         shell: bash
         run: |
           set +e
-          for url in https://bot.piratecartography.com/ https://bot.piratecartography.com/n7-apex/ https://bot.piratecartography.com/api/status https://pct-live.piratecartography.com/health https://n7-agent.piratecartography.com/health; do
+          echo "AUDIT_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          for url in https://bot.piratecartography.com/ https://bot.piratecartography.com/n7-apex/ https://bot.piratecartography.com/api/status https://bot.piratecartography.com/api/agents https://pct-live.piratecartography.com/health https://n7-agent.piratecartography.com/health; do
             host="${url#https://}"; host="${host%%/*}"
             echo "CHECK $url DNS=$(getent ahostsv4 "$host" | head -1 | awk '{print $1}')"
             curl -sS -L --max-redirs 2 --connect-timeout 8 --max-time 18 -o /dev/null -w 'HTTP=%{http_code} IP=%{remote_ip} BYTES=%{size_download} CONTENT_TYPE=%{content_type}\n' "$url"
