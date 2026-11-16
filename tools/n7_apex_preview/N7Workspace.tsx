@@ -4,6 +4,7 @@ import {createPortal} from "react-dom";
 import useN7Voice from "./useN7Voice";
 import {FEMALE_VOICE_ID} from "./N7FemaleVoice";
 import {N7_GUIDE,N7_GUEST_CHAT} from "./N7BuildFlags";
+import {speakable} from "./N7AgentSpeech";
 import type { OrbState } from "./ApexHeroOrb";
 
 type Msg = { role: string; content: string };
@@ -41,6 +42,17 @@ const buttonStyle: React.CSSProperties = {
   padding: "9px 12px", border: "1px solid #29677b", borderRadius: 7,
   color: "#cdf9ff", background: "#112d39", cursor: "pointer",
 };
+// N7_SPECIALIST_AGENTS_V1: answers of the News & Geopolitics and Weather agents arrive in this same
+// conversation. Their source addresses become active links, and the spoken version leaves the
+// addresses and citation marks out. The text itself is never changed.
+const LINK=/(https:\/\/[^\s<>"']+)/g;
+export function richText(text:string){
+  return text.split(LINK).map((part,i)=>{
+    if(i%2===0)return part;
+    let host="";try{const u=new URL(part);if(u.protocol!=="https:")return part;host=u.hostname.replace(/^www\./,"");}catch{return part;}
+    return <a key={i} href={part} target="_blank" rel="noopener noreferrer" title={part} style={{color:"#65e8f5",wordBreak:"break-all"}}>{host} ↗</a>;
+  });
+}
 export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOpen=false, onOpenFigure }: {
   onOpenFigure?:()=>void;
   guideOpen?:boolean;
@@ -67,7 +79,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   const voice=useN7Voice(setMessage,text=>autoSend.current(text));
   const voiceRef=useRef(voice);voiceRef.current=voice;
   const heard=useRef<Record<string,number>>({});
-  const readAnswer=(id:string,messages:Msg[])=>{const replies=messages.filter(m=>m.role==="assistant");if(replies.length>(heard.current[id]||0)){heard.current[id]=replies.length;voiceRef.current.speak(replies.at(-1)!.content);}};
+  const readAnswer=(id:string,messages:Msg[])=>{const replies=messages.filter(m=>m.role==="assistant");if(replies.length>(heard.current[id]||0)){heard.current[id]=replies.length;voiceRef.current.speak(speakable(replies.at(-1)!.content));}};
   const readAnswerRef=useRef(readAnswer);readAnswerRef.current=readAnswer;
   const [voiceOpen,setVoiceOpen]=useState(false),[voiceHost,setVoiceHost]=useState<HTMLElement|null>(null);
   useEffect(()=>{const show=()=>setVoiceOpen(true);window.addEventListener("n7:open-voice",show);return()=>window.removeEventListener("n7:open-voice",show);},[]);
@@ -186,6 +198,8 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
       const id = conversationId || await newConversation();
       const result = await n7("/api/conversations/" + idPath(id) + "/chat", { message: prompt });
       const conv = result.conversation as { messages?: Msg[] } | undefined;
+      // The server names the specialist agent that answered (news/geopolitics or weather).
+      if((result.agent as {id?:string}|undefined)?.id)trace("orchestrator","web_research");
       if(result.pending===true&&typeof result.job_id==="string"){
         idPath(result.job_id);
         setPendingJobs(jobs=>jobs.some(j=>j.id===result.job_id)?jobs:[...jobs,{id:String(result.job_id),conversationId:id}]);
@@ -243,7 +257,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
         {!voice.conversation&&<button type="button" style={buttonStyle} onClick={voice.listen} disabled={busy||pendingJobs.some(j=>j.conversationId===conversationId)||!voice.supported.input}>Υπαγόρευση</button>}
         {!voice.conversation&&<button type="button" style={buttonStyle} onClick={()=>{voice.suspend();}}>Διακοπή ήχου</button>}
         {!voice.conversation&&<button type="button" style={buttonStyle} onClick={()=>voice.speak("Γεια σου. Είμαι το N7. Η φωνή είναι έτοιμη.",true)} disabled={!voice.supported.output}>Δοκιμή φωνής</button>}
-        {!voice.conversation&&lastAnswer&&<button type="button" style={buttonStyle} onClick={()=>voice.speak(lastAnswer,true)} disabled={!voice.supported.output}>Ανάγνωση απάντησης</button>}
+        {!voice.conversation&&lastAnswer&&<button type="button" style={buttonStyle} onClick={()=>voice.speak(speakable(lastAnswer),true)} disabled={!voice.supported.output}>Ανάγνωση απάντησης</button>}
       </div>
       {!voice.conversation&&<label>Φωνή συσκευής <select aria-label="Φωνή συσκευής" value={voice.voiceURI} onChange={e=>voice.setVoiceURI(e.target.value)}><option value={FEMALE_VOICE_ID}>N7 · Ελληνική γυναικεία</option><option value="">Αυτόματη φωνή συσκευής</option>{voice.voices.map(v=><option key={v.voiceURI} value={v.voiceURI}>{v.name} ({v.lang})</option>)}</select></label>}
       {!voice.supported.input&&<p>Το μικρόφωνο δεν υποστηρίζεται εδώ. Δοκίμασε Chrome/Edge ή γράψε το μήνυμα.</p>}
@@ -251,7 +265,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
       <p style={{margin:"5px 0"}}>Πάτησε Έναρξη συζήτησης μία φορά. Μετά μιλάς και το N7 απαντά αυτόματα. Για διακοπή πες «τέλος συζήτησης» όταν σε ακούει. Το μικρόφωνο κλείνει όσο μιλά το N7. Ο browser μπορεί να χρησιμοποιεί την υπηρεσία αναγνώρισής του.</p>
       <p role="status" aria-label="Κατάσταση φωνής">{voice.status||"Πάτησε Δοκιμή φωνής για να ακούσεις το N7."}</p>
       {guideOpen&&<>
-        {lastAnswer&&<div aria-label="Τελευταία απάντηση N7" style={{maxHeight:70,overflow:"auto",whiteSpace:"pre-wrap"}}>{lastAnswer}</div>}
+        {lastAnswer&&<div aria-label="Τελευταία απάντηση N7" style={{maxHeight:70,overflow:"auto",whiteSpace:"pre-wrap"}}>{richText(lastAnswer)}</div>}
         <textarea aria-label="Φωνητικό μήνυμα" readOnly={voice.conversation} rows={2} value={message} onChange={e=>setMessage(e.target.value)} placeholder="Μίλησε ή γράψε εδώ…" style={inputStyle}/>
         {!voice.conversation&&<button type="button" style={buttonStyle} onClick={()=>void send()} disabled={busy||!message.trim()}>Αποστολή στη φιγούρα</button>}
         {busy||pendingJobs.some(j=>j.conversationId===conversationId)?<span role="status"> Το N7 ετοιμάζει απάντηση…</span>:null}
@@ -308,7 +322,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
                 {messages.length===0 && <p style={{opacity:.7}}>Δεν υπάρχουν μηνύματα σε αυτή τη συνομιλία.</p>}
                 {messages.map((m,i)=><article key={i} style={{marginBottom:12,
                   borderLeft:m.role==="user"?"2px solid #c99257":"2px solid #00c6e9",paddingLeft:8}}>
-                  <small style={{opacity:.65}}>{m.role==="user"?"Εσύ":"N7"}</small><div>{m.content}</div>
+                  <small style={{opacity:.65}}>{m.role==="user"?"Εσύ":"N7"}</small><div>{m.role==="assistant"?richText(m.content):m.content}</div>
                 </article>)}
               </div>
               <textarea aria-label="Νέο μήνυμα" rows={3} value={message}

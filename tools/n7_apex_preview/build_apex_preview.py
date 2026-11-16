@@ -158,7 +158,7 @@ def main():
     shutil.copy2(overlay/"N7HumanoidView.tsx",out/"components/N7HumanoidView.tsx")
     shutil.copy2(overlay/"N7Backdrop.tsx",out/"components/N7Backdrop.tsx")
     shutil.copy2(overlay/"N7HeadSurface.ts",out/"components/N7HeadSurface.ts")
-    for name in ("N7GuideScene.tsx","N7GuideView.tsx","N7GuideFx.ts","useN7Voice.ts","N7FemaleVoice.ts","N7VoiceSignal.ts"):
+    for name in ("N7GuideScene.tsx","N7GuideView.tsx","N7GuideFx.ts","useN7Voice.ts","N7FemaleVoice.ts","N7VoiceSignal.ts","N7AgentSpeech.ts"):
         shutil.copy2(overlay/name,out/"components"/name)
     (out/"components/N7BackdropReference.ts").write_text(f'export const N7_BACKDROP_REFERENCE = "{base_path}/n7-mountain-backdrop.webp";\n')
     shutil.copy2(overlay/"N7HumanoidReference.ts",out/"components/N7HumanoidReference.ts")
@@ -167,7 +167,7 @@ def main():
         shutil.copy2(part, out/"components"/part.name)
     shutil.copy2(overlay/"N7HumanoidIdle.ts",out/"components/N7HumanoidIdle.ts")
     (out/"public").mkdir(parents=True, exist_ok=True)
-    shutil.copy2(overlay/"N7FemaleVoiceWorker.js",out/"public/n7-female-voice-worker-v2.js")
+    shutil.copy2(overlay/"N7FemaleVoiceWorker.js",out/"public/n7-female-voice-worker-v3.js")
     chunks = sorted((overlay/"assets_v3").glob("chunk*.b64"))
     if len(chunks) != 15:
         raise RuntimeError(f"expected 15 humanoid asset chunks, found {len(chunks)}")
