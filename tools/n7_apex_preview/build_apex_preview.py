@@ -134,7 +134,7 @@ def main():
     # The owner approved the guide Humanoid for production (/n7-apex). Production
     # gets the same figure, environment, moods and voice; only the test pages and
     # the passwordless guest chat stay in the isolated previews.
-    guide=isolated or base_path=="/n7-apex"
+    guide=isolated or base_path in ("/n7-apex","/n7-apex-home")  # /n7-apex-home: the voice-first Humanoid preview, beside production
     if out.exists(): shutil.rmtree(out)
     out.mkdir(parents=True)
     run("git","init",str(out))

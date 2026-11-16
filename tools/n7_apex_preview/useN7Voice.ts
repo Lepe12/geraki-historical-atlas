@@ -6,11 +6,11 @@ import {N7_GUIDE} from "./N7BuildFlags";
 type RecognitionResult={isFinal:boolean;0:{transcript:string}};
 type Recognition={lang:string;continuous:boolean;interimResults:boolean;onstart:(()=>void)|null;onend:(()=>void)|null;onerror:((e:{error:string})=>void)|null;onresult:((e:{results:ArrayLike<RecognitionResult>})=>void)|null;start:()=>void;abort:()=>void};
 type VoiceWindow=typeof window&{SpeechRecognition?:new()=>Recognition;webkitSpeechRecognition?:new()=>Recognition};
-export default function useN7Voice(onTranscript:(text:string)=>void,onTurn?:(text:string)=>void){
+export default function useN7Voice(onTranscript:(text:string)=>void,onTurn?:(text:string)=>void,onSpeechEnd?:()=>void){
   const [supported,setSupported]=useState({input:false,output:false}),[enabled,setEnabled]=useState(false),[conversation,setConversation]=useState(false);
   const [phase,setPhase]=useState<"listening"|"speaking"|null>(null),[status,setStatus]=useState("");
   const [voices,setVoices]=useState<SpeechSynthesisVoice[]>([]),[voiceURI,setVoiceURI]=useState(FEMALE_VOICE_ID);
-  const current=useRef({onTranscript,onTurn,enabled,voiceURI});current.current={onTranscript,onTurn,enabled,voiceURI};
+  const current=useRef({onTranscript,onTurn,onSpeechEnd,enabled,voiceURI});current.current={onTranscript,onTurn,onSpeechEnd,enabled,voiceURI};
   const recognition=useRef<Recognition|null>(null),generation=useRef(0),timer=useRef<ReturnType<typeof setTimeout>|null>(null),utterance=useRef<SpeechSynthesisUtterance|null>(null);
   const female=useRef<ReturnType<typeof createFemaleVoice>|null>(null);
   const active=useRef(false),rearm=useRef<ReturnType<typeof setTimeout>|null>(null),captureRef=useRef<()=>void>(()=>{});
@@ -62,7 +62,7 @@ export default function useN7Voice(onTranscript:(text:string)=>void,onTurn?:(tex
     let index=0;
     const next=()=>{
       if(token!==generation.current)return;
-      if(index>=chunks.length){utterance.current=null;setPhase(null);setStatus(active.current?"Σε λίγο σε ακούω ξανά…":"Η εκφώνηση ολοκληρώθηκε.");arm();return;}
+      if(index>=chunks.length){utterance.current=null;setPhase(null);setStatus(active.current?"Σε λίγο σε ακούω ξανά…":"Η εκφώνηση ολοκληρώθηκε.");try{current.current.onSpeechEnd?.();}catch{/* never break the loop */}arm();return;}
       if(useFemale){
         const text=chunks[index++];female.current!.play(text,{
           start:()=>{if(token===generation.current){setPhase("speaking");setStatus("Το N7 μιλά με την ελληνική γυναικεία φωνή.");}},
@@ -112,5 +112,7 @@ export default function useN7Voice(onTranscript:(text:string)=>void,onTurn?:(tex
     active.current=true;setConversation(true);current.current.enabled=true;setEnabled(true);capture();
   };
   const toggle=()=>{const next=!current.current.enabled;current.current.enabled=next;setEnabled(next);if(!next){active.current=false;setConversation(false);stop();}setStatus(next?"Οι νέες απαντήσεις θα εκφωνούνται. Μπορείς να διακόψεις οποιαδήποτε στιγμή.":"Η αυτόματη εκφώνηση έκλεισε.");};
-  return {supported,enabled,conversation,phase,status,voices,voiceURI,setVoiceURI,stop,suspend,listen,startConversation,failConversation,speak,toggle};
+  // resume: after a command that is not answered aloud (e.g. opening the typing field) the conversation listens again.
+  const resume=()=>arm(400);
+  return {supported,enabled,conversation,phase,status,voices,voiceURI,setVoiceURI,stop,suspend,listen,startConversation,failConversation,speak,toggle,resume};
 }
