@@ -32,6 +32,7 @@ const preload=path.join(ROOT,'test/fixtures/n7-agents-provider-preload.cjs');
   browser=await chromium.launch({executablePath:process.env.CHROME_BIN||undefined,args:['--no-sandbox']});
   const page=await browser.newPage({viewport:{width:1280,height:900}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
   // A device with a Greek voice: every utterance the screen speaks is recorded instead of played.
+  await page.addInitScript(()=>{window.N7_LEGACY_STAGE_ENTRY=true;}); // N7_APEX_HOME_V1: this test exercises the stage itself
   await page.addInitScript(()=>{window.__spoken=[];
    // The native class refuses a voice object that is not a real SpeechSynthesisVoice, so it is replaced too.
    window.SpeechSynthesisUtterance=class{constructor(text){this.text=text;}};

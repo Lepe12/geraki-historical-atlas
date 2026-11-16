@@ -246,7 +246,8 @@ class GuardedDeployTest(unittest.TestCase):
         self.assertEqual(self.ftp.events, [])
 
     def test_stage_styles_are_appended_once_and_only_to_the_reviewed_stylesheet(self):
-        stage = (deploy.HERE / 'humanoid-stage.css').read_bytes()
+        # N7_APEX_HOME_V1: the stage styles are followed by the home-screen styles (recipe: stage, newline, home).
+        stage = (deploy.HERE / 'humanoid-stage.css').read_bytes() + b'\n' + (deploy.HERE / 'apex-home.css').read_bytes()
         installed = b'body{color:#000}\n\n'
         target = deploy.transform_css(installed)
         self.assertEqual(target, installed + b'\n' + stage)

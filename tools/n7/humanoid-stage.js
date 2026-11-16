@@ -80,7 +80,8 @@ function presence(kind,text){const [k,l]=STATES[kind]||STATES.idle;stage.dataset
 function showStage(on){stage.hidden=!on;back.hidden=on;document.body.classList.toggle('n7-stage-on',on);for(const b of rail.children)b.setAttribute('aria-current',String(on&&b.dataset.nav==='humanoid'));}
 function nav(id){
  settings.hidden=id!=='settings'||!settings.hidden;
- if(id==='humanoid'){showStage(true);input.focus();return;}
+ if(id==='humanoid'){if(window.N7ApexHome?.toHumanoid?.())return; // N7_APEX_HOME_V1: the Humanoid is the APEX screen
+  showStage(true);input.focus();return;}
  if(id==='settings'){showStage(true);return;}
  if(id==='nabou'){showStage(true);(split.open?Promise.resolve(closeSplit()):openSplit().then(()=>presence('done','Ο χάρτης NABOU είναι ανοιχτός.'))).catch(fail);return;}
  showStage(false);
@@ -390,6 +391,7 @@ function watchCoding(id,box){
 let running=false;
 async function run(text,{voice=false}={}){
  if(running){say('Ο N7 επεξεργάζεται ήδη μια εντολή.',{error:true,speak:false});return;}
+ if(window.N7ApexHome?.handle?.(text,{inStage:true})){input.value='';return;} // N7_APEX_HOME_V1: «άνοιξε το Chat», «επέστρεψε στο ολόγραμμα»
  const r=R.route(text);
  running=true;send.disabled=true;stopSpeaking();
  if(!KEEP_RESULTS.has(r.intent))clearResults();

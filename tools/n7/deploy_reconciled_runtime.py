@@ -132,7 +132,8 @@ def transform_app(original):
     tail += (HERE / 'voice-protocol.js').read_text() + '\n'
     tail += (HERE / 'voice-bridge-ui.js').read_text()
     # N7_HUMANOID_STAGE_V1: command router, NABOU map protocol and the Humanoid entry screen.
-    for name in ('n7-command-router.js', 'n7-map-protocol.js', 'humanoid-stage.js'):
+    # N7_APEX_HOME_V1: the APEX Humanoid is the home screen; apex-home.js decides where the visitor lands.
+    for name in ('n7-command-router.js', 'n7-map-protocol.js', 'humanoid-stage.js', 'apex-home.js'):
         tail += '\n' + (HERE / name).read_text()
     return (prefix + tail).encode()
 
@@ -165,7 +166,7 @@ STAGE_CSS_MARKER = '/* N7_HUMANOID_STAGE_V1'
 def transform_css(original):
     # N7_HUMANOID_STAGE_V1: the canonical stylesheet is the installed one plus the stage styles.
     source = original.decode('utf8')
-    stage = (HERE / 'humanoid-stage.css').read_text()
+    stage = (HERE / 'humanoid-stage.css').read_text() + '\n' + (HERE / 'apex-home.css').read_text()
     if source.count(STAGE_CSS_MARKER) > 1:
         raise RuntimeError('N7_PUBLIC_CSS_ANCHOR_CHANGED')
     prefix = source[:source.index(STAGE_CSS_MARKER)] if STAGE_CSS_MARKER in source else source + '\n'
