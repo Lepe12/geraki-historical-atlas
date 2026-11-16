@@ -2,7 +2,7 @@
 // smooth non-overshooting return, state postures, still Idle head, no features added.
 const {chromium}=require('playwright-core');
 const fs=require('fs'),path=require('path'),assert=require('node:assert/strict');
-const url=process.env.N7_VISUAL_URL||'http://127.0.0.1:4173/n7-apex-step5/';
+const url=(process.env.N7_VISUAL_URL||'http://127.0.0.1:4173/n7-apex-step5/')+'?controls=1';
 const out=process.env.N7_JOINTS_OUT||'/tmp/n7-head-joints';fs.mkdirSync(out,{recursive:true});
 const LABEL='[aria-label="N7 guide artwork-tile humanoid"]';
 (async()=>{
