@@ -389,3 +389,16 @@ test("N7 PDF ingestion requires a signed host bridge and preserves original PDF 
   assert.equal(responses.at(-1).status,415);
   assert.equal(chunks.length,1);
 });
+
+
+test("every book the importer sends is on the gateway allowlist with identical metadata",()=>{
+  const fs=require("node:fs"),path=require("node:path");
+  const gateway=fs.readFileSync(path.join(__dirname,"n7-gateway.js"),"utf8");
+  const importer=fs.readFileSync(path.join(__dirname,"../../tools/library/import_gutenberg_public_domain.py"),"utf8");
+  const books=[...importer.matchAll(/\{"id":"(\d+)","title":"([^"]+)",\s*"author":"([^"]+)","year":"(\d+)"/g)];
+  assert.ok(books.length>=1);
+  for(const [,id,title,author,year] of books){
+    const entry=`"${id}":{uri:"https://www.gutenberg.org/ebooks/${id}",title:"${title}",author:"${author}",year:"${year}"}`;
+    assert.ok(gateway.includes(entry),"gateway allowlist missing or different for Gutenberg "+id);
+  }
+});

@@ -168,7 +168,7 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
       }
       return true;
     }
-    // Import only two rights-verified, fixed Gutenberg works over the authenticated host bridge.
+    // Import only rights-verified, fixed Gutenberg works over the authenticated host bridge.
     // This endpoint is not public and does not accept user-selected file paths or shell commands.
     if(p==="/n7/library/import-signed"){
       if(req.method!=="POST"){json(res,405,{error:"method_not_allowed"});return true;}
@@ -183,7 +183,8 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
       catch(_){json(res,400,{error:"invalid_import_json"});return true;}
       const allowlist={
         "22169":{uri:"https://www.gutenberg.org/ebooks/22169",title:"The Story of the Barbary Corsairs",author:"Stanley Lane-Poole; J. D. Jerrold Kelley",year:"1890"},
-        "13689":{uri:"https://www.gutenberg.org/ebooks/13689",title:"Sea-Wolves of the Mediterranean",author:"E. Hamilton Currey",year:"1910"}
+        "13689":{uri:"https://www.gutenberg.org/ebooks/13689",title:"Sea-Wolves of the Mediterranean",author:"E. Hamilton Currey",year:"1910"},
+        "36475":{uri:"https://www.gutenberg.org/ebooks/36475",title:"Privateers and Privateering",author:"E. P. Statham",year:"1910"}
       };
       const book=allowlist[String(source?.gutenberg_id||"")];
       const expectedId=book&&crypto.createHash("sha256").update("gutenberg:"+source.gutenberg_id).digest("hex");
