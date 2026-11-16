@@ -21,7 +21,7 @@ export function createFemaleVoice(){
   }catch{fail("Η ελληνική φωνή δεν υποστηρίζεται εδώ. Μπορείς να επιλέξεις φωνή συσκευής.");}
  };
  function ensureWorker(){
-   if(!worker){const parent=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf('/')+1);worker=new Worker(parent+'n7-female-voice-worker-v2.js');
+   if(!worker){const parent=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf('/')+1);worker=new Worker(parent+'n7-female-voice-worker-v3.js');
     worker.onerror=()=>{if(job){const c=job.callbacks;cancel();c.error("Η ελληνική φωνή δεν φορτώθηκε. Δοκίμασε ξανά ή επίλεξε φωνή συσκευής.");}};
     worker.onmessage=async({data})=>{
      if(data.type==='ready'){ready=true;return;}

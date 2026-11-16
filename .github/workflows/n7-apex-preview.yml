@@ -292,6 +292,15 @@ jobs:
           N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
           N7_FEMALE_OUT: ${{ runner.temp }}/n7-apex-evidence/female-voice
         run: node tools/n7_apex_preview/test_female_voice.cjs
+      - name: Spoken answers of the news and weather agents (unit)
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex'
+        run: node --test tools/n7_apex_preview/test_agent_speech.mjs
+      - name: Greek voice speaks sentences with the palatal chi (real model)
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex'
+        env:
+          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
+          N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
+        run: node tools/n7_apex_preview/test_greek_voice_fit.cjs
       - name: Verify automatic conversation turns without Send clicks
         if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
         env:
