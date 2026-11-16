@@ -22,3 +22,30 @@ jobs:
             curl -sS -L --max-redirs 2 --connect-timeout 8 --max-time 18 -o /dev/null -w 'HTTP=%{http_code} IP=%{remote_ip} BYTES=%{size_download} CONTENT_TYPE=%{content_type}\n' "$url"
           done
           echo "Unauthenticated GET only; this does not test shared chat memory, run deployment, or authenticate."
+      - name: Inspect anonymous runtime and UI links (read only)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import urllib.request, json, re, html
+          from urllib.parse import urljoin
+          base='https://bot.piratecartography.com'
+          def get(path):
+              try:
+                  req=urllib.request.Request(base+path,headers={'User-Agent':'N7-live-audit/1.0'})
+                  with urllib.request.urlopen(req,timeout=12) as r:
+                      return r.status,r.headers.get('Content-Type',''),r.read(450000).decode('utf-8','replace')
+              except Exception as e:
+                  return None,'',type(e).__name__+': '+str(e)[:90]
+          for path in ['/','/n7-apex/','/api/status','/api/conversations','/api/tasks']:
+              status,ctype,data=get(path)
+              print('PAGE',path,'status=',status,'type=',ctype,'bytes=',len(data))
+              if 'application/json' in ctype and path=='/api/status':
+                  try:
+                      obj=json.loads(data)
+                      print('STATUS_FIELDS',[(k, obj.get(k)) for k in ['authenticated','online','status'] if k in obj])
+                  except Exception: pass
+              if path in ['/','/n7-apex/'] and 'text/html' in ctype:
+                  scripts=re.findall(r'<script\\b[^>]*\\bsrc=["\\\']([^"\\\']+)',data,re.I)
+                  print('SCRIPTS',path,[x[:150] for x in scripts[:12]])
+                  print('UI_MARKERS',path,{k:(k.lower() in data.lower()) for k in ['n7-apex','humanoid','app.js','_next','voice']})
+          PY
