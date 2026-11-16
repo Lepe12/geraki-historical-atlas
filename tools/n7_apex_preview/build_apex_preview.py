@@ -134,7 +134,7 @@ def main():
     # The owner approved the guide Humanoid for production (/n7-apex). Production
     # gets the same figure, environment, moods and voice; only the test pages and
     # the passwordless guest chat stay in the isolated previews.
-    guide=isolated or base_path=="/n7-apex"
+    guide=isolated or base_path in ("/n7-apex","/n7-apex-home")  # /n7-apex-home: the voice-first Humanoid preview, beside production
     if out.exists(): shutil.rmtree(out)
     out.mkdir(parents=True)
     run("git","init",str(out))
@@ -158,7 +158,7 @@ def main():
     shutil.copy2(overlay/"N7HumanoidView.tsx",out/"components/N7HumanoidView.tsx")
     shutil.copy2(overlay/"N7Backdrop.tsx",out/"components/N7Backdrop.tsx")
     shutil.copy2(overlay/"N7HeadSurface.ts",out/"components/N7HeadSurface.ts")
-    for name in ("N7GuideScene.tsx","N7GuideView.tsx","N7GuideFx.ts","useN7Voice.ts","N7FemaleVoice.ts","N7VoiceSignal.ts","N7AgentSpeech.ts","N7Navigation.ts"):
+    for name in ("N7GuideScene.tsx","N7GuideView.tsx","N7GuideFx.ts","useN7Voice.ts","N7FemaleVoice.ts","N7VoiceSignal.ts","N7AgentSpeech.ts","N7Navigation.ts","N7Pronunciation.ts"):
         shutil.copy2(overlay/name,out/"components"/name)
     (out/"components/N7BackdropReference.ts").write_text(f'export const N7_BACKDROP_REFERENCE = "{base_path}/n7-mountain-backdrop.webp";\n')
     shutil.copy2(overlay/"N7HumanoidReference.ts",out/"components/N7HumanoidReference.ts")

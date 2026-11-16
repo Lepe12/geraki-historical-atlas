@@ -2,15 +2,36 @@
 import {useCallback,useEffect,useRef,useState} from "react";
 import {createFemaleVoice,FEMALE_VOICE_ID} from "./N7FemaleVoice";
 import {N7_GUIDE} from "./N7BuildFlags";
+import {forSpeech,pickGreekVoice,speechPieces} from "./N7Pronunciation";
 
 type RecognitionResult={isFinal:boolean;0:{transcript:string}};
 type Recognition={lang:string;continuous:boolean;interimResults:boolean;onstart:(()=>void)|null;onend:(()=>void)|null;onerror:((e:{error:string})=>void)|null;onresult:((e:{results:ArrayLike<RecognitionResult>})=>void)|null;start:()=>void;abort:()=>void};
 type VoiceWindow=typeof window&{SpeechRecognition?:new()=>Recognition;webkitSpeechRecognition?:new()=>Recognition};
-export default function useN7Voice(onTranscript:(text:string)=>void,onTurn?:(text:string)=>void){
+export default function useN7Voice(onTranscript:(text:string)=>void,onTurn?:(text:string)=>void,onSpeechEnd?:()=>void){
   const [supported,setSupported]=useState({input:false,output:false}),[enabled,setEnabled]=useState(false),[conversation,setConversation]=useState(false);
   const [phase,setPhase]=useState<"listening"|"speaking"|null>(null),[status,setStatus]=useState("");
   const [voices,setVoices]=useState<SpeechSynthesisVoice[]>([]),[voiceURI,setVoiceURI]=useState(FEMALE_VOICE_ID);
-  const current=useRef({onTranscript,onTurn,enabled,voiceURI});current.current={onTranscript,onTurn,enabled,voiceURI};
+  // N7_APEX_VOICE_QUALITY_V1: the built-in Piper voice is low quality (16 kHz). The best Greek FEMALE voice of the browser
+  // (Edge natural, Google, ...) is used when there is one; ?voice=piper keeps the built-in voice. voiceReady turns true
+  // once the choice is made, so nothing is spoken with a voice that is about to be replaced.
+  const [voiceReady,setVoiceReady]=useState(false),chosenByUser=useRef(false);
+  useEffect(()=>{
+    let forced="";try{forced=new URLSearchParams(window.location.search).get("voice")||"";}catch{/* ignore */}
+    const decide=()=>{
+      if(chosenByUser.current){setVoiceReady(true);return true;}
+      if(forced==="piper"||!window.speechSynthesis){setVoiceReady(true);return true;}
+      const best=pickGreekVoice(window.speechSynthesis.getVoices().map(x=>({name:x.name,lang:x.lang,voiceURI:x.voiceURI,localService:x.localService})));
+      if(best){setVoiceURI(best.voiceURI);setVoiceReady(true);return true;}
+      return false;
+    };
+    if(decide())return;
+    const again=()=>{if(decide())window.speechSynthesis?.removeEventListener("voiceschanged",again);};
+    window.speechSynthesis?.addEventListener("voiceschanged",again);
+    const timer=setTimeout(()=>setVoiceReady(true),2500); // no Greek voice appeared: the built-in voice
+    return()=>{window.speechSynthesis?.removeEventListener("voiceschanged",again);clearTimeout(timer);};
+  },[]);
+  const chooseVoice=(uri:string)=>{chosenByUser.current=true;setVoiceURI(uri);};
+  const current=useRef({onTranscript,onTurn,onSpeechEnd,enabled,voiceURI});current.current={onTranscript,onTurn,onSpeechEnd,enabled,voiceURI};
   const recognition=useRef<Recognition|null>(null),generation=useRef(0),timer=useRef<ReturnType<typeof setTimeout>|null>(null),utterance=useRef<SpeechSynthesisUtterance|null>(null);
   const female=useRef<ReturnType<typeof createFemaleVoice>|null>(null);
   const active=useRef(false),rearm=useRef<ReturnType<typeof setTimeout>|null>(null),captureRef=useRef<()=>void>(()=>{});
@@ -51,18 +72,15 @@ export default function useN7Voice(onTranscript:(text:string)=>void,onTurn?:(tex
     const useFemale=current.current.voiceURI===FEMALE_VOICE_ID;
     if(useFemale){try{if(!female.current)female.current=createFemaleVoice();void female.current.unlock().catch(()=>{});}catch{failConversation("Δεν είναι διαθέσιμη η ελληνική φωνή εδώ.");return;}}
     stop();if(!useFemale&&(!window.speechSynthesis||!window.SpeechSynthesisUtterance)){failConversation("Ο browser δεν υποστηρίζει εκφώνηση. Η απάντηση παραμένει στο κείμενο.");return;}
-    const clean=text.replace(/\[([^\]]+)\]\(https?:\/\/[^)]+\)/g,"$1").replace(/[`*_#]/g,"").trim();if(!clean){arm();return;}
-    // A short first piece (first sentence, at most ~90 characters) so speech
-    // starts while later pieces are synthesised in turn.
-    const firstEnd=(()=>{const m=clean.slice(0,140).match(/^[\s\S]{20,}?[.!;;·]\s/);if(m)return m[0].length;const cut=clean.lastIndexOf(" ",90);return clean.length<=90?clean.length:cut>30?cut+1:90;})();
-    const head=clean.slice(0,firstEnd).trim(),rest=clean.slice(firstEnd).trim();
-    const chunks=[head,...(rest.match(/[\s\S]{1,200}(?:\s|$)|[\s\S]{1,200}/g)||[])].filter(Boolean);
+    const clean=forSpeech(text.replace(/\[([^\]]+)\]\(https?:\/\/[^)]+\)/g,"$1").replace(/[`*_#]/g,"")).trim();if(!clean){arm();return;}
+    const size=useFemale?200:140; // shorter pieces for browser voices: some stop after about fifteen seconds
+    const chunks=speechPieces(clean,size);
     const token=generation.current,available=window.speechSynthesis.getVoices();
     const selected=available.find(v=>v.voiceURI===current.current.voiceURI)||available.find(v=>/^el(?:-|$)/i.test(v.lang));
     let index=0;
     const next=()=>{
       if(token!==generation.current)return;
-      if(index>=chunks.length){utterance.current=null;setPhase(null);setStatus(active.current?"Σε λίγο σε ακούω ξανά…":"Η εκφώνηση ολοκληρώθηκε.");arm();return;}
+      if(index>=chunks.length){utterance.current=null;setPhase(null);setStatus(active.current?"Σε λίγο σε ακούω ξανά…":"Η εκφώνηση ολοκληρώθηκε.");try{current.current.onSpeechEnd?.();}catch{/* never break the loop */}arm();return;}
       if(useFemale){
         const text=chunks[index++];female.current!.play(text,{
           start:()=>{if(token===generation.current){setPhase("speaking");setStatus("Το N7 μιλά με την ελληνική γυναικεία φωνή.");}},
@@ -112,5 +130,10 @@ export default function useN7Voice(onTranscript:(text:string)=>void,onTurn?:(tex
     active.current=true;setConversation(true);current.current.enabled=true;setEnabled(true);capture();
   };
   const toggle=()=>{const next=!current.current.enabled;current.current.enabled=next;setEnabled(next);if(!next){active.current=false;setConversation(false);stop();}setStatus(next?"Οι νέες απαντήσεις θα εκφωνούνται. Μπορείς να διακόψεις οποιαδήποτε στιγμή.":"Η αυτόματη εκφώνηση έκλεισε.");};
-  return {supported,enabled,conversation,phase,status,voices,voiceURI,setVoiceURI,stop,suspend,listen,startConversation,failConversation,speak,toggle};
+  // resume: after a command that is not answered aloud (e.g. opening the typing field) the conversation listens again.
+  const resume=()=>arm(400);
+  const deviceVoiceName=voiceURI===FEMALE_VOICE_ID?"":(voices.find(x=>x.voiceURI===voiceURI)?.name||"");
+  // The browser lets a page speak with its own voices only after the visitor has interacted with the page (Chrome's rule).
+  const deviceSpeechAllowed=()=>{const a=(navigator as Navigator&{userActivation?:{hasBeenActive:boolean}}).userActivation;return !a||a.hasBeenActive;};
+  return {supported,enabled,conversation,phase,status,voices,voiceURI,setVoiceURI:chooseVoice,voiceReady,deviceVoiceName,deviceSpeechAllowed,stop,suspend,listen,startConversation,failConversation,speak,toggle,resume};
 }

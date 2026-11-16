@@ -5,7 +5,7 @@ import useN7Voice from "./useN7Voice";
 import {FEMALE_VOICE_ID} from "./N7FemaleVoice";
 import {N7_GUIDE,N7_GUEST_CHAT} from "./N7BuildFlags";
 import {speakable} from "./N7AgentSpeech";
-import {GREETING,GREETED_KEY,describeAgents,go,isAgentsStatus,markGreeted,navCommand,readConversationId,wasGreeted,writeConversationId} from "./N7Navigation";
+import {GREETING_FIRST,GREETING_AGAIN,GREETED_KEY,describeAgents,describeCapabilities,describeTasks,go,isAgentsStatus,isCapabilitiesQuery,isFirstVisit,isTasksQuery,isWriteCommand,markGreeted,markWelcomed,navCommand,readConversationId,wasGreeted,writeConversationId} from "./N7Navigation";
 import type { OrbState } from "./ApexHeroOrb";
 
 type Msg = { role: string; content: string };
@@ -77,7 +77,8 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   const [message, setMessage] = useState("");
   const autoSend=useRef<(text:string)=>void>(()=>{});
   const sending=useRef(false);
-  const voice=useN7Voice(setMessage,text=>autoSend.current(text));
+  const speechEnded=useRef<()=>void>(()=>{});
+  const voice=useN7Voice(setMessage,text=>autoSend.current(text),()=>speechEnded.current());
   const voiceRef=useRef(voice);voiceRef.current=voice;
   const heard=useRef<Record<string,number>>({});
   const readAnswer=(id:string,messages:Msg[])=>{const replies=messages.filter(m=>m.role==="assistant");if(replies.length>(heard.current[id]||0)){heard.current[id]=replies.length;voiceRef.current.speak(speakable(replies.at(-1)!.content));}};
@@ -86,16 +87,68 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   useEffect(()=>{const show=()=>setVoiceOpen(true);window.addEventListener("n7:open-voice",show);return()=>window.removeEventListener("n7:open-voice",show);},[]);
   const [loginBusy,setLoginBusy]=useState(false);
   useEffect(()=>{setVoiceHost(guideOpen?document.getElementById("n7-guide-voice"):null);if(!guideOpen)voiceRef.current.suspend();},[guideOpen]);
+  // N7_APEX_VOICE_FIRST_V1: the Humanoid is the interface. On entry N7 greets by voice (a first visit gets the full
+  // welcome, later logins the short one, once per login) and, when the browser already allows the microphone, starts
+  // listening by itself: listening -> understanding -> answering -> listening again. The microphone is closed while N7
+  // speaks (the voice hook stops recognition during playback), so N7 never hears itself. Where the browser blocks
+  // automatic audio, the page shows a temporary hint and the first tap or key starts everything (no permanent button).
+  const home=N7_GUIDE&&!N7_GUEST_CHAT;
+  const [controlsMode,setControlsMode]=useState(false);
+  useEffect(()=>{try{setControlsMode(new URLSearchParams(window.location.search).get("controls")==="1");}catch{/* ignore */}},[]);
+  const minimal=home&&!controlsMode;
+  const [listLoaded,setListLoaded]=useState(false),[tapHint,setTapHint]=useState(false);
+  const greeting=useRef({active:false,gesture:false}),conversationsRef=useRef<Conversation[]>([]);
+  useEffect(()=>{conversationsRef.current=conversations;},[conversations]);
+  const micAllowed=async()=>{try{return (await navigator.permissions.query({name:"microphone" as PermissionName})).state==="granted";}catch{return false;}};
+  const begin=async(gesture:boolean)=>{
+    if(wasGreeted())return;markGreeted();
+    const first=isFirstVisit(conversationsRef.current.length>0);if(first)markWelcomed();
+    greeting.current={active:true,gesture};
+    voiceRef.current.speak(first?GREETING_FIRST:GREETING_AGAIN,true);
+  };
+  speechEnded.current=()=>{
+    const g=greeting.current;if(!g.active)return;g.active=false;
+    // A short pause after the last word, like the one used between answers, so the tail of N7's own voice is never taken as a command.
+    window.setTimeout(()=>void (async()=>{if(!voiceRef.current.supported.input)return;if(g.gesture||await micAllowed())voiceRef.current.startConversation();})(),700);
+  };
+  const resumed=useRef(false);
   useEffect(()=>{
-    // One welcome per login (this browser tab session). Where the browser blocks automatic audio, the
-    // visible «Έναρξη N7» button starts it with the visitor's click.
-    if(!authenticated||guest||!guideOpen||!voiceHost||wasGreeted()||!voice.supported.output)return;
+    if(!authenticated||guest||!minimal||!guideOpen||!voiceHost||!listLoaded||!voice.supported.output||!voice.voiceReady)return;
     let locked=true;
-    try{const AudioCtor=window.AudioContext;if(AudioCtor){const probe=new AudioCtor();locked=probe.state!=="running";void probe.close();}}catch{locked=true;}
-    if(locked){setGreetGate(true);return;}
-    markGreeted();voiceRef.current.speak(GREETING,true);
-  },[authenticated,guest,guideOpen,voiceHost,voice.supported.output]);
-  const startGreeting=()=>{markGreeted();setGreetGate(false);voiceRef.current.speak(GREETING,true);};
+    if(voice.voiceURI!==FEMALE_VOICE_ID)locked=!voice.deviceSpeechAllowed(); // the browser's own voices need a tap first (Chrome's rule)
+    else try{const AudioCtor=window.AudioContext;if(AudioCtor){const probe=new AudioCtor();locked=probe.state!=="running";void probe.close();}}catch{locked=true;}
+    if(wasGreeted()){
+      // Already greeted in this login (a return from the Chat, NABOU or the library, or a refresh): no new greeting;
+      // listening resumes only where the browser allows audio and already allows the microphone.
+      if(resumed.current||locked||greeting.current.active)return;resumed.current=true;
+      void (async()=>{if(voiceRef.current.supported.input&&await micAllowed())voiceRef.current.startConversation();})();
+      return;
+    }
+    if(locked){setTapHint(true);return;}
+    void begin(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[authenticated,guest,minimal,guideOpen,voiceHost,listLoaded,voice.supported.input,voice.supported.output,voice.voiceReady,voice.voiceURI]);
+  useEffect(()=>{
+    if(!tapHint)return;
+    const start=()=>{window.removeEventListener("pointerdown",start,true);window.removeEventListener("keydown",start,true);setTapHint(false);void begin(true);};
+    window.addEventListener("pointerdown",start,true);window.addEventListener("keydown",start,true);
+    return()=>{window.removeEventListener("pointerdown",start,true);window.removeEventListener("keydown",start,true);};
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[tapHint]);
+  // The small typing field, and the transient caption (typed exchanges, notices, errors, or when speech is unavailable).
+  const [typing,setTyping]=useState(false),[typed,setTyped]=useState(""),[caption,setCaption]=useState("");
+  const typingInput=useRef<HTMLInputElement>(null),typedPending=useRef(false);
+  useEffect(()=>{if(typing)typingInput.current?.focus();},[typing]);
+  useEffect(()=>{if(!caption)return;const timer=window.setTimeout(()=>setCaption(""),30000);return()=>window.clearTimeout(timer);},[caption]);
+  // Real work in progress (tasks the server reports as running or queued) shows as a plain line and as «thinking».
+  const [workActive,setWorkActive]=useState(false);
+  useEffect(()=>{
+    if(!authenticated||guest||!minimal||!guideOpen)return;
+    let disposed=false;
+    const poll=()=>void n7("/api/tasks").then(r=>{if(disposed)return;const rows=Array.isArray(r.tasks)?r.tasks as Task[]:[];setTasks(rows);setWorkActive(rows.some(x=>x.status==="running"||x.status==="queued"));}).catch(()=>{});
+    poll();const timer=window.setInterval(poll,8000);
+    return()=>{disposed=true;window.clearInterval(timer);};
+  },[authenticated,guest,minimal,guideOpen]);
   const [taskPrompt, setTaskPrompt] = useState("");
   const [kind, setKind] = useState("analysis");
   const [missionTarget, setMissionTarget] = useState("");
@@ -110,11 +163,9 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   // conversation the Chat (or an earlier visit here) was using is opened, with its history; a new one
   // is created only when the user sends the first message and none exists.
   const adopt=useRef<(list:Conversation[])=>void>(()=>{});
-  const [greetGate,setGreetGate]=useState(false);
-  const [notice,setNotice]=useState("");
   useEffect(()=>{activeConversation.current=conversationId;},[conversationId]);
   useEffect(()=>{if(conversationId&&!guest)writeConversationId(conversationId);},[conversationId,guest]);
-  useEffect(()=>{onActivity(voice.phase||(busy||pendingJobs.some(j=>j.conversationId===conversationId)?"thinking":null));},[busy,pendingJobs,conversationId,onActivity,voice.phase]);
+  useEffect(()=>{onActivity(voice.phase||(busy||workActive||pendingJobs.some(j=>j.conversationId===conversationId)?"thinking":null));},[busy,workActive,pendingJobs,conversationId,onActivity,voice.phase]);
   useEffect(()=>{
     if(!pendingJobs.length)return;
     let disposed=false,inflight=false;const attempts=new Map<string,number>();
@@ -142,14 +193,14 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
     try {
       const s = await n7("/api/status");
       setOnline(true);
-      if(wasAuthenticated.current&&s.authenticated!==true){try{window.sessionStorage.removeItem(GREETED_KEY);}catch{/* ignore */}voiceRef.current.suspend();setMessages([]);setConversations([]);setTasks([]);setPendingJobs([]);setConversationId("");}
+      if(wasAuthenticated.current&&s.authenticated!==true){try{window.sessionStorage.removeItem(GREETED_KEY);}catch{/* ignore */}setListLoaded(false);voiceRef.current.suspend();setMessages([]);setConversations([]);setTasks([]);setPendingJobs([]);setConversationId("");}
       wasAuthenticated.current=s.authenticated===true;setAuthenticated(s.authenticated === true);
       if (s.authenticated === true) {
         const [c, t] = await Promise.all([n7("/api/conversations"), n7("/api/tasks")]);
         const list = Array.isArray(c.conversations) ? c.conversations as Conversation[] : [];
         setConversations(list);
         setTasks(Array.isArray(t.tasks) ? t.tasks as Task[] : []);
-        adopt.current(list);
+        adopt.current(list);setListLoaded(true);
       }
     } catch (e) {
       setOnline(false);
@@ -218,11 +269,16 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
       finally{sending.current=false;setBusy(false);}
       return;
     }
-    if(isAgentsStatus(draft)){
-      // Real report of this installation: nothing is invented and the model is not asked.
+    if(isWriteCommand(draft)){setMessage("");setTyping(true);voiceRef.current.resume();return;} // «N7, θέλω να γράψω»: the field opens and listening goes on
+    const informational=isAgentsStatus(draft)?"agents":isTasksQuery(draft)?"tasks":isCapabilitiesQuery(draft)?"capabilities":null;
+    if(informational){
+      // Answered from this installation's real reports (agents, tasks): nothing is invented, the model is not asked,
+      // and a report that cannot be read is said plainly.
       voice.stop();setMessage("");setError("");
-      try{const text=describeAgents(await n7("/api/agents") as never);setNotice(text);voiceRef.current.speak(text,true);}
-      catch(e){const reason=e instanceof Error?e.message:String(e);setNotice("Η κατάσταση των Agents δεν διαβάστηκε: "+reason);}
+      try{
+        const text=informational==="tasks"?describeTasks(await n7("/api/tasks") as never):informational==="agents"?describeAgents(await n7("/api/agents") as never):describeCapabilities(await n7("/api/agents") as never);
+        setCaption(text);voiceRef.current.speak(text,true);
+      }catch(e){const reason=e instanceof Error?e.message:String(e);const text="Η πληροφορία δεν είναι διαθέσιμη αυτή τη στιγμή: "+reason;setCaption(text);voiceRef.current.speak(text,true);}
       return;
     }
     const requested=navCommand(draft);
@@ -284,6 +340,16 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   }
 
   const lastAnswer=messages.filter(m=>m.role==="assistant").at(-1)?.content;
+  const answerCount=messages.filter(m=>m.role==="assistant").length;
+  const shownCount=useRef<number|undefined>(undefined);
+  useEffect(()=>{
+    // Counted, not compared by text: two replies may be identical.
+    if(answerCount===shownCount.current)return;
+    const wasFirst=shownCount.current===undefined,grew=shownCount.current!==undefined&&answerCount>shownCount.current;shownCount.current=answerCount;
+    // A reply to a typed message, or any reply when this browser cannot speak, is also shown as text.
+    if(lastAnswer&&!wasFirst&&grew&&(typedPending.current||!voice.supported.output)){typedPending.current=false;setCaption(lastAnswer);}
+  },[answerCount,lastAnswer,voice.supported.output]);
+  useEffect(()=>{if(error&&minimal)setCaption(error);},[error,minimal]);
   const loginForm=<form onSubmit={event=>void login(event)} style={{display:"flex",gap:8,flexWrap:"wrap"}}>
     <label>Κωδικός N7 <input name="password" type="password" autoComplete="current-password" required style={{...inputStyle,width:170}}/></label>
     <button type="submit" disabled={loginBusy} style={buttonStyle}>{loginBusy?"Σύνδεση…":"Σύνδεση"}</button>
@@ -305,7 +371,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
       <p style={{margin:"5px 0"}}>Πάτησε Έναρξη συζήτησης μία φορά. Μετά μιλάς και το N7 απαντά αυτόματα. Για διακοπή πες «τέλος συζήτησης» όταν σε ακούει. Το μικρόφωνο κλείνει όσο μιλά το N7. Ο browser μπορεί να χρησιμοποιεί την υπηρεσία αναγνώρισής του.</p>
       <p role="status" aria-label="Κατάσταση φωνής">{voice.status||"Πάτησε Δοκιμή φωνής για να ακούσεις το N7."}</p>
       {guideOpen&&<>
-        {notice&&<div role="status" aria-label="Ενημέρωση N7" style={{maxHeight:90,overflow:"auto",whiteSpace:"pre-wrap",color:"#cdf9ff"}}>{notice}</div>}
+        {caption&&<div role="status" aria-label="Ενημέρωση N7" style={{maxHeight:90,overflow:"auto",whiteSpace:"pre-wrap",color:"#cdf9ff"}}>{caption}</div>}
         {lastAnswer&&<div aria-label="Τελευταία απάντηση N7" style={{maxHeight:70,overflow:"auto",whiteSpace:"pre-wrap"}}>{richText(lastAnswer)}</div>}
         <textarea aria-label="Φωνητικό μήνυμα" readOnly={voice.conversation} rows={2} value={message} onChange={e=>setMessage(e.target.value)} placeholder="Μίλησε ή γράψε εδώ…" style={inputStyle}/>
         {!voice.conversation&&<button type="button" style={buttonStyle} onClick={()=>void send()} disabled={busy||!message.trim()}>Αποστολή στη φιγούρα</button>}
@@ -316,11 +382,19 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   </div>;
   return (
     <>
-      {guideOpen&&voiceHost&&createPortal(<div style={{position:"relative",zIndex:5,padding:"6px 12px",background:"#04121beb",flex:"none",maxHeight:"38dvh",overflow:"auto"}}>
-        {greetGate&&<div role="status" aria-label="Καλωσόρισμα N7" style={{textAlign:"center",padding:"4px 0 8px"}}>
-          <p style={{margin:"0 0 6px",color:"#cdf9ff",fontSize:13}}>{GREETING}</p>
-          <button type="button" data-n7-start="" style={{...buttonStyle,fontWeight:700,letterSpacing:1.5}} onClick={startGreeting}>Έναρξη N7</button>
-        </div>}
+      {guideOpen&&voiceHost&&minimal&&createPortal(<div style={{position:"relative",zIndex:5,display:"flex",flexDirection:"column",alignItems:"center",gap:8,padding:"6px 12px calc(14px + env(safe-area-inset-bottom))",pointerEvents:"none"}}>
+        {tapHint&&<p role="status" aria-label="Έναρξη N7" data-n7-tap="" style={{margin:0,color:"#bfe9f3",fontSize:13,letterSpacing:".06em",textShadow:"0 0 12px #000"}}>Πάτησε οπουδήποτε για να ξεκινήσει η N7<span style={{display:"block",marginTop:4,fontSize:11,opacity:.7}}>Φωνή: {voice.deviceVoiceName||"ενσωματωμένη ελληνική"}</span></p>}
+        {caption&&<div role="status" aria-label="Απάντηση N7" style={{pointerEvents:"auto",maxWidth:"min(760px,calc(100% - 24px))",maxHeight:"26dvh",overflow:"auto",whiteSpace:"pre-wrap",fontSize:14,lineHeight:1.55,color:"#e7f9fc",background:"rgba(3,11,18,.82)",border:"1px solid rgba(120,220,240,.14)",borderRadius:14,padding:"10px 14px"}}>{richText(caption)}</div>}
+        {(workActive||pendingJobs.length>0)&&<p role="status" aria-label="Εκτελείται εργασία" style={{margin:0,color:"#9fdbe8",fontSize:12,letterSpacing:".08em"}}>Εκτελείται εργασία…</p>}
+        {typing&&<form onSubmit={e=>{e.preventDefault();const text=typed.trim();if(!text)return;setTyped("");setTyping(false);typedPending.current=true;void send(text);}} style={{pointerEvents:"auto",display:"flex",gap:6,width:"min(640px,calc(100% - 24px))"}}>
+          <input ref={typingInput} aria-label="Γράψε στην N7" value={typed} maxLength={2000} autoComplete="off" onChange={e=>setTyped(e.target.value)} onKeyDown={e=>{if(e.key==="Escape"){e.stopPropagation();setTyped("");setTyping(false);}}} style={{...inputStyle,flex:1,borderRadius:22,padding:"10px 16px",background:"rgba(3,11,18,.88)",fontSize:16}} />
+          <button type="submit" aria-label="Αποστολή" style={{...buttonStyle,borderRadius:22,padding:"0 16px"}} disabled={!typed.trim()}>➤</button>
+        </form>}
+        <button type="button" data-n7-keyboard="" aria-label="Πληκτρολόγιο" aria-expanded={typing} onClick={()=>{if(typing){setTyped("");}setTyping(x=>!x);}} style={{pointerEvents:"auto",width:40,height:32,display:"grid",placeItems:"center",padding:0,border:"1px solid rgba(140,225,245,.22)",borderRadius:8,background:"rgba(4,14,22,.45)",color:"#bfe9f3",cursor:"pointer"}}>
+          <svg width="22" height="16" viewBox="0 0 22 16" fill="none" stroke="currentColor" strokeWidth="1.2" aria-hidden="true"><rect x="1" y="1" width="20" height="14" rx="2"/><path d="M4 5h1M7 5h1M10 5h1M13 5h1M16 5h2M4 8h2M8 8h1M11 8h1M14 8h1M17 8h1M6 11h10" strokeLinecap="round"/></svg>
+        </button>
+      </div>,voiceHost)}
+      {guideOpen&&voiceHost&&!minimal&&createPortal(<div style={{position:"relative",zIndex:5,padding:"6px 12px",background:"#04121beb",flex:"none",maxHeight:"38dvh",overflow:"auto"}}>
         <button type="button" aria-expanded={voiceOpen} onClick={()=>{setVoiceOpen(x=>!x);if(voiceOpen)voice.suspend();}}>Φωνητική συνομιλία</button>
         {voiceOpen&&voiceControls}
       </div>,voiceHost)}
