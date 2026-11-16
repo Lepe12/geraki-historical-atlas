@@ -51,3 +51,5 @@ test('the status of the agents is asked in plain words and answered from the rea
   assert.match(describeAgents({summary:{total:2,ready:2},agents:[{ready:true},{ready:true}]}),/Δεν λείπει καμία απαίτηση/);
   assert.equal(describeAgents({}),'Δεν έλαβα κατάσταση των Agents από τον server.');
 });
+
+// ci probe: no behaviour change
