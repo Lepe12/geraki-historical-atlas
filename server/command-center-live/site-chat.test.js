@@ -45,6 +45,11 @@ const {createAsk}=require("./site-ask-core");
   assert.ok(j.links.filter(l=>l.image).every(l=>/\/site\/thumbs\/\d+$/.test(l.image)),"thumb URLs must be extensionless");
   r=await call("GET","/site/widget");assert.equal(r.status,200);assert.match(r.headers["content-type"],/javascript/);
   assert.ok(!/site\/captain\.jpg/.test(r.body.toString()),"widget must use the extensionless portrait URL");
+  // Closed button: small round portrait in a Shadow DOM (theme CSS cannot resize or misplace it); label only as tooltip/aria-label.
+  const w=r.body.toString();
+  assert.match(w,/attachShadow\(/);assert.match(w,/aria-label","Ρώτα τον Καπετάνιο"/);assert.match(w,/#pcc-btn\{position:fixed;[^}]*width:54px;height:54px;[^}]*border-radius:50%/);
+  assert.match(w,/@media \(max-width:520px\)\{#pcc-btn\{width:48px;height:48px/);assert.match(w,/safe-area-inset-bottom/);
+  assert.ok(!/document\.body\.appendChild/.test(w),"widget host must not live inside a possibly transformed <body>");
   r=await call("GET","/site/widget.js");assert.equal(r.status,200);assert.match(r.body.toString(),/Ρώτα τον Καπετάνιο/);assert.match(r.body.toString(),/pct-live\.piratecartography\.com\/site\/ask/);
   const someThumb=idx.items.find(x=>x.thumb);if(someThumb){r=await call("GET","/site/thumbs/"+someThumb.thumb);assert.equal(r.status,200);r=await call("GET","/site/thumbs/"+someThumb.thumb.split(".")[0]);assert.equal(r.status,200);assert.match(r.headers["content-type"],/^image\//);}
   assert.equal((await call("GET","/site/thumbs/999999999.jpg")).status,404);
