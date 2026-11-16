@@ -1008,6 +1008,6 @@ function LegacyHumanoidView({open,onClose,activity}:{open:boolean;onClose:()=>vo
   </section>;
 }
 
-export default function N7HumanoidView(props:{open:boolean;onClose:()=>void;activity?:N7Activity;onWorkspace?:()=>void}){
-  return N7_GUIDE?<N7GuideView {...props}/>:<LegacyHumanoidView {...props}/>;
+export default function N7HumanoidView(props:{open:boolean;onClose:()=>void;activity?:N7Activity;onWorkspace?:()=>void;onNavigate?:(target:"chat"|"nabou")=>void}){
+  const {onNavigate,...legacy}=props;return N7_GUIDE?<N7GuideView {...props}/>:<LegacyHumanoidView {...legacy}/>;
 }
