@@ -121,3 +121,24 @@ export function SettingsPanel({ session, settings, onChange, onClose }: { sessio
     </EvePanel>
   );
 }
+
+export function ProjectsPanel({ sys, onClose, onHistory }: { sys: import("./useSystemStatus").SystemStatusHook; onClose: () => void; onHistory: () => void }) {
+  const a = sys.agent;
+  const when = (v: unknown) => (typeof v === "string" && v ? new Date(v).toLocaleString("el-GR", { timeZone: "Europe/Athens" }) + " (ώρα Αθήνας)" : "—");
+  return (
+    <EvePanel title="Έργα" code="PROJECTS" onClose={onClose}>
+      <h3 className="eve-h3">Τρέχον έργο</h3>
+      {a ? (
+        <div className="eve-fields">
+          <EveField label="Έργο" value={txt(a.project) || "—"} />
+          <EveField label="Κατάσταση" value={txt(a.state) || "—"} tone={a.state === "PASS" ? "ok" : "warn"} />
+          <EveField label="Τελευταία ενημέρωση" value={when(a.updated_at)} />
+          <EveField label="Νέα αποστολή" value={a.can_dispatch ? "Επιτρέπεται" : "Κλειστή"} tone={a.can_dispatch ? "ok" : "off"} />
+        </div>
+      ) : <EveEmpty title={sys.agentError ? "Η κατάσταση έργου δεν διαβάστηκε" : "Φόρτωση…"}>{sys.agentError}</EveEmpty>}
+      {a && <EveDetails><pre>{JSON.stringify(a, null, 1)}</pre></EveDetails>}
+      <h3 className="eve-h3">Συνομιλίες και εργασίες</h3>
+      <button type="button" className="eve-btn" onClick={onHistory}>Ιστορικό</button>
+    </EvePanel>
+  );
+}

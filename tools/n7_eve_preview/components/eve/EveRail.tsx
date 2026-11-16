@@ -1,41 +1,33 @@
 "use client";
-import { ScanFace, Map, Library, Network, Telescope, Newspaper, CloudSun, History, Settings2, ChevronsRight, ChevronsLeft, type LucideIcon } from "lucide-react";
+import { ScanFace, MessagesSquare, Telescope, BookMarked, Map, Network, Library, FolderKanban, Settings2, type LucideIcon } from "lucide-react";
 
-export type Section = "n7" | "nabou" | "library" | "agents" | "research" | "news" | "weather" | "history" | "settings";
+export type Section = "n7" | "chat" | "research" | "sources" | "nabou" | "agents" | "library" | "projects" | "settings" | "history";
 export const SECTIONS: { id: Section; label: string; hint: string; icon: LucideIcon }[] = [
-  { id: "n7", label: "N7", hint: "Κεντρική συνομιλία με το N7", icon: ScanFace },
-  { id: "nabou", label: "NABOU", hint: "Διαδραστικός ιστορικός χάρτης", icon: Map },
-  { id: "library", label: "LIBRARY", hint: "Πηγές, βιβλία και αναζήτηση τεκμηρίων", icon: Library },
-  { id: "agents", label: "AGENTS", hint: "Κατάσταση και εργασίες των agents", icon: Network },
-  { id: "research", label: "RESEARCH", hint: "Ιστορική και διαδικτυακή έρευνα", icon: Telescope },
-  { id: "news", label: "NEWS", hint: "Ειδήσεις και γεωπολιτική", icon: Newspaper },
-  { id: "weather", label: "WEATHER", hint: "Καιρός", icon: CloudSun },
-  { id: "history", label: "HISTORY", hint: "Ιστορικό συνομιλιών και εργασιών", icon: History },
-  { id: "settings", label: "SETTINGS", hint: "Ρυθμίσεις", icon: Settings2 },
+  { id: "n7", label: "N7", hint: "Αρχική οθόνη του N7", icon: ScanFace },
+  { id: "chat", label: "Συνομιλία", hint: "Συζήτηση με το N7", icon: MessagesSquare },
+  { id: "research", label: "Έρευνα", hint: "Ιστορική έρευνα", icon: Telescope },
+  { id: "sources", label: "Πηγές", hint: "Κατάλογος δημοσιευμένων πηγών", icon: BookMarked },
+  { id: "nabou", label: "Χάρτης NABOU", hint: "Διαδραστικός ιστορικός χάρτης", icon: Map },
+  { id: "agents", label: "Agents", hint: "Κατάσταση των agents", icon: Network },
+  { id: "library", label: "Βιβλιοθήκη", hint: "Αναζήτηση στη βιβλιοθήκη", icon: Library },
+  { id: "projects", label: "Έργα", hint: "Τρέχον έργο και ιστορικό", icon: FolderKanban },
+  { id: "settings", label: "Ρυθμίσεις", hint: "Φωνή, εμφάνιση, σύνδεση", icon: Settings2 },
 ];
 
-export default function EveRail({ active, onSelect, expanded, onToggle, mobileOpen }: {
-  active: Section; onSelect: (s: Section) => void; expanded: boolean; onToggle: () => void; mobileOpen: boolean;
-}) {
+export default function EveRail({ active, onSelect, mobileOpen }: { active: Section; onSelect: (s: Section) => void; mobileOpen: boolean }) {
   return (
-    <nav className="eve-rail" data-expanded={expanded} data-mobile-open={mobileOpen} aria-label="Πλοήγηση N7">
-      <div className="eve-rail-mark" aria-hidden="true"><span>N7</span></div>
+    <nav className="eve-rail" data-mobile-open={mobileOpen} aria-label="Πλοήγηση N7">
       <ul>
         {SECTIONS.map(({ id, label, hint, icon: Icon }) => (
           <li key={id} className={id === "settings" ? "eve-rail-bottom" : undefined}>
             <button type="button" className="eve-rail-item" aria-current={active === id ? "page" : undefined}
-              aria-label={`${label} — ${hint}`} data-section={id} onClick={() => onSelect(id)}>
-              <Icon size={18} strokeWidth={1.4} aria-hidden="true" />
+              title={hint} data-section={id} onClick={() => onSelect(id)}>
+              <span className="eve-rail-ico"><Icon size={17} strokeWidth={1.5} aria-hidden="true" /></span>
               <span className="eve-rail-label">{label}</span>
-              <span className="eve-tip" role="tooltip"><b>{label}</b>{hint}</span>
             </button>
           </li>
         ))}
       </ul>
-      <button type="button" className="eve-rail-toggle" onClick={onToggle} aria-expanded={expanded}
-        aria-label={expanded ? "Σύμπτυξη μενού" : "Επέκταση μενού"}>
-        {expanded ? <ChevronsLeft size={15} strokeWidth={1.4} /> : <ChevronsRight size={15} strokeWidth={1.4} />}
-      </button>
     </nav>
   );
 }

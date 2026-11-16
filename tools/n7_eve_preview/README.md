@@ -15,19 +15,34 @@ A new shell for N7 in the spirit of EVE Online (graphite, dark navy, cool cyan, 
 | Library | pct-live `/library/search`, `/library/books`, `/library/status` + `data/published-library.json` | read-only |
 | Agents | pct-live `/n7/status`, `/health`; N7 `/api/status`; with sign-in `/api/tasks`, `/api/agents` | read-only |
 
+## Layout (command interface)
+Top bar: N7 logo «AI COMMAND INTERFACE», tabs Έρευνα · Πηγές · NABOU Χάρτης · Agents · Βιβλιοθήκη ·
+Έργα, then «N7 Online/Offline» (real `/api/status` reachability), microphone, spoken replies, settings.
+Left rail with Greek labels: N7, Συνομιλία, Έρευνα, Πηγές, Χάρτης NABOU, Agents, Βιβλιοθήκη, Έργα,
+Ρυθμίσεις. Centre: the unchanged Humanoid over a decorative scene (Olive 1662 Aegean chart from the
+atlas, darkened; planet glow; harbour skyline; the approved N7 nebula) with a state ring under it.
+Left: «N7 — Υποδοχή» (output-voice waveform from `N7VoiceSignal`, flat when silent) and «Ενεργοί
+Agents». Right: «Τρέχον Έργο», «Γρήγορες Ενέργειες», «Σύστημα»; an opened section replaces this
+column. Bottom: «Γράψε ή μίλησε στο N7...». On a phone the side panels open from the menu (N7).
+
 ## Components (`components/eve`)
-`N7EveShell` (layout and routing) · `EveRail` (left rail, icons, tooltips, expandable) ·
+`N7EveShell` (layout and routing) · `EveScene` (decorative background) · `EveRail` ·
+`EveSide` (Υποδοχή, Ενεργοί Agents, Τρέχον Έργο, Γρήγορες Ενέργειες, Σύστημα) ·
+`useSystemStatus` (pct-live `/n7/status`, `/health`, `/library/status`, catalogue) · `EveHud` (state ring) ·
 `EveHumanoid` (stage-scale figure) · `EveCommandBar` (field, microphone, send) ·
 `EveStateIndicator` (IDLE / LISTENING / THINKING / SPEAKING from real signals) ·
-`EvePanel` (+ `EveEmpty`, `EveDetails`, `EveField`) · `EveConversation` · `EveSources` ·
-`LibraryPanel` · `AgentsPanel` · `OtherPanels` (Research, History, News, Weather, Settings) ·
+`EvePanel` (chamfered glass panel + `EveEmpty`, `EveDetails`, `EveField`) · `EveConversation` · `EveSources` ·
+`LibraryPanel` (search, or the «Πηγές» catalogue) · `AgentsPanel` · `OtherPanels` (Research, Projects, History, Settings) ·
 `NabouWorkspace` · `useN7Session` · `eveApi` · `eve.css`.
 
 ## Honest states
 * Without the owner's N7 sign-in, the chat field searches the library and labels the results as
   library results, never as an N7 answer. With sign-in, messages go to the N7 runtime as today.
-* NEWS and WEATHER have no backend yet: they say so and show no sample data.
-* AGENTS shows only what the services report (no computed progress or completion).
+* No service reports progress percentages, so agent rows show «—» and an empty bar (striped only
+  while a signed-in task really runs). Missing values are «—», never a sample.
+* Quick actions: NABOU map and Ιστορική έρευνα work; web search and text synthesis go through the
+  real N7 chat and are disabled until sign-in; OCR source analysis is not connected here and is
+  disabled with a note.
 
 ## Build and run locally
 ```bash
@@ -48,7 +63,8 @@ on desktop 1440×900 and mobile 390×844: large Humanoid and completed assembly;
 THINKING → real library hits → IDLE; microphone → LISTENING (scripted speech-recognition
 stand-in, headless browsers have no microphone) → dictated text sent; NABOU loads the real chamber
 with N7 chat beside it and switches back; LIBRARY «Λάντζας» returns real cited hits; AGENTS shows
-pct-live and N7 status; NEWS/WEATHER honest empty states; rail tooltip/expand; mobile menu;
+pct-live and N7 status; home side panels hold only real values (no percentages, OCR/web disabled
+when not available); Πηγές and Έργα; quick action and top tab navigation; mobile menu and overview;
 voice playback → SPEAKING → IDLE (desktop).
 
 ## Publishing (not done)

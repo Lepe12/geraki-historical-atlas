@@ -5,7 +5,7 @@ import EvePanel, { EveDetails, EveEmpty } from "./EvePanel";
 import { EveHit } from "./EveSources";
 import { loadCatalog, pct, searchLibrary, type CatalogBook, type LibrarySearch } from "./eveApi";
 
-export default function LibraryPanel({ onClose, initialQuery }: { onClose: () => void; initialQuery?: string }) {
+export default function LibraryPanel({ onClose, initialQuery, view = "search" }: { onClose: () => void; initialQuery?: string; view?: "search" | "sources" }) {
   const [query, setQuery] = useState(initialQuery || "");
   const [result, setResult] = useState<LibrarySearch | null>(null);
   const [state, setState] = useState<"idle" | "busy" | "error">("idle");
@@ -29,12 +29,12 @@ export default function LibraryPanel({ onClose, initialQuery }: { onClose: () =>
   useEffect(() => { if (initialQuery) { setQuery(initialQuery); void run(initialQuery); } /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [initialQuery]);
   const hits = result?.hits || [];
   return (
-    <EvePanel title="Βιβλιοθήκη" code="LIBRARY · ΠΗΓΕΣ" onClose={onClose} wide>
-      <form className="eve-search" role="search" onSubmit={e => { e.preventDefault(); void run(); }}>
+    <EvePanel title={view === "sources" ? "Πηγές" : "Βιβλιοθήκη"} code={view === "sources" ? "SOURCES · ΚΑΤΑΛΟΓΟΣ" : "LIBRARY · ΑΝΑΖΗΤΗΣΗ"} onClose={onClose} wide>
+      {view === "search" && <form className="eve-search" role="search" onSubmit={e => { e.preventDefault(); void run(); }}>
         <Search size={15} strokeWidth={1.4} aria-hidden="true" />
         <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Όνομα, τόπος ή φράση — π.χ. Λάντζας" aria-label="Αναζήτηση στη βιβλιοθήκη" />
         <button type="submit" disabled={state === "busy" || !query.trim()}>{state === "busy" ? "Αναζήτηση…" : "Αναζήτηση"}</button>
-      </form>
+      </form>}
       {state === "busy" && <div className="eve-progress" role="status"><span />Ψάχνω σε όλες τις πηγές της βιβλιοθήκης…</div>}
       {error && <p className="eve-error" role="alert">{error}</p>}
       {result && (

@@ -1,20 +1,27 @@
 "use client";
-import { X } from "lucide-react";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
+import { Minus, X } from "lucide-react";
 
-// One frame for every side panel: thin luminous edge, a title strip, scrollable body.
-export default function EvePanel({ title, code, onClose, children, footer, wide, footClass }: {
-  title: string; code: string; onClose?: () => void; children: ReactNode; footer?: ReactNode; wide?: boolean; footClass?: string;
+// Glass panel with chamfered corners, a thin glowing cyan edge, caption header and window controls.
+export default function EvePanel({ title, code, onClose, children, footer, wide, footClass, className, minimizable = true }: {
+  title: string; code?: string; onClose?: () => void; children: ReactNode; footer?: ReactNode; wide?: boolean; footClass?: string; className?: string; minimizable?: boolean;
 }) {
+  const [min, setMin] = useState(false);
   return (
-    <section className="eve-panel" data-wide={wide || undefined} aria-label={title}>
-      <header className="eve-panel-head">
-        <div><small>{code}</small><h2>{title}</h2></div>
-        {onClose && <button type="button" className="eve-icon-btn" onClick={onClose} aria-label="Κλείσιμο">
-          <X size={16} strokeWidth={1.4} /></button>}
-      </header>
-      <div className="eve-panel-body">{children}</div>
-      {footer && <footer className={"eve-panel-foot" + (footClass ? " " + footClass : "")}>{footer}</footer>}
+    <section className={"eve-glass" + (className ? " " + className : "")} data-wide={wide || undefined} data-min={min || undefined} aria-label={title}>
+      <div className="eve-glass-in">
+        <header className="eve-panel-head">
+          <i className="eve-accent" aria-hidden="true" />
+          <h2>{title}</h2>
+          {code && <small>{code}</small>}
+          <span className="eve-winctl">
+            {minimizable && <button type="button" onClick={() => setMin(m => !m)} aria-label={min ? "Ανάπτυξη" : "Σύμπτυξη"} aria-expanded={!min}><Minus size={11} strokeWidth={1.6} /></button>}
+            {onClose && <button type="button" onClick={onClose} aria-label="Κλείσιμο"><X size={11} strokeWidth={1.6} /></button>}
+          </span>
+        </header>
+        {!min && <div className="eve-panel-body">{children}</div>}
+        {!min && footer && <footer className={"eve-panel-foot" + (footClass ? " " + footClass : "")}>{footer}</footer>}
+      </div>
     </section>
   );
 }
