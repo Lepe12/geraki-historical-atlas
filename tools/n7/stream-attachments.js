@@ -185,7 +185,7 @@ async function readGroqStream(response,onDelta){
  return {text,reason};
 }
 function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publicSearch,fetcher=fetch,
-  researchDeadlineMs=8500,articleDeadlineMs=8500,modelDeadlineMs=25000,archiveSearch=null}){
+  researchDeadlineMs=8500,articleDeadlineMs=8500,modelDeadlineMs=25000,archiveSearch=null,agents=null}){
  const library=createLibrary(DATA_DIR,{ocr:async images=>{
   if(!API_KEY||!MODEL)throw Error('vision_model_unavailable');
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),55000);
@@ -239,6 +239,30 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
    }
    res.write(JSON.stringify({type,...value})+'\n');
   };
+  // N7_SPECIALIST_AGENTS_V1: the web page sends every message here, not to /chat. A recognised news,
+  // geopolitics or weather request is answered by its agent in this same conversation, from real provider
+  // data. Messages with attachments, project conversations and every message the agents do not recognise
+  // continue unchanged below; so does any fault inside the agent.
+  if(agents&&!attachments.length&&!item.projectId){
+   let agentRun=null;
+   try{
+    const previousAssistant=[...item.messages].reverse().find(m=>m.role==='assistant')?.content||'';
+    if(agents.detect(content,{previousAssistant})){
+     emit('status',{stage:'agent',message:'Το αίτημα ανήκει σε εξειδικευμένο Agent· ανακτώ πραγματικά δεδομένα…'});
+     agentRun=await agents.dispatch(history,{apiKey:API_KEY,model:MODEL,base:BASE,modelFetcher:fetcher});
+    }
+   }catch{agentRun=null;}
+   if(agentRun){
+    try{
+     final=agentRun.reply;emit('delta',{text:final});
+     const current=appendExchange({dataDir:DATA_DIR,load,save,id,user:userMessage,exchangeId,assistant:{content:final,agent:agentRun.agent}});
+     emit('done',{conversation:{id:current.id,title:current.title},exchangeId,agent:agentRun.agent});
+     console.log('N7_AGENT agent='+agentRun.agent.id+' status='+agentRun.status+' route=stream');
+    }catch(e){emit('error',{error:'Η απάντηση του Agent δεν αποθηκεύτηκε: '+String(e.message||e).slice(0,150)});}
+    finally{res.off?.('close',disconnected);if(!res.writableEnded)res.end();}
+    return;
+   }
+  }
   emit('status',{stage:'research',message:'Ελέγχω πηγές και προετοιμάζω την ιστορική έρευνα…'});
   let evidence=null,messages,libraryHits=[],archiveWarning='';
   try{

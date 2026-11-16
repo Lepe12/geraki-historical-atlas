@@ -276,12 +276,12 @@ class GuardedDeployTest(unittest.TestCase):
 
     def test_every_new_file_of_the_real_contract_can_be_installed_and_matches_its_source(self):
         # A file that is new in the release and unknown to the installer stops the whole installation
-        # (the preflight reads it from the server and fails), so a new module must be listed here.
+        # (the preflight reads it from the server and fails), so a new module must be listed here. The three agent
+        # modules were new in the first agents release and stay listed so that they are verified and reinstallable.
         release = deploy.contract()
         new = set(release['files']) - set(release.get('previous_files', {}))
         self.assertEqual(new - deploy.WRITABLE, set(), 'new release files the installer would refuse')
         for name in ('n7-agents.js', 'news-geopolitics.js', 'n7-command-router.js'):
-            self.assertIn(name, new, name + ' is a new file of this release')
             self.assertIn(name, deploy.PUBLIC_MODULES)
             self.assertEqual(deploy.sha((deploy.HERE / deploy.PUBLIC_MODULES[name]).read_bytes()), release['files'][name], name)
         # The installed files are checked against the previous release, so the previous release must be the installed one.
