@@ -1,0 +1,61 @@
+name: N7 owner-chosen library import (URLs)
+on:
+  pull_request:
+    paths:
+      - 'tools/library/import_pdf_from_urls.py'
+      - '.github/workflows/n7-library-url-import.yml'
+      - 'ops_ftps_requests/n7-library-url-import.json'
+  push:
+    branches: [main]
+    paths:
+      - 'ops_ftps_requests/n7-library-url-import.json'
+permissions:
+  contents: read
+concurrency:
+  group: n7-library-url-import
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/library
+            ops_ftps_requests
+      - name: Validate the owner's request (no downloads, no uploads)
+        run: |
+          set -euo pipefail
+          python3 -m py_compile tools/library/import_pdf_from_urls.py
+          python3 - <<'PY'
+          import importlib.util,json
+          s=importlib.util.spec_from_file_location("i","tools/library/import_pdf_from_urls.py")
+          m=importlib.util.module_from_spec(s);s.loader.exec_module(m)
+          items=m.validate_request(json.load(open("ops_ftps_requests/n7-library-url-import.json",encoding="utf-8")))
+          print(json.dumps({"validated_items":len(items),"files":[i["filename"] for i in items]},ensure_ascii=False))
+          PY
+  import:
+    needs: verify
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 45
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/library
+            ops_ftps_requests
+      - name: Install the HTML-to-PDF converter
+        run: pip -q install weasyprint
+      - name: Download the listed works and import them through the signed private route
+        run: python3 tools/library/import_pdf_from_urls.py ops_ftps_requests/n7-library-url-import.json
