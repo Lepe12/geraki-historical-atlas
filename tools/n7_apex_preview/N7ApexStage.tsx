@@ -29,7 +29,7 @@ export default function N7ApexStage() {
           boxShadow:"0 0 20px #00dafa38"}}>HUMANOID</button>
       <N7Workspace onOpenFigure={()=>setHumanoidOpen(true)} guideOpen={humanoidOpen&&isolatedGuide} openSignal={workspaceRequest} onActivity={setN7Activity} onTrace={setN7Trace} />
       </div>
-      <N7HumanoidView onWorkspace={openConversation} onNavigate={home?target=>go(target):undefined} open={humanoidOpen} onClose={()=>{if(home){go("chat");return;}setHumanoidOpen(false);}} activity={n7Activity==="thinking"||n7Activity==="listening"||n7Activity==="speaking"?n7Activity:null} />
+      <N7HumanoidView onWorkspace={openConversation} onNavigate={home?target=>go(target):undefined} open={humanoidOpen} onClose={()=>setHumanoidOpen(false)} activity={n7Activity==="thinking"||n7Activity==="listening"||n7Activity==="speaking"?n7Activity:null} />
     </>
   );
 }
