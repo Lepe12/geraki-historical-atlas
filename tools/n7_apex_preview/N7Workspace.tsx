@@ -113,9 +113,10 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   };
   const resumed=useRef(false);
   useEffect(()=>{
-    if(!authenticated||guest||!minimal||!guideOpen||!voiceHost||!listLoaded||!voice.supported.output)return;
+    if(!authenticated||guest||!minimal||!guideOpen||!voiceHost||!listLoaded||!voice.supported.output||!voice.voiceReady)return;
     let locked=true;
-    try{const AudioCtor=window.AudioContext;if(AudioCtor){const probe=new AudioCtor();locked=probe.state!=="running";void probe.close();}}catch{locked=true;}
+    if(voice.voiceURI!==FEMALE_VOICE_ID)locked=!voice.deviceSpeechAllowed(); // the browser's own voices need a tap first (Chrome's rule)
+    else try{const AudioCtor=window.AudioContext;if(AudioCtor){const probe=new AudioCtor();locked=probe.state!=="running";void probe.close();}}catch{locked=true;}
     if(wasGreeted()){
       // Already greeted in this login (a return from the Chat, NABOU or the library, or a refresh): no new greeting;
       // listening resumes only where the browser allows audio and already allows the microphone.
@@ -126,7 +127,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
     if(locked){setTapHint(true);return;}
     void begin(false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[authenticated,guest,minimal,guideOpen,voiceHost,listLoaded,voice.supported.input,voice.supported.output]);
+  },[authenticated,guest,minimal,guideOpen,voiceHost,listLoaded,voice.supported.input,voice.supported.output,voice.voiceReady,voice.voiceURI]);
   useEffect(()=>{
     if(!tapHint)return;
     const start=()=>{window.removeEventListener("pointerdown",start,true);window.removeEventListener("keydown",start,true);setTapHint(false);void begin(true);};
@@ -382,7 +383,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   return (
     <>
       {guideOpen&&voiceHost&&minimal&&createPortal(<div style={{position:"relative",zIndex:5,display:"flex",flexDirection:"column",alignItems:"center",gap:8,padding:"6px 12px calc(14px + env(safe-area-inset-bottom))",pointerEvents:"none"}}>
-        {tapHint&&<p role="status" aria-label="Έναρξη N7" data-n7-tap="" style={{margin:0,color:"#bfe9f3",fontSize:13,letterSpacing:".06em",textShadow:"0 0 12px #000"}}>Πάτησε οπουδήποτε για να ξεκινήσει η N7</p>}
+        {tapHint&&<p role="status" aria-label="Έναρξη N7" data-n7-tap="" style={{margin:0,color:"#bfe9f3",fontSize:13,letterSpacing:".06em",textShadow:"0 0 12px #000"}}>Πάτησε οπουδήποτε για να ξεκινήσει η N7<span style={{display:"block",marginTop:4,fontSize:11,opacity:.7}}>Φωνή: {voice.deviceVoiceName||"ενσωματωμένη ελληνική"}</span></p>}
         {caption&&<div role="status" aria-label="Απάντηση N7" style={{pointerEvents:"auto",maxWidth:"min(760px,calc(100% - 24px))",maxHeight:"26dvh",overflow:"auto",whiteSpace:"pre-wrap",fontSize:14,lineHeight:1.55,color:"#e7f9fc",background:"rgba(3,11,18,.82)",border:"1px solid rgba(120,220,240,.14)",borderRadius:14,padding:"10px 14px"}}>{richText(caption)}</div>}
         {(workActive||pendingJobs.length>0)&&<p role="status" aria-label="Εκτελείται εργασία" style={{margin:0,color:"#9fdbe8",fontSize:12,letterSpacing:".08em"}}>Εκτελείται εργασία…</p>}
         {typing&&<form onSubmit={e=>{e.preventDefault();const text=typed.trim();if(!text)return;setTyped("");setTyping(false);typedPending.current=true;void send(text);}} style={{pointerEvents:"auto",display:"flex",gap:6,width:"min(640px,calc(100% - 24px))"}}>

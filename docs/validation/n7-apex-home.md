@@ -41,3 +41,16 @@ and appear with `?controls=1` (used by the existing browser tests).
 Files: `N7Navigation.ts` (phrases, welcomes, first-visit record, real-data answers), `N7Workspace.tsx` (welcome, listening, typing field, caption, commands),
 `useN7Voice.ts` (an optional end-of-speech callback and `resume`), `N7GuideView.tsx` (class `n7-minimal` hides header and controls; the voice host has no panel in this mode),
 `build_apex_preview.py` and the workflow (isolated preview path `/n7-apex-home`, built like production).
+
+## Greek voice quality (draft)
+
+Owner report: the Greek voice sounded robotic and stuttered. Cause found: the built-in voice is Piper «rapunzelina» **low** (16 kHz, fine-tuned from an English voice; there is no better Greek Piper model),
+and it is synthesised piece by piece on the visitor's CPU, so pieces can arrive late.
+
+* **Browser voices first.** The best Greek *female* voice the browser offers is used automatically (Edge «Natural» voices, then Google's Greek voice, then any other Greek voice that is not a male name); the built-in voice
+  stays as the fallback and with `?voice=piper` (for comparison). The hint at the first tap names the voice that will be used.
+* **Chrome's rule:** a page may speak with the browser's voices only after the visitor has interacted with the page, so with a browser voice the first tap (the temporary hint) is needed on each page load; the built-in voice does not have this rule.
+* **Said in Greek:** N7, NABOU, Agents, Chat, Humanoid, APEX, Open-Meteo and similar names are spoken from a Greek spelling (the text on screen is unchanged).
+* **Whole sentences:** speech is cut at sentence ends (then commas), the first sentence alone so speech starts quickly; pieces are shorter for browser voices (some stop after about fifteen seconds).
+* Files: `N7Pronunciation.ts` (+ `test_pronunciation.mjs`, 3 tests), `useN7Voice.ts`, `N7Workspace.tsx`.
+* **Not verified:** how the voices actually sound (no audio output here), which Greek voices the owner's browser really offers, and Chrome's activation rule in the owner's browser; the end-to-end test uses a stand-in `speechSynthesis` with an Edge-style voice and Chrome's activation rule.
