@@ -35,7 +35,13 @@ PUBLIC_MODULES = {'conversation-store.js': 'conversation-store.js',
                   'n7-weather.js': 'weather-tool.js',
                   'n7-public-web-search.js': 'public-web-search.js',
                   'n7-semantic-assets.js': 'semantic-assets.js',
-                  'n7-coding-agent.js': 'coding-agent-tool.js'}
+                  'n7-coding-agent.js': 'coding-agent-tool.js',
+                  # N7_SPECIALIST_AGENTS_V1: the News & Geopolitics and Weather agents, their dispatcher and the
+                  # command router the dispatcher shares with the Humanoid. All new files, written only if absent
+                  # or identical; a different file already on the server stops the installation.
+                  'n7-agents.js': 'n7-agents.js',
+                  'news-geopolitics.js': 'news-geopolitics.js',
+                  'n7-command-router.js': 'n7-command-router.js'}
 for _skill in ('book-project-canon', 'document-reading-plan', 'claim-evidence-ledger', 'editorial-preservation'):
     PUBLIC_MODULES['skills/' + _skill + '/SKILL.md'] = 'skills/' + _skill + '/SKILL.md'
 # The engineering workflow is distributed with the other reviewed skills (owner decision, no secrets);
