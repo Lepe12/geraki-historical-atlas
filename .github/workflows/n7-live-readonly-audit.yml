@@ -120,3 +120,27 @@ jobs:
               print('EXISTING_FTPS_CONNECT_ERROR='+type(e).__name__)
               raise SystemExit(4)
           PY
+
+  cross_repo_access:
+    runs-on: ubuntu-24.04
+    environment: nabou-production
+    timeout-minutes: 3
+    permissions:
+      contents: read
+    steps:
+      - name: Verify existing authorization to read private N7 canonical repository
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          N7_PAT_PRESENT: ${{ secrets.N7_REPO_TOKEN != '' }}
+          GH_APP_ID_PRESENT: ${{ secrets.GH_APP_ID != '' }}
+          GH_APP_KEY_PRESENT: ${{ secrets.GH_APP_PRIVATE_KEY != '' }}
+        run: |
+          if gh api repos/Lepe12/independent-ai-bot -q .full_name >/dev/null 2>&1; then
+            echo "CANONICAL_PRIVATE_REPO_READ=YES"
+          else
+            echo "CANONICAL_PRIVATE_REPO_READ=NO"
+          fi
+          echo "EXISTING_N7_TOKEN=$N7_PAT_PRESENT"
+          echo "EXISTING_GH_APP_ID=$GH_APP_ID_PRESENT"
+          echo "EXISTING_GH_APP_KEY=$GH_APP_KEY_PRESENT"
