@@ -70,7 +70,7 @@ def contract():
     digest = sha(json.dumps(data['files'], sort_keys=True, separators=(',', ':')).encode())
     if digest != data['release_id'] or len(data['files']) != 69:
         raise RuntimeError('N7_INVALID_RELEASE_HASH')
-    helper = Path('tools/n7/owner-chat-memory.js').read_bytes()
+    helper = Path('.github/n7-personality-v2-owner-chat-memory.js').read_bytes()
     if sha(helper) != data['files'][HELPER]:
         raise RuntimeError('N7_PERSONA_SOURCE_NOT_CANONICAL')
     if b'DISTINCT VOICE & JUDGEMENT V2' not in helper:
