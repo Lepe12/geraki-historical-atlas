@@ -2,6 +2,7 @@ name: N7 live GET audit
 on:
   push:
     branches: [audit/n7-live-readonly-20261116]
+    paths: [.github/workflows/n7-live-readonly-audit.yml]
   pull_request:
     paths: [.github/workflows/n7-live-readonly-audit.yml]
   workflow_dispatch:
@@ -190,7 +191,7 @@ jobs:
     environment: nabou-production
     timeout-minutes: 18
     permissions:
-      contents: read
+      contents: write
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
