@@ -90,3 +90,17 @@ jobs:
               print('N7_POST_CANCEL_HEALTH_RELEASE='+str(h.get('release')))
           except Exception as e:print('N7_POST_CANCEL_HEALTH_READ_ERROR='+type(e).__name__)
           PY
+
+      - name: Test new persona syntax and transaction rollback
+        run: |
+          node --check tools/n7/owner-chat-memory.js
+          python3 -m py_compile .github/n7-pr84-guarded-deploy.py
+          python3 .github/n7-pr84-guarded-deploy-test.py
+      - name: Verify exact N7 runtime and receipt read-only
+        env:
+          N7_DRY_RUN: '1'
+        run: python3 .github/n7-pr84-guarded-deploy.py
+      - name: Install PR84 persona with rollback and live health proof
+        env:
+          N7_DRY_RUN: '0'
+        run: python3 .github/n7-pr84-guarded-deploy.py
