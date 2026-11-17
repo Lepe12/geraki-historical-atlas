@@ -10,7 +10,7 @@ jobs:
     if: github.event.pull_request.head.repo.full_name == 'Lepe12/geraki-historical-atlas' && github.event.pull_request.head.ref == 'ops/n7-memory-ftps-preflight'
     runs-on: ubuntu-latest
     environment: nabou-production
-    timeout-minutes: 5
+    timeout-minutes: 12
     env:
       PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
       PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
@@ -51,61 +51,42 @@ jobs:
             try:ftp.quit()
             except:ftp.close()
           PY
-      - name: Read-only compare 69 active runtime files with canonical new release
+      - name: Inspect post-cancellation module, manifest, staging and lock (no writes)
         shell: bash
         run: |
           python3 - <<'PY'
-          import ftplib,hashlib,json,os,socket,ssl
-          release=json.load(open('.github/n7-pr84-expected-contract.json'))
+          import ftplib,hashlib,json,os,socket,ssl,urllib.request
           host=os.environ['PCT_FTPS_HOST'];tls='linux3087.grserver.gr';port=21
-          ip=lambda h:{x[4][0] for x in socket.getaddrinfo(h,port,type=socket.SOCK_STREAM)}
-          if not (ip(host)&ip(tls)):raise RuntimeError('TLS_HOST_MISMATCH')
-          ftp=ftplib.FTP_TLS(timeout=40,context=ssl.create_default_context())
+          ips=lambda h:{x[4][0] for x in socket.getaddrinfo(h,port,type=socket.SOCK_STREAM)}
+          if not (ips(host)&ips(tls)):raise RuntimeError('UNEXPECTED_HOST')
+          ftp=ftplib.FTP_TLS(timeout=35,context=ssl.create_default_context())
           ftp.connect(host,port);ftp.host=tls
           ftp.login(os.environ['PCT_FTPS_USER'],os.environ['PCT_FTPS_PASSWORD']);ftp.prot_p()
           root='/bot.piratecartography.com/n7-app'
           ftp.cwd(root)
-          differences=[]; missing=[]
+          def read(name):
+              buf=[];ftp.retrbinary('RETR '+root+'/'+name,buf.append)
+              return b''.join(buf)
           try:
-            for name,expected in release['files'].items():
-              parts=[];size=[0]
-              def collect(p):
-                size[0]+=len(p)
-                if size[0]>8*1024*1024:raise RuntimeError('REMOTE_FILE_TOO_LARGE '+name)
-                parts.append(p)
-              try:ftp.retrbinary('RETR '+root+'/'+name,collect)
-              except ftplib.error_perm as e:
-                if str(e).startswith('550'):
-                  missing.append(name);continue
-                raise
-              digest=hashlib.sha256(b''.join(parts)).hexdigest()
-              if digest!=expected:differences.append(name)
-            parts=[]
-            try:ftp.retrbinary('RETR '+root+'/release-manifest.json',parts.append)
-            except ftplib.error_perm:parts=[]
-            receipt=json.loads(b''.join(parts)) if parts else {}
+              digest=hashlib.sha256(read('owner-chat-memory.js')).hexdigest()
+              receipt=json.loads(read('release-manifest.json'))
+              names=[n.rsplit('/',1)[-1] for n in ftp.nlst(root)]
+              leftover=[n for n in names if n.startswith(('.n7-persona-stage-','.n7-persona-backup-','.n7-persona-activation-lock'))]
+              old='c8a780c590c2269f0e0d2bd92911c78667a4cc4d4ec517e432766c0935c06d55'
+              new='3f726de2fd52d33ac43c6e93ef9b329c1bfef6dc49db05ca8ca5d77dc6b75d38'
+              state='OLD' if digest==old else 'NEW' if digest==new else 'UNEXPECTED'
+              print('N7_POST_CANCEL_HELPER='+state)
+              print('N7_POST_CANCEL_RELEASE='+str(receipt.get('release_id')))
+              print('N7_POST_CANCEL_COMMIT='+str(receipt.get('canonical_commit')))
+              print('N7_POST_CANCEL_STAGE_LOCK_NAMES='+','.join(sorted(leftover)))
           finally:
-            try:ftp.quit()
-            except:ftp.close()
-          print('N7_EXPECTED_RELEASE='+release['release_id'])
-          print('N7_ACTIVE_RELEASE='+str(receipt.get('release_id','MISSING')))
-          print('N7_ACTIVE_CANONICAL_COMMIT='+str(receipt.get('canonical_commit','MISSING')))
-          print('N7_REMOTE_MATCHES_NEW='+str(len(release['files'])-len(differences)-len(missing)))
-          print('N7_REMOTE_DIFFERS='+','.join(differences))
-          print('N7_REMOTE_MISSING='+','.join(missing))
-          print('N7_READ_ONLY_FULL_HASH_AUDIT_PASS=true')
+              try:ftp.quit()
+              except:ftp.close()
+          try:
+              req=urllib.request.Request('https://bot.piratecartography.com/health',headers={'Cache-Control':'no-store'})
+              with urllib.request.urlopen(req,timeout=15) as res:
+                  h=json.loads(res.read(10000))
+              print('N7_POST_CANCEL_HEALTH='+str(h.get('status')))
+              print('N7_POST_CANCEL_HEALTH_RELEASE='+str(h.get('release')))
+          except Exception as e:print('N7_POST_CANCEL_HEALTH_READ_ERROR='+type(e).__name__)
           PY
-
-      - name: Check module syntax and deployment rollback tests
-        run: |
-          node --check tools/n7/owner-chat-memory.js
-          python3 -m py_compile .github/n7-pr84-guarded-deploy.py
-          python3 .github/n7-pr84-guarded-deploy-test.py
-      - name: Validate exact live drift and canonical receipt without writing
-        env:
-          N7_DRY_RUN: '1'
-        run: python3 .github/n7-pr84-guarded-deploy.py
-      - name: Apply approved two-file update and verify restarted live N7
-        env:
-          N7_DRY_RUN: '0'
-        run: python3 .github/n7-pr84-guarded-deploy.py
