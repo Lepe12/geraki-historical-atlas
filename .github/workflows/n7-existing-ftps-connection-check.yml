@@ -59,3 +59,30 @@ jobs:
               print('FTPS_CHECK_FAILED_TYPE='+type(e).__name__)
               raise SystemExit(4)
           PY
+
+  cross_repo_access:
+    runs-on: ubuntu-24.04
+    environment: nabou-production
+    timeout-minutes: 3
+    permissions:
+      contents: read
+    steps:
+      - name: Check existing token scope for private canonical N7, do not fetch code
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ALT_TOKEN_PRESENT: ${{ secrets.N7_REPO_TOKEN != '' }}
+          APP_ID_PRESENT: ${{ secrets.GH_APP_ID != '' }}
+          APP_KEY_PRESENT: ${{ secrets.GH_APP_PRIVATE_KEY != '' }}
+        shell: bash
+        run: |
+          set +e
+          gh api -H "Accept: application/vnd.github+json" repos/Lepe12/independent-ai-bot -q .full_name >/dev/null 2>&1
+          result=$?
+          if [[ "$result" == "0" ]]; then
+            echo "CROSS_REPOSITORY_GITHUB_TOKEN=READ_AVAILABLE"
+          else
+            echo "CROSS_REPOSITORY_GITHUB_TOKEN=NO_READ"
+          fi
+          echo "N7_REPO_TOKEN_CONFIGURED=$ALT_TOKEN_PRESENT"
+          echo "GITHUB_APP_ID_CONFIGURED=$APP_ID_PRESENT"
+          echo "GITHUB_APP_KEY_CONFIGURED=$APP_KEY_PRESENT"
