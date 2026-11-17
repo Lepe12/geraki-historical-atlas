@@ -321,7 +321,21 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
           <p style={{margin:"0 0 6px",color:"#cdf9ff",fontSize:13}}>{GREETING}</p>
           <button type="button" data-n7-start="" style={{...buttonStyle,fontWeight:700,letterSpacing:1.5}} onClick={startGreeting}>Έναρξη N7</button>
         </div>}
-        <button type="button" aria-expanded={voiceOpen} onClick={()=>{setVoiceOpen(x=>!x);if(voiceOpen)voice.suspend();}}>Φωνητική συνομιλία</button>
+        <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+          <button type="button" data-n7-conversation-toggle=""
+            aria-pressed={voice.conversation}
+            aria-label={voice.conversation?"Σταμάτα τη φωνητική συνομιλία N7":"Μίλα στο N7"}
+            style={{...buttonStyle,fontWeight:700,background:voice.conversation?"#713c25":"#12516a"}}
+            disabled={!voice.conversation&&(busy||pendingJobs.some(j=>j.conversationId===conversationId)||!voice.supported.input||!voice.supported.output)}
+            onClick={()=>{if(voice.conversation)voice.suspend();else if(!authenticated&&!guest)setVoiceOpen(true);else voice.startConversation();}}>
+            {voice.conversation?"■ Τέλος συνομιλίας":"🎙 Μίλα στο N7"}
+          </button>
+          <button type="button" aria-expanded={voiceOpen}
+            onClick={()=>{setVoiceOpen(x=>!x);if(voiceOpen)voice.suspend();}}>Ρυθμίσεις φωνής</button>
+          <span role="status" aria-label="Φωνητική κατάσταση N7" style={{fontSize:12,color:"#b8e6ee"}}>
+            {voice.phase==="listening"?"Ακούω…":voice.phase==="speaking"?"Μιλάω…":voice.status||"Η φωνητική συνομιλία ξεκινά με ένα πάτημα"}
+          </span>
+        </div>
         {voiceOpen&&voiceControls}
       </div>,voiceHost)}
       <button type="button" onClick={() => {if(onOpenFigure&&N7_GUIDE&&window.matchMedia("(max-width:700px), (max-width:1000px) and (max-height:500px)").matches){setVoiceOpen(true);onOpenFigure();return;}setOpen(x => !x);}}
