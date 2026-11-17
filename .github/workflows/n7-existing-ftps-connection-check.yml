@@ -1,0 +1,61 @@
+name: N7 existing TopHost connection check - read only
+on:
+  push:
+    branches: [audit/n7-existing-ftps-connection-20261117]
+    paths:
+      - '.github/workflows/n7-existing-ftps-connection-check.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    environment: nabou-production
+    timeout-minutes: 5
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+    steps:
+      - name: Verify existing FTPS credentials and both site roots without mutation
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import ftplib,os,socket,ssl
+          mandatory=('PCT_FTPS_HOST','PCT_FTPS_USER','PCT_FTPS_PASSWORD')
+          present={k:bool(os.getenv(k)) for k in mandatory}
+          print('EXISTING_ENVIRONMENT=nabou-production')
+          print('FTPS_BINDINGS_PRESENT='+str(all(present.values())).lower())
+          if not all(present.values()):raise SystemExit(2)
+          host=os.environ['PCT_FTPS_HOST']
+          tls=os.environ.get('PCT_FTPS_TLS_SERVER_NAME','').strip() or 'linux3087.grserver.gr'
+          port=int(os.environ.get('PCT_FTPS_PORT','21'))
+          try:
+              one={x[4][0] for x in socket.getaddrinfo(host,port,type=socket.SOCK_STREAM)}
+              two={x[4][0] for x in socket.getaddrinfo(tls,port,type=socket.SOCK_STREAM)}
+              if not one.intersection(two):
+                  print('FTPS_TLS_HOST_IP_MATCH=false');raise SystemExit(3)
+              print('FTPS_TLS_HOST_IP_MATCH=true')
+              ftp=ftplib.FTP_TLS(timeout=25,context=ssl.create_default_context())
+              ftp.connect(host,port)
+              ftp.host=tls
+              ftp.login(os.environ['PCT_FTPS_USER'],os.environ['PCT_FTPS_PASSWORD'])
+              ftp.prot_p()
+              print('FTPS_AUTHENTICATED=true')
+              for target,tag in (
+                ('/piratecartography-gateway/server/command-center-live','NABOU_BACKEND'),
+                ('/bot.piratecartography.com/n7-app','N7_RUNTIME')):
+                  try:
+                      ftp.cwd(target)
+                      print(tag+'_EXISTING_PATH_ACCESS=true')
+                      items=set(x.rsplit('/',1)[-1] for x in ftp.nlst())
+                      print(tag+'_SERVER_JS_PRESENT='+str('server.js' in items).lower())
+                  except ftplib.all_errors as e:
+                      print(tag+'_EXISTING_PATH_ACCESS=false')
+                      print(tag+'_ERROR_CATEGORY='+type(e).__name__)
+              ftp.quit()
+          except (ftplib.all_errors,OSError,ValueError) as e:
+              print('FTPS_CHECK_FAILED_TYPE='+type(e).__name__)
+              raise SystemExit(4)
+          PY
