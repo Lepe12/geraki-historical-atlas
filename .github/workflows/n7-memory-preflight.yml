@@ -17,6 +17,9 @@ jobs:
       PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/n7-pr84-expected-contract.json
+          sparse-checkout-cone-mode: false
       - name: Verify existing FTPS secrets and read only N7 memory module hash
         shell: bash
         run: |
