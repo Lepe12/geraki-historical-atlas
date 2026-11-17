@@ -234,6 +234,7 @@ jobs:
               health=json.load(response)
           print('N7_LIVE_HEALTH_OK='+str(health.get('status')=='ok').lower(),flush=True)
           print('N7_LIVE_MODEL_CONFIGURED='+str(health.get('modelConfigured') is True).lower(),flush=True)
+          print('N7_LIVE_BROWSER_CONFIGURED='+str(health.get('browserConfigured') is True).lower(),flush=True)
           print('N7_LIVE_RELEASE_ID_MATCH='+
             str(health.get('release',{}).get('id')==manifest['release_id']).lower(),flush=True)
           print('N7_LIVE_RELEASE_COMMIT_MATCH='+
