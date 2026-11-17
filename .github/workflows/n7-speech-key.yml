@@ -1,0 +1,93 @@
+name: N7 Greek neural voice key (Azure AI Speech)
+on:
+  pull_request:
+    paths:
+      - 'ops_ftps_requests/n7-speech-key.json'
+      - '.github/workflows/n7-speech-key.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'ops_ftps_requests/n7-speech-key.json'
+permissions:
+  contents: read
+concurrency:
+  group: n7-speech-key
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            ops_ftps_requests
+      - name: Validate the request (no secret is read)
+        run: |
+          python3 - <<'PY'
+          import json,re
+          r=json.load(open('ops_ftps_requests/n7-speech-key.json'))
+          assert r['schema']=='n7-speech-key-v1' and r['confirmation']=='INSTALL-N7-AZURE-SPEECH-KEY'
+          assert re.fullmatch(r'[a-z0-9]{3,40}',r['region']) and r['voice']=='el-GR-AthinaNeural'
+          print('N7_SPEECH_KEY_REQUEST_VALID region='+r['region'])
+          PY
+  install:
+    needs: validate
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 6
+    env:
+      AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            ops_ftps_requests
+      - name: Check the key with the real service, then install it as private files (never printed)
+        run: |
+          python3 - <<'PY'
+          import ftplib,hashlib,io,json,os,re,secrets,socket,ssl,urllib.request,urllib.error
+          r=json.load(open('ops_ftps_requests/n7-speech-key.json'));region=r['region']
+          key=os.environ.get('AZURE_SPEECH_KEY','').strip()
+          if not key: raise SystemExit('N7_SPEECH_KEY_MISSING: add the repository secret AZURE_SPEECH_KEY')
+          if not re.fullmatch(r'[A-Za-z0-9]{20,128}',key): raise SystemExit('N7_SPEECH_KEY_MALFORMED (it should be KEY 1 from Keys and Endpoint)')
+          # 1. The real service answers with Greek audio for this key, region and voice.
+          ssml="<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='el-GR'><voice name='el-GR-AthinaNeural'>Καλώς ήρθες.</voice></speak>"
+          req=urllib.request.Request(f'https://{region}.tts.speech.microsoft.com/cognitiveservices/v1',data=ssml.encode(),method='POST',
+            headers={'Ocp-Apim-Subscription-Key':key,'Content-Type':'application/ssml+xml','X-Microsoft-OutputFormat':'audio-24khz-48kbitrate-mono-mp3','User-Agent':'N7-Humanoid-install'})
+          try:
+            with urllib.request.urlopen(req,timeout=30) as resp: audio=resp.read()
+          except urllib.error.HTTPError as e: raise SystemExit(f'N7_SPEECH_SERVICE_REFUSED http={e.code} (401/403: wrong key or region; 429: limit)')
+          if len(audio)<1000: raise SystemExit('N7_SPEECH_SERVICE_NO_AUDIO')
+          print(f'N7_SPEECH_SERVICE_OK region={region} voice=el-GR-AthinaNeural audio_bytes={len(audio)}')
+          # 2. Private files beside the N7 server (same host check as the other N7 installers).
+          ROOT='/bot.piratecartography.com/n7-app';TLS='linux3087.grserver.gr'
+          host=os.environ['PCT_FTPS_HOST'];port=int(os.environ.get('PCT_FTPS_PORT','21'))
+          ips=lambda h:{x[4][0] for x in socket.getaddrinfo(h,port,type=socket.SOCK_STREAM)}
+          if not ips(host).intersection(ips(TLS)): raise SystemExit('N7_UNEXPECTED_FTPS_HOST')
+          ftp=ftplib.FTP_TLS(timeout=45,context=ssl.create_default_context());ftp.connect(host,port);ftp.host=TLS
+          ftp.login(os.environ['PCT_FTPS_USER'],os.environ['PCT_FTPS_PASSWORD']);ftp.prot_p();ftp.cwd(ROOT)
+          if ftp.pwd().rstrip('/')!=ROOT: raise SystemExit('N7_WRONG_APP_ROOT')
+          names=ftp.nlst()
+          if 'server.js' not in [n.rsplit('/',1)[-1] for n in names]: raise SystemExit('N7_SERVER_NOT_FOUND_IN_APP_ROOT')
+          for name,data in (('.n7-speech-key',key.encode()),('.n7-speech-region',region.encode())):
+            stage='.n7-speech-stage-'+secrets.token_hex(4)
+            ftp.storbinary('STOR '+stage,io.BytesIO(data))
+            try: ftp.sendcmd('SITE CHMOD 600 '+stage)
+            except ftplib.all_errors: pass
+            got=[];ftp.retrbinary('RETR '+stage,got.append)
+            if hashlib.sha256(b''.join(got)).digest()!=hashlib.sha256(data).digest(): ftp.delete(stage);raise SystemExit('N7_SPEECH_READBACK_MISMATCH')
+            try: ftp.delete(name)
+            except ftplib.all_errors: pass
+            ftp.rename(stage,name)
+          ftp.quit()
+          print('N7_SPEECH_KEY_INSTALLED files=2 key_printed=false')
+          # 3. The voice route is private: anonymous requests are refused.
+          try: urllib.request.urlopen('https://bot.piratecartography.com/api/n7/voice/status',timeout=20);raise SystemExit('N7_VOICE_STATUS_PUBLIC')
+          except urllib.error.HTTPError as e: print('N7_VOICE_ROUTE_ANONYMOUS_HTTP',e.code)
+          PY
