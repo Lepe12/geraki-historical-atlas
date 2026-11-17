@@ -11,6 +11,7 @@ jobs:
   offline-tests-and-preflight:
     if: github.head_ref == 'ops/n7-jarvis-dialogue-pr86' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
+    environment: nabou-production
     timeout-minutes: 12
     env:
       PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
@@ -51,6 +52,7 @@ jobs:
     needs: offline-tests-and-preflight
     if: github.head_ref == 'ops/n7-jarvis-dialogue-pr86' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
+    environment: nabou-production
     timeout-minutes: 12
     env:
       PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
