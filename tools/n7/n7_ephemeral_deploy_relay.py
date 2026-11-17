@@ -25,6 +25,19 @@ def read_path(path):
         data=json.load(resp)
     if data.get('encoding')!='base64':raise ValueError('Unexpected capsule encoding')
     return base64.b64decode(data['content'])
+def publish_key(public):
+    key_data=json.dumps({'schema':'n7-ephemeral-recipient-v1','public_key':base64.b64encode(public).decode(),
+        'source_commit':SOURCE_COMMIT}).encode()
+    payload=json.dumps({'message':'ci(n7): publish ephemeral encryption recipient, no secrets',
+        'content':base64.b64encode(key_data).decode(),'branch':BRANCH}).encode()
+    url=f'https://api.github.com/repos/{REPO}/contents/n7-secure-relay/session-public-key.json'
+    request=Request(url,data=payload,method='PUT',headers={'Authorization':'Bearer '+os.environ['GITHUB_TOKEN'],
+                   'Accept':'application/vnd.github+json','Content-Type':'application/json',
+                   'User-Agent':'n7-relay'})
+    with urlopen(request,timeout=25) as response:
+        if response.status not in (200,201):raise ValueError('Cannot publish recipient public key')
+    print('N7_EPHEMERAL_PUBLIC_KEY_PUBLISHED=true',flush=True)
+
 def receive(private,pub):
     deadline=time.monotonic()+12*60
     while time.monotonic()<deadline:
@@ -93,6 +106,7 @@ def main():
     private=X25519PrivateKey.generate()
     public=private.public_key().public_bytes(
         encoding=serialization.Encoding.Raw,format=serialization.PublicFormat.Raw)
+    publish_key(public)
     print('N7_EPHEMERAL_PUBLIC_KEY='+base64.b64encode(public).decode(),flush=True)
     print('N7_SOURCE_COMMIT_REQUIRED='+SOURCE_COMMIT,flush=True)
     with tempfile.TemporaryDirectory(prefix='n7-authorized-release-') as temporary:
