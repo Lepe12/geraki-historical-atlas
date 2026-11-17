@@ -1,0 +1,44 @@
+name: N7 owner memory FTPS read-only preflight
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/n7-memory-preflight.yml'
+permissions:
+  contents: read
+jobs:
+  ftps-preflight:
+    if: github.event.pull_request.head.repo.full_name == 'Lepe12/geraki-historical-atlas' && github.event.pull_request.head.ref == 'ops/n7-memory-ftps-preflight'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+    steps:
+      - name: Verify existing FTPS secrets and read only N7 memory module hash
+        shell: bash
+        run: |
+          test -n "$PCT_FTPS_HOST" && test -n "$PCT_FTPS_USER" && test -n "$PCT_FTPS_PASSWORD" || { echo "ATLAS_FTPS_SECRETS_NOT_CONFIGURED"; exit 1; }
+          python3 - <<'PY'
+          import ftplib,hashlib,os,socket,ssl
+          HOST=os.environ['PCT_FTPS_HOST'];PORT=21;TLS='linux3087.grserver.gr'
+          ip=lambda h:{x[4][0] for x in socket.getaddrinfo(h,PORT,type=socket.SOCK_STREAM)}
+          if not(ip(HOST)&ip(TLS)):raise RuntimeError('FTPS_TARGET_IDENTITY_MISMATCH')
+          ftp=ftplib.FTP_TLS(timeout=25,context=ssl.create_default_context());ftp.connect(HOST,PORT);ftp.host=TLS
+          ftp.login(os.environ['PCT_FTPS_USER'],os.environ['PCT_FTPS_PASSWORD']);ftp.prot_p()
+          try:
+            ftp.cwd('/bot.piratecartography.com/n7-app')
+            if ftp.pwd().rstrip('/')!='/bot.piratecartography.com/n7-app':raise RuntimeError('BAD_TARGET_ROOT')
+            parts=[]
+            ftp.retrbinary('RETR owner-chat-memory.js',parts.append)
+            value=hashlib.sha256(b''.join(parts)).hexdigest()
+            old='c8a780c590c2269f0e0d2bd92911c78667a4cc4d4ec517e432766c0935c06d55'
+            new='3f726de2fd52d33ac43c6e93ef9b329c1bfef6dc49db05ca8ca5d77dc6b75d38'
+            state='OLD_APPROVED' if value==old else 'NEW_APPROVED' if value==new else 'UNEXPECTED'
+            print('N7_LIVE_OWNER_MEMORY_STATE='+state)
+            if state=='UNEXPECTED':raise RuntimeError('N7_LIVE_MODULE_DRIFT')
+            print('N7_FTPS_READ_ONLY_PREFLIGHT_OK')
+          finally:
+            try:ftp.quit()
+            except:ftp.close()
+          PY
