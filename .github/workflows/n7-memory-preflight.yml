@@ -9,6 +9,7 @@ jobs:
   ftps-preflight:
     if: github.event.pull_request.head.repo.full_name == 'Lepe12/geraki-historical-atlas' && github.event.pull_request.head.ref == 'ops/n7-memory-ftps-preflight'
     runs-on: ubuntu-latest
+    environment: nabou-production
     timeout-minutes: 5
     env:
       PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
