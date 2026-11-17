@@ -186,3 +186,59 @@ jobs:
           ftp.quit()
           PY
 
+
+  n7_full_release_verify:
+    runs-on: ubuntu-24.04
+    environment: nabou-production
+    timeout-minutes: 12
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+    steps:
+      - name: Read-only hash check of all reviewed N7 runtime files
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import ftplib,hashlib,json,os,ssl,urllib.request
+          url='https://raw.githubusercontent.com/Lepe12/geraki-historical-atlas/41de84c4aedff877cc5f5b3607343c6b9f630ca4/n7-secure-relay/expected-hashes.json'
+          with urllib.request.urlopen(url,timeout=30) as response:
+              manifest=json.load(response)
+          assert manifest['schema']=='n7-live-hash-audit-v1'
+          expected=manifest['files']
+          ftp=ftplib.FTP_TLS(timeout=40,context=ssl.create_default_context())
+          ftp.connect(os.environ['PCT_FTPS_HOST'],21)
+          ftp.host='linux3087.grserver.gr'
+          ftp.login(os.environ['PCT_FTPS_USER'],os.environ['PCT_FTPS_PASSWORD'])
+          ftp.prot_p()
+          ftp.cwd('/bot.piratecartography.com/n7-app')
+          matches=0
+          problems=[]
+          for name,sha in expected.items():
+              pieces=[]
+              try:
+                  ftp.retrbinary('RETR '+name,pieces.append)
+                  if hashlib.sha256(b''.join(pieces)).hexdigest()==sha:
+                      matches+=1
+                  else:
+                      problems.append((name,'HASH_MISMATCH'))
+              except ftplib.all_errors as error:
+                  problems.append((name,type(error).__name__))
+          ftp.quit()
+          print('N7_LIVE_RELEASE_MATCHING_FILES='+str(matches),flush=True)
+          print('N7_LIVE_RELEASE_EXPECTED_FILES='+str(len(expected)),flush=True)
+          for name,kind in problems[:15]:
+              print('N7_LIVE_RELEASE_PROBLEM '+name+' '+kind,flush=True)
+          health_url='https://bot.piratecartography.com/health'
+          with urllib.request.urlopen(health_url,timeout=20) as response:
+              health=json.load(response)
+          print('N7_LIVE_HEALTH_OK='+str(health.get('status')=='ok').lower(),flush=True)
+          print('N7_LIVE_MODEL_CONFIGURED='+str(health.get('modelConfigured') is True).lower(),flush=True)
+          print('N7_LIVE_RELEASE_ID_MATCH='+
+            str(health.get('release',{}).get('id')==manifest['release_id']).lower(),flush=True)
+          print('N7_LIVE_RELEASE_COMMIT_MATCH='+
+            str(health.get('release',{}).get('canonical_commit')==manifest['source_commit']).lower(),flush=True)
+          if matches!=len(expected) or problems or health.get('status')!='ok' or health.get('modelConfigured') is not True:
+              raise SystemExit('N7_FULL_RELEASE_MISMATCH')
+          print('N7_FULL_RELEASE_VERIFIED=true',flush=True)
+          PY
