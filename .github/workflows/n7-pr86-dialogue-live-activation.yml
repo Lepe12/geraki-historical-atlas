@@ -1,0 +1,76 @@
+name: N7 PR86 approved hands-free dialogue activation
+on:
+  pull_request:
+    types: [opened, synchronize]
+permissions:
+  contents: read
+concurrency:
+  group: n7-pr86-guarded-live-activation
+  cancel-in-progress: false
+jobs:
+  offline-tests-and-preflight:
+    if: github.head_ref == 'ops/n7-jarvis-dialogue-pr86' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/n7-pr86-dialogue-deploy.py
+            .github/n7-pr86-dialogue-deploy-test.py
+            .github/n7-pr86-new-stage.js
+            .github/n7-pr86-new-router.js
+            .github/n7-pr86-contract.json
+            tools/n7/asset_version.py
+            tools/n7/humanoid-stage.js
+            tools/n7/n7-command-router.js
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Synthetic upgrade, rollback, and exact-asset checks
+        run: |
+          python3 .github/n7-pr86-dialogue-deploy-test.py -v
+          node --check .github/n7-pr86-new-stage.js
+          node --check .github/n7-pr86-new-router.js
+      - name: Confirm existing TopHost credentials are configured
+        run: |
+          test -n "$PCT_FTPS_HOST" && test -n "$PCT_FTPS_USER" && test -n "$PCT_FTPS_PASSWORD" || {
+            echo "ATLAS_FTPS_SECRETS_UNAVAILABLE; production files untouched"
+            exit 1
+          }
+      - name: Read-only 69-file preflight and exact composed bytes
+        env:
+          N7_DRY_RUN: '1'
+        run: python3 .github/n7-pr86-dialogue-deploy.py
+  activate:
+    needs: offline-tests-and-preflight
+    if: github.head_ref == 'ops/n7-jarvis-dialogue-pr86' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      N7_DRY_RUN: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/n7-pr86-dialogue-deploy.py
+            .github/n7-pr86-new-stage.js
+            .github/n7-pr86-new-router.js
+            .github/n7-pr86-contract.json
+            tools/n7/asset_version.py
+            tools/n7/humanoid-stage.js
+            tools/n7/n7-command-router.js
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Guarded 4-file installation with exact HTTP verification and rollback
+        run: python3 .github/n7-pr86-dialogue-deploy.py
