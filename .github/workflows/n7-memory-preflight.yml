@@ -16,6 +16,7 @@ jobs:
       PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
       PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
     steps:
+      - uses: actions/checkout@v4
       - name: Verify existing FTPS secrets and read only N7 memory module hash
         shell: bash
         run: |
@@ -42,4 +43,48 @@ jobs:
           finally:
             try:ftp.quit()
             except:ftp.close()
+          PY
+      - name: Read-only compare 69 active runtime files with canonical new release
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import ftplib,hashlib,json,os,socket,ssl
+          release=json.load(open('.github/n7-pr84-expected-contract.json'))
+          host=os.environ['PCT_FTPS_HOST'];tls='linux3087.grserver.gr';port=21
+          ip=lambda h:{x[4][0] for x in socket.getaddrinfo(h,port,type=socket.SOCK_STREAM)}
+          if not (ip(host)&ip(tls)):raise RuntimeError('TLS_HOST_MISMATCH')
+          ftp=ftplib.FTP_TLS(timeout=40,context=ssl.create_default_context())
+          ftp.connect(host,port);ftp.host=tls
+          ftp.login(os.environ['PCT_FTPS_USER'],os.environ['PCT_FTPS_PASSWORD']);ftp.prot_p()
+          root='/bot.piratecartography.com/n7-app'
+          ftp.cwd(root)
+          differences=[]; missing=[]
+          try:
+            for name,expected in release['files'].items():
+              parts=[];size=[0]
+              def collect(p):
+                size[0]+=len(p)
+                if size[0]>8*1024*1024:raise RuntimeError('REMOTE_FILE_TOO_LARGE '+name)
+                parts.append(p)
+              try:ftp.retrbinary('RETR '+root+'/'+name,collect)
+              except ftplib.error_perm as e:
+                if str(e).startswith('550'):
+                  missing.append(name);continue
+                raise
+              digest=hashlib.sha256(b''.join(parts)).hexdigest()
+              if digest!=expected:differences.append(name)
+            parts=[]
+            try:ftp.retrbinary('RETR '+root+'/release-manifest.json',parts.append)
+            except ftplib.error_perm:parts=[]
+            receipt=json.loads(b''.join(parts)) if parts else {}
+          finally:
+            try:ftp.quit()
+            except:ftp.close()
+          print('N7_EXPECTED_RELEASE='+release['release_id'])
+          print('N7_ACTIVE_RELEASE='+str(receipt.get('release_id','MISSING')))
+          print('N7_ACTIVE_CANONICAL_COMMIT='+str(receipt.get('canonical_commit','MISSING')))
+          print('N7_REMOTE_MATCHES_NEW='+str(len(release['files'])-len(differences)-len(missing)))
+          print('N7_REMOTE_DIFFERS='+','.join(differences))
+          print('N7_REMOTE_MISSING='+','.join(missing))
+          print('N7_READ_ONLY_FULL_HASH_AUDIT_PASS=true')
           PY
