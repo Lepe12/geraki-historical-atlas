@@ -29,8 +29,8 @@ class FakeFTP:
 
 class UpgradeTests(unittest.TestCase):
     def test_assembles_exact_app_and_index_from_real_versioner(self):
-        old_router=b'// old router unique\n',new_router=b'// new router unique\n'
-        old_stage=b'/* old stage unique */',new_stage=b'/* new stage unique */'
+        old_router=b'// old router unique\n';new_router=b'// new router unique\n'
+        old_stage=b'/* old stage unique */';new_stage=b'/* new stage unique */'
         old_app=b'BEGIN\n'+old_router+b'\nMIDDLE\n'+old_stage+b'\nEND'
         old_index=b'<html><head><meta charset="utf-8"><link href="/style.css"></head><body><script src="/app.js"></script></body></html>'
         css=b'abc.css'
