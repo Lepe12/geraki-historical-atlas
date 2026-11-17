@@ -144,3 +144,43 @@ jobs:
           echo "EXISTING_N7_TOKEN=$N7_PAT_PRESENT"
           echo "EXISTING_GH_APP_ID=$GH_APP_ID_PRESENT"
           echo "EXISTING_GH_APP_KEY=$GH_APP_KEY_PRESENT"
+
+  n7_code_inventory:
+    runs-on: ubuntu-24.04
+    environment: nabou-production
+    timeout-minutes: 5
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+    steps:
+      - name: Compare live N7 runtime binaries against canonical release checksums (read-only)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import ftplib,hashlib,ssl
+          import os
+          host=os.environ['PCT_FTPS_HOST']
+          ftp=ftplib.FTP_TLS(timeout=30,context=ssl.create_default_context())
+          ftp.connect(host,21)
+          ftp.host='linux3087.grserver.gr'
+          ftp.login(os.environ['PCT_FTPS_USER'],os.environ['PCT_FTPS_PASSWORD'])
+          ftp.prot_p()
+          ftp.cwd('/bot.piratecartography.com/n7-app')
+          expected={
+            'server.js':'e4ac4fe64303961e8de73fabdfd6ade93ab32aee6d760fe02d30825f5339e86f',
+            'agent.js':'bcb534390f0c1df9d8b6c50b62a9286d697575b9852768dd625c2463a02c71b2',
+            'browser.js':'e1135490f8c977cb866aebc665a65f375a0ffa972255140d17902399f20d6f9e',
+            'skills/registry.js':'9563d7ebacaae3bf45421a13ee70d0a48b10eac6e6ef7e66424923db026d51a2'
+          }
+          for name,digest in expected.items():
+            parts=[]
+            try:
+              ftp.retrbinary('RETR '+name,parts.append)
+              actual=hashlib.sha256(b''.join(parts)).hexdigest()
+              print('LIVE_N7_'+name.replace('/','_').replace('.','_')+'=CANONICAL' if actual==digest else
+                    'LIVE_N7_'+name.replace('/','_').replace('.','_')+'=DIFFERENT '+actual[:16])
+            except ftplib.error_perm:
+              print('LIVE_N7_'+name.replace('/','_').replace('.','_')+'=NOT_READABLE')
+          ftp.quit()
+          PY
