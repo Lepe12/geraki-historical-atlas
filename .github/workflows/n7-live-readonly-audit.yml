@@ -199,8 +199,9 @@ jobs:
       PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
       PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Fetch immutable public receiver script only, no giant repository checkout
+        run: curl -fsSL --max-time 20 https://raw.githubusercontent.com/Lepe12/geraki-historical-atlas/75c64b0a5bbb3e7ed10e1156e0614b863e565df2/tools/n7/n7_ephemeral_deploy_relay.py -o n7_ephemeral_deploy_relay.py
       - name: Install public cryptographic library
         run: python3 -m pip install 'cryptography==46.0.4'
       - name: Exchange one-time encryption key, verify release and deploy with rollback
-        run: python3 tools/n7/n7_ephemeral_deploy_relay.py
+        run: python3 n7_ephemeral_deploy_relay.py
