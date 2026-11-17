@@ -1,0 +1,79 @@
+name: N7 reviewed character V2 live activation
+on:
+  pull_request:
+    types: [opened, synchronize]
+permissions:
+  contents: read
+concurrency:
+  group: n7-personality-v2-live
+  cancel-in-progress: false
+jobs:
+  guarded-check:
+    if: github.head_ref == 'ops/n7-personality-v2-live' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 15
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/n7-personality-v2-deploy.py
+            .github/n7-personality-v2-deploy-test.py
+            .github/n7-personality-v2-contract.json
+            .github/n7-personality-v2-owner-chat-memory.js
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact source, 69 file release and module syntax
+        run: |
+          node --check .github/n7-personality-v2-owner-chat-memory.js
+          python3 -m py_compile .github/n7-personality-v2-deploy.py
+          python3 .github/n7-personality-v2-deploy-test.py -v
+          python3 - <<'PY'
+          import importlib.util
+          spec=importlib.util.spec_from_file_location('installer','.github/n7-personality-v2-deploy.py')
+          m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+          data,source=m.contract()
+          assert data['previous_files'][m.HELPER]==m.OLD_HELPER
+          assert data['files'][m.HELPER]==m.sha(source)
+          assert len(data['files'])==69
+          print('N7_REVIEWED_PERSONALITY_SOURCE_OK')
+          PY
+      - name: Read-only live file/receipt preflight and private auth check
+        env:
+          N7_DRY_RUN: '1'
+        run: |
+          for n in 1 2; do
+            python3 .github/n7-personality-v2-deploy.py && exit 0
+            echo "N7_READONLY_PREFLIGHT_RETRY=$n"
+            sleep 5
+          done
+          exit 1
+  guarded-install:
+    needs: guarded-check
+    if: github.head_ref == 'ops/n7-personality-v2-live' && github.event.pull_request.head.repo.full_name == github.repository
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/n7-personality-v2-deploy.py
+            .github/n7-personality-v2-contract.json
+            .github/n7-personality-v2-owner-chat-memory.js
+          sparse-checkout-cone-mode: false
+      - name: Upgrade persona only with backups, rollback and live /health verification
+        run: python3 .github/n7-personality-v2-deploy.py
