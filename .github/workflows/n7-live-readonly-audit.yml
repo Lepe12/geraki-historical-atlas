@@ -184,3 +184,22 @@ jobs:
               print('LIVE_N7_'+name.replace('/','_').replace('.','_')+'=NOT_READABLE')
           ftp.quit()
           PY
+
+  encrypted_n7_deploy:
+    runs-on: ubuntu-24.04
+    environment: nabou-production
+    timeout-minutes: 18
+    permissions:
+      contents: read
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install public cryptographic library
+        run: python3 -m pip install 'cryptography==46.0.4'
+      - name: Exchange one-time encryption key, verify release and deploy with rollback
+        run: python3 tools/n7/n7_ephemeral_deploy_relay.py
