@@ -18,7 +18,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          sparse-checkout: .github/n7-pr84-expected-contract.json
+          sparse-checkout: |
+            .github/n7-pr84-expected-contract.json
+            .github/n7-pr84-guarded-deploy.py
+            .github/n7-pr84-guarded-deploy-test.py
+            tools/n7/owner-chat-memory.js
           sparse-checkout-cone-mode: false
       - name: Verify existing FTPS secrets and read only N7 memory module hash
         shell: bash
@@ -91,3 +95,17 @@ jobs:
           print('N7_REMOTE_MISSING='+','.join(missing))
           print('N7_READ_ONLY_FULL_HASH_AUDIT_PASS=true')
           PY
+
+      - name: Check module syntax and deployment rollback tests
+        run: |
+          node --check tools/n7/owner-chat-memory.js
+          python3 -m py_compile .github/n7-pr84-guarded-deploy.py
+          python3 .github/n7-pr84-guarded-deploy-test.py
+      - name: Validate exact live drift and canonical receipt without writing
+        env:
+          N7_DRY_RUN: '1'
+        run: python3 .github/n7-pr84-guarded-deploy.py
+      - name: Apply approved two-file update and verify restarted live N7
+        env:
+          N7_DRY_RUN: '0'
+        run: python3 .github/n7-pr84-guarded-deploy.py
