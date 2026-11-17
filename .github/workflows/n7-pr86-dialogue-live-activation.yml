@@ -44,6 +44,24 @@ jobs:
             echo "ATLAS_FTPS_SECRETS_UNAVAILABLE; production files untouched"
             exit 1
           }
+      - name: Diagnose public live release before touching FTP
+        run: |
+          python3 - <<'PY'
+          import json,urllib.request,urllib.error
+          url='https://bot.piratecartography.com'
+          for p in ('/health','/api/status'):
+              try:
+                  req=urllib.request.Request(url+p,headers={'Cache-Control':'no-store','User-Agent':'N7-PR86-ReadOnly-Diagnostic'})
+                  with urllib.request.urlopen(req,timeout=18) as resp:
+                      body=json.loads(resp.read(12000))
+                  print('N7_HTTP_DIAGNOSTIC route='+p+' code='+str(resp.status)+
+                        ' status='+str(body.get('status'))+
+                        ' modelConfigured='+str(body.get('modelConfigured'))+
+                        ' release='+json.dumps(body.get('release'),sort_keys=True))
+              except Exception as e:
+                  print('N7_HTTP_DIAGNOSTIC route='+p+' error='+type(e).__name__+
+                        ' code='+str(getattr(e,'code',None)))
+          PY
       - name: Read-only 69-file preflight and exact composed bytes
         env:
           N7_DRY_RUN: '1'
