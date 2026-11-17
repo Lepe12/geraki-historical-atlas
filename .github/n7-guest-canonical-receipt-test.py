@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import ftplib
 import importlib.util
 import io
 import json
@@ -26,7 +27,7 @@ class FakeFTP:
         self.data[b]=self.data.pop(a);self.events.append(('rename',a,b))
     def delete(self,name):
         self.events.append(('delete',name))
-        if name not in self.data:raise RuntimeError('not found')
+        if name not in self.data:raise ftplib.error_perm('550 not found')
         del self.data[name]
     def mkd(self,name):
         if name in self.locks:raise RuntimeError('locked')
