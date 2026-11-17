@@ -28,8 +28,19 @@ def read_path(path):
 def publish_key(public):
     key_data=json.dumps({'schema':'n7-ephemeral-recipient-v1','public_key':base64.b64encode(public).decode(),
         'source_commit':SOURCE_COMMIT}).encode()
-    payload=json.dumps({'message':'ci(n7): publish ephemeral encryption recipient, no secrets',
-        'content':base64.b64encode(key_data).decode(),'branch':BRANCH}).encode()
+    existing_sha=None
+    try:
+        existing_api=f'https://api.github.com/repos/{REPO}/contents/n7-secure-relay/session-public-key.json?ref={BRANCH}'
+        existing_request=Request(existing_api,headers={'Authorization':'Bearer '+os.environ['GITHUB_TOKEN'],
+            'Accept':'application/vnd.github+json','User-Agent':'n7-relay'})
+        with urlopen(existing_request,timeout=15) as existing_response:
+            existing_sha=json.load(existing_response)['sha']
+    except HTTPError as error:
+        if error.code!=404:raise
+    payload_obj={'message':'ci(n7): rotate ephemeral encryption recipient, no secrets',
+        'content':base64.b64encode(key_data).decode(),'branch':BRANCH}
+    if existing_sha:payload_obj['sha']=existing_sha
+    payload=json.dumps(payload_obj).encode()
     url=f'https://api.github.com/repos/{REPO}/contents/n7-secure-relay/session-public-key.json'
     request=Request(url,data=payload,method='PUT',headers={'Authorization':'Bearer '+os.environ['GITHUB_TOKEN'],
                    'Accept':'application/vnd.github+json','Content-Type':'application/json',
