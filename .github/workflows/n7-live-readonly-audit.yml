@@ -71,3 +71,52 @@ jobs:
               except Exception as e:
                   print('ERROR',p,type(e).__name__,str(e)[:140])
           PY
+
+  existing_ftps:
+    runs-on: ubuntu-24.04
+    environment: nabou-production
+    timeout-minutes: 5
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+    steps:
+      - name: Authenticate using existing environment and inspect N7 target read-only
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import ftplib,os,socket,ssl
+          keys=('PCT_FTPS_HOST','PCT_FTPS_USER','PCT_FTPS_PASSWORD')
+          print('ENVIRONMENT=nabou-production')
+          print('CREDENTIAL_BINDINGS='+('present' if all(os.getenv(k) for k in keys) else 'missing'))
+          if not all(os.getenv(k) for k in keys):raise SystemExit(2)
+          h=os.environ['PCT_FTPS_HOST']
+          tls=os.getenv('PCT_FTPS_TLS_SERVER_NAME','').strip() or 'linux3087.grserver.gr'
+          port=int(os.getenv('PCT_FTPS_PORT','21'))
+          try:
+              first={row[4][0] for row in socket.getaddrinfo(h,port,type=socket.SOCK_STREAM)}
+              second={row[4][0] for row in socket.getaddrinfo(tls,port,type=socket.SOCK_STREAM)}
+              if not first.intersection(second):
+                  print('TLS_HOST_MATCH=false');raise SystemExit(3)
+              print('TLS_HOST_MATCH=true')
+              ftp=ftplib.FTP_TLS(timeout=25,context=ssl.create_default_context())
+              ftp.connect(h,port)
+              ftp.host=tls
+              ftp.login(os.environ['PCT_FTPS_USER'],os.environ['PCT_FTPS_PASSWORD'])
+              ftp.prot_p()
+              print('EXISTING_FTPS_AUTH=PASS')
+              for tag,dest in (('NABOU','/piratecartography-gateway/server/command-center-live'),('N7','/bot.piratecartography.com/n7-app')):
+                  try:
+                      ftp.cwd(dest)
+                      print(tag+'_TARGET_ACCESS=PASS')
+                      names={x.rsplit('/',1)[-1] for x in ftp.nlst()}
+                      print(tag+'_EXPECTED_ROOT_FILE='+str(('server.js' if tag=='N7' else 'app.js') in names).lower())
+                  except ftplib.all_errors as e:
+                      print(tag+'_TARGET_ACCESS=FAIL_'+type(e).__name__)
+              ftp.quit()
+          except (ftplib.all_errors,OSError,ValueError) as e:
+              print('EXISTING_FTPS_CONNECT_ERROR='+type(e).__name__)
+              raise SystemExit(4)
+          PY
