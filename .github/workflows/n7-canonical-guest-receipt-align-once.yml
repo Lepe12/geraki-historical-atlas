@@ -1,0 +1,63 @@
+name: N7 canonical 70-file guest receipt reconciliation
+on:
+  pull_request:
+    types: [opened, synchronize]
+permissions:
+  contents: read
+concurrency:
+  group: n7-canonical-guest-receipt-align
+  cancel-in-progress: false
+jobs:
+  validate-and-readonly:
+    if: github.head_ref == 'ops/n7-canonical-guest-70file-receipt' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 18
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/n7-guest-canonical-70-contract.json
+            .github/n7-guest-canonical-receipt.py
+            .github/n7-guest-canonical-receipt-test.py
+          sparse-checkout-cone-mode: false
+      - name: Test receipt-only upgrade and mandatory rollback
+        run: |
+          python3 -m py_compile .github/n7-guest-canonical-receipt.py
+          python3 .github/n7-guest-canonical-receipt-test.py -v
+      - name: Verify all 70 live file hashes, old receipt and owner authentication without writes
+        env:
+          N7_DRY_RUN: '1'
+        run: |
+          for trial in 1 2; do
+            python3 .github/n7-guest-canonical-receipt.py && exit 0
+            echo "N7_CANONICAL_READONLY_RETRY=$trial"
+            sleep 6
+          done
+          exit 1
+  write-verified-receipt:
+    needs: validate-and-readonly
+    if: github.head_ref == 'ops/n7-canonical-guest-70file-receipt' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 15
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/n7-guest-canonical-70-contract.json
+            .github/n7-guest-canonical-receipt.py
+          sparse-checkout-cone-mode: false
+      - name: Align ONLY release receipt, retain backup, restart and verify 70 live source hashes
+        run: python3 .github/n7-guest-canonical-receipt.py
