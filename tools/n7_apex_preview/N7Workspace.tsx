@@ -331,7 +331,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
             {voice.conversation?"■ Τέλος συνομιλίας":"🎙 Μίλα στο N7"}
           </button>
           <button type="button" aria-expanded={voiceOpen}
-            onClick={()=>{setVoiceOpen(x=>!x);if(voiceOpen)voice.suspend();}}>Ρυθμίσεις φωνής</button>
+            onClick={()=>{setVoiceOpen(x=>!x);if(voiceOpen)voice.suspend();}}>Φωνητική συνομιλία</button>
           <span role="status" aria-label="Φωνητική κατάσταση N7" style={{fontSize:12,color:"#b8e6ee"}}>
             {voice.phase==="listening"?"Ακούω…":voice.phase==="speaking"?"Μιλάω…":voice.status||"Η φωνητική συνομιλία ξεκινά με ένα πάτημα"}
           </span>
