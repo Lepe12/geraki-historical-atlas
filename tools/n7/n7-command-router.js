@@ -135,6 +135,12 @@
   if(/(γυρνα|γυρισε|επιστροφ|επεστρεψε|πισω).*(humanoid|χιουμανοιντ|ανθρωποειδ|n7|αρχικ)/u.test(f)||/^(πισω|επιστροφη)$/u.test(f))return pick('humanoid.return');
   if(/(δειξε|ανοιξε|εμφανισε).*αποτελεσματ/u.test(f)&&mapWord)return pick('nabou.results');
   if(/(δειξε|ανοιξε|εμφανισε).*(πηγεσ|τεκμηρια|παραπομπεσ)/u.test(f)&&!/(αναζητ|βρεσ|ψαξε)/u.test(f))return pick('nabou.sources');
+  // Conversational questions are not imperative commands. Route them to the SAME
+  // N7 chat, so a user can ask for an opinion about NABOU, the library or history
+  // without opening a map or launching a search. Explicit commands still win.
+  const asksForOpinion=/(τι (?:πιστευεισ|γνωμη|αποψη)|ποια (?:ειναι )?(?:η )?(?:γνωμη|αποψη)|πωσ σου φαινεται|πωσ το βλεπεισ|συμφωνεισ|διαφωνεισ|να (?:το )?συζητησουμε|what do you think|your opinion)/u.test(f);
+  const explicitAction=/(?:^|\s)(?:ανοιξε|δειξε|εμφανισε|εστιασε|πηγαινε|βρεσ|ψαξε|αναζητησε|εκτελεσε|φτιαξε|γραψε)(?:\s|$)/u.test(f);
+  if(asksForOpinion&&!explicitAction)return pick('chat');
   if(/βιβλιοθηκ|στισ πηγεσ μασ|στα βιβλια μασ/u.test(f))return pick('library.search',{terms:libraryTerms(text)});
   if(/github|pull request|repository|κωδικα|commit/u.test(f)||/(?<![a-z])(pr|repo|ci)(?![a-z])/.test(f))return pick('coding');
   if(W('καιρο|θερμοκρασι|βροχ|weather|forecast'))return pick('weather',{location:place?place.name:weatherPlace(text)});

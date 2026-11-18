@@ -173,6 +173,8 @@ class GuardedDeployTest(unittest.TestCase):
             if path.startswith('/health'):
                 return io.BytesIO(json.dumps({'status':'ok','modelConfigured':True,
                     'release':{'id':'a'*64,'canonical_commit':'b'*40}}).encode())
+            if path == '/api/n7-apex/status':
+                return io.BytesIO(b'{"passwordRequired":false,"available":true,"privateHistory":false}')
             if path == '/api/status':
                 return io.BytesIO(json.dumps({'authenticated':False,'modelConfigured':True}).encode())
             if path.startswith('/api/'):
@@ -196,6 +198,8 @@ class GuardedDeployTest(unittest.TestCase):
             if path.startswith('/health'):
                 return io.BytesIO(json.dumps({'status':'ok','modelConfigured':True,
                     'release':{'id':'a'*64,'canonical_commit':'b'*40}}).encode())
+            if path == '/api/n7-apex/status':
+                return io.BytesIO(b'{"passwordRequired":false,"available":true,"privateHistory":false}')
             if path == '/api/status':
                 return io.BytesIO(b'{"authenticated":false,"modelConfigured":true}')
             if path.startswith('/api/'):
@@ -219,30 +223,29 @@ class GuardedDeployTest(unittest.TestCase):
         self.assertEqual(self.ftp.events, [])
         self.assertFalse(self.ftp.lock)
 
-    def test_only_the_known_public_chat_variant_is_removed_back_to_the_reviewed_server(self):
+    def test_reviewed_apex_public_chat_is_preserved_and_any_unreviewed_change_fails(self):
         reviewed = b"const API_KEY=1,MODEL=2,BASE=3;\nconst server = http.createServer(async (req, res) => {\n  route();\n});\n"
         live = reviewed.replace(b'const server', deploy.APEX_PUBLIC_SHIM.encode() + b'const server', 1)
         live = live.replace(b'(req, res) => {', b'(req, res) => {' + deploy.APEX_PUBLIC_GUARD.encode(), 1)
-        self.assertEqual(deploy.remove_apex_public(live), reviewed)
+        self.assertEqual(live.count(deploy.APEX_MARKER), 1)
         self.ftp.files[deploy.ROOT + '/server.js'] = live
-        server = b'// new server'
-        release = {'release_id': 'a'*64, 'previous_server_sha256': deploy.sha(b'other'),
-                   'previous_files': {'server.js': deploy.sha(reviewed)}, 'files': {'server.js': deploy.sha(server)}}
+        release = {'release_id': 'a'*64, 'previous_server_sha256': deploy.sha(reviewed),
+                   'previous_files': {'server.js': deploy.sha(reviewed)},
+                   'files': {'server.js': deploy.sha(live)}}
         seen = []
-        # Recognised by its marker, not by a fixed hash: the same insertions over a newer reviewed server.
-        with patch.object(deploy, 'KNOWN_UNREVIEWED_SERVERS', set()), patch.object(deploy, 'syntax'), \
-             patch.object(deploy, 'PUBLIC_MODULES', {}):
-            payload, originals = deploy.plan(self.ftp, release, 'b'*40, transformer=lambda s: seen.append(s) or server)
-            self.assertEqual(seen, [reviewed])
+        with patch.object(deploy, 'syntax'), patch.object(deploy, 'PUBLIC_MODULES', {}):
+            payload, originals = deploy.plan(self.ftp, release, 'b'*40,
+                transformer=lambda server: seen.append(server) or live)
+            self.assertEqual(seen, [], 'already approved public shim must not be stripped or rebuilt')
             self.assertEqual(originals['server.js'], live)
-            self.assertEqual(payload['server.js'], server)
+            self.assertEqual(payload['server.js'], live)
+            # A marker with unreviewed bytes is not grandfathered.
             self.ftp.files[deploy.ROOT + '/server.js'] = live + b' '
             with self.assertRaisesRegex(RuntimeError, 'UNREVIEWED_LIVE_SERVER'):
-                deploy.plan(self.ftp, release, 'b'*40, transformer=lambda s: server)
-            # A marker with any other change (here: a modified guard) is still refused.
+                deploy.plan(self.ftp, release, 'b'*40, transformer=lambda server: live)
             self.ftp.files[deploy.ROOT + '/server.js'] = live.replace(b'return; }', b'return 1; }', 1)
             with self.assertRaisesRegex(RuntimeError, 'UNREVIEWED_LIVE_SERVER'):
-                deploy.plan(self.ftp, release, 'b'*40, transformer=lambda s: server)
+                deploy.plan(self.ftp, release, 'b'*40, transformer=lambda server: live)
         self.assertEqual(self.ftp.events, [])
 
     def test_stage_styles_are_appended_once_and_only_to_the_reviewed_stylesheet(self):
@@ -282,7 +285,8 @@ class GuardedDeployTest(unittest.TestCase):
         release = deploy.contract()
         new = set(release['files']) - set(release.get('previous_files', {}))
         self.assertEqual(new - deploy.WRITABLE, set(), 'new release files the installer would refuse')
-        for name in ('n7-agents.js', 'news-geopolitics.js', 'n7-command-router.js'):
+        self.assertIn('n7-apex-public-chat.cjs', new, 'public guest route must be included in release contract')
+        for name in ('n7-agents.js', 'news-geopolitics.js', 'n7-command-router.js', 'n7-apex-public-chat.cjs'):
             self.assertIn(name, deploy.PUBLIC_MODULES)
             self.assertEqual(deploy.sha((deploy.HERE / deploy.PUBLIC_MODULES[name]).read_bytes()), release['files'][name], name)
         # The installed files are checked against the previous release, so the previous release must be the installed one.
