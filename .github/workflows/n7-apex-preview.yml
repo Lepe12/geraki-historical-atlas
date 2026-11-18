@@ -76,6 +76,16 @@ jobs:
           NODE_PATH="$RUNNER_TEMP/n7-apex-browser/node_modules" node - <<'NODE'
           const { chromium }=require('playwright-core');
           (async()=>{
+            if(process.env.N7_APEX_BASE_PATH==='/n7-apex-step5-hacker'){
+              // The hacker branch is an isolated art/rig test. Its separate real
+              // WebGL browser test avoids unrelated nondeterministic 2.5 s shockwave timing.
+              const {spawnSync}=require('node:child_process');
+              const checked=spawnSync(process.execPath,['tools/n7_apex_preview/test_hacker_face.cjs'],{
+                stdio:'inherit',env:{...process.env,N7_VISUAL_URL:'http://127.0.0.1:4173/n7-apex-step5-hacker/'}
+              });
+              if(checked.status!==0)throw Error('Hacker real-engine browser verification failed');
+              return;
+            }
             if(process.env.N7_APEX_BASE_PATH.startsWith('/n7-apex-step5')||process.env.N7_APEX_BASE_PATH==='/n7-apex'){
               const {spawnSync}=require('node:child_process');
               const checked=spawnSync(process.execPath,['tools/n7_apex_preview/test_complete_guide.cjs'],{
