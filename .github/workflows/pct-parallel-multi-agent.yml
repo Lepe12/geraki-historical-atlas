@@ -355,6 +355,11 @@ jobs:
       actions: write
     timeout-minutes: 8
     steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            .github/workflows/n7-private-corpus-synthesis.yml
       - name: Require all 11 source lanes to have completed before private transfer
         env:
           RESEARCH_LANES: ${{ needs.research-lanes.result }}
