@@ -59,3 +59,10 @@ test('Humanoid reports search failure honestly, without fabricated sources',asyn
  assert.match(request.messages[0].content,/Never fabricate sources/);
  assert.equal(res.data.reply.includes('https://'),false);
 });
+
+test('production public Humanoid loads renamed reviewed web researcher module',()=>{
+ const source=require('node:fs').readFileSync(require.resolve('./apex-public-chat.cjs'),'utf8');
+ const deploy=require('node:fs').readFileSync(require('node:path').join(__dirname,'deploy_reconciled_runtime.py'),'utf8');
+ assert.match(source,/require\(['"]\.\/n7-public-web-search['"]\)/);
+ assert.match(deploy,/'n7-public-web-search\.js': 'public-web-search\.js'/);
+});
