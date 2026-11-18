@@ -1,7 +1,7 @@
 'use strict';
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
-const {classify,parseRss,googleWebParse,duckDuckGoParse,googleBooksParse,crossrefParse,researchMessages,contextForResearch,sourceFooter,boundedFetch,safeLink}=require('./public-web-search');
+const {classify,parseRss,googleWebParse,duckDuckGoParse,googleBooksParse,crossrefParse,researchMessages,contextForResearch,sourceFooter,boundedFetch,safeLink,enrichPublisherArticles}=require('./public-web-search');
 const when=new Date('2026-11-05T19:00:00Z');
 const xml='<rss><channel>'+
 '<item><title>US 2026 midterm election results - News Agency</title>'+
@@ -187,4 +187,57 @@ test('Google JS-only response transparently falls back to general web index',asy
  assert.ok(calls.some(x=>x.includes('www.google.com/search?')));
  assert.ok(calls.some(x=>x.includes('html.duckduckgo.com/html/?q=')));
  assert.ok(calls.every(x=>!x.includes('bing.com')));
+});
+
+test('real source reading includes Google/DDG hits, not bibliography, and inspects beyond three links',async()=>{
+ const publishers=['https://piratecartography.com/creveliers','https://www.dw.com/history/creveliers',
+   'https://www.bbc.com/history/creveliers','https://www.theguardian.com/history/creveliers'];
+ const candidates=publishers.map((url,i)=>({title:'Creveliers Ierapetra source '+i,url,
+   source:new URL(url).hostname,provider:i%2?'Public Web Search':'Google Web Search',recordType:'search_result'}));
+ candidates.push({title:'Unread Crossref citation',url:'https://doi.org/10.1234/only-metadata',
+   source:'Crossref',recordType:'bibliography'});
+ const calls=[];
+ const transport=async url=>{
+   calls.push(url);
+   const text='Hugues Creveliers and Ierapetra in 1675: an attributed historical report, not verified. ';
+   return new Response('<html><article>'+('<p>'+text+'</p>').repeat(10)+'</article></html>',
+     {status:200,headers:{'Content-Type':'text/html'}});
+ };
+ const research={searched:true,kind:'historical',query:'Hugues Creveliers Ierapetra 1675',items:candidates};
+ const out=await enrichPublisherArticles(research,{transport});
+ assert.equal(calls.length,4,'all four real search hits must be fetched');
+ assert.equal(out.evidenceCoverage.attemptedReads,4);
+ assert.equal(out.evidenceCoverage.successfullyRead,4);
+ assert.equal(out.evidenceCoverage.distinctTopicHosts,4);
+ assert.equal(out.evidenceCoverage.historicalClaimVerified,false);
+ assert.equal(out.evidenceCoverage.independenceStatus,'NOT_ESTABLISHED_BY_HOST_COUNT');
+ assert.ok(out.items.slice(0,4).every(x=>x.articleRead&&x.articleText.includes('Ierapetra')));
+ assert.equal(out.items[4].articleRead,undefined,'Crossref is only bibliographic metadata');
+});
+test('one matching historical search result does not prevent variant research',async()=>{
+ const calls=[];
+ const google='<html><a href="https://piratecartography.com/creveliers"><h3>Hugues Creveliers Ierapetra 1675</h3></a></html>';
+ const transport=async url=>{
+   calls.push(url);
+   if(url.includes('www.google.com/search'))return new Response(google,{status:200});
+   if(url.includes('html.duckduckgo.com'))return new Response('<html></html>',{status:200});
+   if(url.includes('googleapis.com'))return new Response('{}',{status:429});
+   if(url.includes('crossref.org'))return new Response('{"message":{"items":[]}}',{status:200});
+   return new Response('{"pages":[]}',{status:200});
+ };
+ const result=await researchMessages([{role:'user',
+   content:'Ψάξε ιστορικές πηγές για Hugues Creveliers Ιεράπετρα 1675'}],
+   {now:new Date('2026-11-18T18:00:00Z'),transport});
+ assert.equal(result.queryRetried,true);
+ assert.ok(calls.some(x=>x.includes('Hugues%20Creveliers%20Ierapetra%201675')));
+ assert.ok(calls.some(x=>x.includes('Crevellier%20Crete')));
+});
+
+test('DuckDuckGo Lite links are actually parsed as source candidates',()=>{
+ const lite='<html><table><tr><td><a rel="nofollow" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fexample.org%2Fcreveliers" class="result-link">Hugues Creveliers Ierapetra 1675</a></td></tr>'+
+ '<tr><td><a class="result-link" href="https://university.example/history">Second historical source</a></td></tr></table></html>';
+ const hits=duckDuckGoParse(lite);
+ assert.equal(hits.length,2);
+ assert.equal(hits[0].url,'https://example.org/creveliers');
+ assert.equal(hits[1].recordType,'search_result');
 });
