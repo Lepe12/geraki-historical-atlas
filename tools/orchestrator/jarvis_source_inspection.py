@@ -151,8 +151,13 @@ def inspect(search_runs,*,target,aliases=(),max_pages=4,reader=read):
         if not isinstance(run,dict):continue
         for rec in run.get('records') or []:
             if not isinstance(rec,dict):continue
-            url=str(rec.get('url') or rec.get('digital_url') or '').strip()
-            if not url or url in seen or not document_candidate(url,rec.get('title')):continue
+            # Prioritize underlying full text over DOI and catalogue landing pages.
+            # Only approved domains may be opened; never follow a redirect to a new host.
+            links=[rec.get('digital_url')]+list(rec.get('fulltext_links') or [])+[rec.get('url')]
+            candidates=[x.get('url') if isinstance(x,dict) else x for x in links]
+            url=next((str(x).strip() for x in candidates if x and
+                      str(x).startswith('https://') and document_candidate(str(x),rec.get('title'))),'')
+            if not url or url in seen:continue
             seen.add(url)
             result=reader(url); status=str(result.get('status'))
             item={'url':url,'title':str(rec.get('title') or '')[:300],'status':status,

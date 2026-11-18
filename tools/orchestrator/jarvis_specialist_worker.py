@@ -59,10 +59,15 @@ def _planned_public_inspection(agent,plan):
     question=cfg.get("query")
     if not isinstance(question,str) or not question.startswith("Ψάξε στο Internet ιστορικές πηγές") or len(question)>900:
         raise RuntimeError("UNSAFE_SUPPLEMENTAL_WEB_QUERY")
+    variants=cfg.get("query_variants") or [question]
+    if not isinstance(variants,list) or not 1<=len(variants)<=3 or any(
+        not isinstance(q,str) or not q.startswith("Ψάξε στο Internet ιστορικές πηγές")
+        or len(q)>240 for q in variants):
+        raise RuntimeError("UNSAFE_SUPPLEMENTAL_WEB_VARIANTS")
     script=Path(__file__).with_name("archival_web_discovery.cjs")
     try:
-        proc=subprocess.run(["node",str(script)],input=json.dumps({"question":question}),
-                            capture_output=True,text=True,timeout=45,check=True)
+        proc=subprocess.run(["node",str(script)],input=json.dumps({"question":question,"variants":variants}),
+                            capture_output=True,text=True,timeout=110,check=True)
         response=json.loads(proc.stdout)
         records=response.get("records",[])
         if not isinstance(records,list):raise ValueError("BAD_WEB_RECORDS")
@@ -122,14 +127,18 @@ def run_one(agent:dict, plan:dict, run_id:str="local", event_root:Path|None=None
                  detail=str(connector or "source")+" "+str(data.get("query",""))[:250])
         inspection=inspect(outputs,target=plan.get("target",""),
                            aliases=plan.get("aliases",[]),max_pages=4)
-        if not inspection.get("inspected_count") and agent.get("supplemental_inspection"):
-            # Catalogues can return dozens of DOI metadata hits without a readable document.
-            # Invoke only the planner-authorized public web route, not a self-selected provider.
+        readable_statuses={"PAGE_READ_NO_EVENT_MATCH","CO_OCCURRENCE_NEEDS_REVIEW"}
+        if not any(row.get("status") in readable_statuses
+                   for row in inspection.get("inspected_pages",[])) and agent.get("supplemental_inspection"):
+            # An HTTP error or inaccessible metadata URL is not an inspected source.
+            # Keep prior diagnostics and append the planner-authorized public-web inspection.
             web=_planned_public_inspection(agent,plan)
             if web:
                 outputs.append(web)
-                inspection=inspect([web],target=plan.get("target",""),
-                                   aliases=plan.get("aliases",[]),max_pages=4)
+                web_inspection=inspect([web],target=plan.get("target",""),
+                                       aliases=plan.get("aliases",[]),max_pages=4)
+                inspection["inspected_pages"].extend(web_inspection.get("inspected_pages",[]))
+                inspection["inspected_count"]=len(inspection["inspected_pages"])
         result={
           "schema":"pct-specialist-agent-result-v4",
           "agent_id":agent["agent_id"],"label":agent.get("label"),

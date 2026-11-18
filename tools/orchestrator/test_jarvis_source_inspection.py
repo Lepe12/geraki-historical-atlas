@@ -94,6 +94,34 @@ class N7SourceInspectionTests(unittest.TestCase):
         self.assertFalse(result['partial'])
         self.assertEqual(result['page_excerpts'][0]['pdf_page'],8)
 
+    def test_metadata_doi_does_not_hide_allowed_fulltext_pdf(self):
+        row={'records':[{'url':'https://doi.org/10.1234/catalogue',
+                          'digital_url':'https://helios.eie.gr/helios/bitstream/10442/18865/1/Koutzakiotis%202023.pdf',
+                          'title':'Historical article'}]}
+        calls=[]
+        def reader(url):
+            calls.append(url)
+            return {'status':'DOCUMENT_READ','text':'Creveliers and Ierapetra',
+                    'pages_read':24,'total_pages':24,'page_excerpts':[{'pdf_page':14,'text':'Creveliers near Ierapetra'}]}
+        result=inspect([row],target='Ierapetra, Crete',aliases=['Hugues Creveliers'],reader=reader)
+        self.assertEqual(len(calls),1)
+        self.assertTrue(calls[0].endswith('.pdf'))
+        self.assertEqual(result['inspected_pages'][0]['pages_read'],24)
+        self.assertFalse(result['historically_verified'])
+
+    def test_planner_web_search_uses_short_focused_query(self):
+        from jarvis_specialist_plan import build
+        purpose=('Investigate the alleged 1675 raid on Ierapetra by Hugues Creveliers; '
+                 'find archival records, shelfmarks, sources and contradictory narratives. ')*5
+        plan=build('Ierapetra, Crete',purpose,'1665-1680',
+                   ['Ιεράπετρα','Hugo de Creveuil','Hugues de Creveliers','Crevellier'])
+        source=next(a for a in plan['agents'] if a['agent_id']=='source_genealogy')
+        query=source['supplemental_inspection']['query']
+        self.assertLessEqual(len(query),240)
+        self.assertIn('1675',query)
+        self.assertIn('Ierapetra',query)
+        self.assertIn('Creveliers',query)
+
     def test_planner_authorizes_fallback_only_for_source_genealogy(self):
         from jarvis_specialist_plan import build
         plan=build('Ierapetra, Crete','Investigate Hugues Creveliers raid on Ierapetra 1675',
