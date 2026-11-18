@@ -1,0 +1,26 @@
+name: N7 Private Synthesis Recovery — One Shot
+on:
+  push:
+    branches:
+      - ops/n7-private-synthesis-retry-20261118
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  dispatch-existing-private-synthesis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Reuse previously completed research run, without rediscovery
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run n7-private-corpus-synthesis.yml --ref main -f run_id=44270059306
+          echo "N7_PRIVATE_SYNTHESIS_DISPATCHED source_run=44270059306"
+          echo "Dispatch alone is not proof of final synthesis."
