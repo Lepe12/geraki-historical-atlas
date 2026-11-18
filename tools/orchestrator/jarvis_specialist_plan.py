@@ -166,6 +166,20 @@ def build(target,purpose,date_range="",aliases=None,target_type="auto"):
                         if re.search(r"(?<!\d)1[5-9]\d{2}(?!\d)",purpose)
                         else date_range[:4]))[:240],
               "max_results":8,
+              # Three planner-approved variants, not free-form agent self-routing.
+              "query_variants":[
+                  ("Ψάξε στο Internet ιστορικές πηγές για "+
+                   " ".join(a for a in aliases if re.search(r'creve|κρεβε',a,re.I))[:95]+" "+
+                   target.split(",")[0]+" "+
+                   (re.search(r"(?<!\\d)1[5-9]\\d{2}(?!\\d)",purpose).group(0)
+                    if re.search(r"(?<!\\d)1[5-9]\\d{2}(?!\\d)",purpose) else date_range[:4]))[:240],
+                  ("Ψάξε στο Internet ιστορικές πηγές για "+
+                   " ".join(a for a in aliases if re.search(r'creve|κρεβε',a,re.I))[:85]+
+                   " ιστορική μελέτη PDF")[:240],
+                  ("Ψάξε στο Internet ιστορικές πηγές για "+
+                   " ".join(a for a in aliases if re.search(r'creve|κρεβε',a,re.I))[:85]+
+                   " site:helios.eie.gr")[:240],
+              ],
           } if aid=="source_genealogy" else None),
           "query_budget":{
             "total":len(assigned)*len(assigned_queries),
