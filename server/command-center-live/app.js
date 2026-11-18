@@ -233,14 +233,13 @@ async function githubResearchStatus(requestId){
         report.research_conclusion=research.conclusion||null;
         report.status=research.status==="completed"?"PIPELINE_FAILED":"PIPELINE_"+String(research.status).toUpperCase();
         if(research.status==="completed"&&research.conclusion==="success"){
-          const artifacts=await getJson(api+"runs/"+research.id+"/artifacts?per_page=20",150_000,authorization);
-          const dossier=(Array.isArray(artifacts.artifacts)?artifacts.artifacts:[]).find(a=>
-            !a.expired&&/^[0-9]{8,20}$/.test(String(a.id))&&
-            ["n7-owner-research-complete","n7-owner-research-incomplete"].includes(a.name));
-          if(dossier){
-            const complete=dossier.name==="n7-owner-research-complete";
+          const jobs=await getJson(api+"runs/"+research.id+"/jobs?per_page=20",450_000,authorization);
+          const worker=(Array.isArray(jobs.jobs)?jobs.jobs:[]).find(job=>job.name==="public-evidence");
+          const steps=(Array.isArray(worker?.steps)?worker.steps:[]).filter(step=>step.conclusion==="success");
+          const complete=steps.some(step=>step.name==="N7 research completed all routes");
+          const incomplete=steps.some(step=>step.name==="N7 research exhausted retries");
+          if(complete!==incomplete&&steps.some(step=>step.name==="Publish report to private run summary")){
             report.status=complete?"PIPELINE_COMPLETED":"EVIDENCE_PRESERVED_REVIEW_REQUIRED";
-            report.research_url=runUrl+"/artifacts/"+dossier.id;
             report.preview={report_status:complete?"DISCOVERY_FINISHED":"INCOMPLETE",
               paragraphs:[complete?
                 "Ο κύκλος αναζήτησης ολοκληρώθηκε. Ο ιδιωτικός φάκελος πηγών περιλαμβάνει τις εκκρεμότητες τεκμηρίωσης.":
