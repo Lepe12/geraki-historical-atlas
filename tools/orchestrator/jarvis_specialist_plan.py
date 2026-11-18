@@ -157,8 +157,14 @@ def build(target,purpose,date_range="",aliases=None,target_type="auto"):
           "supplemental_inspection":({
               "route_type":"public_web_read_only",
               "authority":"JARVIS_PLANNER",
-              "query":("Ψάξε στο Internet ιστορικές πηγές για "+purpose+" "+target+" "+
-                       " ".join(aliases[-5:]))[:850],
+              # A short, focused person/place/year query is essential for general web
+              # retrieval: long archival instructions drown out the named subject.
+              "query":("Ψάξε στο Internet ιστορικές πηγές για "+
+                       " ".join(a for a in aliases if re.search(r'creve|κρεβε',a,re.I))[:95]+" "+
+                       target.split(",")[0]+" "+
+                       (re.search(r"(?<!\\d)1[5-9]\\d{2}(?!\\d)",purpose).group(0)
+                        if re.search(r"(?<!\\d)1[5-9]\\d{2}(?!\\d)",purpose)
+                        else date_range[:4]))[:240],
               "max_results":8,
           } if aid=="source_genealogy" else None),
           "query_budget":{
