@@ -52,11 +52,34 @@ class PlainText(HTMLParser):
     def handle_data(self,data):
         if not self.skip:self.parts.append(data)
 
+class ArchiveLinks(HTMLParser):
+    def __init__(self):super().__init__();self.urls=[]
+    def handle_starttag(self,tag,attrs):
+        if tag=='a':
+            self.urls.extend(v for k,v in attrs if k=='href' and isinstance(v,str))
+
+def archive_file_links(page_url,raw):
+    """Follow only original-item links and the corresponding PDF in an approved repository."""
+    p=urllib.parse.urlsplit(page_url);host=(p.hostname or '').lower()
+    if host not in ('www.openarchives.gr','openarchives.gr','helios.eie.gr'):return []
+    parser=ArchiveLinks();parser.feed(raw.decode('utf-8','replace'))
+    urls=[]
+    for href in parser.urls:
+        url=urllib.parse.urljoin(page_url,html.unescape(href))
+        if not allowed(url):continue
+        target=urllib.parse.urlsplit(url)
+        if (host.endswith('openarchives.gr') and target.hostname=='helios.eie.gr'
+            and target.path.startswith('/helios/handle/')) or (
+            host=='helios.eie.gr' and p.path.startswith('/helios/handle/')
+            and target.hostname=='helios.eie.gr' and '/helios/bitstream/' in target.path
+            and target.path.lower().endswith('.pdf')):
+            if url not in urls:urls.append(url)
+    return urls[:2]
 class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self,req,fp,code,msg,headers,newurl):
         raise ValueError('REDIRECT_REQUIRES_REVIEW')
 
-def read(url,opener=None):
+def read(url,opener=None,_archive_depth=0):
     if not allowed(url):return {'status':'URL_NOT_ALLOWLISTED'}
     try:
         opener=opener or urllib.request.build_opener(NoRedirect(),urllib.request.HTTPSHandler(context=ssl.create_default_context()))
@@ -94,6 +117,13 @@ def read(url,opener=None):
                 return {'status':'PDF_READER_NOT_INSTALLED'}
             except Exception:
                 return {'status':'PDF_EXTRACTION_FAILED'}
+        if _archive_depth<2:
+            for linked in archive_file_links(url,raw):
+                document=read(linked,opener=opener,_archive_depth=_archive_depth+1)
+                if document.get('status')=='DOCUMENT_READ':
+                    document['source_chain']=[url]+document.get('source_chain',[linked])
+                    document['document_url']=document.get('document_url',linked)
+                    return document
         parser=PlainText();parser.feed(raw.decode('utf-8','replace'))
         return {'status':'PAGE_READ','text':' '.join(html.unescape(' '.join(parser.parts)).split())[:35000]}
     except (OSError,ValueError,TimeoutError) as exc:
@@ -127,6 +157,8 @@ def inspect(search_runs,*,target,aliases=(),max_pages=4,reader=read):
             result=reader(url); status=str(result.get('status'))
             item={'url':url,'title':str(rec.get('title') or '')[:300],'status':status,
                   'historically_verified':False,'citation_verified':False}
+            if result.get('document_url'):item['document_url']=result['document_url']
+            if result.get('source_chain'):item['source_chain']=result['source_chain'][:3]
             if status in ('PAGE_READ','DOCUMENT_READ'):
                 text=str(result.get('text') or '')
                 snippets=result.get('page_excerpts') or []
