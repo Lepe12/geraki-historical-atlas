@@ -122,14 +122,18 @@ def run_one(agent:dict, plan:dict, run_id:str="local", event_root:Path|None=None
                  detail=str(connector or "source")+" "+str(data.get("query",""))[:250])
         inspection=inspect(outputs,target=plan.get("target",""),
                            aliases=plan.get("aliases",[]),max_pages=4)
-        if not inspection.get("inspected_count") and agent.get("supplemental_inspection"):
-            # Catalogues can return dozens of DOI metadata hits without a readable document.
-            # Invoke only the planner-authorized public web route, not a self-selected provider.
+        readable_statuses={"PAGE_READ_NO_EVENT_MATCH","CO_OCCURRENCE_NEEDS_REVIEW"}
+        if not any(row.get("status") in readable_statuses
+                   for row in inspection.get("inspected_pages",[])) and agent.get("supplemental_inspection"):
+            # An HTTP error or inaccessible metadata URL is not an inspected source.
+            # Keep prior diagnostics and append the planner-authorized public-web inspection.
             web=_planned_public_inspection(agent,plan)
             if web:
                 outputs.append(web)
-                inspection=inspect([web],target=plan.get("target",""),
-                                   aliases=plan.get("aliases",[]),max_pages=4)
+                web_inspection=inspect([web],target=plan.get("target",""),
+                                       aliases=plan.get("aliases",[]),max_pages=4)
+                inspection["inspected_pages"].extend(web_inspection.get("inspected_pages",[]))
+                inspection["inspected_count"]=len(inspection["inspected_pages"])
         result={
           "schema":"pct-specialist-agent-result-v4",
           "agent_id":agent["agent_id"],"label":agent.get("label"),
