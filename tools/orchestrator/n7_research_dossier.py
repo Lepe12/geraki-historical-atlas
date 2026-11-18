@@ -9,7 +9,6 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
-from urllib.parse import urlsplit
 
 READABLE = {"PAGE_READ_NO_EVENT_MATCH", "CO_OCCURRENCE_NEEDS_REVIEW"}
 PERSON = re.compile(r"creveuil|crevell|crevelier|κρεβε", re.I)
@@ -96,7 +95,7 @@ def compile_dossier(directory: Path, report: dict):
           "subject":"Alleged Creveliers raid on Ierapetra in 1675",
           "status":"NOT_HISTORICALLY_VERIFIED",
           "basis":"No independent primary attestation established by this automatic inspection.",
-          "cross_checked":len(independent_urls)>=2,
+          "cross_checked":False,
           "source_critical_review_required":True
         },
         "next_research_actions":[
