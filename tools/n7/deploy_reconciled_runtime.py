@@ -30,6 +30,7 @@ PUBLIC_MODULES = {'conversation-store.js': 'conversation-store.js',
                   'historical-research.js': '../library/n7-historical-research.js',
                   'n7-stream-attachments.js': 'stream-attachments.js',
                   'owner-chat-memory.js': 'owner-chat-memory.js',
+                  'n7-apex-public-chat.cjs': 'apex-public-chat.cjs',
                   'source-library.js': 'source-library.js',
                   'n7-release-info.js': 'runtime-release-info.js',
                   'n7-weather.js': 'weather-tool.js',
@@ -47,6 +48,17 @@ for _skill in ('book-project-canon', 'document-reading-plan', 'claim-evidence-le
 # The engineering workflow is distributed with the other reviewed skills (owner decision, no secrets);
 # skills/n7-verified-change/SKILL.md in the canonical repository is kept byte-identical by a test.
 PUBLIC_MODULES['skills/n7-verified-change/SKILL.md'] = 'skills/n7-verified-change/SKILL.md'
+# Apache-licensed upstream Agent Skills are reviewed, read-only files. The installer
+# may add only these exact paths after verifying their reviewed release hashes.
+for _skill in ('frontend-design', 'webapp-testing', 'mcp-builder', 'skill-creator'):
+    for _filename in ('SKILL.md', 'LICENSE.txt'):
+        _target = 'skills/' + _skill + '/' + _filename
+        PUBLIC_MODULES[_target] = '../../' + _target
+# Only the reviewed files for the new execution capability are upgradable.
+for _file in ('agent.js', 'browser.js', 'browser-test.py',
+              'skills/registry.js', 'skills/active.js', 'skills/mcp-client.js',
+              'skills/mcp-builtin-server.js', 'skills/mcp-builder-runtime.js'):
+    PUBLIC_MODULES[_file] = '../../' + _file
 WRITABLE = {'server.js', 'public/app.js', 'public/index.html', 'public/style.css', 'release-manifest.json', *PUBLIC_MODULES}
 LIMIT = 8 * 1024 * 1024
 
@@ -104,6 +116,15 @@ def transform_server(original):
                 source = source.replace(patch['old'], patch['new'], 1)
             elif not patch['new'] or source.count(patch['new']) != 1:
                 raise RuntimeError('N7_RUNTIME_PATCH_ANCHOR_CHANGED')
+    # The guest route is an approved, pinned release dependency. Reproduce exactly the live shim.
+    if APEX_MARKER.decode() in source:
+        if source.count(APEX_PUBLIC_SHIM) != 1 or source.count(APEX_PUBLIC_GUARD) != 1:
+            raise RuntimeError('N7_APEX_PUBLIC_SHIM_DRIFT')
+    else:
+        anchor = 'const server = http.createServer(async (req, res) => {'
+        if source.count(anchor) != 1:
+            raise RuntimeError('N7_APEX_PUBLIC_ANCHOR_CHANGED')
+        source = source.replace(anchor, APEX_PUBLIC_SHIM + anchor + APEX_PUBLIC_GUARD, 1)
     return source.encode()
 
 
@@ -140,25 +161,13 @@ def transform_app(original):
 
 # SHA-256 of the installed approved-character block (release 483096c9…, canonical 1ba82fd/f9932e6).
 PREVIOUS_CHARACTER_BLOCKS = {'cdc734194899240f5045266863c16dbcea28f57b0907af17655be264760c0286'}
-# Owner decision 2026-11-13 (confirmed again the same evening): remove the unreviewed password-free public
-# chat that tools/n7_apex_preview/deploy_public_chat.py installs directly on the live server (atlas PR #347,
-# later again from preview/n7-visual-h01). A live server carrying its marker is accepted ONLY if removing
-# exactly those two insertions yields a reviewed server (the installed or the target release) byte for byte;
-# any other difference is still refused as unreviewed.
+# N7_APEX_PUBLIC_CANONICAL_V1: the owner-approved public APEX route is now part of the
+# reproducible 70-file release. Never strip it during deployment; validate exact bytes.
 APEX_PUBLIC_SHIM = ("// N7_APEX_PASSWORDLESS_CHAT_V1\nconst n7ApexPublic=require('./n7-apex-public-chat.cjs')"
                     ".createApexPublicChat({apiKey:API_KEY,model:MODEL,base:BASE});\n")
 APEX_PUBLIC_GUARD = ("\n  try { if(await n7ApexPublic.handle(req,res)) return; } catch { res.writeHead(500,{'Content-Type':"
                      "'application/json','Cache-Control':'no-store'});res.end(JSON.stringify({error:'Η συνομιλία δεν ολοκληρώθηκε.'}));return; }\n")
 APEX_MARKER = b'N7_APEX_PASSWORDLESS_CHAT_V1'
-KNOWN_UNREVIEWED_SERVERS = {'2a4d6c8a6003a13f6b040ff25482516113a90b692372d89baaef7d3298eb05cd'}
-
-
-def remove_apex_public(source):
-    text = source.decode('utf8')
-    if text.count(APEX_PUBLIC_SHIM) != 1 or text.count(APEX_PUBLIC_GUARD) != 1:
-        raise RuntimeError('N7_UNREVIEWED_LIVE_SERVER')
-    return text.replace(APEX_PUBLIC_SHIM, '', 1).replace(APEX_PUBLIC_GUARD, '', 1).encode()
-
 
 STAGE_CSS_MARKER = '/* N7_HUMANOID_STAGE_V1'
 
@@ -207,12 +216,12 @@ def plan(ftp, release, canonical_commit, transformer=transform_server):
             allowed = {expected, previous_files.get(name)} - {None}
             if name == 'server.js':
                 allowed.add(release['previous_server_sha256'])
-            if name == 'server.js' and current is not None and (sha(current) in KNOWN_UNREVIEWED_SERVERS
-                                                                 or APEX_MARKER in current):
-                reverted = remove_apex_public(current)
-                if sha(reverted) not in {previous_files.get('server.js'), expected}:
+            if name == 'server.js' and current is not None and APEX_MARKER in current:
+                # Already-installed approved guest routes are PRESERVED, not removed.
+                if (sha(current) not in allowed or current.count(APEX_PUBLIC_SHIM.encode()) != 1
+                        or current.count(APEX_PUBLIC_GUARD.encode()) != 1):
                     raise RuntimeError('N7_UNREVIEWED_LIVE_SERVER')
-                server_input = reverted
+                server_input = current
             elif current is not None and sha(current) not in allowed:
                 raise RuntimeError('N7_UNREVIEWED_LIVE_SERVER' if name == 'server.js' else 'N7_RUNTIME_DRIFT ' + name)
             originals[name] = current
@@ -227,7 +236,7 @@ def plan(ftp, release, canonical_commit, transformer=transform_server):
         data = (HERE / source).read_bytes()
         if sha(data) != release['files'][name]:
             raise RuntimeError('N7_CANONICAL_RUNTIME_OUTPUT_MISMATCH')
-        if name.endswith('.js'):
+        if name.endswith(('.js', '.cjs')):
             syntax(data)
         payload[name] = data
     if sha(server) != release['files']['server.js']:
@@ -393,6 +402,11 @@ def verify(release, commit, ftp=None, active=True):
                 continue
             raise
         raise RuntimeError('N7_PRIVATE_ENDPOINT_EXPOSED')
+    # Public APEX guest route must survive every clean rebuild without exposing owner data.
+    with request('/api/n7-apex/status') as response:
+        guest = json.loads(response.read(20000))
+    if guest != {'passwordRequired': False, 'available': True, 'privateHistory': False}:
+        raise RuntimeError('N7_PUBLIC_APEX_ROUTE_MISSING_OR_UNSAFE')
     with request('/api/status') as response:
         status = json.loads(response.read(20000))
     if status.get('authenticated') is not False or status.get('modelConfigured') is not True:
