@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Execute one JARVIS specialist assignment without self-routing."""
 from __future__ import annotations
-import argparse,json,sys,concurrent.futures
+import argparse,json,sys,concurrent.futures,subprocess
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parent.parent
@@ -50,6 +50,32 @@ def _run_repository_batch(items:list[dict],max_workers:int=6)->list[dict]:
                 out.append({"status":"FAILED","records":[],"error":str(exc),"evidence_level":"DISCOVERY_ONLY"})
     return out
 
+def _planned_public_inspection(agent,plan):
+    """Execute ONLY the planner-signed bounded public discovery route; never choose a source."""
+    cfg=agent.get("supplemental_inspection")
+    if not cfg:return None
+    if agent.get("agent_id")!="source_genealogy" or cfg.get("authority")!="JARVIS_PLANNER" or cfg.get("route_type")!="public_web_read_only":
+        raise RuntimeError("UNAUTHORIZED_SUPPLEMENTAL_WEB_ROUTE")
+    question=cfg.get("query")
+    if not isinstance(question,str) or not question.startswith("Ψάξε στο Internet ιστορικές πηγές") or len(question)>900:
+        raise RuntimeError("UNSAFE_SUPPLEMENTAL_WEB_QUERY")
+    script=Path(__file__).with_name("archival_web_discovery.cjs")
+    try:
+        proc=subprocess.run(["node",str(script)],input=json.dumps({"question":question}),
+                            capture_output=True,text=True,timeout=45,check=True)
+        response=json.loads(proc.stdout)
+        records=response.get("records",[])
+        if not isinstance(records,list):raise ValueError("BAD_WEB_RECORDS")
+        return {"connector_id":"planner:public_web","repository":"Planned public scholarly web",
+                "operation":"search","status":"EXECUTED",
+                "query":question,"records":records[:min(8,int(cfg.get("max_results",8)))],
+                "evidence_level":"DISCOVERY_ONLY","routing_mode":"JARVIS_PLANNER_SUPPLEMENTAL",
+                "warnings":[],"blockers":[]}
+    except (subprocess.SubprocessError,ValueError,KeyError,json.JSONDecodeError) as error:
+        return {"connector_id":"planner:public_web","status":"FAILED","records":[],
+                "diagnostic":type(error).__name__,"evidence_level":"DISCOVERY_ONLY"}
+
+
 def _assignment(agent:dict, plan:dict):
     permit=validate_specialist_assignment(plan,agent)
     routes=agent.get("assigned_sources")
@@ -94,6 +120,16 @@ def run_one(agent:dict, plan:dict, run_id:str="local", event_root:Path|None=None
             emit(event_root,"piratecartography",run_id,"agent_progress",agent_id=agent["agent_id"],
                  phase="assigned_discovery",percent=progress,status=str(data.get("status","")),
                  detail=str(connector or "source")+" "+str(data.get("query",""))[:250])
+        inspection=inspect(outputs,target=plan.get("target",""),
+                           aliases=plan.get("aliases",[]),max_pages=4)
+        if not inspection.get("inspected_count") and agent.get("supplemental_inspection"):
+            # Catalogues can return dozens of DOI metadata hits without a readable document.
+            # Invoke only the planner-authorized public web route, not a self-selected provider.
+            web=_planned_public_inspection(agent,plan)
+            if web:
+                outputs.append(web)
+                inspection=inspect([web],target=plan.get("target",""),
+                                   aliases=plan.get("aliases",[]),max_pages=4)
         result={
           "schema":"pct-specialist-agent-result-v4",
           "agent_id":agent["agent_id"],"label":agent.get("label"),
@@ -116,8 +152,7 @@ def run_one(agent:dict, plan:dict, run_id:str="local", event_root:Path|None=None
             "learned_pdf_evidence":query_live_learning(queries),
             "historical_map_catalogue":curated_map_leads(queries),
           },
-          "source_inspection":inspect(outputs,target=plan.get("target",""),
-                                      aliases=plan.get("aliases",[]),max_pages=4),
+          "source_inspection":inspection,
           "result_count":sum(len(x.get("records",[])) for x in outputs if isinstance(x,dict)),
           "verified_promotion_allowed":False,
           "rule":"Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
