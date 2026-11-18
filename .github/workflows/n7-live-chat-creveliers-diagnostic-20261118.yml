@@ -1,0 +1,82 @@
+name: N7 live chat boundary and Creveliers research diagnostic
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/n7-live-chat-creveliers-diagnostic-20261118.yml']
+permissions:
+  contents: read
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            tools/n7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Examine live owner and public chat routes without login or changes
+        run: |
+          python3 - <<'PY'
+          import json,urllib.request,urllib.error
+          base='https://bot.piratecartography.com'
+          def request(path,method='GET',payload=None,headers=None,timeout=25):
+              hdr={'User-Agent':'N7-Live-Chat-E2E-Diagnostic/1.0','Accept':'application/json'}
+              hdr.update(headers or {})
+              if payload is not None: hdr['Content-Type']='application/json'
+              q=urllib.request.Request(base+path,method=method,headers=hdr,
+                                       data=json.dumps(payload,ensure_ascii=False).encode() if payload is not None else None)
+              try:
+                  with urllib.request.urlopen(q,timeout=timeout) as resp:
+                      return resp.status,json.loads(resp.read(40000))
+              except urllib.error.HTTPError as error:
+                  try: obj=json.loads(error.read(8000))
+                  except ValueError: obj={}
+                  return error.code,obj
+          health,body=request('/health')
+          print('N7_LIVE_HEALTH',json.dumps({'http':health,'model_configured':body.get('modelConfigured'),
+                                                  'browser_configured':body.get('browserConfigured')}))
+          status,body=request('/api/status')
+          print('N7_LIVE_AUTH_STATUS',json.dumps({'http':status,'authenticated':body.get('authenticated'),
+                                                  'model_configured':body.get('modelConfigured')}))
+          private,body=request('/api/conversations')
+          print('N7_LIVE_OWNER_CONVERSATIONS_AUTH_BOUNDARY',json.dumps({'http':private,'error':body.get('error')}))
+          apex,body=request('/api/n7-apex/status')
+          print('N7_LIVE_APEX_STATUS',json.dumps({'http':apex,'available':body.get('available'),
+                                                  'password_required':body.get('passwordRequired')}))
+          if health!=200 or status!=200 or private!=401 or apex!=200:
+              raise SystemExit('N7_LIVE_ACCESS_BOUNDARY_UNEXPECTED')
+          if not body.get('available'):
+              raise SystemExit('N7_LIVE_APEX_UNAVAILABLE')
+          message='Ψάξε στο Internet και βρες τεκμηριωμένες ιστορικές πηγές για τον Hugues Creveliers (Crevellier) και την επιδρομή στην Ιεράπετρα το 1675. Δώσε URL μόνο αν τα διάβασες.'
+          code,result=request('/api/n7-apex/chat',method='POST',payload={'messages':[{'role':'user','content':message}]},
+                              headers={'Origin':base},timeout=55)
+          answer=result.get('reply','')
+          print('N7_LIVE_PUBLIC_HUMANOID_CHAT',json.dumps({
+             'http':code,'answered':isinstance(answer,str) and len(answer.strip())>0,
+             'chars':len(answer),'citations_http':answer.count('https://'),
+             'note':'Public Apex does not call n7-public-web-search.js; any citation is not verified retrieved evidence',
+             'answer_excerpt':answer[:900] if isinstance(answer,str) else '',
+             'error':result.get('error')},ensure_ascii=False))
+          if code!=200:raise SystemExit('N7_LIVE_PUBLIC_CHAT_FAILED_HTTP_'+str(code))
+          print('N7_END_TO_END_OWNER_RESEARCH_VERIFIED=false reason=private_session_required')
+          PY
+      - name: Run actual uncredentialed research module and reading independently
+        run: |
+          node - <<'JS'
+          const {researchMessages,enrichPublisherArticles}=require('./tools/n7/public-web-search.js');
+          (async()=>{
+            const prompt='Ψάξε στο Internet για Hugues Creveliers Crevellier επιδρομή Ιεράπετρα 1675 ιστορικές πηγές';
+            const research=await researchMessages([{role:'user',content:prompt}]);
+            const result=await enrichPublisherArticles(research);
+            const items=result.items.map(x=>({title:x.title,provider:x.provider,url:x.url,
+              actuallyRead:!!x.articleRead,readStatus:x.readStatus||null,bytes:x.articleText?.length||0}));
+            console.log('N7_RESEARCH_EVIDENCE_DIAGNOSTIC '+JSON.stringify({
+              searched:result.searched,retried:result.queryRetried,found:items.length,
+              read:items.filter(x=>x.actuallyRead).length,items}));
+            if(!result.searched||!result.items.length)throw Error('N7_RESEARCH_NO_SOURCES');
+          })().catch(e=>{console.error(e.message);process.exitCode=1})
+          JS
