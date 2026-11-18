@@ -111,6 +111,11 @@ def inspect(search_runs,*,target,aliases=(),max_pages=4,reader=read):
         a=str(a).strip()
         if a and fold(a) not in fold(target) and (len(a.split())>=2 or re.search(r'creve|κρεβε',fold(a))):
             names.append(fold(a))
+            # Period sources regularly omit given names and use spelling variants;
+            # a distinctive surname remains sufficient for a *lead*, never verification.
+            surname=fold(a.split()[-1])
+            if len(surname)>=6 and re.search(r'creve|κρεβε',surname):
+                names.append(surname)
     inspected=[];seen=set()
     for run in search_runs or []:
         if not isinstance(run,dict):continue
