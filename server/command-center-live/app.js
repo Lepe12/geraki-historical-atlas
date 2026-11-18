@@ -244,7 +244,8 @@ async function githubResearchStatus(requestId){
             report.preview={report_status:complete?"DISCOVERY_FINISHED":"INCOMPLETE",
               paragraphs:[complete?
                 "Ο κύκλος αναζήτησης ολοκληρώθηκε. Ο ιδιωτικός φάκελος πηγών περιλαμβάνει τις εκκρεμότητες τεκμηρίωσης.":
-                "Εξαντλήθηκαν οι προσπάθειες σε ορισμένες διαδρομές. Ο ιδιωτικός φάκελος παραμένει διαθέσιμος."],
+                "Εξαντλήθηκαν οι προσπάθειες σε ορισμένες διαδρομές. Ο ιδιωτικός φάκελος παραμένει διαθέσιμος.",
+                "Ιδιωτικός φάκελος: "+report.research_url],
               sources:[],verified:false,human_review_required:true};
           }
         }
