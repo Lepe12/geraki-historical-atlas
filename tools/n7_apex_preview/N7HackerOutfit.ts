@@ -118,14 +118,39 @@ ${shader.vertexShader}`;
     const seam = (path: Point[],width: number,finish: THREE.Material)=>tube(path.map(p=>mirror(p,side)),width,finish);
     profile(torso,side,leather,row=>opening[row],Math.PI);
     profile(hem,side,seamLeather,row=>opening[row+5],Math.PI,1.5);
-    profile(sleeve,side,leather,()=>-Math.PI,Math.PI);
+    // Bias-cut sleeve folds compress towards the elbow. Carry the ridges
+    // around the arm so the silhouette and specular response move together.
+    const sleeveRows: Point[][] = [];
+    for(let y=255;y<=415;y++){
+      const hi=sleeve.findIndex(row=>row[0]>=y);
+      const low=sleeve[Math.max(0,hi-1)], high=sleeve[hi];
+      const t=(y-low[0])/Math.max(1,high[0]-low[0]);
+      const cx=lerp(low[1],high[1],t), width=lerp(low[2],high[2],t);
+      const depth=lerp(low[3],high[3],t);
+      sleeveRows.push(Array.from({length:65},(_,i)=>{
+        const angle=(i/64*2-1)*Math.PI;
+        const elbow=Math.exp(-Math.pow((y-375)/37,2));
+        const phase=y*.39+2.8*Math.sin(angle+.017*y)+side*.7;
+        const fold=elbow*(3.2*Math.sin(phase)+1.4*Math.sin(2*phase+.6));
+        return surface([y,cx,width+fold,depth+fold],angle);
+      }));
+    }
+    patch(sleeveRows,side,leather);
     profile(sleeve.slice(-3),side,seamLeather,()=>-Math.PI,Math.PI,1.2);
     profile(bracer,side,armor,()=>-Math.PI,Math.PI);
 
     const lapel = torso.map((section,row)=>surface(section,opening[row],2.5));
     const lapelFacing = torso.map((section,row)=>surface(section,opening[row]+.13,1.7));
     band(lapel,lapelFacing,side,seamLeather);
-    seam(lapel,1.2,hardware);
+    seam(lapel,1.1,seamLeather);
+    const fastening=new THREE.CatmullRomCurve3(lapel.map(p=>point(mirror(p,side))));
+    const teeth=new THREE.InstancedMesh(new THREE.BoxGeometry(1.8,.8,1.2),hardware,56);
+    for(let i=0;i<teeth.count;i++){
+      const pos=fastening.getPointAt(i/(teeth.count-1));
+      teeth.setMatrixAt(i,new THREE.Matrix4().makeTranslation(pos.x,pos.y,pos.z+1));
+    }
+    teeth.renderOrder=1;
+    chest.add(teeth);
     const [zipX,zipY,zipZ] = mirror(lapel[5],side);
     buckle([zipX,zipY+3,zipZ+2],2.8,8,2,hardware);
     seam(torso.map(section=>surface(section,.82,1.6)),.7,seamLeather);
@@ -134,7 +159,12 @@ ${shader.vertexShader}`;
     const hoodFold: Point[] = outerHood.map(([x,y,z],i)=>[
       lerp(x,innerHood[i][0],.26),lerp(y,innerHood[i][1],.26),z+2.4,
     ]);
-    band(innerHood,hoodFold,side,hoodLining);
+    const hoodRows = innerHood.map((inner,i)=>Array.from({length:13},(_,j)=>{
+      const u=j/12, outer=hoodFold[i];
+      return [lerp(inner[0],outer[0],u),lerp(inner[1],outer[1],u),
+        lerp(inner[2],outer[2],u)+4.5*Math.sin(Math.PI*u)] as Point;
+    }));
+    patch(hoodRows,side,hoodLining);
     band(hoodFold,outerHood,side,leather);
     seam(outerHood,1.9,seamLeather);
     seam(innerHood.slice(1,5),.7,cyan);
