@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import N7GuideScene,{type GuideFrameInfo,type GuideMode,type GuideMood} from "./N7GuideScene";
 import N7Backdrop,{type N7BackdropHandle} from "./N7Backdrop";
 import { N7_HUMANOID_REFERENCE } from "./N7HumanoidReference";
+import { N7_HACKER } from "./N7BuildFlags";
 import { CORE, createAssemblySound, createFx } from "./N7GuideFx";
 
 // Second face option: the owner-supplied H01 head composed onto the same body.
@@ -11,7 +12,7 @@ type Face="n7"|"h01"|"hacker";
 const H01_FIGURE=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/"))+"/n7-humanoid-h01-v2.webp";
 const H01_SCALE=2.5;
 const HACKER_FIGURE=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/"))+"/n7-hacker-v1.webp";
-const HACKER_ENABLED=typeof window!=="undefined" && window.location.pathname.startsWith("/n7-apex-step5-hacker");
+const HACKER_ENABLED=N7_HACKER;
 
 export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigate}:{open:boolean;onClose:()=>void;activity?:GuideMood|null;onWorkspace?:()=>void;onNavigate?:(target:"chat"|"nabou")=>void}){
   const [reduced,setReduced]=useState(false),[effects,setEffects]=useState(true),[breathing,setBreathing]=useState(true),[gestures,setGestures]=useState(true);
