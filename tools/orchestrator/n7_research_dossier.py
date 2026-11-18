@@ -92,7 +92,7 @@ def compile_dossier(directory: Path, report: dict):
         "same_page_person_place_leads":candidates,
         "independent_source_candidates":len(independent_urls),
         "claim_assessment":{
-          "subject":"Alleged Creveliers raid on Ierapetra in 1675",
+          "subject":str(report.get("research_question") or "Unspecified historical research question"),
           "status":"NOT_HISTORICALLY_VERIFIED",
           "basis":"No independent primary attestation established by this automatic inspection.",
           "cross_checked":False,
@@ -108,7 +108,7 @@ def compile_dossier(directory: Path, report: dict):
 
 def render_markdown(d):
     lines = ["# N7 — Ιστορική ερευνητική αναφορά",
-             "", "**Ερώτημα:** Επιδρομή του Creveliers στην Ιεράπετρα (1675)",
+             "", "**Ερώτημα:** "+str(d["claim_assessment"]["subject"]),
              "", "**Κατάσταση:** Απαιτείται κριτικός έλεγχος πηγών — δεν έχει ιστορικά επαληθευτεί.",
              "", "## Πραγματική εργασία",
              f"- Υποψήφιες εγγραφές αναζήτησης: {d['discovery_count']}",
