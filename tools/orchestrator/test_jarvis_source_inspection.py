@@ -1,5 +1,8 @@
 """Offline security and historical evidence tests; no external HTTP."""
 import unittest
+import sys
+import types
+from unittest.mock import patch
 from jarvis_source_inspection import allowed,read,inspect
 from jarvis_specialist_plan import event_queries
 
@@ -38,7 +41,13 @@ class N7SourceInspectionTests(unittest.TestCase):
             def read(self,n):raise AssertionError('must not parse PDF as HTML')
         class Opener:
             def open(self,req,timeout):return Resp()
-        self.assertEqual(read('https://gallica.bnf.fr/test.pdf',opener=Opener())['status'],
-                         'NON_HTML_REQUIRES_DOCUMENT_READER')
+        class PDF:
+            is_encrypted=False
+            pages=[types.SimpleNamespace(extract_text=lambda:'Hugo de Creveuil in Ierapetra')]
+            def __init__(self,*args,**kwargs):pass
+        with patch.dict(sys.modules,{'pypdf':types.SimpleNamespace(PdfReader=PDF)}):
+            result=read('https://gallica.bnf.fr/test.pdf',opener=Opener())
+        self.assertEqual(result['status'],'DOCUMENT_READ')
+        self.assertEqual(result['pages_read'],1)
 
 if __name__=='__main__':unittest.main()
