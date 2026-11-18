@@ -213,6 +213,14 @@ def run(root: Path, run_id: str, worker: Callable | None = None, max_steps: int 
             step["last_error"] = type(exc).__name__ + ": " + str(exc)[:300]
         atomic_json(directory / "mission.json", state)
     report = summarize(state)
+    # Produce the actual historical research artifact, not just a count of search hits.
+    from n7_research_dossier import write_dossier
+    dossier = write_dossier(directory, report)
+    report["research_dossier"] = "research_dossier.md"
+    report["research_dossier_json"] = "research_dossier.json"
+    report["readable_source_count"] = dossier["readable_source_count"]
+    report["same_page_person_place_leads"] = len(dossier["same_page_person_place_leads"])
+    report["historically_verified"] = False
     state["status"] = report["status"]
     atomic_json(directory / "mission.json", state)
     atomic_json(directory / "report.json", report)
