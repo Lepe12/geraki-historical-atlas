@@ -68,3 +68,29 @@ test('rejects redirects, unexpected destinations and oversized untrusted body',a
  const transport=async()=>new Response('x'.repeat(350001),{status:200});
  await assert.rejects(boundedFetch('https://www.bing.com/search?q=x',{transport}),/limit/);
 });
+
+test('historical Creveuil research rejects unrelated Bing pages and retries a shorter query',async()=>{
+ const unrelated='<rss><channel><item><title>Microsoft Planner account help</title><link>https://support.microsoft.com/help</link><pubDate>Wed, 18 Nov 2026 09:00:00 GMT</pubDate></item></channel></rss>';
+ const relevant='<rss><channel><item><title>Hugo de Creveuil and Crete history</title><link>https://example.org/creveuil-crete</link><pubDate>Wed, 18 Nov 2026 09:00:00 GMT</pubDate></item></channel></rss>';
+ const calls=[];
+ const transport=async url=>{
+  calls.push(url);
+  if(url.includes('europeana'))return new Response('{}',{status:200});
+  if(url.includes('/w/rest.php/'))return new Response(JSON.stringify({pages:[]}),{status:200});
+  if(url.includes('Hugo%20de%20Creveuil'))return new Response(relevant,{status:200});
+  return new Response(unrelated,{status:200});
+ };
+ const result=await researchMessages([{role:'user',content:'Ψάξε στο Internet ιστορικές πηγές για Hugo de Creveuil Crevellie επιδρομή Ιεράπετρα Ierapetra 1675.'}],{now:new Date('2026-11-18T12:00:00Z'),transport});
+ assert.equal(result.queryRetried,true);
+ assert.equal(result.items.length,1);
+ assert.match(result.items[0].title,/Creveuil/);
+ assert.ok(result.items.every(x=>!x.url.includes('microsoft.com')));
+ assert.ok(calls.some(x=>x.includes('Hugo%20de%20Creveuil')));
+});
+test('historical Creveuil search gives zero evidence if retries are irrelevant',async()=>{
+ const unrelated='<rss><channel><item><title>Microsoft security</title><link>https://support.microsoft.com/security</link><pubDate>Wed, 18 Nov 2026 09:00:00 GMT</pubDate></item></channel></rss>';
+ const transport=async url=>new Response(url.includes('/w/rest.php/')?JSON.stringify({pages:[]}):unrelated,{status:200});
+ const result=await researchMessages([{role:'user',content:'Ψάξε ιστορικές πηγές για Hugo de Creveuil στην Ιεράπετρα'}],{now:new Date('2026-11-18T12:00:00Z'),transport});
+ assert.equal(result.items.length,0);
+ assert.match(contextForResearch(result),/No verifiable public results/);
+});
