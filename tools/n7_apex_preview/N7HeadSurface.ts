@@ -16,7 +16,7 @@ export type GuideFrame={turn:number;pitch?:number;roll?:number;talk?:number;brea
 // `moodArt` (optional): the owner's approved Listening, Thinking and Speaking
 // pictures, aligned to the idle frame. When given, each mood shows its own
 // picture instead of a colour variation computed from the idle.
-export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,moodArt?:HTMLCanvasElement[]) {
+export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,moodArt?:HTMLCanvasElement[],hackerLayout=false) {
   const renderer=new THREE.WebGLRenderer({alpha:false,antialias:false,depth:true,preserveDrawingBuffer:true});
   renderer.setSize(Math.round(320*scale),Math.round(480*scale),false);renderer.setPixelRatio(1);
   renderer.outputColorSpace=THREE.SRGBColorSpace;
@@ -41,7 +41,7 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,m
   geometry.setIndex(indices);
   const material=new THREE.ShaderMaterial({
     uniforms:{turn:{value:0},pitch:{value:0},neckMatrix:{value:new THREE.Matrix4()},headMatrix:{value:new THREE.Matrix4()},faceRelief:{value:faceRelief},talk:{value:0},useArt:{value:moodArt?.length===3?1:0},artListening:{value:null as THREE.Texture|null},artThinking:{value:null as THREE.Texture|null},artSpeaking:{value:null as THREE.Texture|null},artwork:{value:texture},breath:{value:0},opacity:{value:1},
-      baseMood:{value:0},states:{value:[0,0,0,0]},ages:{value:[0,0,0,0]},count:{value:0},ignition:{value:0},time:{value:0},voiceLevel:{value:-1}},
+      hackerLayout:{value:hackerLayout?1:0},baseMood:{value:0},states:{value:[0,0,0,0]},ages:{value:[0,0,0,0]},count:{value:0},ignition:{value:0},time:{value:0},voiceLevel:{value:-1}},
     // Depth test on the head surface only: when the deeper face turns over the
     // far cheek and hair, the nearer surface wins instead of drawing order.
     depthTest:true,depthWrite:true,side:THREE.DoubleSide,toneMapped:false,transparent:true,
@@ -53,6 +53,7 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,m
     uniform mat4 neckMatrix;
     uniform mat4 headMatrix;
     uniform float faceRelief;
+    uniform float hackerLayout;
     varying vec2 texUV;
     varying float shade;
     varying float rim;
@@ -73,15 +74,17 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,m
     }
     void main(){
       vec2 tile=source;
-      float depth=restDepth(tile);
+      // Remap the small full-body hacker head into the approved virtual head layout.
+      vec2 shapeTile=hackerLayout>.5?vec2(160.+(tile.x-160.)*1.85,tile.y*1.85+5.):tile;
+      float depth=restDepth(shapeTile)/(hackerLayout>.5?1.85:1.);
       // Surface normal of the volume (layout y points down). Used only for
       // light that changes with the pose, so the rest frame is untouched.
-      vec3 normal=normalize(vec3(restDepth(tile-vec2(3.,0.))-restDepth(tile+vec2(3.,0.)),restDepth(tile-vec2(0.,3.))-restDepth(tile+vec2(0.,3.)),6.));
+      vec3 normal=normalize(vec3(restDepth(shapeTile-vec2(3.,0.))-restDepth(shapeTile+vec2(3.,0.)),restDepth(shapeTile-vec2(0.,3.))-restDepth(shapeTile+vec2(0.,3.)),6.));
       vec4 rest=vec4(tile.x,tile.y,depth,1.);
 
       // Skin weights. The skull, face, jaw and loose hair are fully bound to
       // the head joint. The neck column blends head -> neck -> fixed shoulders.
-      float lateral=smoothstep(mix(30.,36.,faceRelief),mix(46.,50.,faceRelief),abs(tile.x-160.));
+      float lateral=smoothstep(mix(30.,36.,faceRelief),mix(46.,50.,faceRelief),abs(shapeTile.x-160.));
       // With H01 the shoulder lines rise higher beside the neck, so the loose
       // hair there lets go earlier and the raised shoulders stay fixed.
       float looseFrom=mix(210.,204.,faceRelief),looseTo=mix(232.,217.,faceRelief);
@@ -90,9 +93,9 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,m
       // under the jaw stays still, so its lines never bend or break. The jaw
       // is measured on the artwork: chin at row 203 (N7) / 199 (H01).
       float chinY=mix(203.,199.,faceRelief),jawK=mix(.0275,.0215,faceRelief);
-      float jaw=chinY-jawK*(tile.x-160.)*(tile.x-160.);
-      float wCentre=1.-smoothstep(jaw+2.,jaw+14.,tile.y);
-      float wLoose=1.-smoothstep(looseFrom,looseTo,tile.y);
+      float jaw=chinY-jawK*(shapeTile.x-160.)*(shapeTile.x-160.);
+      float wCentre=1.-smoothstep(jaw+2.,jaw+14.,shapeTile.y);
+      float wLoose=1.-smoothstep(looseFrom,looseTo,shapeTile.y);
       float wHead=mix(wCentre,wLoose,lateral);
       float wNeck=wHead;
       wNeck=max(wNeck,wHead);
@@ -100,7 +103,7 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,m
       vec2 p=skinned.xy;
 
       // The APEX breathing effect operates below the neck only.
-      float chest=exp(-pow((tile.y-320.)/94.,2.))*smoothstep(208.,252.,tile.y)*(1.-smoothstep(420.,470.,tile.y));
+      float chest=exp(-pow((shapeTile.y-320.)/94.,2.))*smoothstep(208.,252.,shapeTile.y)*(1.-smoothstep(420.,470.,shapeTile.y));
       p.x=160.+(p.x-160.)*(1.+breath*.006*chest);
       p.y-=breath*.9*chest;
 
@@ -117,9 +120,9 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,m
       float frontZ=normalize(front*(1.-wNeck)+mat3(neckMatrix)*front*(wNeck-wHead)+mat3(headMatrix)*front*wHead).z;
       float away=max(0.,normal.z-posedNormal.z-(1.-frontZ));
       float toward=max(0.,posedNormal.z-normal.z);
-      float side=clamp(abs(tile.x-160.)/96.,0.,1.);
+      float side=clamp(abs(shapeTile.x-160.)/96.,0.,1.);
       shade=clamp(1.-away*3.5*wNeck,.55,1.);
-      float lowered=clamp(-pitch,0.,1.)*smoothstep(150.,205.,tile.y)*wHead;
+      float lowered=clamp(-pitch,0.,1.)*smoothstep(150.,205.,shapeTile.y)*wHead;
       shade*=1.-.18*lowered;
       // Near-side profile line: strongest on the steep outer rim of the volume.
       float steep=1.-normal.z;
@@ -303,7 +306,8 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,m
   // Angles are radians; the neck carries 30% and the skull joint 70%.
   // The turning axis runs inside the neck, level with the chin surface, so the
   // chin stays on the neck while the face and the hair behind it turn about it.
-  const NECK_BASE=new THREE.Vector3(160,252,18),SKULL_BASE=new THREE.Vector3(160,168,18);
+  const NECK_BASE=hackerLayout?new THREE.Vector3(160,134,10):new THREE.Vector3(160,252,18);
+  const SKULL_BASE=hackerLayout?new THREE.Vector3(160,88,10):new THREE.Vector3(160,168,18);
   const neckJoint=new THREE.Object3D(),headJoint=new THREE.Object3D();
   neckJoint.position.copy(NECK_BASE);headJoint.position.copy(SKULL_BASE).sub(NECK_BASE);neckJoint.add(headJoint);
   neckJoint.rotation.order="YXZ";headJoint.rotation.order="YXZ";
