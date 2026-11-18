@@ -195,7 +195,7 @@ export default function N7GuideScene(props:GuideSceneProps){
       };
       raf=requestAnimationFrame(draw);
     };
-    host.dataset.face=config.current.source?"h01":"n7";
+    host.dataset.face=config.current.source?.includes("n7-hacker-v1.webp")?"hacker":config.current.source?"h01":"n7";
     image.src=sourceUrl;
     return()=>{disposed=true;cancelAnimationFrame(raf);surface?.dispose();window.removeEventListener("pointermove",pointer);window.removeEventListener("blur",clearTarget);document.removeEventListener("mouseleave",clearTarget);host.replaceChildren();};
   },[]);
