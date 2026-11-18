@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'tools/orchestrator/n7_mission.py'
+      - 'tools/orchestrator/n7_research_dossier.py'
+      - 'tools/orchestrator/test_n7_research_dossier.py'
       - 'tools/orchestrator/test_n7_mission.py'
       - 'tools/orchestrator/jarvis_specialist_plan.py'
       - 'tools/orchestrator/jarvis_specialist_worker.py'
@@ -53,6 +55,7 @@ jobs:
         run: |
           python3 -m py_compile tools/orchestrator/n7_mission.py tools/orchestrator/test_n7_mission.py
           python3 -m unittest tools/orchestrator/test_n7_mission.py -v
+          python3 -m unittest tools/orchestrator/test_n7_research_dossier.py -v
           python3 -m unittest tools/orchestrator/test_jarvis_source_inspection.py -v
       - name: Exercise real JARVIS planner and policy (offline)
         env:
@@ -115,5 +118,8 @@ jobs:
           report = json.loads(p.read_text(encoding='utf-8'))
           if report['status'] != 'DISCOVERY_FINISHED':
               raise SystemExit('N7_MISSION_INCOMPLETE: review artifact and resume from checkpoint')
-          print('N7_DISCOVERY_COMPLETE; HUMAN_REVIEW_REQUIRED; VERIFIED=false')
+          from pathlib import Path
+          d=p.parent
+          assert (d/'research_dossier.md').exists() and (d/'research_dossier.json').exists(), 'N7_RESEARCH_DOSSIER_MISSING'
+          print('N7_DISCOVERY_COMPLETE; SOURCE_LINKED_DOSSIER_CREATED; VERIFIED=false')
           PY
