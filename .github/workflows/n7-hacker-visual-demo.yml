@@ -56,7 +56,7 @@ jobs:
             const b=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN,args:['--no-sandbox','--disable-dev-shm-usage','--use-angle=swiftshader']});
             try{
               const p=await b.newPage({viewport:{width:1100,height:800}});
-              const errors=[];p.on('pageerror',e=>{if(!/ort\\.wasm\\.min\\.js/.test(e.message))errors.push(e.message);});
+              const errors=[];p.on('pageerror',e=>{if(!e.message.includes('ort.wasm.min.js'))errors.push(e.message);});
               const response=await p.goto('http://127.0.0.1:4173/n7-apex-step5-hacker/?face=hacker&controls=1',{waitUntil:'domcontentloaded'});
               if(!response?.ok())throw Error('HTTP preview failed');
               await p.getByRole('dialog',{name:'N7 Humanoid preview'}).waitFor({state:'visible'});
