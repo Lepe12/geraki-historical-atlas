@@ -16,6 +16,7 @@ from repository_connectors import audited_dispatch as repository_dispatch
 from jarvis_event_bus import emit
 from jarvis_task_history import record
 from jarvis_runtime_guard import validate_specialist_assignment
+from jarvis_source_inspection import inspect
 
 def _repository_call(repository:str,query:str,agent_id:str)->dict:
     try:
@@ -115,6 +116,8 @@ def run_one(agent:dict, plan:dict, run_id:str="local", event_root:Path|None=None
             "learned_pdf_evidence":query_live_learning(queries),
             "historical_map_catalogue":curated_map_leads(queries),
           },
+          "source_inspection":inspect(outputs,target=plan.get("target",""),
+                                      aliases=plan.get("aliases",[]),max_pages=4),
           "result_count":sum(len(x.get("records",[])) for x in outputs if isinstance(x,dict)),
           "verified_promotion_allowed":False,
           "rule":"Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
