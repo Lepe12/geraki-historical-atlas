@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Isolated N7 APEX static preview deployer with verified upgrade/rollback."""
-import ftplib, hashlib, io, json, os, pathlib, secrets, socket, ssl, urllib.request, urllib.error
+import ftplib, hashlib, io, json, os, pathlib, secrets, socket, ssl, time, urllib.request, urllib.error
 
 PARENT="/bot.piratecartography.com/n7-app/public"
 TARGET=os.getenv("N7_APEX_TARGET","n7-apex").strip("/") or "n7-apex"
@@ -14,12 +14,21 @@ def connect():
     host=os.environ["PCT_FTPS_HOST"]; port=int(os.getenv("PCT_FTPS_PORT","21"))
     ips=lambda h:{x[4][0] for x in socket.getaddrinfo(h,port,type=socket.SOCK_STREAM)}
     if not ips(host).intersection(ips(TLS)): raise RuntimeError("N7_APEX_UNEXPECTED_FTPS_HOST")
-    ftp=ftplib.FTP_TLS(timeout=45,context=ssl.create_default_context())
-    ftp.connect(host,port); ftp.host=TLS
-    ftp.login(os.environ["PCT_FTPS_USER"],os.environ["PCT_FTPS_PASSWORD"]); ftp.prot_p()
-    ftp.cwd(PARENT)
-    if ftp.pwd().rstrip("/")!=PARENT: raise RuntimeError("N7_APEX_WRONG_PUBLIC_ROOT")
-    return ftp
+    # Limited retries for intermittent Top.Host FTP control-port timeouts.
+    # All attempts use the same approved hostname, TLS validation and root guard.
+    for attempt in range(1,5):
+        ftp=ftplib.FTP_TLS(timeout=25,context=ssl.create_default_context())
+        try:
+            ftp.connect(host,port); ftp.host=TLS
+            ftp.login(os.environ["PCT_FTPS_USER"],os.environ["PCT_FTPS_PASSWORD"]); ftp.prot_p()
+            ftp.cwd(PARENT)
+            if ftp.pwd().rstrip("/")!=PARENT: raise RuntimeError("N7_APEX_WRONG_PUBLIC_ROOT")
+            return ftp
+        except ftplib.all_errors as error:
+            ftp.close()
+            if attempt==4: raise
+            print("N7_APEX_FTPS_CONNECT_RETRY="+str(attempt)+" error_type="+type(error).__name__,flush=True)
+            time.sleep(attempt*4)
 
 def exists_dir(ftp,name):
     cur=ftp.pwd()
