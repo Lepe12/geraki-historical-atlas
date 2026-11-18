@@ -64,7 +64,7 @@ const tick=()=>{const d=new Date();clock.dateTime=d.toISOString();clock.textCont
 main.append(brandBox,clock,figure,stateLine,quick,reply,results,form,mapLine,dock);
 const settings=make('aside',null,'n7-stage-settings');settings.id='n7StageSettings';settings.hidden=true;settings.setAttribute('aria-label','Ρυθμίσεις N7');
 const logList=make('ol',null,'n7-stage-log');logList.id='n7StageLog';
-function toggle(label,key){const l=make('label',null,'n7-switch');const c=make('input');c.type='checkbox';c.checked=!!S.prefs[key];c.addEventListener('change',()=>{S.prefs[key]=c.checked;save();});l.append(c,make('span',label));return l;}
+function toggle(label,key){const l=make('label',null,'n7-switch');const c=make('input');c.type='checkbox';c.dataset.n7Pref=key;c.checked=!!S.prefs[key];c.addEventListener('change',()=>{S.prefs[key]=c.checked;save();if(key==='continuous'&&!c.checked&&voiceSession)stopVoiceSession('Η συνεχής συνομιλία σταμάτησε.');});l.append(c,make('span',label));return l;}
 settings.append(make('h2','Ρυθμίσεις'),toggle('Φωνητική απάντηση (TTS, el-GR)','tts'),toggle('Συνεχής φωνητική συνομιλία μετά από φωνητική εντολή','continuous'),toggle('Αναζήτηση βιβλιοθήκης με βάση το νόημα στη συσκευή (λήψη ≈140 MB μία φορά)','semanticDevice'),
  make('p','Η μνήμη συνεδρίας (συνομιλία, τόπος, κατάσταση χάρτη, αποτελέσματα, ενέργειες) αποθηκεύεται μόνο σε αυτόν τον browser. Οι συνομιλίες αποθηκεύονται στον server του N7.','n7-note'),
  btn('Διαγραφή μνήμης συνεδρίας',()=>{if(confirm('Να διαγραφεί η τοπική μνήμη συνεδρίας; Οι συνομιλίες στον server δεν επηρεάζονται.'))forget();},'n7-danger'),
@@ -77,7 +77,7 @@ const STATES={idle:['idle','Έτοιμος'],listening:['listen','Ακούει']
 function presence(kind,text){const [k,l]=STATES[kind]||STATES.idle;stage.dataset.state=kind;window.N7Presence?.setKind(k);stateLine.textContent=text||l;}
 
 /* ---------- navigation ---------- */
-function showStage(on){stage.hidden=!on;back.hidden=on;document.body.classList.toggle('n7-stage-on',on);for(const b of rail.children)b.setAttribute('aria-current',String(on&&b.dataset.nav==='humanoid'));}
+function showStage(on){if(!on&&voiceSession)stopVoiceSession();stage.hidden=!on;back.hidden=on;document.body.classList.toggle('n7-stage-on',on);for(const b of rail.children)b.setAttribute('aria-current',String(on&&b.dataset.nav==='humanoid'));}
 function nav(id){
  settings.hidden=id!=='settings'||!settings.hidden;
  if(id==='humanoid'){if(window.N7ApexHome?.toHumanoid?.())return; // N7_APEX_HOME_V1: the Humanoid is the APEX screen
@@ -429,29 +429,96 @@ async function run(text,{voice=false}={}){
   else status=await chat(text);
   log(r.intent,text,status);
  }catch(e){fail(e);}
- finally{running=false;send.disabled=false;if(voice)lastVoice=true;}
+ finally{running=false;send.disabled=false;if(voice)lastVoice=true;if(voiceSession&&!utter&&!listening)scheduleListening(450);}
 }
 form.addEventListener('submit',e=>{e.preventDefault();const t=input.value.trim();if(!t)return;input.value='';lastVoice=false;run(t);});
 input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();form.requestSubmit();}});
 
-/* ---------- voice: STT (browser) and TTS (device voices) ---------- */
+/* ---------- voice: explicit one-tap, hands-free Greek conversation ---------- */
+// Microphone is NEVER enabled without a user click. A second click stops recording.
+// Browser SpeechRecognition still runs in individual utterances; we restart ONLY
+// after the N7 has answered, to prevent the speaker's voice becoming user input.
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-let rec=null,listening=false,lastVoice=false;
-function toggleMic(){
- if(listening){rec?.stop();return;}
- if(!SR){fail(Error('Η αναγνώριση ομιλίας δεν υποστηρίζεται σε αυτόν τον browser. Χρησιμοποίησε πληκτρολόγηση.'));return;}
- stopSpeaking();
- rec=new SR();rec.lang='el-GR';rec.interimResults=true;rec.continuous=false;rec.maxAlternatives=1;
- let finalText='';
- rec.onstart=()=>{listening=true;mic.setAttribute('aria-pressed','true');stage.dataset.mic='on';presence('listening','Ακούει — μίλησε τώρα');};
- rec.onresult=e=>{let t='';for(const x of e.results){t+=x[0].transcript;if(x.isFinal)finalText=t;}input.value=t;};
- rec.onerror=e=>{const m={'not-allowed':'Δεν δόθηκε άδεια χρήσης μικροφώνου.','service-not-allowed':'Ο browser δεν επιτρέπει την υπηρεσία αναγνώρισης ομιλίας.','no-speech':'Δεν ακούστηκε ομιλία.','audio-capture':'Δεν βρέθηκε μικρόφωνο.','network':'Η υπηρεσία αναγνώρισης ομιλίας του browser δεν είναι προσβάσιμη.','language-not-supported':'Τα ελληνικά δεν υποστηρίζονται από την αναγνώριση ομιλίας αυτού του browser.'}[e.error];
-  if(e.error!=='aborted')fail(Error(m||('Σφάλμα αναγνώρισης ομιλίας: '+e.error)));};
- rec.onend=()=>{listening=false;mic.setAttribute('aria-pressed','false');delete stage.dataset.mic;
-  const t=(finalText||'').trim();if(t){input.value='';run(t,{voice:true});}else if(stage.dataset.state==='listening')presence('idle');};
- try{rec.start();}catch(e){fail(Error('Το μικρόφωνο δεν ξεκίνησε: '+e.message));return;}
- const current=rec;setTimeout(()=>{if(rec===current&&!listening&&stage.dataset.state!=='error'){try{current.abort();}catch{}fail(Error('Η αναγνώριση ομιλίας δεν ξεκίνησε: ο browser δεν απάντησε. Χρησιμοποίησε πληκτρολόγηση.'));}},5000);
+let rec=null,listening=false,lastVoice=false,voiceSession=false,relistenTimer=null;
+function updateMicState(){
+ mic.setAttribute('aria-pressed',String(voiceSession));
+ mic.setAttribute('aria-label',voiceSession?'Διακοπή φωνητικής συνομιλίας':'Έναρξη φωνητικής συνομιλίας');
+ mic.title=voiceSession?'Πάτησε για διακοπή':'Πάτησε μία φορά για συνομιλία χωρίς επαναλαμβανόμενα πατήματα';
+ if(voiceSession)stage.dataset.mic='on';else delete stage.dataset.mic;
 }
+function stopVoiceSession(message=''){
+ voiceSession=false;
+ if(relistenTimer){clearTimeout(relistenTimer);relistenTimer=null;}
+ const current=rec;rec=null;listening=false;
+ if(current){current.onend=null;current.onerror=null;try{current.abort();}catch{}}
+ updateMicState();
+ if(message)presence('idle',message);
+}
+function scheduleListening(delay=450){
+ if(!voiceSession||!S.prefs.continuous)return;
+ if(relistenTimer)clearTimeout(relistenTimer);
+ relistenTimer=setTimeout(()=>{
+  relistenTimer=null;
+  if(!voiceSession||!S.prefs.continuous)return;
+  if(stage.hidden){stopVoiceSession();return;}
+  if(running||utter||window.speechSynthesis?.speaking){scheduleListening(450);return;}
+  beginListening();
+ },delay);
+}
+function beginListening(){
+ if(!voiceSession||!S.prefs.continuous||listening||rec||running||stage.hidden)return;
+ if(!SR){stopVoiceSession();fail(Error('Ο browser δεν υποστηρίζει αναγνώριση ομιλίας.'));return;}
+ const current=new SR();rec=current;
+ current.lang='el-GR';current.interimResults=true;current.continuous=false;current.maxAlternatives=1;
+ let finalText='';
+ current.onstart=()=>{
+  if(current!==rec||!voiceSession)return;
+  listening=true;updateMicState();
+  presence('listening','Ακούω · μίλησε φυσικά. Πάτησε ξανά το μικρόφωνο για διακοπή.');
+ };
+ current.onresult=e=>{
+  if(current!==rec||!voiceSession)return;
+  let t='';
+  for(const x of e.results){t+=x[0].transcript;if(x.isFinal)finalText=t;}
+  input.value=t;
+ };
+ current.onerror=e=>{
+  if(current!==rec||!voiceSession||e.error==='aborted'||e.error==='no-speech')return;
+  const errors={
+   'not-allowed':'Δεν δόθηκε άδεια μικροφώνου.',
+   'service-not-allowed':'Ο browser δεν επιτρέπει την αναγνώριση ομιλίας.',
+   'audio-capture':'Δεν βρέθηκε μικρόφωνο.',
+   'network':'Η υπηρεσία φωνής του browser δεν είναι προσβάσιμη.',
+   'language-not-supported':'Ο browser δεν υποστηρίζει ελληνική αναγνώριση.'
+  };
+  stopVoiceSession();
+  fail(Error(errors[e.error]||('Σφάλμα αναγνώρισης: '+e.error)));
+ };
+ current.onend=()=>{
+  if(current!==rec)return;
+  rec=null;listening=false;
+  if(!voiceSession)return;
+  const text=finalText.trim();
+  if(text){input.value='';run(text,{voice:true});}
+  else scheduleListening(850);
+ };
+ try{current.start();}
+ catch(e){stopVoiceSession();fail(Error('Το μικρόφωνο δεν ξεκίνησε: '+e.message));return;}
+ setTimeout(()=>{
+  if(rec===current&&!listening&&voiceSession){
+   stopVoiceSession();fail(Error('Ο browser δεν ξεκίνησε το μικρόφωνο. Δοκίμασε πληκτρολόγηση.'));
+  }
+ },5000);
+}
+function toggleMic(){
+ if(voiceSession){stopVoiceSession('Η συνεχής συνομιλία σταμάτησε.');stopSpeaking();return;}
+ if(!SR){fail(Error('Η αναγνώριση ομιλίας δεν υποστηρίζεται σε αυτόν τον browser. Χρησιμοποίησε πληκτρολόγηση.'));return;}
+ // Explicit click opts in to hands-free. Existing users do not need to find a buried setting.
+ S.prefs.continuous=true;save();
+ const setting=settings.querySelector('input[data-n7-pref="continuous"]');if(setting)setting.checked=true;
+ stopSpeaking();voiceSession=true;updateMicState();beginListening();
+}
+updateMicState();
 let utter=null;
 function greekVoice(){return (window.speechSynthesis?.getVoices()||[]).find(v=>/^el(-|_|$)/i.test(v.lang))||null;}
 function speakText(text){
@@ -463,7 +530,7 @@ function speakText(text){
  const clean=String(spoken).replace(/[*_#`>|⟦⟧]/g,' ').replace(/https?:\/\/\S+/g,'').replace(/\s+/g,' ').trim().slice(0,1400);
  utter=new SpeechSynthesisUtterance(clean);utter.voice=v;utter.lang=v.lang;
  utter.onstart=()=>{hush.hidden=false;presence('speaking');};
- const end=()=>{hush.hidden=true;utter=null;if(stage.dataset.state==='speaking')presence('idle');if(S.prefs.continuous&&lastVoice&&!stage.hidden)setTimeout(()=>{if(!listening&&!running)toggleMic();},350);};
+ const end=()=>{hush.hidden=true;utter=null;if(stage.dataset.state==='speaking')presence('idle');if(voiceSession&&S.prefs.continuous&&!stage.hidden)scheduleListening(350);};
  utter.onend=end;utter.onerror=e=>{end();if(e.error!=='interrupted'&&e.error!=='canceled')stateLine.textContent='Η εκφώνηση απέτυχε ('+e.error+').';};
  window.speechSynthesis.cancel();window.speechSynthesis.speak(utter);
 }
@@ -485,6 +552,6 @@ function watch(){const app=$('application');if(!app)return;const check=()=>{if(!
 document.addEventListener('click',e=>{if(e.target?.closest?.('#logout'))forget();},true);
 // Keep the shared conversation ID aligned with the conversation chosen in the classic view.
 setInterval(()=>{if(active&&S.conversationId!==active){S.conversationId=active;save();}},2000);
-window.N7Stage={run,nav,state:()=>JSON.parse(JSON.stringify(S)),map:()=>({ready:map.ready,open:!!map.win&&!map.win.closed})};
+window.N7Stage={run,nav,state:()=>JSON.parse(JSON.stringify(S)),voice:()=>({active:voiceSession,listening}),map:()=>({ready:map.ready,open:!!map.win&&!map.win.closed})};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watch,{once:true});else watch();
 })();
