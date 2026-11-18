@@ -1,7 +1,9 @@
 'use strict';
 // Stateless public figure chat. Public, read-only web evidence only; no owner conversations, files or sessions.
-const publicWebSearch=require('./public-web-search');
-function createApexPublicChat({apiKey,model,base,fetchImpl=fetch,now=Date.now,maxPerHour=60,research=publicWebSearch}){
+function createApexPublicChat({apiKey,model,base,fetchImpl=fetch,now=Date.now,maxPerHour=60,research=null}){
+ // Runtime package installs the reviewed researcher as n7-public-web-search.js.
+ // Inject a mock research object in isolated source tests without importing a non-existent runtime alias.
+ research=research||require('./n7-public-web-search');
  const origin='https://bot.piratecartography.com';let active=0,windowStart=now(),total=0;const visitors=new Map();
  const reply=(res,status,data,extra={})=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff',...extra});res.end(JSON.stringify(data));};
  async function handle(req,res){
