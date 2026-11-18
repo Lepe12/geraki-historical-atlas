@@ -260,14 +260,14 @@ jobs:
           N7_VISUAL_URL: http://127.0.0.1:4173/n7-apex-step5-hacker/
         run: node tools/n7_apex_preview/test_hacker_face.cjs
       - name: Verify unauthenticated figure conversation without password fields
-        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') && env.N7_APEX_BASE_PATH != '/n7-apex-step5-hacker'
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
           N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
           N7_PASSWORDLESS_OUT: ${{ runner.temp }}/n7-apex-evidence/passwordless
         run: node tools/n7_apex_preview/test_passwordless.cjs
       - name: Keep mobile conversation beside the visible humanoid
-        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') && env.N7_APEX_BASE_PATH != '/n7-apex-step5-hacker'
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
           N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
@@ -281,14 +281,14 @@ jobs:
           N7_VOICE_OUT: ${{ runner.temp }}/n7-apex-evidence/voice
         run: node tools/n7_apex_preview/test_voice.cjs
       - name: Verify real rigged avatar, facial morphs and automatic audio conversation
-        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') && env.N7_APEX_BASE_PATH != '/n7-apex-step5-hacker'
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
           N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
           N7_REAL3D_OUT: ${{ runner.temp }}/n7-apex-evidence/real-avatar
         run: node tools/n7_apex_preview/test_real_avatar.cjs
       - name: Verify H01 head-only motion and exact neutral return
-        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') && env.N7_APEX_BASE_PATH != '/n7-apex-step5-hacker'
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
           N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
@@ -321,7 +321,7 @@ jobs:
           N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
         run: node tools/n7_apex_preview/test_greek_voice_fit.cjs
       - name: Verify automatic conversation turns without Send clicks
-        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') && env.N7_APEX_BASE_PATH != '/n7-apex-step5-hacker'
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
           N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
@@ -349,7 +349,7 @@ jobs:
           N7_FACE_OUT: ${{ runner.temp }}/n7-apex-evidence/face-menu
         run: node tools/n7_apex_preview/test_face_menu.cjs
       - name: Verify the owner's 3D model test page beside the unchanged Humanoid
-        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') && env.N7_APEX_BASE_PATH != '/n7-apex-step5-hacker'
         env:
           NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
           N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
