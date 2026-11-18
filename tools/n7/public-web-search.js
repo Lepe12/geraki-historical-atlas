@@ -8,12 +8,13 @@ const n7Europeana=require('./europeana-api'); // N7_EUROPEANA_SEARCH_INTEGRATION
 const n7HistoricalAudit=require('./historical-source-audit'); // N7_HISTORICAL_DEEP_READING_V1
 const GOOGLE_SEARCH_HOST='www.google.com';
 const DDG_SEARCH_HOST='html.duckduckgo.com';
+const DDG_LITE_HOST='lite.duckduckgo.com';
 const NEWS_HOST='news.google.com';
 const GOOGLE_BOOKS_API='www.googleapis.com';
 const CROSSREF_HOST='api.crossref.org';
 const WIKI_HOST='en.wikipedia.org';
 const WIKI_FR_HOST='fr.wikipedia.org';
-const ALLOWED=new Set([GOOGLE_SEARCH_HOST,DDG_SEARCH_HOST,NEWS_HOST,GOOGLE_BOOKS_API,CROSSREF_HOST,WIKI_HOST,WIKI_FR_HOST]);
+const ALLOWED=new Set([GOOGLE_SEARCH_HOST,DDG_SEARCH_HOST,DDG_LITE_HOST,NEWS_HOST,GOOGLE_BOOKS_API,CROSSREF_HOST,WIKI_HOST,WIKI_FR_HOST]);
 const MAX_REMOTE=350000;
 const TIMEOUT=6500;
 const MAX_QUERY=170;
@@ -203,7 +204,8 @@ function duckDuckGoParse(raw){
   if(/captcha|unusual traffic|verify you are human/iu.test(html))throw Error('WEB_SEARCH_ACCESS_CHALLENGE');
   for(const match of html.matchAll(/<a\b[^>]*>[\s\S]*?<\/a>/giu)){
     const anchor=match[0];
-    if(!/\bclass\s*=\s*["'][^"']*\bresult__a\b/iu.test(anchor))continue;
+    // DuckDuckGo HTML uses result__a; its Lite view uses result-link.
+    if(!/\bclass\s*=\s*["'][^"']*\b(?:result__a|result-link)\b/iu.test(anchor))continue;
     const rawHref=anchor.match(/\bhref\s*=\s*["']([^"']+)["']/iu)?.[1]||'';
     const decoded=xmlText(rawHref);
     let destination='';
@@ -258,6 +260,7 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
   ]:request.kind==='news'?[
     {name:'Google Web',url:'https://www.google.com/search?q='+q+'&num=10',web:true},
     {name:'Public Web fallback',url:'https://html.duckduckgo.com/html/?q='+q,ddg:true},
+    {name:'Public Web Lite fallback',url:'https://lite.duckduckgo.com/lite/?q='+q,ddg:true},
     {name:'Google News',url:'https://news.google.com/rss/search?q='+q+'&hl=en-US&gl=US&ceid=US:en',rss:true}
   ]:[
     {name:'Google Web',url:'https://www.google.com/search?q='+q+'&num=10',web:true},
@@ -285,7 +288,11 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
   // Do not mistake HTTP success for useful evidence.
   if(request.kind==='historical'){
     const initial=results.flatMap(r=>r.status==='fulfilled'?r.value:[]);
-    if(!initial.some(x=>historicalMatch(x,request))){
+    // A single matching search headline is not evidence and must not suppress
+    // further source discovery. Continue until alternative queries are exhausted.
+    // A later reader, not this index, decides which works have actually been read.
+    const initialRelevant=initial.filter(x=>historicalMatch(x,request));
+    if(initialRelevant.length<2 || /creveuil|crevell|crevelier|κρεβε/iu.test(request.userText)){
       // If Google Books rejects quota-limited requests (e.g. HTTP 429), do not repeat them.
       const booksOk=targets.some((x,i)=>x.books&&results[i]?.status==='fulfilled');
       for(const alternative of historicalRetryQueries(request).slice(0,4)){
@@ -293,6 +300,7 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
         const retryTargets=[
           {name:'Google Web retry',url:'https://www.google.com/search?q='+qq+'&num=10',web:true},
           {name:'Public Web retry',url:'https://html.duckduckgo.com/html/?q='+qq,ddg:true},
+          {name:'Public Web Lite retry',url:'https://lite.duckduckgo.com/lite/?q='+qq,ddg:true},
           ...(booksOk?[{name:'Google Books retry',url:'https://www.googleapis.com/books/v1/volumes?q='+qq+'&maxResults=8',books:true}]:[]),
           {name:'Crossref retry',url:'https://api.crossref.org/works?query.bibliographic='+qq+'&rows=6',crossref:true},
           {name:'French Wikipedia',url:'https://fr.wikipedia.org/w/rest.php/v1/search/page?q='+qq+'&limit=4',rss:false}
@@ -302,7 +310,14 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
           return x.web?googleWebParse(raw):x.ddg?duckDuckGoParse(raw):x.books?googleBooksParse(raw):x.crossref?crossrefParse(raw):wikiParse(raw).map(y=>({...y,url:y.url.replace('https://en.wikipedia.org/','https://fr.wikipedia.org/'),source:'French Wikipedia (background only)'}));
         }));
         results.push(...retried);
-        if(retried.some(r=>r.status==='fulfilled'&&r.value.some(x=>historicalMatch(x,request))))break;
+        // Do not stop after one relevant title. For named historical-event
+        // research, exhaust bounded alternative queries to surface independent works.
+        const allRelevant=results.flatMap(r=>r.status==='fulfilled'?r.value:[])
+          .filter(x=>historicalMatch(x,request));
+        const distinctHosts=new Set(allRelevant.filter(x=>x.url).map(x=>{
+          try{return new URL(x.url).hostname.replace(/^www\./,'')}catch{return ''}
+        }).filter(Boolean));
+        if(!/creveuil|crevell|crevelier|κρεβε/iu.test(request.userText)&&distinctHosts.size>=3)break;
       }
     }
   }
@@ -398,10 +413,13 @@ async function publisherArticle(url,{transport=fetch,timeout=7000}={}){
 }
 async function enrichPublisherArticles(research,{transport=fetch}={}){
  if(!research?.searched||!research.items?.length)return research;
+ // Search result links are precisely what must be READ. The old condition
+ // (!x.recordType) silently excluded all Google/DDG results from reading.
+ // Bibliographic records remain metadata-only; do not claim their text was read.
  const chosen=research.items.filter(x=>{
-  try{return !x.recordType&&new URL(x.url).protocol==='https:'}catch{return false}
- }).slice(0,3);
- const jobs=chosen.map(async x=>{
+  try{return x.recordType!=='bibliography'&&new URL(x.url).protocol==='https:'}catch{return false}
+ }).slice(0,9);
+ const readOne=async x=>{
   try{
    const trusted=ARTICLE_HOSTS.has(new URL(x.url).hostname);
    const result=trusted&&!x.direct&&!/\.pdf(?:$|[?#])/i.test(x.url)?{text:await publisherArticle(x.url,{transport})}:await documentReader.readDocument(x.url);
@@ -409,12 +427,37 @@ async function enrichPublisherArticles(research,{transport=fetch}={}){
    if(result.text){x.articleText=result.text;x.articleRead=true;}
    else{x.articleRead=false;x.readStatus=result.reason||'no_readable_text';}
   }catch(e){x.articleRead=false;x.readStatus=String(e.message||'read_failed').slice(0,80);}
+ };
+ // Three parallel requests per batch, at most nine candidates per question.
+ // Record failed reads; never silently convert metadata into evidence.
+ for(let i=0;i<chosen.length;i+=3)
+   await Promise.all(chosen.slice(i,i+3).map(readOne));
+ const read=chosen.filter(x=>x.articleRead&&x.articleText?.trim());
+ const hostOf=x=>{try{return new URL(x.url).hostname.replace(/^www\./,'')}catch{return ''}};
+ const origins=[...new Set(read.map(hostOf).filter(Boolean))];
+ const related=read.filter(x=>{
+   const t=String(x.articleText||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+   const q=String(research.query||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+   // This is a conservative topic filter, not machine verification of facts.
+   if(/creveuil|crevell|crevelier|κρεβε/.test(q))
+     return /creveuil|crevell|crevelier|κρεβε/.test(t)&&/ierapetra|hierapetra|ιεραπετρα/.test(t);
+   return true;
  });
+ const distinctTopicOrigins=[...new Set(related.map(hostOf).filter(Boolean))];
+ research.evidenceCoverage={
+   searchedCandidates:research.items.length,attemptedReads:chosen.length,
+   successfullyRead:read.length,distinctReadableHosts:origins.length,
+   topicMatchingReadSources:related.length,distinctTopicHosts:distinctTopicOrigins.length,
+   moreIndependentEvidenceNeeded:distinctTopicOrigins.length<2,
+   historicalClaimVerified:false,
+   independenceStatus:'NOT_ESTABLISHED_BY_HOST_COUNT',
+   note:'Independent domains and retrieved texts are research candidates, not proof of independent authorship or the historical event.'
+ };
  // Independently consult an academic encyclopedia for the sultan's dates,
  // never infer that the source was read merely from a memorized chronology.
  let reignChecked=false;
  if(research.kind==='historical'&&/Pietro Lanza|Corfu corsair/iu.test(research.query||'')){
-  jobs.push((async()=>{
+  const chronologyJob=(async()=>{
    try{
     const url='https://islamansiklopedisi.org.tr/murad-iii';
     const text=await publisherArticle(url,{transport,timeout:7000});
@@ -426,9 +469,9 @@ async function enrichPublisherArticles(research,{transport=fetch}={}){
         published:'',provider:'Independent historical chronology',articleText:text.slice(0,3500),articleRead:true});
     }
    }catch{}
-  })());
+  })();
+  await chronologyJob;
  }
- await Promise.all(jobs);
  n7HistoricalAudit.attachHistoricalAudit(research,{independentReignChecked:reignChecked});
  return research;
 }
@@ -491,6 +534,8 @@ function contextForResearch(research){
       'Give a concise, complete response before detailed timelines. If timeline is long, summarize key milestones; do not produce an open-ended chronology.',
       'Read this audit FIRST. Bibliography entries are explicit even if some full article text was abbreviated.',
       audit,
+      'REAL READING COVERAGE (NOT verification): '+JSON.stringify(research.evidenceCoverage||{status:'NOT_MEASURED'}),
+      'If fewer than two genuinely independent supporting works were read, state that the research is incomplete, even if search results are numerous.',
       'Unresolved contradictions must be identified and not silently resolved. Do not invent birth/death dates or claim to have consulted documents only named in a bibliography.'
     ]:[]),
     europeanaNote,
