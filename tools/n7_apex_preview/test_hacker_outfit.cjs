@@ -8,14 +8,17 @@ const base = process.env.N7_VISUAL_URL || 'http://127.0.0.1:4173/n7-apex-step5-h
 const out = process.env.N7_HACKER_OUT || '/tmp/n7-hacker-evidence';
 const label = 'N7 guide artwork-tile humanoid';
 
-function difference(a, b, firstRow, lastRow) {
+function difference(a, b, firstRow, lastRow, left = 0, right = a.width) {
   assert.equal(a.width, b.width);
   assert.equal(a.height, b.height);
   let changed = 0;
-  for (let i = firstRow * a.width * 4; i < lastRow * a.width * 4; i += 4) {
-    const delta = [0, 1, 2].reduce((sum, channel) =>
-      sum + Math.abs(a.data[i + channel] - b.data[i + channel]), 0);
-    if (delta > 24) changed++;
+  for (let y = firstRow; y < lastRow; y++) {
+    for (let x = left; x < right; x++) {
+      const i = (y * a.width + x) * 4;
+      const delta = [0, 1, 2].reduce((sum, channel) =>
+        sum + Math.abs(a.data[i + channel] - b.data[i + channel]), 0);
+      if (delta > 24) changed++;
+    }
   }
   return changed;
 }
@@ -68,6 +71,7 @@ function difference(a, b, firstRow, lastRow) {
     const right = await pixels('hacker-right');
     assert.equal(difference(original, right, 0, 231), 0, 'Outfit toggle altered the posed head or hair');
     assert(difference(original, right, 255, 475) > 3000, 'No visible fitted garment');
+    assert.equal(difference(original, right, 280, 319, 149, 171), 0, 'The open jacket obscured the original chest core');
     await move(0, 0);
     const neutral = await pixels('hacker-front');
     for (const [name, yaw, pitch] of [['left', -1, 0], ['up', 0, 1], ['down', 0, -1], ['diagonal', 1, 1]]) {

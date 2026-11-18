@@ -243,6 +243,12 @@ jobs:
             await b.close();
           })().catch(e=>{console.error(e);process.exit(1)});
           NODE
+      - name: Verify fitted Hacker outfit in Chromium
+        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5-hacker-3d'
+        env:
+          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
+          N7_HACKER_OUT: ${{ runner.temp }}/n7-apex-evidence/hacker
+        run: node tools/n7_apex_preview/test_hacker_outfit.cjs
       - name: Verify unauthenticated figure conversation without password fields
         if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5')
         env:
@@ -339,12 +345,6 @@ jobs:
           N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
           N7_MODEL_OUT: ${{ runner.temp }}/n7-apex-evidence/model-3d
         run: node tools/n7_apex_preview/test_model_3d.cjs
-      - name: Verify fitted Hacker outfit in Chromium
-        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5-hacker-3d'
-        env:
-          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
-          N7_HACKER_OUT: ${{ runner.temp }}/n7-apex-evidence/hacker
-        run: node tools/n7_apex_preview/test_hacker_outfit.cjs
       - name: Preserve visual evidence
         if: always() && (startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex')
         uses: actions/upload-artifact@v4

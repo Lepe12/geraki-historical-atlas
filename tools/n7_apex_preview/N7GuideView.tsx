@@ -116,6 +116,7 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
       .n7-guide-view button:focus-visible,.n7-guide-view a:focus-visible{outline:2px solid #f5c26b;outline-offset:2px}
       .n7-guide-view button[aria-pressed=true]{background:rgba(98,232,247,.14);border-color:rgba(140,232,247,.55);color:#f2fdff;box-shadow:0 0 12px rgba(98,232,247,.18)}.n7-guide-view button:disabled{opacity:.35;cursor:default}
       .n7-guide-header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;gap:12px;z-index:5;flex:none}
+      .n7-outfit-header{flex-wrap:wrap}
       .n7-guide-brand{letter-spacing:.34em;color:#7fe6f5;font-size:13px;font-weight:600}.n7-guide-brand i{font-style:normal;color:#f5c26b}
       .n7-guide-main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding:0 12px}
       .n7-guide-main[data-details=true]{grid-template-columns:minmax(0,1fr) 260px}
@@ -144,7 +145,12 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
     `}</style>
     <N7Backdrop ref={backdrop} effects={effects} reduced={reduced}/>
     <div ref={waveRef} aria-label="N7 completion shockwave" data-progress="-1" style={{display:"none",position:"fixed",pointerEvents:"none",border:"2px solid #ffe0a6",boxShadow:"0 0 12px #63ddff88",borderRadius:"50%",zIndex:3}}/>
-    <header className="n7-guide-header"><strong className="n7-guide-brand">N7 <i>·</i> HUMANOID</strong><div style={{display:"flex",gap:8}}>{onWorkspace&&<button type="button" onClick={onWorkspace}>Συνομιλία</button>}{onNavigate&&<button type="button" data-nav="chat" onClick={()=>onNavigate("chat")}>Chat</button>}{onNavigate&&<button type="button" data-nav="nabou" onClick={()=>onNavigate("nabou")}>NABOU</button>}<button type="button" data-exit="" onClick={onClose}>Exit</button></div></header>
+    <header className={N7_HACKER_OUTFIT?"n7-guide-header n7-outfit-header":"n7-guide-header"}><strong className="n7-guide-brand">N7 <i>·</i> HUMANOID</strong>
+      {N7_HACKER_OUTFIT&&faceChoice==="n7"&&<span className="n7-guide-group" aria-label="Ενδυμασία">
+        <button type="button" aria-pressed={!hacker} onClick={()=>setHacker(false)}>N7 outfit</button>
+        <button type="button" aria-pressed={hacker} onClick={()=>{setHacker(true);if(mode==="original"||mode==="compare")skip();}}>Hacker outfit</button>
+      </span>}
+      <div style={{display:"flex",gap:8}}>{onWorkspace&&<button type="button" onClick={onWorkspace}>Συνομιλία</button>}{onNavigate&&<button type="button" data-nav="chat" onClick={()=>onNavigate("chat")}>Chat</button>}{onNavigate&&<button type="button" data-nav="nabou" onClick={()=>onNavigate("nabou")}>NABOU</button>}<button type="button" data-exit="" onClick={onClose}>Exit</button></div></header>
     <div className="n7-guide-main" data-details={details}>
       <div className="n7-guide-figure-slot"><div ref={figureRef} className="n7-guide-figure" aria-label={mode==="assembly"?"N7 guide particle-river assembly":undefined}>
         {(mode==="original"||mode==="compare")&&<img src={figureUrl} alt="Approved N7 idle reference" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"contain",opacity:mode==="compare"?.38:1,zIndex:mode==="compare"?1:undefined}}/>}
@@ -169,10 +175,6 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
         <button type="button" aria-label="Πρόσωπο N7" aria-pressed={faceChoice==="n7"} onClick={()=>chooseFace("n7")}>N7</button>
         <button type="button" aria-label="Πρόσωπο H01" aria-pressed={faceChoice==="h01"} onClick={()=>chooseFace("h01")}>H01</button>
       </span>
-      {N7_HACKER_OUTFIT&&faceChoice==="n7"&&<span className="n7-guide-group" aria-label="Ενδυμασία">
-        <button type="button" aria-pressed={!hacker} onClick={()=>setHacker(false)}>N7 outfit</button>
-        <button type="button" aria-pressed={hacker} onClick={()=>{setHacker(true);if(mode==="original"||mode==="compare")skip();}}>Hacker outfit</button>
-      </span>}
       <span className="n7-guide-group"><small aria-hidden="true">ΠΡΟΒΟΛΗ</small>
         <button type="button" aria-pressed={mode==="original"} onClick={()=>setMode("original")}>Original</button><button type="button" aria-pressed={mode==="particle"} onClick={()=>setMode("particle")}>Particles</button>
         <button type="button" aria-pressed={mode==="compare"} onClick={()=>{setMode("compare");setDetails(true);}}>Compare</button>

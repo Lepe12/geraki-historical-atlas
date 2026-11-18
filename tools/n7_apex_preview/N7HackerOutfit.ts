@@ -3,13 +3,19 @@ import * as THREE from "three";
 // Profile sections measured in the guide's 320×480 rest coordinates.
 // Each section is [row, centre x, half width, depth].
 type Section = readonly [number, number, number, number];
+// The crop ends above the utility belt. The inner edges leave the original core exposed.
 const torso: Section[] = [
-  [248,160,49,30], [261,160,79,43], [290,160,84,55],
-  [338,160,77,62], [373,160,66,53], [415,160,56,42], [480,160,61,38],
+  [252,160,65,33], [266,160,87,45], [289,160,90,57],
+  [322,160,84,62], [352,160,76,54], [377,160,65,47], [386,160,63,45],
 ];
 const sleeve: Section[] = [
-  [255,253,9,15], [267,255,25,27], [292,259,29,35],
-  [331,259,25,30], [387,264,20,26], [441,275,20,22], [480,280,20,18],
+  [255,244,7,17], [263,253,21,24], [277,257,29,31],
+  [299,260,29,33], [324,261,25,31], [348,261,22,25],
+  [369,263,20,25], [380,265,22,24], [391,267,19,22],
+  [402,269,21,24], [415,271,18,20],
+];
+const bracer: Section[] = [
+  [413,271,16,16], [427,273,19,19], [455,280,18,18], [480,288,16,15],
 ];
 
 // Used by the approved textured torso and every part of the fitted jacket.
@@ -49,74 +55,109 @@ ${shader.vertexShader}`;
     materials.push(result);
     return result;
   };
-  const fabric = material(0x151f29,.12,.88);
-  const sleeves = material(0x101822,.1,.91);
-  const armor = material(0x263947,.48,.49);
-  const webbing = material(0x080d14,.05,.95);
-  const hardware = material(0x536875,.72,.36);
-  const cyan = material(0x27dff8,.2,.35,0x14b8ed);
+  const leather = material(0x1b242c,.15,.68);
+  const seamLeather = material(0x0c1218,.07,.83);
+  const hoodLining = material(0x153141,.25,.62);
+  const armor = material(0x283a46,.45,.47);
+  const webbing = material(0x13171d,.08,.9);
+  const hardware = material(0x75838c,.72,.37);
+  const cyan = material(0x22adc9,.18,.5,0x086581);
+  const amber = material(0xffae49,.2,.38,0xc65a09);
 
-  const point = (x: number,y: number,z: number) => new THREE.Vector3(x-160,248-y,z);
+  type Point = readonly [number,number,number];
+  const point = ([x,y,z]: Point) => new THREE.Vector3(x-160,248-y,z);
   const add = (geometry: THREE.BufferGeometry, finish: THREE.Material) => {
     const mesh = new THREE.Mesh(geometry,finish);
     chest.add(mesh);
     mesh.renderOrder = 1;
     return mesh;
   };
-  const shell = (sections: Section[], finish: THREE.Material, mirror = 1, neckline = false) => {
-    const vertices: number[] = [], indices: number[] = [];
-    const sides = 48;
-    sections.forEach(([y,x,width,depth],row) => {
-      for(let i=0;i<sides;i++){
-        const angle = i/sides*Math.PI*2;
-        const centreDip = neckline && row===0 ? 24*Math.pow(Math.abs(Math.cos(angle)),6) : 0;
-        const p = point(160+mirror*(x-160+width*Math.sin(angle)),y+centreDip,depth*Math.cos(angle)+7);
-        vertices.push(p.x,p.y,p.z);
-        if(row===0)continue;
-        const a=(row-1)*sides+i, b=(row-1)*sides+(i+1)%sides;
-        if(mirror===1)indices.push(a,a+sides,b,b,a+sides,b+sides);
-        else indices.push(a,b,a+sides,b,b+sides,a+sides);
+  const tube = (path: Point[], radius: number, finish: THREE.Material) =>
+    add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(path.map(point)),20,radius,6,false),finish);
+  const lerp = THREE.MathUtils.lerp;
+  const mirror = (p: Point, side: number): Point => [160+side*(p[0]-160),p[1],p[2]];
+  const surface = ([y,x,width,depth]: Section, angle: number, offset = 0): Point =>
+    [x+width*Math.sin(angle),y,8+depth*Math.cos(angle)+offset];
+  const patch = (rows: Point[][], side: number, finish: THREE.Material) => {
+    const vertices = rows.flatMap(row=>row.flatMap(p=>point(mirror(p,side)).toArray()));
+    const indices: number[] = [];
+    const columns = rows[0].length;
+    for(let row=1;row<rows.length;row++){
+      for(let col=0;col<columns-1;col++){
+        const a=(row-1)*columns+col, b=a+1, c=a+columns, d=c+1;
+        if(side===1)indices.push(a,c,b,b,c,d);
+        else indices.push(a,b,c,b,d,c);
       }
-    });
+    }
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute("position",new THREE.Float32BufferAttribute(vertices,3));
     geometry.setIndex(indices);
     geometry.computeVertexNormals();
-    add(geometry,finish);
+    return add(geometry,finish);
   };
-  type Point = readonly [number,number,number];
-  const seam = (path: Point[], radius: number, finish: THREE.Material) =>
-    add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(path.map(([x,y,z])=>point(x,y,z))),24,radius,6,false),finish);
-  const hardwareBox = (x: number,y: number,z: number,w: number,h: number,d: number,finish: THREE.Material) => {
+  const band = (inner: Point[], outer: Point[], side: number, finish: THREE.Material) => {
+    patch(inner.map((p,i)=>[p,outer[i]]),side,finish);
+  };
+  const profile = (
+    sections: Section[], side: number, finish: THREE.Material, start: (row: number)=>number,
+    end: number, offset = 0,
+  ) => {
+    patch(sections.map((section,row)=>Array.from({length:33},(_,i)=>
+      surface(section,lerp(start(row),end,i/32),offset))),side,finish);
+  };
+  const buckle = (p: Point,w: number,h: number,d: number,finish: THREE.Material) => {
     const mesh = add(new THREE.BoxGeometry(w,h,d),finish);
-    mesh.position.copy(point(x,y,z));
+    mesh.position.copy(point(p));
     return mesh;
   };
-
-  shell(torso,fabric,1,true);
+  const opening = [.56,.45,.36,.32,.33,.37,.38];
+  const outerHood: Point[] = [[192,234,31],[216,237,32],[233,246,31],[235,253,37],[224,266,48],[202,285,61]];
+  const innerHood: Point[] = [[191,237,27],[200,242,32],[207,250,40],[209,257,51],[197,272,58],[197,285,63]];
   for(const side of [-1,1]){
-    shell(sleeve,sleeves,side);
-    const x = (offset: number) => 160+side*offset;
-    // Raised shoulder plates and collar piping follow the jacket's surface.
-    seam([[x(51),263,36],[x(76),267,35],[x(93),275,44],[x(109),294,43]],4,armor);
-    seam([[x(67),268,37],[x(89),273,48],[x(105),287,49]],1.15,cyan);
-    seam([[x(31),252,33],[x(24),261,43],[x(12),268,49],[160,277,56]],2.4,armor);
-    seam([[x(31),253,36],[x(24),261,46],[x(12),269,52]],.85,cyan);
-    seam([[x(55),288,52],[x(46),320,65],[x(37),354,65],[x(40),397,49]],3.6,webbing);
-    seam([[x(63),316,50],[x(60),355,54],[x(51),388,43],[x(50),429,38]],1.1,armor);
-    seam([[x(103),308,42],[x(105),345,40],[x(111),390,37]],1,armor);
+    const hem = torso.slice(-2);
+    const seam = (path: Point[],width: number,finish: THREE.Material)=>tube(path.map(p=>mirror(p,side)),width,finish);
+    profile(torso,side,leather,row=>opening[row],Math.PI);
+    profile(hem,side,seamLeather,row=>opening[row+5],Math.PI,1.5);
+    profile(sleeve,side,leather,()=>-Math.PI,Math.PI);
+    profile(sleeve.slice(-3),side,seamLeather,()=>-Math.PI,Math.PI,1.2);
+    profile(bracer,side,armor,()=>-Math.PI,Math.PI);
+
+    const lapel = torso.map((section,row)=>surface(section,opening[row],2.5));
+    const lapelFacing = torso.map((section,row)=>surface(section,opening[row]+.13,1.7));
+    band(lapel,lapelFacing,side,seamLeather);
+    seam(lapel,1.2,hardware);
+    const [zipX,zipY,zipZ] = mirror(lapel[5],side);
+    buckle([zipX,zipY+3,zipZ+2],2.8,8,2,hardware);
+    seam(torso.map(section=>surface(section,.82,1.6)),.7,seamLeather);
+
+    // Turned-back hood with a separate lining and rolled leather edge.
+    const hoodFold: Point[] = outerHood.map(([x,y,z],i)=>[
+      lerp(x,innerHood[i][0],.26),lerp(y,innerHood[i][1],.26),z+2.4,
+    ]);
+    band(innerHood,hoodFold,side,hoodLining);
+    band(hoodFold,outerHood,side,leather);
+    seam(outerHood,1.9,seamLeather);
+    seam(innerHood.slice(1,5),.7,cyan);
+
+    const shoulder = sleeve.slice(2,5);
+    profile(shoulder,side,armor,()=>.1,1.28,2.6);
+    seam(shoulder.map(section=>surface(section,1.03,3.6)),1,amber);
+    seam(shoulder.map(section=>surface(section,.55,3.5)),.8,cyan);
+    seam(bracer.map(section=>surface(section,.25,1.8)),1.1,cyan);
+    seam(sleeve.slice(4,9).map(section=>surface(section,-.32,1.6)),.75,seamLeather);
   }
-  seam([[160,277,58],[160,319,69],[160,343,70],[160,384,58],[160,418,51],[160,479,47]],1.25,hardware);
-  seam([[107,414,30],[127,417,48],[160,418,54],[193,417,48],[213,414,30]],5,webbing);
-  hardwareBox(160,417,55,23,12,5,hardware);
-  hardwareBox(160,417,58,12,2,2,cyan);
-  const module = hardwareBox(208,315,61,23,30,9,armor);
-  module.rotation.z = -.19;
-  for(let i=0;i<3;i++)hardwareBox(206+i*2,306+i*5,66,10,1.4,1.4,cyan);
-  hardwareBox(195,394,54,23,17,10,webbing).rotation.z = -.12;
-  seam([[219,319,62],[226,335,49],[220,359,50],[204,387,55]],1.45,hardware);
-  hardwareBox(160,298,65,8,10,4,armor);
-  hardwareBox(160,298,68,3,6,2,cyan);
+  // Waist webbing sits below the hem, over the original illuminated torso.
+  const beltTop: Point[] = [[108,420,26],[129,424,44],[160,427,50],[190,423,44],[211,417,26]];
+  const beltBottom: Point[] = beltTop.map(([x,y,z])=>[x,y+9,z+1]);
+  patch([beltTop,beltBottom],1,webbing);
+  tube(beltTop,.75,leather);
+  tube(beltBottom,.75,leather);
+  buckle([169,430,51],18,12,4,hardware);
+  buckle([169,430,54],11,6,2,seamLeather);
+  buckle([169,430,56],7,1.8,1,amber);
+  buckle([118,448,34],17,26,9,seamLeather).rotation.z = -.18;
+  buckle([120,441,39],11,6,2,armor);
+  buckle([119,444,41],5,1.8,1,cyan);
 
   return {
     root,
