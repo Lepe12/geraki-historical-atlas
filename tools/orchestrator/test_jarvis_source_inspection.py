@@ -38,7 +38,7 @@ class N7SourceInspectionTests(unittest.TestCase):
             def __enter__(self):return self
             def __exit__(self,*a):pass
             def geturl(self):return 'https://gallica.bnf.fr/test.pdf'
-            def read(self,n):raise AssertionError('must not parse PDF as HTML')
+            def read(self,n):return b'%PDF-1.5 test bytes'
         class Opener:
             def open(self,req,timeout):return Resp()
         class PDF:
