@@ -1,0 +1,119 @@
+name: N7 Hacker isolated visual demo
+on:
+  push:
+    branches: [preview/n7-hacker-visual-test]
+    paths:
+      - 'tools/n7_apex_preview/**'
+      - '.github/workflows/n7-hacker-visual-demo.yml'
+permissions:
+  contents: read
+concurrency:
+  group: n7-hacker-visual-demo
+  cancel-in-progress: true
+env:
+  N7_APEX_BASE_PATH: /n7-apex-step5-hacker
+  N7_APEX_TARGET: n7-apex-step5-hacker
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/n7_apex_preview
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify embedded image
+        run: |
+          python3 - <<'PY'
+          import re,base64,hashlib,pathlib
+          data=pathlib.Path('tools/n7_apex_preview/N7HackerPreview.ts').read_text()
+          m=re.search(r'data:image/webp;base64,([A-Za-z0-9+/=]+)',data)
+          assert m, 'missing preview art'
+          b=base64.b64decode(m.group(1),validate=True)
+          assert hashlib.sha256(b).hexdigest()=='f8ae05adbc8b2645c7bbd137850d5477725f2b3c854b49a9860338abf877e3af'
+          print('HACKER_ASSET_PASS',len(b))
+          PY
+      - name: Build original Apex with isolated skin
+        run: |
+          python3 tools/n7_apex_preview/build_apex_preview.py --out "$RUNNER_TEMP/apex"
+          cd "$RUNNER_TEMP/apex"
+          npm ci
+          npm run build
+          test -s out/index.html
+      - name: Browser-render skin, particle and mood controls
+        run: |
+          npm install --prefix "$RUNNER_TEMP/browser" --ignore-scripts --no-audit playwright-core@1.56.1
+          CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          test -n "$CHROME_BIN"
+          mkdir -p "$RUNNER_TEMP/www$N7_APEX_BASE_PATH" "$RUNNER_TEMP/evidence"
+          cp -a "$RUNNER_TEMP/apex/out/." "$RUNNER_TEMP/www$N7_APEX_BASE_PATH/"
+          python3 -m http.server 4173 --directory "$RUNNER_TEMP/www" >/tmp/hacker-http.log 2>&1 &
+          CHROME_BIN="$CHROME_BIN" NODE_PATH="$RUNNER_TEMP/browser/node_modules" EVIDENCE="$RUNNER_TEMP/evidence" node - <<'NODE'
+          const {chromium}=require('playwright-core'),path=require('node:path');
+          (async()=>{
+            const b=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN,args:['--no-sandbox','--disable-dev-shm-usage','--use-angle=swiftshader']});
+            try{
+              const p=await b.newPage({viewport:{width:1100,height:800}});
+              const errors=[];p.on('pageerror',e=>errors.push(e.message));
+              const response=await p.goto('http://127.0.0.1:4173/n7-apex-step5-hacker/?face=hacker&controls=1',{waitUntil:'domcontentloaded'});
+              if(!response?.ok())throw Error('HTTP preview failed');
+              await p.getByRole('dialog',{name:'N7 Humanoid preview'}).waitFor({state:'visible'});
+              const hacker=p.getByRole('button',{name:'Hacker N7 outfit'});
+              await hacker.waitFor({state:'visible'});
+              if(await hacker.getAttribute('aria-pressed')!=='true')throw Error('Hacker not selected');
+              await p.getByRole('button',{name:'Original',exact:true}).click();
+              const img=p.getByRole('img',{name:'Approved N7 idle reference'});
+              await img.waitFor({state:'visible'});
+              const dimensions=await img.evaluate(e=>[e.naturalWidth,e.naturalHeight,e.currentSrc.startsWith('data:image/webp;')]);
+              if(JSON.stringify(dimensions)!=='[240,360,true]')throw Error('Wrong image '+JSON.stringify(dimensions));
+              await p.screenshot({path:path.join(process.env.EVIDENCE,'original.png')});
+              await p.getByRole('button',{name:'Particles',exact:true}).click();
+              await p.waitForFunction(()=>!!document.querySelector('[data-reference-ready="true"]'),null,{timeout:15000});
+              await p.waitForTimeout(400);
+              await p.screenshot({path:path.join(process.env.EVIDENCE,'particles.png')});
+              for(const name of ['Listening','Thinking','Speaking','Idle']){
+                await p.getByRole('button',{name,exact:true}).click();
+              }
+              await p.getByRole('button',{name:'Assembly',exact:true}).click();
+              await p.waitForTimeout(300);
+              await p.screenshot({path:path.join(process.env.EVIDENCE,'assembly.png')});
+              if(errors.length)throw Error(errors.join('; '));
+              console.log('HACKER_BROWSER_PASS');
+            } finally { await b.close() }
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: n7-hacker-visual-evidence
+          path: ${{ runner.temp }}/evidence
+          if-no-files-found: warn
+  deploy:
+    needs: validate
+    runs-on: ubuntu-24.04
+    environment: nabou-production
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/n7_apex_preview
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build reviewed isolated preview
+        run: |
+          python3 tools/n7_apex_preview/build_apex_preview.py --out "$RUNNER_TEMP/apex"
+          cd "$RUNNER_TEMP/apex"
+          npm ci
+          npm run build
+      - name: Publish only /n7-apex-step5-hacker and verify, with rollback
+        env:
+          N7_APEX_OUT: ${{ runner.temp }}/apex/out
+          N7_DRY_RUN: '0'
+          PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+          PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+          PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+          PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+        run: python3 tools/n7_apex_preview/deploy_apex_preview.py
