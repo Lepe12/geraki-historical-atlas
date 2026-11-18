@@ -1,0 +1,35 @@
+name: N7 Humanoid live historical research — Creveliers
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/n7-humanoid-live-creveliers.yml'
+permissions:
+  contents: read
+jobs:
+  real-humanoid:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Actual public Humanoid chat, actual research, actual model response
+        run: |
+          node <<'JS'
+          (async()=>{
+            const question='Ψάξε ιστορικές πηγές για τον Hugues Creveliers (Crevellier) και την επιδρομή στην Ιεράπετρα της Κρήτης το 1675. Δώσε επαληθεύσιμες πηγές και ξεχώρισε τι διάβασες.';
+            const response=await fetch('https://bot.piratecartography.com/api/n7-apex/chat',{
+              method:'POST',redirect:'error',signal:AbortSignal.timeout(110000),
+              headers:{Origin:'https://bot.piratecartography.com','Content-Type':'application/json'},
+              body:JSON.stringify({messages:[{role:'user',content:question}]})
+            });
+            const payload=await response.json().catch(()=>({}));
+            const answer=String(payload.reply||'');
+            const links=[...answer.matchAll(/https:\/\/[^\s<>]+/g)].map(x=>x[0]).slice(0,5);
+            const summary={http:response.status,attempted:payload.research?.attempted||false,sources:payload.research?.sources||0,answerChars:answer.length,links,error:payload.error||null};
+            console.log('N7_HUMANOID_LIVE_RESEARCH='+JSON.stringify(summary));
+            if(response.status!==200)throw Error('N7_LIVE_HUMANOID_HTTP_ERROR');
+            if(!payload.research?.attempted)throw Error('N7_HUMANOID_WEB_NOT_INVOKED');
+            if(!payload.research?.sources||!links.length)throw Error('N7_HUMANOID_NO_VERIFIABLE_SOURCE_IN_REPLY');
+            if(answer.length<80)throw Error('N7_HUMANOID_ANSWER_TOO_SHORT');
+            console.log('N7_HUMANOID_LIVE_EVIDENCE_RESPONSE_VERIFIED=true');
+          })().catch(e=>{console.error(String(e.message||e));process.exitCode=1;});
+          JS
