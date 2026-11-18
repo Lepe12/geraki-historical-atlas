@@ -56,6 +56,21 @@ ${shader.vertexShader}`;
     return result;
   };
   const leather = material(0x1b242c,.15,.68);
+  const prepareLeather=leather.onBeforeCompile.bind(leather);
+  leather.onBeforeCompile=(shader,renderer)=>{
+    prepareLeather(shader,renderer);
+    shader.vertexShader="varying vec3 clothPosition;\n"+shader.vertexShader.replace(
+      "#include <begin_vertex>", "#include <begin_vertex>\nclothPosition=position;"
+    );
+    shader.fragmentShader="varying vec3 clothPosition;\n"+shader.fragmentShader.replace(
+      "#include <roughnessmap_fragment>", `#include <roughnessmap_fragment>
+      vec2 grainCoord=clothPosition.xy;
+      float weave=sin(grainCoord.x*2.8+grainCoord.y*1.7)*sin(grainCoord.y*2.5-grainCoord.x*.6);
+      float grain=fract(sin(dot(floor(grainCoord*1.4),vec2(12.9898,78.233)))*43758.5453);
+      diffuseColor.rgb*=.94+.08*weave+.13*grain;
+      roughnessFactor=clamp(.51+.12*weave+.17*grain,.42,.84);`
+    );
+  };
   const seamLeather = material(0x0c1218,.07,.83);
   const hoodLining = material(0x153141,.25,.62);
   const armor = material(0x283a46,.45,.47);
