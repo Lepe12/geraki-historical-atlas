@@ -51,7 +51,7 @@ jobs:
           python3 tools/n7_apex_preview/test_deploy_female_voice.py
           python3 tools/n7_apex_preview/deploy_public_chat.py
       - name: Reconstruct pinned Greek female voice assets
-        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex'
+        if: env.N7_APEX_BASE_PATH != '/n7-apex-step5-hacker' && (startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex')
         run: python3 tools/n7_apex_preview/prepare_female_voice.py --out "$RUNNER_TEMP/n7-female-assets"
       - name: Reconstruct exact upstream APEX source with reviewed N7 overlay
         run: python3 tools/n7_apex_preview/build_apex_preview.py --out "$RUNNER_TEMP/n7-apex-src"
