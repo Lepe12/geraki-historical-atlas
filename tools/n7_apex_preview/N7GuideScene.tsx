@@ -60,7 +60,7 @@ export default function N7GuideScene(props:GuideSceneProps){
       if(scale===1)ctx.drawImage(image,0,0);else ctx.drawImage(image,0,0,W,H);
       ctx.putImageData(ctx.getImageData(0,0,W,H),0,0);
       host.dataset.moodArt=art?"approved-pictures":"computed";
-      try{surface=createHeadSurface(reference,scale,config.current.source?1:0,art);}catch(e){host.dataset.renderError=String(e);reference.style.display="block";return;}
+      try{const hacker=sourceUrl.endsWith("/n7-hacker-v1.webp");surface=createHeadSurface(reference,scale,hacker?0:config.current.source?1:0,art,hacker);}catch(e){host.dataset.renderError=String(e);reference.style.display="block";return;}
       Object.assign(surface.canvas.style,{width:"100%",height:"100%",display:"none"});host.append(surface.canvas);
       // Freeze each reduced-motion state on a native 2D canvas. Keeping a
       // constantly re-composited WebGL canvas visible was not byte-stable
