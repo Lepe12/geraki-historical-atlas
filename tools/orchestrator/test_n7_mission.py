@@ -129,6 +129,19 @@ class N7MissionTests(unittest.TestCase):
         self.assertEqual(report["status"], "INCOMPLETE")
         self.assertIn("NO_SUCCESSFUL_SEARCH_ROUTES", report["agent_states"][PREFERRED[0]]["last_error"])
 
+    def test_end_to_end_checkpoint_report_is_consistent(self):
+        """Offline contract: dispatcher plan -> worker -> saved report -> restart readback."""
+        self.init()
+        completed = run(self.root, "naxos-1670", worker=result)
+        persisted = json.loads((self.root / "naxos-1670" / "report.json").read_text(encoding="utf-8"))
+        restarted = summarize(load_state(self.root, "naxos-1670"))
+        self.assertEqual(completed["status"], "DISCOVERY_FINISHED")
+        self.assertEqual(persisted["status"], completed["status"])
+        self.assertEqual(restarted["status"], completed["status"])
+        self.assertEqual(persisted["discovered_record_count"], completed["discovered_record_count"])
+        self.assertFalse(persisted["historically_verified"])
+        self.assertEqual(len(restarted["agent_states"]), len(PREFERRED))
+
     def test_stop_switch_on_resume(self):
         self.init()
         with patch("jarvis_runtime_guard.load_policy", return_value=policy(kill=True)):
