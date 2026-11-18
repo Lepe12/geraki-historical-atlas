@@ -7,9 +7,11 @@ import { CORE, createAssemblySound, createFx } from "./N7GuideFx";
 
 // Second face option: the owner-supplied H01 head composed onto the same body.
 // It is a different source raster for the same scene, rig, moods and voice.
-type Face="n7"|"h01";
+type Face="n7"|"h01"|"hacker";
 const H01_FIGURE=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/"))+"/n7-humanoid-h01-v2.webp";
 const H01_SCALE=2.5;
+const HACKER_FIGURE=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/"))+"/n7-hacker-v1.webp";
+const HACKER_ENABLED=typeof window!=="undefined" && window.location.pathname.startsWith("/n7-apex-step5-hacker");
 
 export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigate}:{open:boolean;onClose:()=>void;activity?:GuideMood|null;onWorkspace?:()=>void;onNavigate?:(target:"chat"|"nabou")=>void}){
   const [reduced,setReduced]=useState(false),[effects,setEffects]=useState(true),[breathing,setBreathing]=useState(true),[gestures,setGestures]=useState(true);
@@ -28,10 +30,10 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
   const home=!!onNavigate; // N7_APEX_HOME_V1: the authenticated home screen
   const [faceChoice,setFace]=useState<Face>("n7");
   useEffect(()=>{
-    try{const asked=new URLSearchParams(window.location.search).get("face"),saved=window.localStorage.getItem("n7-face");const next=asked||saved;if(next==="h01"||next==="n7")setFace(next);}catch{}
+    try{const asked=new URLSearchParams(window.location.search).get("face"),saved=window.localStorage.getItem("n7-face");const next=asked||saved;if(next==="h01"||next==="n7"||(HACKER_ENABLED&&next==="hacker"))setFace(next);}catch{}
   },[]);
   const chooseFace=(next:Face)=>{setFace(next);try{window.localStorage.setItem("n7-face",next);}catch{}};
-  const figureUrl=faceChoice==="h01"?H01_FIGURE:N7_HUMANOID_REFERENCE;
+  const figureUrl=faceChoice==="h01"?H01_FIGURE:faceChoice==="hacker"&&HACKER_ENABLED?HACKER_FIGURE:N7_HUMANOID_REFERENCE;
   const dialogRef=useRef<HTMLElement>(null);
   // In the authenticated home screen only «Συνομιλία», «Chat», «NABOU» and «Exit» are shown, at the bottom. The
   // technical controls stay in the code and in the page; the class below hides them unless ?controls=1 is in the
@@ -146,7 +148,7 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
     <div className="n7-guide-main" data-details={details}>
       <div className="n7-guide-figure-slot"><div ref={figureRef} className="n7-guide-figure" aria-label={mode==="assembly"?"N7 guide particle-river assembly":undefined}>
         {(mode==="original"||mode==="compare")&&<img src={figureUrl} alt="Approved N7 idle reference" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"contain",opacity:mode==="compare"?.38:1,zIndex:mode==="compare"?1:undefined}}/>}
-        <N7GuideScene key={faceChoice} source={faceChoice==="h01"?H01_FIGURE:undefined} scale={faceChoice==="h01"?H01_SCALE:undefined} mode={mode} mood={mood} effects={effects} reduced={reduced} breathing={breathing} gestures={gestures} replay={replay} manualMotion={manualMotion} diagnostics={details} onComplete={complete} onFrame={frame}/>
+        <N7GuideScene key={faceChoice} source={faceChoice==="h01"?H01_FIGURE:faceChoice==="hacker"&&HACKER_ENABLED?HACKER_FIGURE:undefined} scale={faceChoice==="h01"?H01_SCALE:undefined} mode={mode} mood={mood} effects={effects} reduced={reduced} breathing={breathing} gestures={gestures} replay={replay} manualMotion={manualMotion} diagnostics={details} onComplete={complete} onFrame={frame}/>
         <canvas ref={fxRef} aria-hidden="true" data-fx="assembly-burst" style={{position:"absolute",inset:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:2,mixBlendMode:"screen"}}/>
         <span ref={ignitionRef} aria-label="N7 face ignition" data-active="false" style={{position:"absolute",pointerEvents:"none"}}/>
         {mode==="assembly"&&!done&&<span aria-label="N7 visible assembly source" style={{position:"absolute",left:`${CORE.x/3.2}%`,top:`${CORE.y/4.8}%`,width:1,height:1,pointerEvents:"none"}}/>}
@@ -166,6 +168,7 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
       <span className="n7-guide-group"><small aria-hidden="true">ΠΡΟΣΩΠΟ</small>
         <button type="button" aria-label="Πρόσωπο N7" aria-pressed={faceChoice==="n7"} onClick={()=>chooseFace("n7")}>N7</button>
         <button type="button" aria-label="Πρόσωπο H01" aria-pressed={faceChoice==="h01"} onClick={()=>chooseFace("h01")}>H01</button>
+        {HACKER_ENABLED&&<button type="button" aria-label="Εμφάνιση Hacker N7" aria-pressed={faceChoice==="hacker"} onClick={()=>chooseFace("hacker")}>Hacker</button>}
       </span>
       <span className="n7-guide-group"><small aria-hidden="true">ΠΡΟΒΟΛΗ</small>
         <button type="button" aria-pressed={mode==="original"} onClick={()=>setMode("original")}>Original</button><button type="button" aria-pressed={mode==="particle"} onClick={()=>setMode("particle")}>Particles</button>
