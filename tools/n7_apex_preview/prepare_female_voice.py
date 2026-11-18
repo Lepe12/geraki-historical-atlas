@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Reconstruct pinned public Greek voice assets; no models committed to Git."""
-import argparse,hashlib,io,json,pathlib,tarfile,urllib.request
+import argparse,hashlib,io,json,pathlib,tarfile,urllib.error,urllib.request
 ASSET_VERSION='rapunzelina-v1'
 FILES={
 'model.onnx':'7824cd5c9912e8aab9fce653f7af9d609c4e2e1d6e4c81d823699afa6d1b1537',
@@ -35,7 +35,13 @@ def main():
  notice='''N7 Greek female voice: Piper el_GR-rapunzelina-low (16 kHz, single speaker).\nModel dataset license: CC0; see MODEL_CARD.txt.\nSource model: https://github.com/k2-fsa/sherpa-onnx/releases/tag/tts-models\nPiper WASM wrapper 1.0.0: MIT, Konstantin Paulus.\nSource/build instructions: https://github.com/diffusion-studio/piper-wasm/tree/69522c832bd52d7c16389e9a8aee568065027689\nPiper phonemizer source: https://github.com/wide-video/piper-phonemize\neSpeak NG component: GPL-3.0; source: https://github.com/rhasspy/espeak-ng\nONNX Runtime Web 1.18.0: MIT, Microsoft Corporation.\nSource: https://github.com/microsoft/onnxruntime/tree/v1.18.0\nVoice inference runs locally in the browser. No user text is sent to a speech provider.\n'''
  save('NOTICE.txt',notice.encode())
  for name,url in [('ESPEAK_COPYING.txt','https://raw.githubusercontent.com/rhasspy/espeak-ng/master/COPYING'),('ONNX_LICENSE.txt','https://raw.githubusercontent.com/microsoft/onnxruntime/v1.18.0/LICENSE')]:
-  with urllib.request.urlopen(url,timeout=30) as r:save(name,r.read())
+  try:
+   with urllib.request.urlopen(url,timeout=30) as r:save(name,r.read())
+  except urllib.error.HTTPError as e:
+   if name!='ONNX_LICENSE.txt' or e.code!=404:raise
+   with urllib.request.urlopen('https://cdn.jsdelivr.net/gh/microsoft/onnxruntime@v1.18.0/LICENSE',timeout=30) as r:data=r.read()
+   if sha(data)!='2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c':raise RuntimeError('VOICE_ONNX_LICENSE_HASH_MISMATCH')
+   save(name,data)
  files={p.name:sha(p.read_bytes()) for p in out.iterdir() if p.is_file() and p.name!='manifest.json'}
  manifest={'product':'N7-GREEK-FEMALE-VOICE','version':ASSET_VERSION,'voice':'el_GR-rapunzelina-low','files':files}
  (out/'manifest.json').write_text(json.dumps(manifest,sort_keys=True,indent=2)+'\n');print('N7_FEMALE_VOICE_ASSETS_READY '+json.dumps({'version':ASSET_VERSION,'files':len(files),'bytes':sum(p.stat().st_size for p in out.iterdir())}))

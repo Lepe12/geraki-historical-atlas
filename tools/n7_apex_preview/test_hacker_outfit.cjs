@@ -46,10 +46,10 @@ function difference(a, b, firstRow, lastRow) {
     await page.getByRole('checkbox', { name: 'Breathing' }).uncheck();
     const box = await host.boundingBox();
     const move = async (yaw, pitch) => {
-      await page.mouse.move(box.x + box.width * (.5 + .42 * yaw), box.y + box.height * (.5 - .42 * pitch));
+      await page.mouse.move(box.x + box.width * (.5 + .44 * yaw), box.y + box.height * (.5 - .44 * pitch));
       await page.waitForFunction(({ label, yaw, pitch }) => {
         const {currentTurn, currentPitch} = document.querySelector('[aria-label="'+label+'"]').dataset;
-        return Math.abs(+currentTurn - yaw) < .005 && Math.abs(+currentPitch - pitch) < .005;
+        return +currentTurn === yaw && +currentPitch === pitch;
       }, { label, yaw, pitch });
     };
     const pixels = async name => {
