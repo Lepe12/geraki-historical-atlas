@@ -8,7 +8,7 @@ on:
       - '.github/workflows/n7-apex-preview.yml'
       - 'ops_ftps_requests/n7-apex-preview.json'
   push:
-    branches: [main, 'preview/n7-apex-step5-guide', 'preview/n7-visual-h01']
+    branches: [main, 'preview/n7-apex-step5-guide', 'preview/n7-visual-h01', 'preview/n7-hacker-visual']
     paths:
       - 'tools/n7_apex_preview/**'
       - '.github/workflows/n7-apex-preview.yml'
@@ -30,8 +30,8 @@ jobs:
       PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
       N7_DRY_RUN: '1'
       # The visual trial branch publishes beside the functional preview, never over it.
-      N7_APEX_BASE_PATH: ${{ github.ref == 'refs/heads/main' && '/n7-apex' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && '/n7-apex-step5-visual' || '/n7-apex-step5') }}
-      N7_APEX_TARGET: ${{ github.ref == 'refs/heads/main' && 'n7-apex' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && 'n7-apex-step5-visual' || 'n7-apex-step5') }}
+      N7_APEX_BASE_PATH: ${{ github.ref == 'refs/heads/main' && '/n7-apex' || ((github.ref == 'refs/heads/preview/n7-hacker-visual' || github.head_ref == 'preview/n7-hacker-visual') && '/n7-apex-step5-hacker' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && '/n7-apex-step5-visual' || '/n7-apex-step5')) }}
+      N7_APEX_TARGET: ${{ github.ref == 'refs/heads/main' && 'n7-apex' || ((github.ref == 'refs/heads/preview/n7-hacker-visual' || github.head_ref == 'preview/n7-hacker-visual') && 'n7-apex-step5-hacker' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && 'n7-apex-step5-visual' || 'n7-apex-step5')) }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -362,8 +362,8 @@ jobs:
       PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
       N7_DRY_RUN: '0'
       # The visual trial branch publishes beside the functional preview, never over it.
-      N7_APEX_BASE_PATH: ${{ github.ref == 'refs/heads/main' && '/n7-apex' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && '/n7-apex-step5-visual' || '/n7-apex-step5') }}
-      N7_APEX_TARGET: ${{ github.ref == 'refs/heads/main' && 'n7-apex' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && 'n7-apex-step5-visual' || 'n7-apex-step5') }}
+      N7_APEX_BASE_PATH: ${{ github.ref == 'refs/heads/main' && '/n7-apex' || ((github.ref == 'refs/heads/preview/n7-hacker-visual' || github.head_ref == 'preview/n7-hacker-visual') && '/n7-apex-step5-hacker' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && '/n7-apex-step5-visual' || '/n7-apex-step5')) }}
+      N7_APEX_TARGET: ${{ github.ref == 'refs/heads/main' && 'n7-apex' || ((github.ref == 'refs/heads/preview/n7-hacker-visual' || github.head_ref == 'preview/n7-hacker-visual') && 'n7-apex-step5-hacker' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && 'n7-apex-step5-visual' || 'n7-apex-step5')) }}
     steps:
       - uses: actions/checkout@v4
         with:
