@@ -1,5 +1,6 @@
 name: N7 canonical runtime — guarded installation
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - 'tools/n7/deploy_reconciled_runtime.py'
@@ -20,7 +21,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   install:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    if: (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name != 'pull_request' && github.ref == 'refs/heads/main')
     environment: nabou-production
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -60,18 +61,33 @@ jobs:
               'retain_verified_backups_and_rollback':True
           }
           # A generated source-sync PR performs a read-only preflight before a
-          # separate owner deployment request is updated. Push must match exactly.
-          if os.environ['GITHUB_EVENT_NAME'] == 'push':
+          # separate owner deployment request is updated. Installation requires an exact match.
+          if os.environ['GITHUB_EVENT_NAME'] != 'pull_request':
               assert request == expected
           with open(os.environ['GITHUB_ENV'],'a') as environment:
               environment.write('N7_CANONICAL_COMMIT='+distribution['commit']+'\n')
           PY
+      - name: Check out the exact canonical commit with all installer dependencies
+        uses: actions/checkout@v4
+        with:
+          repository: Lepe12/independent-ai-bot
+          ref: ${{ env.N7_CANONICAL_COMMIT }}
+          token: ${{ secrets.PCT_GITHUB_DISPATCH_TOKEN }}
+          persist-credentials: false
+          path: .canonical-n7
+      - name: Verify checkout and release contract match the approved distribution
+        run: |
+          test "$(git -C .canonical-n7 rev-parse HEAD)" = "$N7_CANONICAL_COMMIT"
+          cmp tools/n7/reconciled-runtime-contract.json .canonical-n7/tools/n7/reconciled-runtime-contract.json
       - name: Test staged integrity, rollback, concurrent changes and dry-run scope
+        working-directory: .canonical-n7
         run: python3 tools/n7/test_reconciled_runtime_deploy.py
       - name: Read-only preflight of every installed runtime file and private endpoint
+        working-directory: .canonical-n7
         run: python3 tools/n7/deploy_reconciled_runtime.py
       - name: Install guarded delta, restart, verify active release and retain rollback
-        if: github.event_name == 'push'
+        if: github.event_name != 'pull_request'
         env:
           N7_DRY_RUN: '0'
+        working-directory: .canonical-n7
         run: python3 tools/n7/deploy_reconciled_runtime.py
