@@ -152,6 +152,15 @@ def build(target,purpose,date_range="",aliases=None,target_type="auto"):
           "assigned_sources":assigned,
           "fallback_sources":fallbacks,
           "assigned_queries":assigned_queries,
+          # Planner permits a bounded independent web discovery fallback for source genealogy
+          # only when assigned archive/catalogue results have no inspectable pages.
+          "supplemental_inspection":({
+              "route_type":"public_web_read_only",
+              "authority":"JARVIS_PLANNER",
+              "query":("Ψάξε στο Internet ιστορικές πηγές για "+purpose+" "+target+" "+
+                       " ".join(aliases[-5:]))[:850],
+              "max_results":8,
+          } if aid=="source_genealogy" else None),
           "query_budget":{
             "total":len(assigned)*len(assigned_queries),
             "max_total":TOTAL_QUERY_BUDGET,
