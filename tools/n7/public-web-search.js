@@ -6,12 +6,14 @@ const documentReader=require('./document-reader'); // N7_GENERAL_READING_V1
 const DEFAULT_UA='N7PublicResearch/1.0 (https://piratecartography.com)';
 const n7Europeana=require('./europeana-api'); // N7_EUROPEANA_SEARCH_INTEGRATION_V1
 const n7HistoricalAudit=require('./historical-source-audit'); // N7_HISTORICAL_DEEP_READING_V1
+const GOOGLE_SEARCH_HOST='www.google.com';
+const DDG_SEARCH_HOST='html.duckduckgo.com';
 const NEWS_HOST='news.google.com';
 const GOOGLE_BOOKS_API='www.googleapis.com';
 const CROSSREF_HOST='api.crossref.org';
 const WIKI_HOST='en.wikipedia.org';
 const WIKI_FR_HOST='fr.wikipedia.org';
-const ALLOWED=new Set([NEWS_HOST,GOOGLE_BOOKS_API,CROSSREF_HOST,WIKI_HOST,WIKI_FR_HOST]);
+const ALLOWED=new Set([GOOGLE_SEARCH_HOST,DDG_SEARCH_HOST,NEWS_HOST,GOOGLE_BOOKS_API,CROSSREF_HOST,WIKI_HOST,WIKI_FR_HOST]);
 const MAX_REMOTE=350000;
 const TIMEOUT=6500;
 const MAX_QUERY=170;
@@ -68,7 +70,7 @@ function classify(messages,at=new Date()){
   const context=isContinuation?compact(prior+' '+last,550):last;
   const explicit=/(?:ψάξε|αναζήτησε|βρες\s+(?:στο\s+)?(?:διαδίκτυο|πηγές|online)|έλεγξε\s+(?:στο\s+)?(?:ίντερνετ|διαδίκτυο)|search\s+(?:the\s+)?web|look\s+up|πηγές\s+στο\s+διαδίκτυο)/iu.test(last);
   const current=/(?:χθεσιν|χθες|σήμερα|σημεριν|προχθές|ειδήσ|ειδησ|φέτος|πρόσφατ|τελευταί|τρέχον|τωριν|αυτή\s+την\s+εβδομάδα|εξελίξε|είδησ|νέα\s+για|εκλογ|πρόεδρ|κυβέρνησ|αποτελέσματ|latest|recent|breaking|yesterday|today|now|current|election|midterm|president|news|result)/iu.test(context);
-  const history=/(?:τι\s+ξέρεις\s+για|ποιος\s+(?:ήταν|είναι)|ποια\s+(?:ήταν|είναι)|ιστορικ|κουρσάρ|πειρατ|μεσαιων|αναγέννησ|16(?:ος|ου)|17(?:ος|ου)|archiv|historical|corsair|pirat|history|lanz|lantz|λάντζ|πετρο\s+λαντζ|pietro\s+lanza|πέτρο\s+λάντζ)/iu.test(context);
+  const history=/(?:τι\s+ξέρεις\s+για|ποιος\s+(?:ήταν|είναι)|ποια\s+(?:ήταν|είναι)|ιστορικ|κουρσάρ|πειρατ|μεσαιων|αναγέννησ|16(?:ος|ου)|17(?:ος|ου)|archiv|historical|corsair|pirat|history|creveuil|crevell|crevelier|κρεβε|ιεραπετρα|ierapetra|lanz|lantz|λάντζ|πετρο\s+λαντζ|pietro\s+lanza|πέτρο\s+λάντζ)/iu.test(context);
   const directUrls=[...last.matchAll(/https:\/\/[^\s<>"'\[\]]+/gu)].map(x=>safeLink(x[0].replace(/[).,;]+$/,''))).filter(Boolean).slice(0,3);
   if(!explicit&&!current&&!history&&!directUrls.length)return null;
   const year=Number(new Intl.DateTimeFormat('en',{timeZone:'Europe/Athens',year:'numeric'}).format(at));
@@ -101,7 +103,7 @@ async function boundedFetch(url,{transport=fetch,timeout=TIMEOUT}={}){
   const t=setTimeout(()=>ctl.abort(),timeout);
   try{
     const r=await transport(uri.href,{method:'GET',redirect:'error',signal:ctl.signal,
-      headers:{'User-Agent':DEFAULT_UA,'Accept':'application/rss+xml, application/xml, application/json;q=0.9'}});
+      headers:{'User-Agent':DEFAULT_UA,'Accept':'text/html, application/rss+xml, application/xml, application/json;q=0.9','Accept-Language':'en-US,en;q=0.8'}});
     if(!r.ok)throw Error('Research HTTP '+r.status);
     const declared=Number(r.headers?.get?.('content-length')||0);
     if(declared>MAX_REMOTE)throw Error('Research response too large');
@@ -163,6 +165,64 @@ function wikiParse(raw){
       excerpt:compact(xmlText(p.excerpt||p.description||''),180)};
   }).filter(Boolean);
 }
+// N7_GOOGLE_WEB_SEARCH_V1: ordinary google.com/search page, not News or Books.
+// This is a best-effort HTML reader: never bypass CAPTCHA, consent or access controls.
+function googleWebParse(raw){
+  const html=String(raw||'');
+  if(/(?:unusual traffic from your computer|our systems have detected unusual traffic|captcha|sorry\/index|consent\.google\.com)/iu.test(html))
+    throw Error('GOOGLE_SEARCH_ACCESS_CHALLENGE');
+  const results=[],seen=new Set();
+  // Google search often renders links as <a href="/url?q=https%3A..."> or direct HTTPS links.
+  // Pair each link with its nearby heading rather than treating arbitrary page links as results.
+  const anchors=html.match(/<a\b[^>]*href\s*=\s*(?:"[^"]*"|'[^']*')[^>]*>[\s\S]*?<\/a>/giu)||[];
+  for(const a of anchors.slice(0,180)){
+    const href=a.match(/\bhref\s*=\s*["']([^"']+)["']/iu)?.[1]||'';
+    const heading=a.match(/<h3\b[^>]*>([\s\S]*?)<\/h3>/iu)?.[1]||'';
+    if(!heading)continue;
+    let link=xmlText(href).replace(/&amp;/g,'&');
+    if(link.startsWith('/url?')){
+      try{link=new URL(link,'https://www.google.com').searchParams.get('q')||'';}catch{continue;}
+    }
+    const url=safeLink(link);
+    if(!url||seen.has(url))continue;
+    const host=new URL(url).hostname;
+    if(/(?:^|\.)(?:google\.com|googleusercontent\.com|gstatic\.com)$/iu.test(host))continue;
+    const title=compact(xmlText(heading),180);
+    if(title.length<5)continue;
+    seen.add(url);
+    results.push({title,url,source:host,provider:'Google Web Search',
+      published:'',excerpt:'',recordType:'search_result'});
+    if(results.length>=8)break;
+  }
+  return results;
+}
+// Public HTML search fallback when ordinary Google Search returns a JS-only page.
+// Never follow opaque redirect URLs; decode only the public uddg destination as a result URL.
+function duckDuckGoParse(raw){
+  const html=String(raw||''),items=[],seen=new Set();
+  if(/captcha|unusual traffic|verify you are human/iu.test(html))throw Error('WEB_SEARCH_ACCESS_CHALLENGE');
+  for(const match of html.matchAll(/<a\b[^>]*>[\s\S]*?<\/a>/giu)){
+    const anchor=match[0];
+    if(!/\bclass\s*=\s*["'][^"']*\bresult__a\b/iu.test(anchor))continue;
+    const rawHref=anchor.match(/\bhref\s*=\s*["']([^"']+)["']/iu)?.[1]||'';
+    const decoded=xmlText(rawHref);
+    let destination='';
+    try{
+      const uri=new URL(decoded.startsWith('//')?'https:'+decoded:decoded,'https://html.duckduckgo.com');
+      if(uri.hostname==='duckduckgo.com'&&uri.pathname==='/l/')destination=uri.searchParams.get('uddg')||'';
+      else destination=uri.href;
+    }catch{continue;}
+    const url=safeLink(destination);
+    if(!url||seen.has(url))continue;
+    const title=compact(xmlText(anchor.replace(/^<a\b[^>]*>/iu,'').replace(/<\/a>$/iu,'')),180);
+    if(title.length<5)continue;
+    seen.add(url);
+    items.push({title,url,source:new URL(url).hostname,provider:'Public Web Search',
+      published:'',excerpt:'',recordType:'search_result'});
+    if(items.length>=8)break;
+  }
+  return items;
+}
 // Google Books API indexes bibliographic records, NOT the whole Google Web Search.
 function googleBooksParse(raw){
   const parsed=JSON.parse(raw),items=Array.isArray(parsed.items)?parsed.items:[];
@@ -196,8 +256,12 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
   const targets=request.generic?[
     {name:'Google News (Ελλάδα)',url:'https://news.google.com/rss?hl=el&gl=GR&ceid=GR:el',rss:true}
   ]:request.kind==='news'?[
+    {name:'Google Web',url:'https://www.google.com/search?q='+q+'&num=10',web:true},
+    {name:'Public Web fallback',url:'https://html.duckduckgo.com/html/?q='+q,ddg:true},
     {name:'Google News',url:'https://news.google.com/rss/search?q='+q+'&hl=en-US&gl=US&ceid=US:en',rss:true}
   ]:[
+    {name:'Google Web',url:'https://www.google.com/search?q='+q+'&num=10',web:true},
+    {name:'Public Web fallback',url:'https://html.duckduckgo.com/html/?q='+q,ddg:true},
     {name:'Google Books',url:'https://www.googleapis.com/books/v1/volumes?q='+q+'&maxResults=8',books:true},
     {name:'Crossref',url:'https://api.crossref.org/works?query.bibliographic='+q+'&rows=6',crossref:true},
     {name:'Wikipedia',url:'https://en.wikipedia.org/w/rest.php/v1/search/page?q='+q+'&limit=4',rss:false}
@@ -213,7 +277,7 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
   const [results,europeana]=await Promise.all([
     Promise.allSettled(targets.map(async x=>{
       const raw=await boundedFetch(x.url,{transport});
-      return x.rss?parseRss(raw,x.name,now.getTime(),request.kind==='news'?75:10000):x.books?googleBooksParse(raw):x.crossref?crossrefParse(raw):wikiParse(raw);
+      return x.web?googleWebParse(raw):x.ddg?duckDuckGoParse(raw):x.rss?parseRss(raw,x.name,now.getTime(),request.kind==='news'?75:10000):x.books?googleBooksParse(raw):x.crossref?crossrefParse(raw):wikiParse(raw);
     })),
     europeanaJob
   ]);
@@ -227,13 +291,15 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
       for(const alternative of historicalRetryQueries(request).slice(0,4)){
         const qq=encodeURIComponent(alternative);
         const retryTargets=[
+          {name:'Google Web retry',url:'https://www.google.com/search?q='+qq+'&num=10',web:true},
+          {name:'Public Web retry',url:'https://html.duckduckgo.com/html/?q='+qq,ddg:true},
           ...(booksOk?[{name:'Google Books retry',url:'https://www.googleapis.com/books/v1/volumes?q='+qq+'&maxResults=8',books:true}]:[]),
           {name:'Crossref retry',url:'https://api.crossref.org/works?query.bibliographic='+qq+'&rows=6',crossref:true},
           {name:'French Wikipedia',url:'https://fr.wikipedia.org/w/rest.php/v1/search/page?q='+qq+'&limit=4',rss:false}
         ];
         const retried=await Promise.allSettled(retryTargets.map(async x=>{
           const raw=await boundedFetch(x.url,{transport});
-          return x.books?googleBooksParse(raw):x.crossref?crossrefParse(raw):wikiParse(raw).map(y=>({...y,url:y.url.replace('https://en.wikipedia.org/','https://fr.wikipedia.org/'),source:'French Wikipedia (background only)'}));
+          return x.web?googleWebParse(raw):x.ddg?duckDuckGoParse(raw):x.books?googleBooksParse(raw):x.crossref?crossrefParse(raw):wikiParse(raw).map(y=>({...y,url:y.url.replace('https://en.wikipedia.org/','https://fr.wikipedia.org/'),source:'French Wikipedia (background only)'}));
         }));
         results.push(...retried);
         if(retried.some(r=>r.status==='fulfilled'&&r.value.some(x=>historicalMatch(x,request))))break;
@@ -440,5 +506,5 @@ function sourceFooter(research){
     items.map((x,i)=>'[S'+(i+1)+'] '+x.title+' — '+x.source+
       (x.published?' ('+x.published+')':'')+(x.articleRead?' [αναγνώστηκε περιεχόμενο'+(x.pdfPages?' · PDF σ. '+x.pdfPages.map(p=>p.page).join(', '):'')+(x.partial?' · μερική ανάγνωση':'')+']':' [μόνο μεταδεδομένα'+(x.readStatus?' · '+x.readStatus:'')+']')+'\n'+x.url).join('\n');
 }
-module.exports={classify,parseRss,wikiParse,googleBooksParse,crossrefParse,boundedFetch,researchMessages,contextForResearch,sourceFooter,safeLink,extractVisibleArticle,publisherArticle,enrichPublisherArticles,cleanHistoryForTopic};
+module.exports={classify,parseRss,wikiParse,googleWebParse,duckDuckGoParse,googleBooksParse,crossrefParse,boundedFetch,researchMessages,contextForResearch,sourceFooter,safeLink,extractVisibleArticle,publisherArticle,enrichPublisherArticles,cleanHistoryForTopic};
 
