@@ -1,16 +1,16 @@
 'use strict';
 // N7_PUBLIC_SEARCH_V1: private server-side read-only retrieval, no API key.
-// Bounded public search feeds and Wikimedia reference material; not a full browser.
+// Google News RSS, Google Books bibliographic API and Wikimedia; NOT unrestricted Google web search.
 const identities=require('./research-identities'); // N7_HISTORICAL_NAME_VARIANTS_V1
 const documentReader=require('./document-reader'); // N7_GENERAL_READING_V1
 const DEFAULT_UA='N7PublicResearch/1.0 (https://piratecartography.com)';
 const n7Europeana=require('./europeana-api'); // N7_EUROPEANA_SEARCH_INTEGRATION_V1
 const n7HistoricalAudit=require('./historical-source-audit'); // N7_HISTORICAL_DEEP_READING_V1
 const NEWS_HOST='news.google.com';
-const BING_HOST='www.bing.com';
+const GOOGLE_BOOKS_API='www.googleapis.com';
 const WIKI_HOST='en.wikipedia.org';
 const WIKI_FR_HOST='fr.wikipedia.org';
-const ALLOWED=new Set([NEWS_HOST,BING_HOST,WIKI_HOST,WIKI_FR_HOST]);
+const ALLOWED=new Set([NEWS_HOST,GOOGLE_BOOKS_API,WIKI_HOST,WIKI_FR_HOST]);
 const MAX_REMOTE=350000;
 const TIMEOUT=6500;
 const MAX_QUERY=170;
@@ -133,7 +133,7 @@ function historicalMatch(item,request){
   if(request.kind!=='historical'||item.direct)return true;
   const text=[item.title,item.excerpt,item.source].join(' ').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
   const subject=String(request.userText||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-  if(/creveuil|crevell|κρεβε/.test(subject))return /creveuil|crevell|κρεβε/.test(text);
+  if(/creveuil|crevell|crevelier|κρεβε/.test(subject))return /creveuil|crevell|crevelier|κρεβε/.test(text);
   if(request.historicalLanza)return /lanza|lantza|λαντζ/.test(text);
   // For other historical questions require at least one substantive query term.
   const stop=new Set(['internet','historical','history','sources','source','search','research','primary','secondary','about','online','archive','archives','ιστορικες','πηγες','διαδικτυο','αναζητησε','πρωτογενεις','δευτερογενεις','συνδεσμους','ψαξε','βρες','στο','για','και','την','του','της']);
@@ -142,9 +142,11 @@ function historicalMatch(item,request){
 }
 function historicalRetryQueries(request){
   const subject=String(request.userText||'');
-  if(/creveuil|crevell|κρεβε/iu.test(subject))return [
-    'Hugo de Creveuil Ierapetra Crete raid',
-    'Crevellier Creveuil Hierapetra Candia corsair'
+  if(/creveuil|crevell|crevelier|κρεβε/iu.test(subject))return [
+    'Hugues Creveliers Ierapetra 1675',
+    'Crevellier Crete Ierapetra raid 1675',
+    'Creveliers Hierapetra Candia corsair 1675',
+    'Hugues de Creveuil Crete'
   ];
   return [request.query.replace(/^(?:ψαξε|αναζητησε|βρες)\s+(?:στο\s+internet\s+)?/iu,'').slice(0,110)];
 }
@@ -160,6 +162,19 @@ function wikiParse(raw){
       excerpt:compact(xmlText(p.excerpt||p.description||''),180)};
   }).filter(Boolean);
 }
+// Google Books API indexes bibliographic records, NOT the whole Google Web Search.
+function googleBooksParse(raw){
+  const parsed=JSON.parse(raw),items=Array.isArray(parsed.items)?parsed.items:[];
+  return items.slice(0,8).map(book=>{
+    const v=book?.volumeInfo||{},title=compact(v.title,180);
+    const info=safeLink(v.infoLink||v.previewLink||'');
+    if(!title||!info||!/^https:\/\/(?:books\.google\.[a-z.]+|play\.google\.com)\//iu.test(info))return null;
+    const authors=Array.isArray(v.authors)?v.authors.slice(0,3).map(x=>compact(x,80)).join(', '):'';
+    return {title,url:info,source:'Google Books (bibliographic metadata only)',
+      published:compact(v.publishedDate,12),provider:'Google Books',
+      excerpt:compact([authors,v.description].filter(Boolean).join(' — '),350),recordType:'bibliography'};
+  }).filter(Boolean);
+}
 async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
   const request=classify(messages,now);
   if(!request)return {searched:false,items:[],reason:'not_needed'};
@@ -167,14 +182,13 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
   const targets=request.generic?[
     {name:'Google News (Ελλάδα)',url:'https://news.google.com/rss?hl=el&gl=GR&ceid=GR:el',rss:true}
   ]:request.kind==='news'?[
-    {name:'Bing News',url:'https://www.bing.com/news/search?q='+q+'&format=rss',rss:true},
-    {name:'Google News',url:'https://news.google.com/rss/search?q='+q+'&hl=en-US&gl=US&ceid=US:en',rss:true},
-    {name:'Bing Web',url:'https://www.bing.com/search?q='+q+'&format=rss',rss:true}
+    {name:'Google News',url:'https://news.google.com/rss/search?q='+q+'&hl=en-US&gl=US&ceid=US:en',rss:true}
   ]:[
-    {name:'Bing Web',url:'https://www.bing.com/search?q='+q+'&format=rss',rss:true},
+    {name:'Google Books',url:'https://www.googleapis.com/books/v1/volumes?q='+q+'&maxResults=8',books:true},
     {name:'Wikipedia',url:'https://en.wikipedia.org/w/rest.php/v1/search/page?q='+q+'&limit=4',rss:false}
   ];
-  if(request.historicalLanza)targets.push({name:'Bing name variants',url:'https://www.bing.com/search?q='+encodeURIComponent(identities.lanzaQueries()[1])+'&format=rss',rss:true});
+  if(request.historicalLanza)targets.push({name:'Google Books name variants',
+    url:'https://www.googleapis.com/books/v1/volumes?q='+encodeURIComponent(identities.lanzaQueries()[1])+'&maxResults=8',books:true});
   // Historical research uses general search, not short-lived news feeds.
   // Europeana is metadata-only. Query in parallel with legacy sources so
   // configured European heritage discovery does not introduce sequential latency.
@@ -184,7 +198,7 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
   const [results,europeana]=await Promise.all([
     Promise.allSettled(targets.map(async x=>{
       const raw=await boundedFetch(x.url,{transport});
-      return x.rss?parseRss(raw,x.name,now.getTime(),request.kind==='news'?75:10000):wikiParse(raw);
+      return x.rss?parseRss(raw,x.name,now.getTime(),request.kind==='news'?75:10000):x.books?googleBooksParse(raw):wikiParse(raw);
     })),
     europeanaJob
   ]);
@@ -193,15 +207,15 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
   if(request.kind==='historical'){
     const initial=results.flatMap(r=>r.status==='fulfilled'?r.value:[]);
     if(!initial.some(x=>historicalMatch(x,request))){
-      for(const alternative of historicalRetryQueries(request).slice(0,2)){
+      for(const alternative of historicalRetryQueries(request).slice(0,4)){
         const qq=encodeURIComponent(alternative);
         const retryTargets=[
-          {name:'Bing Web retry',url:'https://www.bing.com/search?q='+qq+'&format=rss',rss:true},
+          {name:'Google Books retry',url:'https://www.googleapis.com/books/v1/volumes?q='+qq+'&maxResults=8',books:true},
           {name:'French Wikipedia',url:'https://fr.wikipedia.org/w/rest.php/v1/search/page?q='+qq+'&limit=4',rss:false}
         ];
         const retried=await Promise.allSettled(retryTargets.map(async x=>{
           const raw=await boundedFetch(x.url,{transport});
-          return x.rss?parseRss(raw,x.name,now.getTime(),10000):wikiParse(raw).map(y=>({...y,url:y.url.replace('https://en.wikipedia.org/','https://fr.wikipedia.org/'),source:'French Wikipedia (background only)'}));
+          return x.books?googleBooksParse(raw):wikiParse(raw).map(y=>({...y,url:y.url.replace('https://en.wikipedia.org/','https://fr.wikipedia.org/'),source:'French Wikipedia (background only)'}));
         }));
         results.push(...retried);
         if(retried.some(r=>r.status==='fulfilled'&&r.value.some(x=>historicalMatch(x,request))))break;
@@ -408,5 +422,5 @@ function sourceFooter(research){
     items.map((x,i)=>'[S'+(i+1)+'] '+x.title+' — '+x.source+
       (x.published?' ('+x.published+')':'')+(x.articleRead?' [αναγνώστηκε περιεχόμενο'+(x.pdfPages?' · PDF σ. '+x.pdfPages.map(p=>p.page).join(', '):'')+(x.partial?' · μερική ανάγνωση':'')+']':' [μόνο μεταδεδομένα'+(x.readStatus?' · '+x.readStatus:'')+']')+'\n'+x.url).join('\n');
 }
-module.exports={classify,parseRss,wikiParse,boundedFetch,researchMessages,contextForResearch,sourceFooter,safeLink,extractVisibleArticle,publisherArticle,enrichPublisherArticles,cleanHistoryForTopic};
+module.exports={classify,parseRss,wikiParse,googleBooksParse,boundedFetch,researchMessages,contextForResearch,sourceFooter,safeLink,extractVisibleArticle,publisherArticle,enrichPublisherArticles,cleanHistoryForTopic};
 
