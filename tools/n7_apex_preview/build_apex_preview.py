@@ -135,6 +135,7 @@ def main():
     # gets the same figure, environment, moods and voice; only the test pages and
     # the passwordless guest chat stay in the isolated previews.
     guide=isolated or base_path=="/n7-apex"
+    hacker_preview=base_path=="/n7-apex-step5-hacker"
     if out.exists(): shutil.rmtree(out)
     out.mkdir(parents=True)
     run("git","init",str(out))
@@ -146,7 +147,7 @@ def main():
     overlay=pathlib.Path(__file__).resolve().parent
     shutil.copy2(overlay/"N7Workspace.tsx",out/"components/N7Workspace.tsx")
     shutil.copy2(overlay/"N7ApexStage.tsx",out/"components/N7ApexStage.tsx")
-    (out/"components/N7BuildFlags.ts").write_text(f"export const N7_GUIDE = {str(guide).lower()};\nexport const N7_GUEST_CHAT = {str(isolated).lower()};\n")
+    (out/"components/N7BuildFlags.ts").write_text(f"export const N7_GUIDE = {str(guide).lower()};\nexport const N7_GUEST_CHAT = {str(isolated).lower()};\nexport const N7_HACKER_PREVIEW = {str(hacker_preview).lower()};\n")
     # Step 5/6 stays isolated; retain the normal production entry point.
     # The isolated Step 5 route must present the humanoid immediately.
     # Production /n7-apex keeps the normal button-controlled workflow.
@@ -156,6 +157,7 @@ def main():
             "const [humanoidOpen,setHumanoidOpen]=useState(false);",
             "const [humanoidOpen,setHumanoidOpen]=useState(true);")
     shutil.copy2(overlay/"N7HumanoidView.tsx",out/"components/N7HumanoidView.tsx")
+    shutil.copy2(overlay/"N7HackerSkin.tsx",out/"components/N7HackerSkin.tsx")
     shutil.copy2(overlay/"N7Backdrop.tsx",out/"components/N7Backdrop.tsx")
     shutil.copy2(overlay/"N7HeadSurface.ts",out/"components/N7HeadSurface.ts")
     for name in ("N7GuideScene.tsx","N7GuideView.tsx","N7GuideFx.ts","useN7Voice.ts","N7FemaleVoice.ts","N7VoiceSignal.ts","N7AgentSpeech.ts","N7Navigation.ts"):
@@ -167,6 +169,11 @@ def main():
         shutil.copy2(part, out/"components"/part.name)
     shutil.copy2(overlay/"N7HumanoidIdle.ts",out/"components/N7HumanoidIdle.ts")
     (out/"public").mkdir(parents=True, exist_ok=True)
+    if hacker_preview:
+        skin_bytes=base64.b64decode((overlay/"assets_v3/n7-hacker-v1.b64").read_text(),validate=True)
+        if hashlib.sha256(skin_bytes).hexdigest()!="1fe1aa3450242ab536ca9d3d5cf60c438067146ae4ac2594008e21cc4e6b9f63":
+            raise RuntimeError("wrong N7 hacker trial artwork")
+        (out/"public/n7-hacker-v1.webp").write_bytes(skin_bytes)
     shutil.copy2(overlay/"N7FemaleVoiceWorker.js",out/"public/n7-female-voice-worker-v3.js")
     chunks = sorted((overlay/"assets_v3").glob("chunk*.b64"))
     if len(chunks) != 15:
