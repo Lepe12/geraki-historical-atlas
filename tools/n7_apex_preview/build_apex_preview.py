@@ -171,7 +171,7 @@ def main():
     (out/"public").mkdir(parents=True, exist_ok=True)
     if hacker_preview:
         skin_bytes=base64.b64decode((overlay/"assets_v3/n7-hacker-v1.b64").read_text(),validate=True)
-        if hashlib.sha256(skin_bytes).hexdigest()!="39b3255830e312d52952f313d3179b2ab4aa4a0b9ae1e4a6daabc1b3007f8e32":
+        if hashlib.sha256(skin_bytes).hexdigest()!="1fe1aa3450242ab536ca9d3d5cf60c438067146ae4ac2594008e21cc4e6b9f63":
             raise RuntimeError("wrong N7 hacker trial artwork")
         (out/"public/n7-hacker-v1.webp").write_bytes(skin_bytes)
     shutil.copy2(overlay/"N7FemaleVoiceWorker.js",out/"public/n7-female-voice-worker-v3.js")
