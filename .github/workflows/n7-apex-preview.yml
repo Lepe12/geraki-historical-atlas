@@ -355,8 +355,14 @@ jobs:
         env:
           N7_APEX_OUT: ${{ runner.temp }}/n7-apex-src/out
         run: python3 tools/n7_apex_preview/deploy_apex_preview.py
+      - name: Install the validated Hacker preview from the connected runner
+        if: github.event_name == 'push' && github.ref == 'refs/heads/preview/n7-hacker-mesh' && env.N7_APEX_TARGET == 'n7-apex-step5-hacker-3d'
+        env:
+          N7_DRY_RUN: '0'
+          N7_APEX_OUT: ${{ runner.temp }}/n7-apex-src/out
+        run: python3 tools/n7_apex_preview/deploy_apex_preview.py
   deploy:
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref != 'refs/heads/preview/n7-hacker-mesh'
     needs: validate
     environment: nabou-production
     runs-on: ubuntu-24.04
