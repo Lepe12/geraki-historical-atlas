@@ -35,6 +35,8 @@ jobs:
               const deep=await enrichPublisherArticles(result);
               console.log('N7_REAL_WEB_READING',JSON.stringify(deep.items.map(x=>({title:x.title,url:x.url,articleRead:x.articleRead||false,readStatus:x.readStatus||null,textLength:(x.articleText||'').length,ocrRequired:x.ocrRequired||false}))));
             }
+            if(result.items.some(x=>/bing/i.test(x.provider||'')||/bing\\.com/i.test(x.url||'')))throw Error('BING_MUST_BE_REMOVED');
+            console.log('N7_GOOGLE_RESEARCH_PROVIDERS',JSON.stringify({googleBooks:result.items.filter(x=>x.provider==='Google Books').length,wikipedia:result.items.filter(x=>x.provider==='Wikipedia').length,failedProviders:result.failedProviders,queryRetried:result.queryRetried}));
             if(!result.searched)process.exitCode=2;
           })().catch(e=>{console.error('N7_REAL_WEB_ERROR',e.name,e.message);process.exitCode=1});
           JS
