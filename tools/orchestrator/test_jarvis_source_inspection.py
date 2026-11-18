@@ -59,4 +59,39 @@ class N7SourceInspectionTests(unittest.TestCase):
         self.assertEqual(result['status'],'DOCUMENT_READ')
         self.assertEqual(result['pages_read'],1)
 
+    def test_public_eie_pdf_is_inspectable_but_doi_catalogue_is_not_a_readable_work(self):
+        self.assertTrue(allowed('https://helios.eie.gr/helios/bitstream/10442/18865/1/Koutzakiotis%202023.pdf'))
+        self.assertFalse(document_candidate('https://doi.org/10.1234/catalogue'))
+        row={'records':[{'url':'https://helios.eie.gr/helios/bitstream/10442/18865/1/Koutzakiotis%202023.pdf','title':'Historical research'}]}
+        result=inspect([row],target='Ierapetra, Crete',aliases=['Hugues Creveliers'],
+                       reader=lambda url:{'status':'DOCUMENT_READ','text':'A Creveliers expedition to Ierapetra',
+                                         'pages_read':12,'total_pages':12,'partial':False,
+                                         'page_excerpts':[{'pdf_page':11,'text':'Creveliers in Ierapetra'}]})
+        self.assertEqual(result['inspected_count'],1)
+        self.assertEqual(result['inspected_pages'][0]['pages_read'],12)
+        self.assertEqual(result['inspected_pages'][0]['page_excerpts'][0]['pdf_page'],11)
+        self.assertEqual(result['inspected_pages'][0]['status'],'CO_OCCURRENCE_NEEDS_REVIEW')
+        self.assertFalse(result['historically_verified'])
+
+    def test_pdf_reader_does_not_stop_at_first_six_pages(self):
+        class Resp:
+            headers={'Content-Type':'application/pdf'}
+            def __enter__(self):return self
+            def __exit__(self,*a):pass
+            def geturl(self):return 'https://helios.eie.gr/public.pdf'
+            def read(self,n):return b'%PDF-test'
+        class Opener:
+            def open(self,req,timeout):return Resp()
+        class PDF:
+            is_encrypted=False
+            pages=[types.SimpleNamespace(extract_text=lambda i=i: 'Other page' if i!=7 else 'Creveliers Ierapetra') for i in range(11)]
+            def __init__(self,*args,**kwargs):pass
+        with patch.dict(sys.modules,{'pypdf':types.SimpleNamespace(PdfReader=PDF)}):
+            result=read('https://helios.eie.gr/public.pdf',opener=Opener())
+        self.assertEqual(result['status'],'DOCUMENT_READ')
+        self.assertEqual(result['pages_read'],11)
+        self.assertEqual(result['total_pages'],11)
+        self.assertFalse(result['partial'])
+        self.assertEqual(result['page_excerpts'][0]['pdf_page'],8)
+
 if __name__=='__main__':unittest.main()
