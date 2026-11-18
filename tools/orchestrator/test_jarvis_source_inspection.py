@@ -3,7 +3,7 @@ import unittest
 import sys
 import types
 from unittest.mock import patch
-from jarvis_source_inspection import allowed,document_candidate,read,inspect
+from jarvis_source_inspection import allowed,document_candidate,archive_file_links,read,inspect
 from jarvis_specialist_plan import event_queries
 
 class N7SourceInspectionTests(unittest.TestCase):
@@ -123,5 +123,41 @@ class N7SourceInspectionTests(unittest.TestCase):
         agent['supplemental_inspection']['authority']='UNTRUSTED'
         with self.assertRaisesRegex(RuntimeError,'UNAUTHORIZED'):
             _planned_public_inspection(agent,{})
+
+    def test_archive_metadata_follows_only_original_item_and_pdf(self):
+        aggregator='https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18865?language=en'
+        landing='https://helios.eie.gr/helios/handle/10442/18865'
+        pdf='https://helios.eie.gr/helios/bitstream/10442/18865/1/Koutzakiotis%202023.pdf'
+        self.assertEqual(archive_file_links(aggregator,
+          ('<a href="'+landing+'">see original item</a><a href="http://localhost/private">bad</a>').encode()),[landing])
+        self.assertEqual(archive_file_links(landing,
+          ('<a href="'+pdf+'">PDF</a><a href="https://attacker.test/file.pdf">bad</a>').encode()),[pdf])
+        self.assertEqual(archive_file_links(pdf,b'<a href="'+pdf.encode()+b'">PDF</a>'),[])
+
+    def test_catalogue_metadata_reads_original_pdf_in_bounded_two_hops(self):
+        aggregator='https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18865'
+        landing='https://helios.eie.gr/helios/handle/10442/18865'
+        pdf='https://helios.eie.gr/helios/bitstream/10442/18865/1/paper.pdf'
+        pages={aggregator:('<a href="'+landing+'">Original</a>').encode(),
+               landing:('<a href="'+pdf+'">PDF file</a>').encode(),pdf:b'%PDF-test'}
+        class Resp:
+            def __init__(self,url):
+                self.url=url;self.headers={'Content-Type':'application/pdf' if url==pdf else 'text/html'}
+            def __enter__(self):return self
+            def __exit__(self,*a):pass
+            def geturl(self):return self.url
+            def read(self,n):return pages[self.url]
+        class Opener:
+            def open(self,req,timeout):return Resp(req.full_url)
+        class PDF:
+            is_encrypted=False
+            pages=[types.SimpleNamespace(extract_text=lambda:'Creveliers history') for _ in range(8)]
+            def __init__(self,*args,**kwargs):pass
+        with patch.dict(sys.modules,{'pypdf':types.SimpleNamespace(PdfReader=PDF)}):
+            r=read(aggregator,opener=Opener())
+        self.assertEqual(r['status'],'DOCUMENT_READ')
+        self.assertEqual(r['pages_read'],8)
+        self.assertEqual(r['document_url'],pdf)
+        self.assertEqual(r['source_chain'],[aggregator,landing,pdf])
 
 if __name__=='__main__':unittest.main()
