@@ -57,9 +57,9 @@ function normalizePath(pathname){
   if(pathname.startsWith(PREFIX)) pathname=pathname.slice(PREFIX.length)||"/";
   return pathname||"/";
 }
-function getJson(url,maxBytes=8_000_000,authorization){
+function getJson(url,maxBytes=8_000_000){
   return new Promise((resolve,reject)=>{
-    const request=https.get(url,{headers:{"user-agent":"piratecartography-command-center-live/1",...(authorization?{authorization}:{})}},r=>{
+    const request=https.get(url,{headers:{"user-agent":"piratecartography-command-center-live/1"}},r=>{
       const chunks=[];let bytes=0;r.setEncoding("utf8");
       r.on("error",reject);
       r.on("data",c=>{bytes+=Buffer.byteLength(c);if(bytes>maxBytes){r.destroy();reject(new Error("response_too_large"));return;}chunks.push(c);});
@@ -73,7 +73,7 @@ function safeEqual(a,b){
   return x.length===y.length&&x.length>0&&crypto.timingSafeEqual(x,y);
 }
 function githubDispatchWorkflow(workflow,inputs,repo=REPO){
-  const privateN7=repo==="Lepe12/independent-ai-bot"&&["n7-private-model.yml","n7-private-historical-research.yml"].includes(workflow);
+  const privateN7=repo==="Lepe12/independent-ai-bot"&&workflow==="n7-private-model.yml";
   if(!privateN7&&(repo!==REPO||![CONTROLLED_WORKFLOW,"nabou-coder-v03.yml",N7_RESEARCH_WORKFLOW].includes(workflow)))
     return Promise.reject(new Error("workflow_not_allowed"));
   return new Promise((resolve,reject)=>{
@@ -103,9 +103,7 @@ function githubWorkflowDispatch(inputs){return githubDispatchWorkflow(CONTROLLED
 function githubCodingDispatch(inputs){return githubDispatchWorkflow("nabou-coder-v03.yml",inputs);}
 function githubPrivateDispatch(inputs){return githubDispatchWorkflow("n7-private-model.yml",inputs,"Lepe12/independent-ai-bot");}
 
-function githubResearchDispatch(inputs){
-  return githubDispatchWorkflow("n7-private-historical-research.yml",inputs,"Lepe12/independent-ai-bot");
-}
+function githubResearchDispatch(inputs){return githubDispatchWorkflow(N7_RESEARCH_WORKFLOW,inputs);}
 let n7MissionStatusCache=new Map();
 async function githubResearchStatus(requestId){
   // Always constrain GitHub lookups to the two fixed, public workflow identifiers.
@@ -215,41 +213,6 @@ async function githubResearchStatus(requestId){
       report.preview={report_status:"NOT_YET_PUBLISHED",paragraphs:[],sources:[],
         verified:false,human_review_required:true};
     }
-  }
-  // N7_OWNER_PRIVATE_RESEARCH_V1
-  // Resolve the private run only for new requests. Earlier Atlas runs keep
-  // their established status and preview, even if the private API is down.
-  if(!parent&&!child&&GITHUB_DISPATCH_TOKEN){
-    try{
-      const repo="Lepe12/independent-ai-bot";
-      const api="https://api.github.com/repos/"+repo+"/actions/";
-      const authorization="Bearer "+GITHUB_DISPATCH_TOKEN;
-      const privateRuns=await getJson(api+"workflows/n7-private-historical-research.yml/runs?event=workflow_dispatch&per_page=50",2_000_000,authorization);
-      const research=select(privateRuns,"N7 Mission "+requestId);
-      if(research&&/^[0-9]{8,20}$/.test(String(research.id))){
-        const runUrl="https://github.com/"+repo+"/actions/runs/"+research.id;
-        report.research_run_id=research.id;
-        report.research_url=runUrl;
-        report.research_conclusion=research.conclusion||null;
-        report.status=research.status==="completed"?"PIPELINE_FAILED":"PIPELINE_"+String(research.status).toUpperCase();
-        if(research.status==="completed"&&research.conclusion==="success"){
-          const jobs=await getJson(api+"runs/"+research.id+"/jobs?per_page=20",450_000,authorization);
-          const worker=(Array.isArray(jobs.jobs)?jobs.jobs:[]).find(job=>job.name==="public-evidence");
-          const steps=(Array.isArray(worker?.steps)?worker.steps:[]).filter(step=>step.conclusion==="success");
-          const complete=steps.some(step=>step.name==="N7 research completed all routes");
-          const incomplete=steps.some(step=>step.name==="N7 research exhausted retries");
-          if(complete!==incomplete&&steps.some(step=>step.name==="Publish report to private run summary")){
-            report.status=complete?"PIPELINE_COMPLETED":"EVIDENCE_PRESERVED_REVIEW_REQUIRED";
-            report.preview={report_status:complete?"DISCOVERY_FINISHED":"INCOMPLETE",
-              paragraphs:[complete?
-                "Ο κύκλος αναζήτησης ολοκληρώθηκε. Ο ιδιωτικός φάκελος πηγών περιλαμβάνει τις εκκρεμότητες τεκμηρίωσης.":
-                "Εξαντλήθηκαν οι προσπάθειες σε ορισμένες διαδρομές. Ο ιδιωτικός φάκελος παραμένει διαθέσιμος.",
-                "Ιδιωτικός φάκελος: "+report.research_url],
-              sources:[],verified:false,human_review_required:true};
-          }
-        }
-      }
-    }catch(_){/* Keep the observed status when private evidence is unavailable. */}
   }
   if(n7MissionStatusCache.size>100)n7MissionStatusCache.clear();
   n7MissionStatusCache.set(requestId,{at:Date.now(),report});
