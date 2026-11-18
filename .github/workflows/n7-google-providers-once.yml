@@ -1,0 +1,38 @@
+name: N7 Google provider connectivity — one time
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/n7-google-providers-once.yml']
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Probe documented Google Books metadata and Google News RSS
+        run: |
+          node - <<'JS'
+          (async()=>{
+            for (const [name,url] of [
+              ['google-books-history','https://www.googleapis.com/books/v1/volumes?q=Hugues%20Creveliers&maxResults=3'],
+              ['google-books-common','https://www.googleapis.com/books/v1/volumes?q=piracy&maxResults=3'],
+              ['google-news','https://news.google.com/rss/search?q=archaeology&hl=en-US&gl=US&ceid=US:en'],
+              ['wikipedia-rest','https://en.wikipedia.org/w/rest.php/v1/search/page?q=Creveliers&limit=3']
+            ]){
+              try{
+                const ac=new AbortController(),timer=setTimeout(()=>ac.abort(),8000);
+                try{
+                  const response=await fetch(url,{redirect:'error',signal:ac.signal,headers:{'User-Agent':'N7PublicResearch/1.0 (https://piratecartography.com)'}});
+                  const body=await response.text();
+                  let count=0,err='';
+                  try{const json=JSON.parse(body);count=Array.isArray(json.items)?json.items.length:Array.isArray(json.pages)?json.pages.length:0;err=String(json.error?.message||'').slice(0,100);}catch{count=(body.match(/<item>/g)||[]).length;}
+                  console.log('GOOGLE_PROBE',JSON.stringify({name,status:response.status,count,bytes:body.length,err}));
+                }finally{clearTimeout(timer)}
+              }catch(e){console.log('GOOGLE_PROBE',JSON.stringify({name,exception:String(e.message||e).slice(0,180)}));}
+            }
+          })().catch(e=>{console.error(e);process.exitCode=1});
+          JS
