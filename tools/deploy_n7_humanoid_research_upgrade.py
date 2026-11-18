@@ -10,6 +10,7 @@ import socket
 import ssl
 import subprocess
 import tempfile
+import time
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -140,7 +141,21 @@ def main():
         if digest(fetch(ftp, HELPER)) != expected_new:
             raise RuntimeError('N7_HUMANOID_RESEARCH_UPGRADE_READBACK_MISMATCH')
         restart(ftp, 'activate')
-        verify_health()
+        # Passenger can briefly return HTTP 500 while recycling Node workers.
+        # Never accept a failed final state: bounded retries, then verified rollback.
+        last_health_error = None
+        for attempt in range(8):
+            try:
+                verify_health()
+                last_health_error = None
+                break
+            except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, ConnectionError) as error:
+                last_health_error = error
+                print('N7_HUMANOID_HEALTH_RETRY attempt=' + str(attempt + 1) + ' error=' + type(error).__name__)
+                if attempt < 7:
+                    time.sleep(2)
+        if last_health_error is not None:
+            raise RuntimeError('N7_HUMANOID_HEALTH_NOT_RESTORED') from last_health_error
         ftp.cwd(ROOT)
         if digest(fetch(ftp, HELPER)) != expected_new:
             raise RuntimeError('N7_HUMANOID_RESEARCH_UPGRADE_POST_RESTART_HASH_MISMATCH')
