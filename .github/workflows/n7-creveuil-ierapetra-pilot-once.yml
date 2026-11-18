@@ -1,0 +1,30 @@
+name: N7 Creveuil Ierapetra research pilot — one time
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/n7-creveuil-ierapetra-pilot-once.yml'
+permissions:
+  contents: read
+  actions: write
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            .github/workflows/n7-mission-pilot.yml
+      - name: Launch real JARVIS historical discovery
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run n7-mission-pilot.yml --ref main \
+            -f target='Ierapetra, Crete' \
+            -f date_range='1665-1680' \
+            -f aliases='Ιεράπετρα|Hierapetra|Ierapetra|Gerapetra|Hugo de Creveuil|Hugues de Creveuil|Crevellie|Κρεβελιέ|Crevellier' \
+            -f purpose='Investigate the alleged 1675 raid of Hugo/Hugues de Creveuil (Crevellie, Κρεβελιέ) on Ierapetra in Crete. Find independent original or near-contemporary dated sources, archival shelfmarks, folios and exact quotations, including Venetian and Ottoman records. Verify or challenge the reported 500 attackers and three Ottoman galleys from Candia; separate secondary retellings and citations from archival evidence. Explicitly report if no independent primary evidence is found. Do not infer source authenticity or historicity from piratecartography.com alone.'
+          echo 'N7_CREVEUIL_IERAPETRA_PILOT_DISPATCHED'
