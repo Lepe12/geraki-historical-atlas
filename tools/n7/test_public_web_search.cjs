@@ -1,7 +1,7 @@
 'use strict';
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
-const {classify,parseRss,googleBooksParse,researchMessages,contextForResearch,sourceFooter,boundedFetch,safeLink}=require('./public-web-search');
+const {classify,parseRss,googleBooksParse,crossrefParse,researchMessages,contextForResearch,sourceFooter,boundedFetch,safeLink}=require('./public-web-search');
 const when=new Date('2026-11-05T19:00:00Z');
 const xml='<rss><channel>'+
 '<item><title>US 2026 midterm election results - News Agency</title>'+
@@ -103,4 +103,25 @@ test('Google-only historical search gives zero evidence if retries are irrelevan
  const result=await researchMessages([{role:'user',content:'Ψάξε ιστορικές πηγές για Hugo de Creveuil στην Ιεράπετρα'}],{now:new Date('2026-11-18T12:00:00Z'),transport});
  assert.equal(result.items.length,0);
  assert.match(contextForResearch(result),/No verifiable public results/);
+});
+
+test('Crossref metadata fallback is parsed safely and Google Books quota skips retry',async()=>{
+ const records=JSON.stringify({message:{items:[{title:['Hugues Creveliers in Crete'],DOI:'10.1234/creveliers',author:[{given:'A',family:'Scholar'}],published:{'date-parts':[[2017]]}}]}});
+ const parsed=crossrefParse(records);
+ assert.equal(parsed.length,1);
+ assert.equal(parsed[0].url,'https://doi.org/10.1234/creveliers');
+ assert.equal(parsed[0].recordType,'bibliography');
+ assert.equal(crossrefParse(JSON.stringify({message:{items:[{title:['Unsafe'],URL:'https://evil.example/1'}]}})).length,0);
+ const calls=[];
+ const transport=async url=>{
+   calls.push(url);
+   if(url.includes('googleapis.com'))return new Response('{}',{status:429});
+   if(url.includes('crossref.org'))return new Response(url.includes('Hugues%20Creveliers')?records:JSON.stringify({message:{items:[]}}),{status:200});
+   return new Response(JSON.stringify({pages:[]}),{status:200});
+ };
+ const result=await researchMessages([{role:'user',content:'Ψάξε ιστορικές πηγές για Crevellier Ιεράπετρα 1675'}],{now:new Date('2026-11-18T12:00:00Z'),transport});
+ assert.equal(result.items.length,1);
+ assert.equal(result.items[0].provider,'Crossref');
+ assert.equal(calls.filter(x=>x.includes('googleapis.com')).length,1);
+ assert.ok(calls.every(x=>!x.includes('bing.com')));
 });
