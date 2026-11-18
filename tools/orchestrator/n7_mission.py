@@ -214,6 +214,7 @@ def run(root: Path, run_id: str, worker: Callable | None = None, max_steps: int 
         atomic_json(directory / "mission.json", state)
     report = summarize(state)
     # Produce the actual historical research artifact, not just a count of search hits.
+    report["research_question"] = str(state["plan"].get("purpose") or state["plan"].get("target") or "")[:1200]
     from n7_research_dossier import write_dossier
     dossier = write_dossier(directory, report)
     report["research_dossier"] = "research_dossier.md"

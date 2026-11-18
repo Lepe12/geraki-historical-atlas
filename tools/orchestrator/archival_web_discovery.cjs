@@ -30,6 +30,25 @@ const {researchMessages}=require('../n7/public-web-search.js');
      (/(?:^|\.)helios\.eie\.gr|(?:^|\.)ekt\.gr|(?:^|\.)openarchives\.gr/i.test(new URL(x.url).hostname)?4:0);
    return score(b)-score(a);
  });
+ // Reuse previously *read* public documents as discovery leads when ordinary
+ // search fails. Entries remain unverified until independently re-read.
+ const index=JSON.parse(fs.readFileSync(require('node:path').join(__dirname,'public_source_index.json'),'utf8'));
+ if(index.schema!=='n7-inspected-public-sources/v1')throw Error('UNTRUSTED_PUBLIC_SOURCE_INDEX');
+ const requestText=[input.question,...queries].join(' ').toLowerCase();
+ for(const saved of index.sources||[]){
+   if(!Array.isArray(saved.aliases)||!saved.aliases.some(alias=>requestText.includes(String(alias).toLowerCase())))continue;
+   if(typeof saved.url!=='string'||!saved.url.startsWith('https://helios.eie.gr/')||seen.has(saved.url))continue;
+   seen.add(saved.url);
+   records.unshift({title:String(saved.title||'').slice(0,250),url:saved.url,
+     provider:'N7 Previously Read Public Library',evidence_level:'DISCOVERY_ONLY',
+     verification_status:'UNVERIFIED_DISCOVERY',record_type:'previously_read_document'});
+ }
+ records.sort((a,b)=>{
+   const score=x=>(x.record_type==='previously_read_document'?20:0)+
+     (/\\.pdf(?:[?#]|$)/i.test(x.url)?10:0)+
+     (/(?:^|\\.)helios\\.eie\\.gr|(?:^|\\.)ekt\\.gr|(?:^|\\.)openarchives\\.gr/i.test(new URL(x.url).hostname)?4:0);
+   return score(b)-score(a);
+ });
  const selected=records.slice(0,16);
  process.stdout.write(JSON.stringify({status:searched?'EXECUTED':'NOT_SEARCHED',
    connector_id:'planner:public_web',records:selected,source_count:selected.length,
