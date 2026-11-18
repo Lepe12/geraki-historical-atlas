@@ -59,10 +59,15 @@ def _planned_public_inspection(agent,plan):
     question=cfg.get("query")
     if not isinstance(question,str) or not question.startswith("Ψάξε στο Internet ιστορικές πηγές") or len(question)>900:
         raise RuntimeError("UNSAFE_SUPPLEMENTAL_WEB_QUERY")
+    variants=cfg.get("query_variants") or [question]
+    if not isinstance(variants,list) or not 1<=len(variants)<=3 or any(
+        not isinstance(q,str) or not q.startswith("Ψάξε στο Internet ιστορικές πηγές")
+        or len(q)>240 for q in variants):
+        raise RuntimeError("UNSAFE_SUPPLEMENTAL_WEB_VARIANTS")
     script=Path(__file__).with_name("archival_web_discovery.cjs")
     try:
-        proc=subprocess.run(["node",str(script)],input=json.dumps({"question":question}),
-                            capture_output=True,text=True,timeout=45,check=True)
+        proc=subprocess.run(["node",str(script)],input=json.dumps({"question":question,"variants":variants}),
+                            capture_output=True,text=True,timeout=110,check=True)
         response=json.loads(proc.stdout)
         records=response.get("records",[])
         if not isinstance(records,list):raise ValueError("BAD_WEB_RECORDS")
