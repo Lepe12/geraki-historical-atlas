@@ -146,7 +146,7 @@ def main():
     overlay=pathlib.Path(__file__).resolve().parent
     shutil.copy2(overlay/"N7Workspace.tsx",out/"components/N7Workspace.tsx")
     shutil.copy2(overlay/"N7ApexStage.tsx",out/"components/N7ApexStage.tsx")
-    (out/"components/N7BuildFlags.ts").write_text(f"export const N7_GUIDE = {str(guide).lower()};\nexport const N7_GUEST_CHAT = {str(isolated).lower()};\n")
+    (out/"components/N7BuildFlags.ts").write_text(f"export const N7_GUIDE = {str(guide).lower()};\nexport const N7_GUEST_CHAT = {str(isolated and base_path != '/n7-apex-step5-hacker').lower()};\nexport const N7_HACKER = {str(base_path == '/n7-apex-step5-hacker').lower()};\n")
     # Step 5/6 stays isolated; retain the normal production entry point.
     # The isolated Step 5 route must present the humanoid immediately.
     # Production /n7-apex keeps the normal button-controlled workflow.
