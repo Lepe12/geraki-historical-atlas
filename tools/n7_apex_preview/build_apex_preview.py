@@ -156,6 +156,7 @@ def main():
             "const [humanoidOpen,setHumanoidOpen]=useState(false);",
             "const [humanoidOpen,setHumanoidOpen]=useState(true);")
     shutil.copy2(overlay/"N7HumanoidView.tsx",out/"components/N7HumanoidView.tsx")
+    shutil.copy2(overlay/"N7HackerPreview.ts",out/"components/N7HackerPreview.ts")
     shutil.copy2(overlay/"N7Backdrop.tsx",out/"components/N7Backdrop.tsx")
     shutil.copy2(overlay/"N7HeadSurface.ts",out/"components/N7HeadSurface.ts")
     for name in ("N7GuideScene.tsx","N7GuideView.tsx","N7GuideFx.ts","useN7Voice.ts","N7FemaleVoice.ts","N7VoiceSignal.ts"):
