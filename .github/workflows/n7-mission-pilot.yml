@@ -62,6 +62,9 @@ jobs:
     needs: offline-contract
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
     # Workflow never writes to main, the host, WordPress or public databases.
     steps:
       - uses: actions/checkout@v4
@@ -75,6 +78,7 @@ jobs:
       - name: Start and run N7 research mission
         env:
           PYTHONPATH: .:tools:tools/orchestrator:tools/connectors
+          PCT_COMMAND_CENTER_URL: https://pct-live.piratecartography.com/pct-api/live
           TARGET: ${{ inputs.target }}
           PURPOSE: ${{ inputs.purpose }}
           DATE_RANGE: ${{ inputs.date_range }}
