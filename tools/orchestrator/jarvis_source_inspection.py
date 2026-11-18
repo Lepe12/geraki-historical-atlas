@@ -55,7 +55,7 @@ def read(url,opener=None):
                 from pypdf import PdfReader
                 pdf=PdfReader(io.BytesIO(raw),strict=False)
                 if pdf.is_encrypted:return {'status':'ENCRYPTED_PDF_REQUIRES_REVIEW'}
-                pages=[(p.extract_text() or '') for p in list(pdf.pages)[:6]]
+                pages=[(pdf.pages[i].extract_text() or '') for i in range(min(6,len(pdf.pages)))]
                 body=' '.join(' '.join(pages).split())[:35000]
                 return {'status':'DOCUMENT_READ','text':body,'pages_read':len(pages)}
             except ImportError:
