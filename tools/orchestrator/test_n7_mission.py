@@ -129,6 +129,15 @@ class N7MissionTests(unittest.TestCase):
         self.assertEqual(report["status"], "INCOMPLETE")
         self.assertIn("NO_SUCCESSFUL_SEARCH_ROUTES", report["agent_states"][PREFERRED[0]]["last_error"])
 
+    def test_summary_counts_true_pdf_pages_not_only_document_hits(self):
+        self.init()
+        state=load_state(self.root, "naxos-1670")
+        state["steps"]["source_genealogy"]["inspected_documents"]=1
+        state["steps"]["source_genealogy"]["inspected_pages"]=32
+        report=summarize(state)
+        self.assertEqual(report["inspected_source_documents_count"],1)
+        self.assertEqual(report["inspected_source_pages_count"],32)
+        self.assertEqual(report["historical_attestations_verified"],0)
     def test_stop_switch_on_resume(self):
         self.init()
         with patch("jarvis_runtime_guard.load_policy", return_value=policy(kill=True)):

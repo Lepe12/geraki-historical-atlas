@@ -124,14 +124,16 @@ def summarize(state: dict) -> dict:
     found = sum(int(row.get("candidate_records", 0)) for row in steps.values())
     contradiction_ok = steps["contradiction"]["status"] == "COMPLETED"
     pages_read = sum(int(row.get("inspected_pages", 0)) for row in steps.values())
+    documents_read = sum(int(row.get("inspected_documents", 0)) for row in steps.values())
     cooccurrences = sum(int(row.get("cooccurrence_leads", 0)) for row in steps.values())
     return {"schema": "n7-research-mission-report-v1", "run_id": state["run_id"],
             "request_fingerprint": state["request_fingerprint"],
             "status": "DISCOVERY_FINISHED" if finished else ("INCOMPLETE" if any_failed else "IN_PROGRESS"),
-            "agent_states": {aid: {k: row.get(k) for k in ("status", "attempts", "candidate_records", "inspected_pages", "cooccurrence_leads", "last_error") if k in row}
+            "agent_states": {aid: {k: row.get(k) for k in ("status", "attempts", "candidate_records", "inspected_documents", "inspected_pages", "cooccurrence_leads", "last_error") if k in row}
                              for aid, row in steps.items()},
             "discovered_record_count": found,
             "inspected_source_pages_count": pages_read,
+            "inspected_source_documents_count": documents_read,
             "cooccurrence_leads_count": cooccurrences,
             "historical_attestations_verified": 0,
             "adversarial_search_completed": contradiction_ok,
@@ -192,7 +194,10 @@ def run(root: Path, run_id: str, worker: Callable | None = None, max_steps: int 
             step["candidate_records"] = sum(len(row.get("records") or []) for row in result["search_runs"]
                                             if isinstance(row, dict) and isinstance(row.get("records"), list))
             inspected = (result.get("source_inspection") or {}).get("inspected_pages") or []
-            step["inspected_pages"] = sum(row.get("status") in ("PAGE_READ_NO_EVENT_MATCH", "CO_OCCURRENCE_NEEDS_REVIEW") for row in inspected)
+            readable=[row for row in inspected if row.get("status") in
+                      ("PAGE_READ_NO_EVENT_MATCH", "CO_OCCURRENCE_NEEDS_REVIEW")]
+            step["inspected_documents"] = len(readable)
+            step["inspected_pages"] = sum(max(1,int(row.get("pages_read") or 1)) for row in readable)
             step["cooccurrence_leads"] = sum(row.get("status") == "CO_OCCURRENCE_NEEDS_REVIEW" for row in inspected)
             # Memory is private to the mission, learning search performance only.
             try:

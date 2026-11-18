@@ -1,0 +1,69 @@
+name: N7 Ierapetra actual source-reading regression
+on:
+  pull_request:
+    paths:
+      - 'tools/orchestrator/jarvis_source_inspection.py'
+      - 'tools/orchestrator/jarvis_specialist_worker.py'
+      - 'tools/orchestrator/jarvis_specialist_plan.py'
+      - '.github/workflows/n7-ierapetra-reading-regression.yml'
+permissions:
+  contents: read
+jobs:
+  live-read:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            tools
+            config
+            data
+      - name: Install bounded PDF extraction
+        run: python3 -m pip install --disable-pip-version-check pypdf==6.4.0
+      - name: Execute actual N7 mission from fix branch
+        env:
+          PYTHONPATH: .:tools:tools/orchestrator:tools/connectors
+          PCT_COMMAND_CENTER_URL: https://pct-live.piratecartography.com/pct-api/live
+        run: |
+          python3 tools/orchestrator/n7_mission.py init --root .n7_missions --run-id "$GITHUB_RUN_ID"             --target 'Ierapetra, Crete'             --purpose 'Investigate Hugues Creveliers Crevellier alleged Ierapetra raid 1675; find dated primary sources and compare independent evidence'             --date-range '1665-1680'             --aliases 'Ιεράπετρα|Hierapetra|Ierapetra|Hugo de Creveuil|Hugues Creveliers|Crevellier|Κρεβελιέ'
+          python3 tools/orchestrator/n7_mission.py run --root .n7_missions --run-id "$GITHUB_RUN_ID"
+      - name: Summarize actual inspected pages and source outcomes
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path('.n7_missions')/os.environ['GITHUB_RUN_ID']
+          summary=json.loads((root/'report.json').read_text()) if (root/'report.json').exists() else {}
+          rows=[]
+          for path in sorted((root/'results').glob('*.json')):
+            obj=json.loads(path.read_text())
+            rows += [{'agent':obj.get('agent_id'),'url':str(x.get('url',''))[:220],
+                      'status':x.get('status'),'pages_read':x.get('pages_read'),
+                      'total_pages':x.get('total_pages'),'matched':x.get('contains_target') and x.get('contains_person')}
+                     for x in obj.get('source_inspection',{}).get('inspected_pages',[])]
+          print('N7_SOURCE_READING_ACTUAL='+json.dumps({
+            'mission_status':summary.get('status'),
+            'candidate_records':summary.get('discovered_record_count'),
+            'pages_inspected':summary.get('inspected_source_pages_count'),
+            'historical_attestations_verified':summary.get('historical_attestations_verified'),
+            'inspected_results':rows},ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: n7-ierapetra-reading-${{ github.run_id }}
+          path: .n7_missions/
+          include-hidden-files: true
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Fail unless at least one page was really read
+        run: |
+          python3 - <<'PY'
+          import json,os,pathlib
+          path=pathlib.Path('.n7_missions')/os.environ['GITHUB_RUN_ID']/'report.json'
+          report=json.loads(path.read_text())
+          if report['inspected_source_pages_count']<1:raise SystemExit('N7_NO_READABLE_SOURCE_PAGES')
+          print('N7_ACTUAL_SOURCE_PAGES_READ='+str(report['inspected_source_pages_count']))
+          PY

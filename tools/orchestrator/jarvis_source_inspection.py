@@ -10,7 +10,8 @@ HOSTS=('bnf.fr','loc.gov','archive.org','nationalarchives.gov.uk',
        'diplomatie.gouv.fr','internetculturale.it','cultura.gov.it',
        'openarchives.gr','anemi.lib.uoc.gr','google.com','googleapis.com',
        'isam.org.tr','nationaalarchief.nl','kb.nl','bne.es','searchculture.gr',
-       'openalex.org','crossref.org','zenodo.org')
+       'openalex.org','crossref.org','zenodo.org',
+       'helios.eie.gr','ekt.gr','eie.gr')
 
 def allowed(url):
     try:
@@ -67,7 +68,7 @@ def read(url,opener=None):
             is_pdf='pdf' in typ
             if 'html' not in typ and not is_pdf:
                 return {'status':'UNSUPPORTED_DOCUMENT_TYPE'}
-            cap=3_000_000 if is_pdf else 450_000
+            cap=20_000_000 if is_pdf else 450_000
             raw=resp.read(cap+1)
         if len(raw)>cap:return {'status':'DOCUMENT_TOO_LARGE'}
         if is_pdf:
@@ -75,9 +76,20 @@ def read(url,opener=None):
                 from pypdf import PdfReader
                 pdf=PdfReader(io.BytesIO(raw),strict=False)
                 if pdf.is_encrypted:return {'status':'ENCRYPTED_PDF_REQUIRES_REVIEW'}
-                pages=[(pdf.pages[i].extract_text() or '') for i in range(min(6,len(pdf.pages)))]
-                body=' '.join(' '.join(pages).split())[:35000]
-                return {'status':'DOCUMENT_READ','text':body,'pages_read':len(pages)}
+                total=len(pdf.pages)
+                count=min(total,180)
+                excerpts=[]
+                collected=[]
+                pages_read=0
+                for i in range(count):
+                    body=' '.join((pdf.pages[i].extract_text() or '').split())
+                    pages_read=i+1
+                    if sum(map(len,collected))<30000:collected.append(body[:1200])
+                    for match in list(re.finditer(r'creveuil|crevell|crevelier|ierapetra|hierapetra|ιεραπετρ|κρεβε',body,re.I))[:3]:
+                        if len(excerpts)<20:excerpts.append({'pdf_page':i+1,'text':body[max(0,match.start()-180):match.end()+350]})
+                return {'status':'DOCUMENT_READ','text':' '.join(collected)[:35000],
+                        'pages_read':pages_read,'total_pages':total,
+                        'partial':total>count,'page_excerpts':excerpts[:20]}
             except ImportError:
                 return {'status':'PDF_READER_NOT_INSTALLED'}
             except Exception:
@@ -99,6 +111,11 @@ def inspect(search_runs,*,target,aliases=(),max_pages=4,reader=read):
         a=str(a).strip()
         if a and fold(a) not in fold(target) and (len(a.split())>=2 or re.search(r'creve|κρεβε',fold(a))):
             names.append(fold(a))
+            # Period sources regularly omit given names and use spelling variants;
+            # a distinctive surname remains sufficient for a *lead*, never verification.
+            surname=fold(a.split()[-1])
+            if len(surname)>=6 and re.search(r'creve|κρεβε',surname):
+                names.append(surname)
     inspected=[];seen=set()
     for run in search_runs or []:
         if not isinstance(run,dict):continue
@@ -112,12 +129,21 @@ def inspect(search_runs,*,target,aliases=(),max_pages=4,reader=read):
                   'historically_verified':False,'citation_verified':False}
             if status in ('PAGE_READ','DOCUMENT_READ'):
                 text=str(result.get('text') or '')
-                item['contains_target']=bool(place and place in fold(text))
-                item['contains_person']=any(n in fold(text) for n in names)
+                snippets=result.get('page_excerpts') or []
+                snippets_text=' '.join(row.get('text','') for row in snippets)
+                searchable=fold(text+' '+snippets_text)
+                item['contains_target']=bool(place and place in searchable)
+                item['contains_person']=any(n in searchable for n in names)
+                if status=='DOCUMENT_READ':
+                    item['pages_read']=result.get('pages_read',0)
+                    item['total_pages']=result.get('total_pages')
+                    item['partial_document_read']=bool(result.get('partial'))
+                    item['page_excerpts']=snippets[:10]
                 if item['contains_target'] and item['contains_person']:
-                    pos=text.casefold().find(str(target).split(',')[0].casefold())
+                    excerpt_source=snippets_text if snippets_text else text
+                    pos=fold(excerpt_source).find(place)
                     pos=max(0,pos)
-                    item['page_excerpt']=text[max(0,pos-200):pos+500]
+                    item['page_excerpt']=excerpt_source[max(0,pos-200):pos+500]
                     item['status']='CO_OCCURRENCE_NEEDS_REVIEW'
                 else:item['status']='PAGE_READ_NO_EVENT_MATCH'
             inspected.append(item)
