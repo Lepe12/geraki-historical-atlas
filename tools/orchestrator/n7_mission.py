@@ -123,12 +123,17 @@ def summarize(state: dict) -> dict:
     any_failed = any(row["status"] == "FAILED" for row in steps.values())
     found = sum(int(row.get("candidate_records", 0)) for row in steps.values())
     contradiction_ok = steps["contradiction"]["status"] == "COMPLETED"
+    pages_read = sum(int(row.get("inspected_pages", 0)) for row in steps.values())
+    cooccurrences = sum(int(row.get("cooccurrence_leads", 0)) for row in steps.values())
     return {"schema": "n7-research-mission-report-v1", "run_id": state["run_id"],
             "request_fingerprint": state["request_fingerprint"],
             "status": "DISCOVERY_FINISHED" if finished else ("INCOMPLETE" if any_failed else "IN_PROGRESS"),
-            "agent_states": {aid: {k: row.get(k) for k in ("status", "attempts", "candidate_records", "last_error") if k in row}
+            "agent_states": {aid: {k: row.get(k) for k in ("status", "attempts", "candidate_records", "inspected_pages", "cooccurrence_leads", "last_error") if k in row}
                              for aid, row in steps.items()},
             "discovered_record_count": found,
+            "inspected_source_pages_count": pages_read,
+            "cooccurrence_leads_count": cooccurrences,
+            "historical_attestations_verified": 0,
             "adversarial_search_completed": contradiction_ok,
             "review_status": "HUMAN_SOURCE_INSPECTION_REQUIRED",
             "historically_verified": False,
@@ -186,6 +191,9 @@ def run(root: Path, run_id: str, worker: Callable | None = None, max_steps: int 
             step["status"] = "COMPLETED"
             step["candidate_records"] = sum(len(row.get("records") or []) for row in result["search_runs"]
                                             if isinstance(row, dict) and isinstance(row.get("records"), list))
+            inspected = (result.get("source_inspection") or {}).get("inspected_pages") or []
+            step["inspected_pages"] = sum(row.get("status") in ("PAGE_READ_NO_EVENT_MATCH", "CO_OCCURRENCE_NEEDS_REVIEW") for row in inspected)
+            step["cooccurrence_leads"] = sum(row.get("status") == "CO_OCCURRENCE_NEEDS_REVIEW" for row in inspected)
             # Memory is private to the mission, learning search performance only.
             try:
                 from tools.memory.naboux_memory import load, save, learn_specialist_result

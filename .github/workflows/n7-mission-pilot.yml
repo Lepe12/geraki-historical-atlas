@@ -48,6 +48,7 @@ jobs:
         run: |
           python3 -m py_compile tools/orchestrator/n7_mission.py tools/orchestrator/test_n7_mission.py
           python3 -m unittest tools/orchestrator/test_n7_mission.py -v
+          python3 -m unittest tools/orchestrator/test_jarvis_source_inspection.py -v
       - name: Exercise real JARVIS planner and policy (offline)
         env:
           PYTHONPATH: .:tools:tools/orchestrator
@@ -61,6 +62,9 @@ jobs:
     needs: offline-contract
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
     # Workflow never writes to main, the host, WordPress or public databases.
     steps:
       - uses: actions/checkout@v4
@@ -71,9 +75,12 @@ jobs:
             tools
             config
             data
+      - name: Install bounded public PDF reader
+        run: python3 -m pip install --disable-pip-version-check pypdf==6.4.0
       - name: Start and run N7 research mission
         env:
           PYTHONPATH: .:tools:tools/orchestrator:tools/connectors
+          PCT_COMMAND_CENTER_URL: https://pct-live.piratecartography.com/pct-api/live
           TARGET: ${{ inputs.target }}
           PURPOSE: ${{ inputs.purpose }}
           DATE_RANGE: ${{ inputs.date_range }}

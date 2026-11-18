@@ -58,6 +58,18 @@ def render_queries(agent_id:str,target:str,date_range:str="",aliases:list[str]|N
         if q not in out: out.append(q)
     return out[:int(reg.get("max_queries",8))]
 
+def event_queries(target, purpose, date_range, aliases):
+    """Prioritize explicit person/place/event co-occurrence over generic catalogue hits."""
+    year = re.search(r"(?<!\d)(1[5-9]\d{2}|20\d{2})(?!\d)", purpose)
+    when = year.group(1) if year else (date_range[:4] if date_range else "")
+    place = target.split(",")[0].strip()
+    names = [a.strip() for a in aliases if len(a.split()) >= 2
+             and a.casefold() not in target.casefold()
+             and not any(w.casefold() in target.casefold() for w in a.split() if len(w)>3)]
+    variants = names[:2] or [a.strip() for a in aliases[-2:] if a.strip() and a.casefold() not in target.casefold()]
+    return [f'"{name}" "{place}" {when}'.strip() for name in variants[:2]]
+
+
 def build(target,purpose,date_range="",aliases=None,target_type="auto"):
     aliases=list(aliases or [])
     focus=decompose(target,aliases,purpose,target_type)
@@ -109,6 +121,10 @@ def build(target,purpose,date_range="",aliases=None,target_type="auto"):
                         'contradiction':['disputed','history'],
                         'relationship_network':['captain','associates']}.get(aid,['history'])
             queries=focused_queries(focus,qualifiers,include_hypotheses=True)[:int(meta.get('max_queries',8))]
+        # Put the event-specific combined queries first inside the existing route budget.
+        # Discovery remains unverified, regardless of result count.
+        if aliases:
+            queries = list(dict.fromkeys(event_queries(target, purpose, date_range, aliases) + queries))
         if memory is not None and successful_queries:
             try:
                 learned=successful_queries(memory,aid,limit=4)
