@@ -88,7 +88,17 @@ def patch_site_chat(live: bytes, canonical: bytes) -> bytes:
 
 
 def patch_library_reader(live: bytes, canonical: bytes) -> bytes:
-    return patch_site_chat(_patch_library_reader_core(live, canonical), canonical)
+    live = patch_site_chat(_patch_library_reader_core(live, canonical), canonical)
+    marker = b"  // N7_OWNER_PUBLIC_EVIDENCE_V1\n"
+    end = b"  if(n7MissionStatusCache.size>100)"
+    if canonical.count(marker) != 1:
+        raise RuntimeError("N7_OWNER_PUBLIC_EVIDENCE_CANONICAL_MISSING")
+    addition = marker + canonical.split(marker, 1)[1].split(end, 1)[0]
+    if marker in live:
+        if live.count(addition) != 1:
+            raise RuntimeError("N7_OWNER_PUBLIC_EVIDENCE_PATCH_DRIFT")
+        return live
+    return add_exact(live, end, addition)
 
 
 def wrap_mission_patched(original_patched):

@@ -214,6 +214,30 @@ async function githubResearchStatus(requestId){
         verified:false,human_review_required:true};
     }
   }
+  // N7_OWNER_PUBLIC_EVIDENCE_V1
+  if(parent&&!child&&/^[0-9]{8,20}$/.test(String(parent.id))){
+    if(parent.status!=="completed")report.status="PIPELINE_"+String(parent.status).toUpperCase();
+    if(parent.status==="completed"&&parent.conclusion==="success"){
+      try{
+        const artifacts=await getJson("https://api.github.com/repos/"+REPO+
+          "/actions/runs/"+parent.id+"/artifacts?per_page=20",150_000);
+        const dossier=(Array.isArray(artifacts.artifacts)?artifacts.artifacts:[]).find(a=>
+          !a.expired&&/^[0-9]{8,20}$/.test(String(a.id))&&
+          ["n7-owner-public-evidence-complete","n7-owner-public-evidence-incomplete"].includes(a.name));
+        if(dossier){
+          const complete=dossier.name==="n7-owner-public-evidence-complete";
+          report.status=complete?"PIPELINE_COMPLETED":"EVIDENCE_PRESERVED_REVIEW_REQUIRED";
+          report.research_run_id=parent.id;
+          report.research_url="https://github.com/"+REPO+"/actions/runs/"+parent.id+"/artifacts/"+dossier.id;
+          report.preview={report_status:complete?"DISCOVERY_FINISHED":"INCOMPLETE",
+            paragraphs:[complete?
+              "Ο διαθέσιμος κύκλος αναζήτησης ολοκληρώθηκε. Ο φάκελος πηγών περιλαμβάνει τις εκκρεμότητες τεκμηρίωσης.":
+              "Εξαντλήθηκαν οι διαθέσιμες προσπάθειες σε ορισμένες διαδρομές. Ο φάκελος παραμένει διαθέσιμος."],
+            sources:[],verified:false,human_review_required:true};
+        }
+      }catch(_){/* Keep the observed workflow status when evidence is unavailable. */}
+    }
+  }
   if(n7MissionStatusCache.size>100)n7MissionStatusCache.clear();
   n7MissionStatusCache.set(requestId,{at:Date.now(),report});
   return report;
