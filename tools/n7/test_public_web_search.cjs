@@ -1,7 +1,7 @@
 'use strict';
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
-const {classify,parseRss,googleBooksParse,crossrefParse,researchMessages,contextForResearch,sourceFooter,boundedFetch,safeLink}=require('./public-web-search');
+const {classify,parseRss,googleWebParse,duckDuckGoParse,googleBooksParse,crossrefParse,researchMessages,contextForResearch,sourceFooter,boundedFetch,safeLink}=require('./public-web-search');
 const when=new Date('2026-11-05T19:00:00Z');
 const xml='<rss><channel>'+
 '<item><title>US 2026 midterm election results - News Agency</title>'+
@@ -123,5 +123,68 @@ test('Crossref metadata fallback is parsed safely and Google Books quota skips r
  assert.equal(result.items.length,1);
  assert.equal(result.items[0].provider,'Crossref');
  assert.equal(calls.filter(x=>x.includes('googleapis.com')).length,1);
+ assert.ok(calls.every(x=>!x.includes('bing.com')));
+});
+
+test('ordinary Google Web Search extracts third-party result headings without tracking links',()=>{
+ const html='<html><body><a href="/url?q=https%3A%2F%2Fexample.org%2Fcreveliers%3Fx%3D1&sa=U"><h3>Hugues Creveliers and the history of Crete</h3></a>'+
+ '<a href="https://another.edu/research"><h3>Research on Ierapetra 1675</h3></a>'+
+ '<a href="https://www.google.com/"><h3>Internal Google link</h3></a>'+
+ '<a href="http://127.0.0.1"><h3>Internal private network</h3></a></body></html>';
+ const results=googleWebParse(html);
+ assert.equal(results.length,2);
+ assert.equal(results[0].url,'https://example.org/creveliers?x=1');
+ assert.equal(results[1].url,'https://another.edu/research');
+ assert.ok(results.every(x=>x.recordType==='search_result'));
+ assert.throws(()=>googleWebParse('Our systems have detected unusual traffic from your computer. CAPTCHA'),/GOOGLE_SEARCH_ACCESS_CHALLENGE/);
+});
+test('historical research can find a Google Web result after reformulating without using Bing',async()=>{
+ const calls=[];
+ const resultPage='<html><a href="https://www.ekt.gr/en/research/creveliers"><h3>Hugues Creveliers history of Ierapetra</h3></a></html>';
+ const transport=async url=>{
+   calls.push(url);
+   if(url.includes('/search?')&&url.includes('Hugues%20Creveliers'))return new Response(resultPage,{status:200});
+   if(url.includes('google.com/search'))return new Response('<html><body>No useful results</body></html>',{status:200});
+   if(url.includes('googleapis.com'))return new Response('{}',{status:429});
+   if(url.includes('crossref.org'))return new Response('{"message":{"items":[]}}',{status:200});
+   return new Response('{"pages":[]}',{status:200});
+ };
+ const r=await researchMessages([{role:'user',content:'Ψάξε στο διαδίκτυο για Hugo de Creveuil Crevellie και Ιεράπετρα 1675'}],{now:new Date('2026-11-18T12:00:00Z'),transport});
+ assert.equal(r.items.length,1);
+ assert.match(r.items[0].title,/Creveliers/);
+ assert.equal(r.items[0].provider,'Google Web Search');
+ assert.equal(r.queryRetried,true);
+ assert.ok(calls.some(x=>x.startsWith('https://www.google.com/search?')));
+ assert.ok(calls.every(x=>!x.includes('bing.com')));
+});
+
+test('no-key HTML web fallback extracts real HTTPS results, not its redirect wrappers',()=>{
+ const html='<html><body>'+
+  '<a class="result__a" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fexample.org%2Fhistory%3Fid%3D5&amp;rut=xyz"><h2>Hugues Creveliers in Crete</h2></a>'+
+  '<a class="result__a" href="https://example.edu/ierapetra"><span>Ierapetra 1675 maritime raid</span></a>'+
+  '<a class="result__a" href="//duckduckgo.com/l/?uddg=http%3A%2F%2F127.0.0.1%2Fadmin">Unsafe private host</a>'+
+  '</body></html>';
+ const found=duckDuckGoParse(html);
+ assert.equal(found.length,2);
+ assert.equal(found[0].url,'https://example.org/history?id=5');
+ assert.equal(found[1].url,'https://example.edu/ierapetra');
+ assert.ok(found.every(x=>x.recordType==='search_result'));
+});
+test('Google JS-only response transparently falls back to general web index',async()=>{
+ const html='<html><a class="result__a" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fekt.gr%2Fhistory"><h2>Hugues Creveliers Ierapetra raid</h2></a></html>';
+ const calls=[];
+ const transport=async url=>{
+   calls.push(url);
+   if(url.includes('html.duckduckgo.com'))return new Response(html,{status:200});
+   if(url.includes('www.google.com'))return new Response('<html><title>Google Search</title></html>',{status:200});
+   if(url.includes('googleapis.com'))return new Response('{}',{status:429});
+   if(url.includes('crossref.org'))return new Response('{"message":{"items":[]}}',{status:200});
+   return new Response('{"pages":[]}',{status:200});
+ };
+ const result=await researchMessages([{role:'user',content:'Ψάξε ιστορικές πηγές για Hugues Creveliers και Ιεράπετρα 1675'}],{now:new Date('2026-11-18T12:00:00Z'),transport});
+ assert.equal(result.items.length,1,JSON.stringify(result));
+ assert.equal(result.items[0].provider,'Public Web Search');
+ assert.ok(calls.some(x=>x.includes('www.google.com/search?')));
+ assert.ok(calls.some(x=>x.includes('html.duckduckgo.com/html/?q=')));
  assert.ok(calls.every(x=>!x.includes('bing.com')));
 });
