@@ -3,7 +3,7 @@
 Reading a page is NOT validation of the source or of a historical claim.
 """
 from __future__ import annotations
-import html, ipaddress, re, ssl, urllib.parse, urllib.request
+import html, ipaddress, io, re, ssl, urllib.parse, urllib.request
 from html.parser import HTMLParser
 
 HOSTS=('bnf.fr','loc.gov','archive.org','nationalarchives.gov.uk',
@@ -44,9 +44,24 @@ def read(url,opener=None):
         with opener.open(req,timeout=9) as resp:
             if not allowed(resp.geturl()):return {'status':'UNSAFE_FINAL_URL'}
             typ=resp.headers.get('Content-Type','').lower()
-            if 'html' not in typ:return {'status':'NON_HTML_REQUIRES_DOCUMENT_READER'}
-            raw=resp.read(450001)
-        if len(raw)>450000:return {'status':'PAGE_TOO_LARGE'}
+            is_pdf='pdf' in typ
+            if 'html' not in typ and not is_pdf:
+                return {'status':'UNSUPPORTED_DOCUMENT_TYPE'}
+            cap=3_000_000 if is_pdf else 450_000
+            raw=resp.read(cap+1)
+        if len(raw)>cap:return {'status':'DOCUMENT_TOO_LARGE'}
+        if is_pdf:
+            try:
+                from pypdf import PdfReader
+                pdf=PdfReader(io.BytesIO(raw),strict=False)
+                if pdf.is_encrypted:return {'status':'ENCRYPTED_PDF_REQUIRES_REVIEW'}
+                pages=[(p.extract_text() or '') for p in list(pdf.pages)[:6]]
+                body=' '.join(' '.join(pages).split())[:35000]
+                return {'status':'DOCUMENT_READ','text':body,'pages_read':len(pages)}
+            except ImportError:
+                return {'status':'PDF_READER_NOT_INSTALLED'}
+            except Exception:
+                return {'status':'PDF_EXTRACTION_FAILED'}
         parser=PlainText();parser.feed(raw.decode('utf-8','replace'))
         return {'status':'PAGE_READ','text':' '.join(html.unescape(' '.join(parser.parts)).split())[:35000]}
     except (OSError,ValueError,TimeoutError) as exc:
@@ -75,7 +90,7 @@ def inspect(search_runs,*,target,aliases=(),max_pages=4,reader=read):
             result=reader(url); status=str(result.get('status'))
             item={'url':url,'title':str(rec.get('title') or '')[:300],'status':status,
                   'historically_verified':False,'citation_verified':False}
-            if status=='PAGE_READ':
+            if status in ('PAGE_READ','DOCUMENT_READ'):
                 text=str(result.get('text') or '')
                 item['contains_target']=bool(place and place in fold(text))
                 item['contains_person']=any(n in fold(text) for n in names)
