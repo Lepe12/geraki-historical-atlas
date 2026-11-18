@@ -60,7 +60,7 @@ def render_queries(agent_id:str,target:str,date_range:str="",aliases:list[str]|N
 
 def event_queries(target, purpose, date_range, aliases):
     """Prioritize explicit person/place/event co-occurrence over generic catalogue hits."""
-    year = re.search(r"(?<!\\d)(1[5-9]\\d{2}|20\\d{2})(?!\\d)", purpose)
+    year = re.search(r"(?<!\d)(1[5-9]\d{2}|20\d{2})(?!\d)", purpose)
     when = year.group(1) if year else (date_range[:4] if date_range else "")
     place = target.split(",")[0].strip()
     names = [a.strip() for a in aliases if len(a.split()) >= 2
@@ -123,7 +123,7 @@ def build(target,purpose,date_range="",aliases=None,target_type="auto"):
             queries=focused_queries(focus,qualifiers,include_hypotheses=True)[:int(meta.get('max_queries',8))]
         # Put the event-specific combined queries first inside the existing route budget.
         # Discovery remains unverified, regardless of result count.
-        if aliases and focus['kind'] != 'topic':
+        if aliases:
             queries = list(dict.fromkeys(event_queries(target, purpose, date_range, aliases) + queries))
         if memory is not None and successful_queries:
             try:
