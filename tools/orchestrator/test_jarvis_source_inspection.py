@@ -3,7 +3,7 @@ import unittest
 import sys
 import types
 from unittest.mock import patch
-from jarvis_source_inspection import allowed,read,inspect
+from jarvis_source_inspection import allowed,document_candidate,read,inspect
 from jarvis_specialist_plan import event_queries
 
 class N7SourceInspectionTests(unittest.TestCase):
@@ -31,6 +31,15 @@ class N7SourceInspectionTests(unittest.TestCase):
         self.assertEqual(r['inspected_pages'][0]['status'],'CO_OCCURRENCE_NEEDS_REVIEW')
         self.assertFalse(r['historically_verified'])
         self.assertFalse(r['inspected_pages'][0]['citation_verified'])
+
+    def test_search_echo_is_not_historical_evidence(self):
+        search_url='https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Hugo+de+Creveuil%22+%22Ierapetra%22+1675'
+        self.assertFalse(document_candidate(search_url,'Recherche guidée'))
+        self.assertFalse(document_candidate('https://www.internetculturale.it/it/1/home','Home'))
+        rows=[{'records':[{'url':search_url,'title':'Recherche guidée'}]}]
+        def forbidden(_):raise AssertionError('search result page must never be inspected')
+        result=inspect(rows,target='Ierapetra, Crete',aliases=['Hugo de Creveuil'],reader=forbidden)
+        self.assertEqual(result['inspected_count'],0)
 
     def test_pdf_not_misrepresented_as_read(self):
         class Resp:

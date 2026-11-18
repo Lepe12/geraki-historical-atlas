@@ -21,6 +21,26 @@ def allowed(url):
         return any(h==d or h.endswith('.'+d) for d in HOSTS)
     except (ValueError,TypeError):return False
 
+NAV_TITLES={'home','recherche guidée','recherche simple','formulaire de recherche dans tous les fonds',
+            'informazioni','itinerari','mostre','la bdi','search','browse','search results'}
+
+def document_candidate(url,title=''):
+    """Reject search forms, echoed search queries and site navigation before reading."""
+    if not allowed(url):return False
+    p=urllib.parse.urlsplit(url)
+    path=p.path.casefold()
+    params={k.casefold() for k,_ in urllib.parse.parse_qsl(p.query,keep_blank_values=True)}
+    archival=('/ark:/' in path or '/ead/' in path or '/notice/' in path)
+    if not archival and params & {'q','query','search','s','term','general_term','searchterm'}:
+        return False
+    if not archival and re.search(r'/(?:search|browse|recherche|form|results)(?:/|$)',path):
+        return False
+    if str(title or '').strip().casefold() in NAV_TITLES:
+        return False
+    if path in ('','/','/it/1/home','/it/76/itinerari','/it/75/mostre'):
+        return False
+    return True
+
 class PlainText(HTMLParser):
     def __init__(self):super().__init__();self.parts=[];self.skip=0
     def handle_starttag(self,tag,attrs):
@@ -85,7 +105,7 @@ def inspect(search_runs,*,target,aliases=(),max_pages=4,reader=read):
         for rec in run.get('records') or []:
             if not isinstance(rec,dict):continue
             url=str(rec.get('url') or rec.get('digital_url') or '').strip()
-            if not url or url in seen or not allowed(url):continue
+            if not url or url in seen or not document_candidate(url,rec.get('title')):continue
             seen.add(url)
             result=reader(url); status=str(result.get('status'))
             item={'url':url,'title':str(rec.get('title') or '')[:300],'status':status,

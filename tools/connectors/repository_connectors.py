@@ -156,13 +156,13 @@ def bne_sru(q,lane):
 def archives_diplomatiques(q,lane):
     base="https://archivesdiplomatiques.diplomatie.gouv.fr"
     url=base+"/search/results?"+urllib.parse.urlencode({"q":q})
-    keep=lambda u,t: ("/ark:/" in u or "/search/" in u or "/ead/" in u or "notice" in u.lower()) and len(t)>3
+    keep=lambda u,t: ("/ark:/" in u or "/ead/" in u or "/notice/" in u.lower()) and len(t)>3
     return "EXECUTED",_html_search(url,"Archives diplomatiques France",lane,base,keep),url
 
 def internet_culturale(q,lane):
     base="https://www.internetculturale.it"
     url=base+"/it/16/search?"+urllib.parse.urlencode({"q":q,"instance":"magindice","pag":1})
-    keep=lambda u,t: ("/opencms/" in u or "/it/" in u) and ("search?" not in u) and len(t)>3
+    keep=lambda u,t: ("/opencms/" in u or "/it/16/" in u) and ("search?" not in u) and len(t)>3
     return "EXECUTED",_html_search(url,"Internet Culturale",lane,base,keep),url
 
 def _norm_search_text(v):
