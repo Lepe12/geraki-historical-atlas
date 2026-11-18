@@ -1,7 +1,7 @@
 'use strict';
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
-const {classify,parseRss,researchMessages,contextForResearch,sourceFooter,boundedFetch,safeLink}=require('./public-web-search');
+const {classify,parseRss,googleBooksParse,researchMessages,contextForResearch,sourceFooter,boundedFetch,safeLink}=require('./public-web-search');
 const when=new Date('2026-11-05T19:00:00Z');
 const xml='<rss><channel>'+
 '<item><title>US 2026 midterm election results - News Agency</title>'+
@@ -49,7 +49,8 @@ test('read-only research fetches public indexed sources and exposes their links'
  const out=await researchMessages([{role:'user',content:'Πες μου για τις εκλογές ΗΠΑ του 2026'}],{now:when,transport});
  assert.equal(out.searched,true);
  assert.ok(out.items.length>=2);
- assert.ok(calls.length>=3);
+ assert.ok(calls.length>=1);
+ assert.ok(calls.every(c=>!c.url.toLowerCase().includes('bing.com')));
  assert.ok(calls.every(c=>c.url.startsWith('https://')));
  assert.match(contextForResearch(out),/untrusted headlines/);
  assert.match(sourceFooter(out),/https:\/\/example.org\/elections/);
@@ -66,29 +67,38 @@ test('rejects redirects, unexpected destinations and oversized untrusted body',a
  await assert.rejects(boundedFetch('https://localhost/admin'),/Forbidden/);
  await assert.rejects(boundedFetch('https://example.net/private'),/Forbidden/);
  const transport=async()=>new Response('x'.repeat(350001),{status:200});
- await assert.rejects(boundedFetch('https://www.bing.com/search?q=x',{transport}),/limit/);
+ await assert.rejects(boundedFetch('https://news.google.com/rss?q=x',{transport}),/limit/);
 });
 
-test('historical Creveuil research rejects unrelated Bing pages and retries a shorter query',async()=>{
- const unrelated='<rss><channel><item><title>Microsoft Planner account help</title><link>https://support.microsoft.com/help</link><pubDate>Wed, 18 Nov 2026 09:00:00 GMT</pubDate></item></channel></rss>';
- const relevant='<rss><channel><item><title>Hugo de Creveuil and Crete history</title><link>https://example.org/creveuil-crete</link><pubDate>Wed, 18 Nov 2026 09:00:00 GMT</pubDate></item></channel></rss>';
+test('Google Books parser provides bibliographic metadata without claiming full text',()=>{
+ const books=JSON.stringify({items:[{volumeInfo:{title:'Hugues Creveliers and Crete',authors:['Historian A'],infoLink:'https://books.google.com/books?id=123',description:'History of Ierapetra',publishedDate:'2018'}}]});
+ const items=googleBooksParse(books);
+ assert.equal(items.length,1);
+ assert.equal(items[0].recordType,'bibliography');
+ assert.match(items[0].title,/Creveliers/);
+ assert.equal(googleBooksParse('{}').length,0);
+ assert.equal(googleBooksParse(JSON.stringify({items:[{volumeInfo:{title:'Trick',infoLink:'https://evil.example/tracker'}}]})).length,0);
+});
+test('historical Creveliers variant query searches Google Books instead of Bing',async()=>{
+ const unrelated=JSON.stringify({items:[{volumeInfo:{title:'Microsoft Planner',infoLink:'https://books.google.com/books?id=111'}}]});
+ const relevant=JSON.stringify({items:[{volumeInfo:{title:'Hugues Creveliers raid on Crete',infoLink:'https://books.google.com/books?id=222',description:'Ierapetra 1675'}}]});
  const calls=[];
  const transport=async url=>{
   calls.push(url);
-  if(url.includes('europeana'))return new Response('{}',{status:200});
   if(url.includes('/w/rest.php/'))return new Response(JSON.stringify({pages:[]}),{status:200});
-  if(url.includes('search?q=Hugo%20de%20Creveuil'))return new Response(relevant,{status:200});
+  if(url.includes('Hugues%20Creveliers%20Ierapetra'))return new Response(relevant,{status:200});
   return new Response(unrelated,{status:200});
  };
- const result=await researchMessages([{role:'user',content:'Ψάξε στο Internet ιστορικές πηγές για Hugo de Creveuil Crevellie επιδρομή Ιεράπετρα Ierapetra 1675.'}],{now:new Date('2026-11-18T12:00:00Z'),transport});
- assert.equal(result.queryRetried,true,JSON.stringify({kind:result.kind,query:result.query,calls,items:result.items}));
+ const result=await researchMessages([{role:'user',content:'Ψάξε στο Internet ιστορικές πηγές για Hugo de Creveuil Crevellie επιδρομή Ιεράπετρα Ierapetra 1675.'}],
+   {now:new Date('2026-11-18T12:00:00Z'),transport});
+ assert.equal(result.queryRetried,true);
  assert.equal(result.items.length,1);
- assert.match(result.items[0].title,/Creveuil/);
- assert.ok(result.items.every(x=>!x.url.includes('microsoft.com')));
- assert.ok(calls.some(x=>x.includes('Hugo%20de%20Creveuil')));
+ assert.match(result.items[0].title,/Creveliers/);
+ assert.ok(calls.some(x=>x.includes('Hugues%20Creveliers')));
+ assert.ok(calls.every(x=>!x.includes('bing.com')));
 });
-test('historical Creveuil search gives zero evidence if retries are irrelevant',async()=>{
- const unrelated='<rss><channel><item><title>Microsoft security</title><link>https://support.microsoft.com/security</link><pubDate>Wed, 18 Nov 2026 09:00:00 GMT</pubDate></item></channel></rss>';
+test('Google-only historical search gives zero evidence if retries are irrelevant',async()=>{
+ const unrelated=JSON.stringify({items:[{volumeInfo:{title:'Microsoft security',infoLink:'https://books.google.com/books?id=333'}}]});
  const transport=async url=>new Response(url.includes('/w/rest.php/')?JSON.stringify({pages:[]}):unrelated,{status:200});
  const result=await researchMessages([{role:'user',content:'Ψάξε ιστορικές πηγές για Hugo de Creveuil στην Ιεράπετρα'}],{now:new Date('2026-11-18T12:00:00Z'),transport});
  assert.equal(result.items.length,0);
