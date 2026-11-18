@@ -228,9 +228,21 @@ def run(root: Path, run_id: str, worker: Callable | None = None, max_steps: int 
     return report
 
 
+def run_until_exhausted(root: Path, run_id: str, worker: Callable | None = None) -> dict:
+    """Resume unfinished routes within the existing per-route attempt budget."""
+    for _ in range(MAX_ATTEMPTS):
+        report = run(root, run_id, worker=worker)
+        if not any(
+            step["status"] != "COMPLETED" and step["attempts"] < MAX_ATTEMPTS
+            for step in report["agent_states"].values()
+        ):
+            break
+    return report
+
+
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("action", choices=("init", "run", "status"))
+    p.add_argument("action", choices=("init", "run", "run-until-exhausted", "status"))
     p.add_argument("--root", default=".n7_missions")
     p.add_argument("--run-id", required=True)
     p.add_argument("--target", default="")
@@ -247,6 +259,8 @@ def main() -> None:
                           "agents": list(result["steps"])}, ensure_ascii=False))
     elif args.action == "run":
         print(json.dumps(run(root, args.run_id, max_steps=args.max_steps), ensure_ascii=False, indent=2))
+    elif args.action == "run-until-exhausted":
+        print(json.dumps(run_until_exhausted(root, args.run_id), ensure_ascii=False, indent=2))
     else:
         print(json.dumps(summarize(load_state(root, args.run_id)), ensure_ascii=False, indent=2))
 

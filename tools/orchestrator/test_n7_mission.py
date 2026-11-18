@@ -8,7 +8,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from n7_mission import (PREFERRED, MAX_ATTEMPTS, create_plan, initialize, load_state,
-                        mission_dir, run, summarize)
+                        mission_dir, run, run_until_exhausted, summarize)
 
 
 def policy(kill=False):
@@ -88,6 +88,26 @@ class N7MissionTests(unittest.TestCase):
         self.assertEqual(third["agent_states"], second["agent_states"])
         self.assertTrue((self.root / "naxos-1670" / "report.json").exists())
         self.assertTrue((self.root / "naxos-1670" / "results" / "contradiction.json").exists())
+
+    def test_automatic_resume_retries_only_unfinished_routes(self):
+        self.init()
+        attempts = dict.fromkeys(PREFERRED, 0)
+
+        def worker(agent, plan, **kwargs):
+            agent_id = agent["agent_id"]
+            attempts[agent_id] += 1
+            if agent_id == PREFERRED[0] and attempts[agent_id] == 1:
+                raise TimeoutError("transient source failure")
+            if agent_id == PREFERRED[1]:
+                raise TimeoutError("source still unavailable")
+            return result(agent, plan, **kwargs)
+
+        report = run_until_exhausted(self.root, "naxos-1670", worker=worker)
+        self.assertEqual(attempts, dict(zip(PREFERRED, (2, 2, 1, 1))))
+        self.assertEqual(report["status"], "INCOMPLETE")
+        self.assertEqual(report["agent_states"][PREFERRED[0]]["status"], "COMPLETED")
+        self.assertEqual(report["agent_states"][PREFERRED[1]]["status"], "FAILED")
+        self.assertFalse(report["historically_verified"])
 
     def test_failure_retry_cap_and_untrusted_worker_result(self):
         self.init()
