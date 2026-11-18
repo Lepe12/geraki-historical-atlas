@@ -57,9 +57,9 @@ function normalizePath(pathname){
   if(pathname.startsWith(PREFIX)) pathname=pathname.slice(PREFIX.length)||"/";
   return pathname||"/";
 }
-function getJson(url,maxBytes=8_000_000){
+function getJson(url,maxBytes=8_000_000,authorization){
   return new Promise((resolve,reject)=>{
-    const request=https.get(url,{headers:{"user-agent":"piratecartography-command-center-live/1"}},r=>{
+    const request=https.get(url,{headers:{"user-agent":"piratecartography-command-center-live/1",...(authorization?{authorization}:{})}},r=>{
       const chunks=[];let bytes=0;r.setEncoding("utf8");
       r.on("error",reject);
       r.on("data",c=>{bytes+=Buffer.byteLength(c);if(bytes>maxBytes){r.destroy();reject(new Error("response_too_large"));return;}chunks.push(c);});
@@ -73,7 +73,7 @@ function safeEqual(a,b){
   return x.length===y.length&&x.length>0&&crypto.timingSafeEqual(x,y);
 }
 function githubDispatchWorkflow(workflow,inputs,repo=REPO){
-  const privateN7=repo==="Lepe12/independent-ai-bot"&&workflow==="n7-private-model.yml";
+  const privateN7=repo==="Lepe12/independent-ai-bot"&&["n7-private-model.yml","n7-private-historical-research.yml"].includes(workflow);
   if(!privateN7&&(repo!==REPO||![CONTROLLED_WORKFLOW,"nabou-coder-v03.yml",N7_RESEARCH_WORKFLOW].includes(workflow)))
     return Promise.reject(new Error("workflow_not_allowed"));
   return new Promise((resolve,reject)=>{
@@ -103,7 +103,9 @@ function githubWorkflowDispatch(inputs){return githubDispatchWorkflow(CONTROLLED
 function githubCodingDispatch(inputs){return githubDispatchWorkflow("nabou-coder-v03.yml",inputs);}
 function githubPrivateDispatch(inputs){return githubDispatchWorkflow("n7-private-model.yml",inputs,"Lepe12/independent-ai-bot");}
 
-function githubResearchDispatch(inputs){return githubDispatchWorkflow(N7_RESEARCH_WORKFLOW,inputs);}
+function githubResearchDispatch(inputs){
+  return githubDispatchWorkflow("n7-private-historical-research.yml",inputs,"Lepe12/independent-ai-bot");
+}
 let n7MissionStatusCache=new Map();
 async function githubResearchStatus(requestId){
   // Always constrain GitHub lookups to the two fixed, public workflow identifiers.
@@ -214,29 +216,40 @@ async function githubResearchStatus(requestId){
         verified:false,human_review_required:true};
     }
   }
-  // N7_OWNER_PUBLIC_EVIDENCE_V1
-  if(parent&&!child&&/^[0-9]{8,20}$/.test(String(parent.id))){
-    if(parent.status!=="completed")report.status="PIPELINE_"+String(parent.status).toUpperCase();
-    if(parent.status==="completed"&&parent.conclusion==="success"){
-      try{
-        const artifacts=await getJson("https://api.github.com/repos/"+REPO+
-          "/actions/runs/"+parent.id+"/artifacts?per_page=20",150_000);
-        const dossier=(Array.isArray(artifacts.artifacts)?artifacts.artifacts:[]).find(a=>
-          !a.expired&&/^[0-9]{8,20}$/.test(String(a.id))&&
-          ["n7-owner-public-evidence-complete","n7-owner-public-evidence-incomplete"].includes(a.name));
-        if(dossier){
-          const complete=dossier.name==="n7-owner-public-evidence-complete";
-          report.status=complete?"PIPELINE_COMPLETED":"EVIDENCE_PRESERVED_REVIEW_REQUIRED";
-          report.research_run_id=parent.id;
-          report.research_url="https://github.com/"+REPO+"/actions/runs/"+parent.id+"/artifacts/"+dossier.id;
-          report.preview={report_status:complete?"DISCOVERY_FINISHED":"INCOMPLETE",
-            paragraphs:[complete?
-              "Ο διαθέσιμος κύκλος αναζήτησης ολοκληρώθηκε. Ο φάκελος πηγών περιλαμβάνει τις εκκρεμότητες τεκμηρίωσης.":
-              "Εξαντλήθηκαν οι διαθέσιμες προσπάθειες σε ορισμένες διαδρομές. Ο φάκελος παραμένει διαθέσιμος."],
-            sources:[],verified:false,human_review_required:true};
+  // N7_OWNER_PRIVATE_RESEARCH_V1
+  // Resolve the private run only for new requests. Earlier Atlas runs keep
+  // their established status and preview, even if the private API is down.
+  if(!parent&&!child&&GITHUB_DISPATCH_TOKEN){
+    try{
+      const repo="Lepe12/independent-ai-bot";
+      const api="https://api.github.com/repos/"+repo+"/actions/";
+      const authorization="Bearer "+GITHUB_DISPATCH_TOKEN;
+      const privateRuns=await getJson(api+"workflows/n7-private-historical-research.yml/runs?event=workflow_dispatch&per_page=50",2_000_000,authorization);
+      const research=select(privateRuns,"N7 Mission "+requestId);
+      if(research&&/^[0-9]{8,20}$/.test(String(research.id))){
+        const runUrl="https://github.com/"+repo+"/actions/runs/"+research.id;
+        report.research_run_id=research.id;
+        report.research_url=runUrl;
+        report.research_conclusion=research.conclusion||null;
+        report.status=research.status==="completed"?"PIPELINE_FAILED":"PIPELINE_"+String(research.status).toUpperCase();
+        if(research.status==="completed"&&research.conclusion==="success"){
+          const artifacts=await getJson(api+"runs/"+research.id+"/artifacts?per_page=20",150_000,authorization);
+          const dossier=(Array.isArray(artifacts.artifacts)?artifacts.artifacts:[]).find(a=>
+            !a.expired&&/^[0-9]{8,20}$/.test(String(a.id))&&
+            ["n7-owner-research-complete","n7-owner-research-incomplete"].includes(a.name));
+          if(dossier){
+            const complete=dossier.name==="n7-owner-research-complete";
+            report.status=complete?"PIPELINE_COMPLETED":"EVIDENCE_PRESERVED_REVIEW_REQUIRED";
+            report.research_url=runUrl+"/artifacts/"+dossier.id;
+            report.preview={report_status:complete?"DISCOVERY_FINISHED":"INCOMPLETE",
+              paragraphs:[complete?
+                "Ο κύκλος αναζήτησης ολοκληρώθηκε. Ο ιδιωτικός φάκελος πηγών περιλαμβάνει τις εκκρεμότητες τεκμηρίωσης.":
+                "Εξαντλήθηκαν οι προσπάθειες σε ορισμένες διαδρομές. Ο ιδιωτικός φάκελος παραμένει διαθέσιμος."],
+              sources:[],verified:false,human_review_required:true};
+          }
         }
-      }catch(_){/* Keep the observed workflow status when evidence is unavailable. */}
-    }
+      }
+    }catch(_){/* Keep the observed status when private evidence is unavailable. */}
   }
   if(n7MissionStatusCache.size>100)n7MissionStatusCache.clear();
   n7MissionStatusCache.set(requestId,{at:Date.now(),report});

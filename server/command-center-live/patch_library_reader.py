@@ -89,15 +89,26 @@ def patch_site_chat(live: bytes, canonical: bytes) -> bytes:
 
 def patch_library_reader(live: bytes, canonical: bytes) -> bytes:
     live = patch_site_chat(_patch_library_reader_core(live, canonical), canonical)
-    marker = b"  // N7_OWNER_PUBLIC_EVIDENCE_V1\n"
+    marker = b"  // N7_OWNER_PRIVATE_RESEARCH_V1\n"
     end = b"  if(n7MissionStatusCache.size>100)"
     if canonical.count(marker) != 1:
-        raise RuntimeError("N7_OWNER_PUBLIC_EVIDENCE_CANONICAL_MISSING")
+        raise RuntimeError("N7_OWNER_PRIVATE_RESEARCH_CANONICAL_MISSING")
     addition = marker + canonical.split(marker, 1)[1].split(end, 1)[0]
     if marker in live:
         if live.count(addition) != 1:
-            raise RuntimeError("N7_OWNER_PUBLIC_EVIDENCE_PATCH_DRIFT")
+            raise RuntimeError("N7_OWNER_PRIVATE_RESEARCH_PATCH_DRIFT")
         return live
+    live = replace_exact(live, b"function getJson(url,maxBytes=8_000_000){",
+                         b"function getJson(url,maxBytes=8_000_000,authorization){")
+    old_headers = b'const request=https.get(url,{headers:{"user-agent":"piratecartography-command-center-live/1"}},r=>{'
+    new_headers = old_headers.replace(b'live/1"}', b'live/1",...(authorization?{authorization}:{})}')
+    live = replace_exact(live, old_headers, new_headers)
+    live = replace_exact(live, b'workflow==="n7-private-model.yml";',
+                         b'["n7-private-model.yml","n7-private-historical-research.yml"].includes(workflow);')
+    old_dispatch = b"function githubResearchDispatch(inputs){return githubDispatchWorkflow(N7_RESEARCH_WORKFLOW,inputs);}"
+    dispatch = b"function githubResearchDispatch(inputs){" + canonical.split(
+        b"function githubResearchDispatch(inputs){", 1)[1].split(b"\nlet n7MissionStatusCache", 1)[0]
+    live = replace_exact(live, old_dispatch, dispatch)
     return add_exact(live, end, addition)
 
 

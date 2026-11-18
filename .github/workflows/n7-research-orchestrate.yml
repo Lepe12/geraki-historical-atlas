@@ -27,78 +27,73 @@ on:
 
 permissions:
   contents: read
-  id-token: write
-
-concurrency:
-  group: n7-owner-research-${{ inputs.request_id }}
-  cancel-in-progress: false
+  actions: write
 
 jobs:
-  public-evidence:
+  plan-and-dispatch:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
-          persist-credentials: false
+          fetch-depth: 1
+          filter: blob:none
           sparse-checkout: |
             tools
-            config
-            data
-      - name: Install bounded public PDF reader
-        run: python3 -m pip install --disable-pip-version-check pypdf==6.4.0
-      - name: Run bounded public-source research without a model
+      - name: Validate signed-bridge mission inputs and freeze JARVIS plan
+        id: plan
         env:
-          PYTHONPATH: .:tools:tools/orchestrator:tools/connectors
-          PCT_COMMAND_CENTER_URL: https://pct-live.piratecartography.com/pct-api/live
-          REQUEST_ID: ${{ inputs.request_id }}
-          TARGET: ${{ inputs.target }}
-          PURPOSE: ${{ inputs.purpose }}
-          DATE_RANGE: ${{ inputs.date_range }}
-          ALIASES: ${{ inputs.aliases }}
+          INPUT_REQUEST_ID: ${{ inputs.request_id }}
+          INPUT_TARGET: ${{ inputs.target }}
+          INPUT_PURPOSE: ${{ inputs.purpose }}
+          INPUT_DATE_RANGE: ${{ inputs.date_range }}
+          INPUT_ALIASES: ${{ inputs.aliases }}
         run: |
           set -euo pipefail
-          [[ "$REQUEST_ID" =~ ^n7mission-[a-f0-9]{24}$ ]]
-          mission_root="$RUNNER_TEMP/n7-owner-mission"
-          python3 tools/orchestrator/n7_mission.py init --root "$mission_root" --run-id "$REQUEST_ID" \
-            --target "$TARGET" --purpose "$PURPOSE" --date-range "$DATE_RANGE" --aliases "$ALIASES" >/dev/null
-          python3 tools/orchestrator/n7_mission.py run-until-exhausted \
-            --root "$mission_root" --run-id "$REQUEST_ID" >/dev/null
-      - name: Prepare bounded owner report
-        if: always()
-        id: report
+          mkdir -p .n7_runtime
+          PYTHONPATH=tools/orchestrator python3 - <<'PY'
+          import json,os,pathlib,re
+          rid=os.environ['INPUT_REQUEST_ID']
+          if not re.fullmatch(r'n7mission-[a-f0-9]{24}',rid):
+              raise SystemExit('INVALID_MISSION_REQUEST_ID')
+          req={'target':os.environ['INPUT_TARGET'],'purpose':os.environ['INPUT_PURPOSE'],
+               'date_range':os.environ['INPUT_DATE_RANGE'],
+               'aliases':[x.strip() for x in os.environ['INPUT_ALIASES'].split('|') if x.strip()]}
+          pathlib.Path('.n7_runtime/request.json').write_text(json.dumps(req,ensure_ascii=False),encoding='utf-8')
+          PY
+          python3 tools/orchestrator/jarvis_dispatch.py \
+            --request .n7_runtime/request.json \
+            --run-id "$GITHUB_RUN_ID" \
+            --request-id "$INPUT_REQUEST_ID" \
+            --github-output "$GITHUB_OUTPUT" \
+            --write-audit .n7_runtime/dispatch_audit.json
+      - name: Dispatch existing full-source research and synthesis pipeline (no auto chain)
         env:
-          REQUEST_ID: ${{ inputs.request_id }}
+          GH_TOKEN: ${{ github.token }}
+          TARGET: ${{ steps.plan.outputs.target }}
+          PURPOSE: ${{ steps.plan.outputs.purpose }}
+          DATE_RANGE: ${{ steps.plan.outputs.date_range }}
+          ALIASES: ${{ steps.plan.outputs.aliases }}
+          REQUEST_ID: ${{ steps.plan.outputs.request_id }}
+          SELECTED_AGENTS: ${{ steps.plan.outputs.workflow_selected_agents }}
         run: |
-          python3 - <<'PYCODE'
-          import json, os, re
-          from pathlib import Path
-          request_id = os.environ["REQUEST_ID"]
-          if not re.fullmatch(r"n7mission-[a-f0-9]{24}", request_id):
-              raise SystemExit("INVALID_MISSION_REQUEST_ID")
-          root = Path(os.environ["RUNNER_TEMP"])
-          mission = root / "n7-owner-mission" / request_id
-          report_file = mission / "report.json"
-          if not report_file.is_file():
-              raise SystemExit("N7_REPORT_UNAVAILABLE")
-          report = json.loads(report_file.read_text())
-          if report["historically_verified"] is not False:
-              raise SystemExit("N7_REPORT_UNSAFE")
-          state = {"DISCOVERY_FINISHED": "complete", "INCOMPLETE": "incomplete"}[report["status"]]
-          out = root / "n7-public-source-report"
-          out.mkdir()
-          dossier = json.loads((mission / "research_dossier.json").read_text())
-          dossier["claim_assessment"]["subject"] = "Historical research in public sources"
-          from tools.orchestrator.n7_research_dossier import render_markdown
-          (out / "research_dossier.md").write_text(render_markdown(dossier), encoding="utf-8")
-          with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
-              print(f"status={state}", file=fh)
-          PYCODE
-      - name: Attach source-linked research report
-        if: steps.report.outputs.status != ''
+          set -euo pipefail
+          gh workflow run pct-parallel-multi-agent.yml --ref main \
+            -f request_id="$REQUEST_ID" \
+            -f target="$TARGET" -f purpose="$PURPOSE" \
+            -f date_range="$DATE_RANGE" -f aliases="$ALIASES" \
+            -f selected_agents="$SELECTED_AGENTS" \
+            -f auto_continue=false \
+            -f require_semantic_analysis=true \
+            -f initial_semantic_shards=1 \
+            -f semantic_shards=1
+          echo "N7_RESEARCH_DISPATCH_ACCEPTED request_id=$REQUEST_ID"
+          echo "Full pipeline handles PDF extraction, source inspection gates and evidence-bound synthesis."
+          echo "Workflow dispatch is not proof that the research or verification succeeded."
+      - name: Preserve frozen plan for review
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: n7-owner-public-evidence-${{ steps.report.outputs.status }}
-          path: ${{ runner.temp }}/n7-public-source-report/research_dossier.md
+          name: n7-planning-${{ github.run_id }}
+          path: .n7_runtime/
+          if-no-files-found: warn
           retention-days: 30
-          if-no-files-found: error
