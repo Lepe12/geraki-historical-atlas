@@ -1,0 +1,39 @@
+name: N7 Existing Web Research Real-Internet Smoke — Creveuil
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/n7-existing-web-creveuil-smoke.yml'
+permissions:
+  contents: read
+jobs:
+  real-web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            tools/n7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Existing public web-search module unit tests
+        run: node --test tools/n7/test_public_web_search.cjs
+      - name: Real Internet search of Creveuil's Ierapetra raid (no paid API)
+        run: |
+          node - <<'JS'
+          const {researchMessages,enrichPublisherArticles}=require('./tools/n7/public-web-search.js');
+          (async()=>{
+            const query='Ψάξε στο Internet ιστορικές πηγές για Hugo de Creveuil Crevellie επιδρομή Ιεράπετρα Ierapetra 1675. Βρες πρωτογενείς ή δευτερογενείς πηγές και συνδέσμους.';
+            const result=await researchMessages([{role:'user',content:query}]);
+            console.log('N7_REAL_WEB_SUMMARY',JSON.stringify({searched:result.searched,kind:result.kind,query:result.query,availableProviders:result.availableProviders,failedProviders:result.failedProviders,resultCount:result.items.length,europeana:result.europeana}));
+            console.log('N7_REAL_WEB_ITEMS',JSON.stringify(result.items.map(x=>({title:x.title,url:x.url,source:x.source,provider:x.provider}))));
+            if(result.items.length){
+              const deep=await enrichPublisherArticles(result);
+              console.log('N7_REAL_WEB_READING',JSON.stringify(deep.items.map(x=>({title:x.title,url:x.url,articleRead:x.articleRead||false,readStatus:x.readStatus||null,textLength:(x.articleText||'').length,ocrRequired:x.ocrRequired||false}))));
+            }
+            if(!result.searched)process.exitCode=2;
+          })().catch(e=>{console.error('N7_REAL_WEB_ERROR',e.name,e.message);process.exitCode=1});
+          JS
