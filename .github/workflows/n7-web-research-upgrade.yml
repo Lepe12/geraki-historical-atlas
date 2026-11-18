@@ -1,0 +1,45 @@
+name: N7 Web Research — guarded single-module upgrade
+on:
+  pull_request:
+    paths:
+      - tools/deploy_n7_web_research_upgrade.py
+      - ops_ftps_requests/n7-web-research-upgrade.json
+      - .github/workflows/n7-web-research-upgrade.yml
+  push:
+    branches: [main]
+    paths:
+      - ops_ftps_requests/n7-web-research-upgrade.json
+permissions:
+  contents: read
+concurrency:
+  group: n7-web-research-guarded-upgrade
+  cancel-in-progress: false
+jobs:
+  upgrade:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: ${{ github.event_name == 'pull_request' && '1' || '0' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools
+            n7-distribution.json
+            ops_ftps_requests/n7-web-research-upgrade.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact canonical research source
+        run: |
+          node --check tools/n7/public-web-search.js
+          node --test tools/n7/test_public_web_search.cjs
+          python3 -m py_compile tools/deploy_n7_web_research_upgrade.py
+      - name: Guarded FTPS compatibility probe or approved upgrade
+        run: python3 tools/deploy_n7_web_research_upgrade.py
