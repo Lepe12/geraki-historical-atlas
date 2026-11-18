@@ -1,0 +1,26 @@
+name: N7 one-time private synthesis replay for research 44270059306
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/n7-private-corpus-replay-44270059306.yml'
+permissions:
+  contents: read
+  actions: write
+jobs:
+  dispatch-original-artifacts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            .github/workflows/n7-private-corpus-synthesis.yml
+      - name: Replay existing evidence only (no rediscovery)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run n7-private-corpus-synthesis.yml --ref main -f run_id=44270059306
+          echo "N7_PRIVATE_CORPUS_REPLAY_DISPATCH_ACCEPTED: 44270059306"
