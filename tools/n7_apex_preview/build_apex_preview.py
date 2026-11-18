@@ -177,6 +177,11 @@ def main():
     if humanoid_sha != "bdba288c56230908e1c6abd1a199e5a895159730faf27c672916b03d51a5c7e5":
         raise RuntimeError(f"wrong N7 humanoid asset sha256: {humanoid_sha}")
     (out/"public/n7-humanoid-idle-v3.webp").write_bytes(humanoid_bytes)
+    if base_path == "/n7-apex-step5-hacker":
+        # Standalone artist-approved Hacker skin; never touch production artwork.
+        hacker_art=base64.b64decode((overlay/"assets_v3/n7-hacker-v1.b64").read_text().strip(), validate=True)
+        if not hacker_art.startswith(b"RIFF") or b"WEBP" not in hacker_art[:16]: raise RuntimeError("bad hacker WEBP asset")
+        (out/"public/n7-hacker-v1.webp").write_bytes(hacker_art)
     if guide:
         face_bytes=(overlay/"assets/n7-humanoid-face-v4.webp").read_bytes()
         if hashlib.sha256(face_bytes).hexdigest()!="1abf41530c4253962a46fe426c107eb2f776f54ad5c2c5e594b8765bd569ea68":
