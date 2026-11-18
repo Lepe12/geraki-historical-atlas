@@ -8,9 +8,10 @@ const n7Europeana=require('./europeana-api'); // N7_EUROPEANA_SEARCH_INTEGRATION
 const n7HistoricalAudit=require('./historical-source-audit'); // N7_HISTORICAL_DEEP_READING_V1
 const NEWS_HOST='news.google.com';
 const GOOGLE_BOOKS_API='www.googleapis.com';
+const CROSSREF_HOST='api.crossref.org';
 const WIKI_HOST='en.wikipedia.org';
 const WIKI_FR_HOST='fr.wikipedia.org';
-const ALLOWED=new Set([NEWS_HOST,GOOGLE_BOOKS_API,WIKI_HOST,WIKI_FR_HOST]);
+const ALLOWED=new Set([NEWS_HOST,GOOGLE_BOOKS_API,CROSSREF_HOST,WIKI_HOST,WIKI_FR_HOST]);
 const MAX_REMOTE=350000;
 const TIMEOUT=6500;
 const MAX_QUERY=170;
@@ -175,6 +176,19 @@ function googleBooksParse(raw){
       excerpt:compact([authors,v.description].filter(Boolean).join(' — '),350),recordType:'bibliography'};
   }).filter(Boolean);
 }
+// Crossref is a free independent scholarly bibliography, not the Google Web index.
+function crossrefParse(raw){
+  const payload=JSON.parse(raw),records=Array.isArray(payload?.message?.items)?payload.message.items:[];
+  return records.slice(0,8).map(p=>{
+    const title=compact(Array.isArray(p.title)?p.title[0]:p.title,180);
+    const url=safeLink(p.DOI?'https://doi.org/'+encodeURIComponent(String(p.DOI)).replace(/%2F/gi,'/'):p.URL);
+    if(!title||!url||new URL(url).hostname!=='doi.org')return null;
+    const authors=Array.isArray(p.author)?p.author.slice(0,3).map(a=>[a.given,a.family].filter(Boolean).join(' ')).join(', '):'';
+    const date=p.published?.['date-parts']?.[0]?.[0]||p.issued?.['date-parts']?.[0]?.[0]||'';
+    return {title,url,source:'Crossref (scholarly metadata only)',published:String(date).slice(0,4),
+      provider:'Crossref',recordType:'bibliography',excerpt:compact([authors,Array.isArray(p['container-title'])?p['container-title'][0]:''].filter(Boolean).join(' — '),280)};
+  }).filter(Boolean);
+}
 async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
   const request=classify(messages,now);
   if(!request)return {searched:false,items:[],reason:'not_needed'};
@@ -185,6 +199,7 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
     {name:'Google News',url:'https://news.google.com/rss/search?q='+q+'&hl=en-US&gl=US&ceid=US:en',rss:true}
   ]:[
     {name:'Google Books',url:'https://www.googleapis.com/books/v1/volumes?q='+q+'&maxResults=8',books:true},
+    {name:'Crossref',url:'https://api.crossref.org/works?query.bibliographic='+q+'&rows=6',crossref:true},
     {name:'Wikipedia',url:'https://en.wikipedia.org/w/rest.php/v1/search/page?q='+q+'&limit=4',rss:false}
   ];
   if(request.historicalLanza)targets.push({name:'Google Books name variants',
@@ -198,7 +213,7 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
   const [results,europeana]=await Promise.all([
     Promise.allSettled(targets.map(async x=>{
       const raw=await boundedFetch(x.url,{transport});
-      return x.rss?parseRss(raw,x.name,now.getTime(),request.kind==='news'?75:10000):x.books?googleBooksParse(raw):wikiParse(raw);
+      return x.rss?parseRss(raw,x.name,now.getTime(),request.kind==='news'?75:10000):x.books?googleBooksParse(raw):x.crossref?crossrefParse(raw):wikiParse(raw);
     })),
     europeanaJob
   ]);
@@ -207,15 +222,18 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
   if(request.kind==='historical'){
     const initial=results.flatMap(r=>r.status==='fulfilled'?r.value:[]);
     if(!initial.some(x=>historicalMatch(x,request))){
+      // If Google Books rejects quota-limited requests (e.g. HTTP 429), do not repeat them.
+      const booksOk=targets.some((x,i)=>x.books&&results[i]?.status==='fulfilled');
       for(const alternative of historicalRetryQueries(request).slice(0,4)){
         const qq=encodeURIComponent(alternative);
         const retryTargets=[
-          {name:'Google Books retry',url:'https://www.googleapis.com/books/v1/volumes?q='+qq+'&maxResults=8',books:true},
+          ...(booksOk?[{name:'Google Books retry',url:'https://www.googleapis.com/books/v1/volumes?q='+qq+'&maxResults=8',books:true}]:[]),
+          {name:'Crossref retry',url:'https://api.crossref.org/works?query.bibliographic='+qq+'&rows=6',crossref:true},
           {name:'French Wikipedia',url:'https://fr.wikipedia.org/w/rest.php/v1/search/page?q='+qq+'&limit=4',rss:false}
         ];
         const retried=await Promise.allSettled(retryTargets.map(async x=>{
           const raw=await boundedFetch(x.url,{transport});
-          return x.books?googleBooksParse(raw):wikiParse(raw).map(y=>({...y,url:y.url.replace('https://en.wikipedia.org/','https://fr.wikipedia.org/'),source:'French Wikipedia (background only)'}));
+          return x.books?googleBooksParse(raw):x.crossref?crossrefParse(raw):wikiParse(raw).map(y=>({...y,url:y.url.replace('https://en.wikipedia.org/','https://fr.wikipedia.org/'),source:'French Wikipedia (background only)'}));
         }));
         results.push(...retried);
         if(retried.some(r=>r.status==='fulfilled'&&r.value.some(x=>historicalMatch(x,request))))break;
@@ -422,5 +440,5 @@ function sourceFooter(research){
     items.map((x,i)=>'[S'+(i+1)+'] '+x.title+' — '+x.source+
       (x.published?' ('+x.published+')':'')+(x.articleRead?' [αναγνώστηκε περιεχόμενο'+(x.pdfPages?' · PDF σ. '+x.pdfPages.map(p=>p.page).join(', '):'')+(x.partial?' · μερική ανάγνωση':'')+']':' [μόνο μεταδεδομένα'+(x.readStatus?' · '+x.readStatus:'')+']')+'\n'+x.url).join('\n');
 }
-module.exports={classify,parseRss,wikiParse,googleBooksParse,boundedFetch,researchMessages,contextForResearch,sourceFooter,safeLink,extractVisibleArticle,publisherArticle,enrichPublisherArticles,cleanHistoryForTopic};
+module.exports={classify,parseRss,wikiParse,googleBooksParse,crossrefParse,boundedFetch,researchMessages,contextForResearch,sourceFooter,safeLink,extractVisibleArticle,publisherArticle,enrichPublisherArticles,cleanHistoryForTopic};
 
