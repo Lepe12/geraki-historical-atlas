@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import N7GuideScene,{type GuideFrameInfo,type GuideMode,type GuideMood} from "./N7GuideScene";
 import N7Backdrop,{type N7BackdropHandle} from "./N7Backdrop";
 import { N7_HUMANOID_REFERENCE } from "./N7HumanoidReference";
+import { N7_HACKER_OUTFIT } from "./N7BuildFlags";
 import { CORE, createAssemblySound, createFx } from "./N7GuideFx";
 
 // Second face option: the owner-supplied H01 head composed onto the same body.
@@ -25,7 +26,8 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
     const unlock=()=>{if(soundOn.current)s.unlock();};window.addEventListener("pointerdown",unlock,true);window.addEventListener("keydown",unlock,true);
     return()=>{window.removeEventListener("pointerdown",unlock,true);window.removeEventListener("keydown",unlock,true);s.dispose();sfx.current=null;};
   },[open]);
-  const home=!!onNavigate; // N7_APEX_HOME_V1: the authenticated home screen
+  const home=!!onNavigate&&!N7_HACKER_OUTFIT; // N7_APEX_HOME_V1: the authenticated home screen
+  const [hacker,setHacker]=useState(false);
   const [faceChoice,setFace]=useState<Face>("n7");
   useEffect(()=>{
     try{const asked=new URLSearchParams(window.location.search).get("face"),saved=window.localStorage.getItem("n7-face");const next=asked||saved;if(next==="h01"||next==="n7")setFace(next);}catch{}
@@ -146,7 +148,7 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
     <div className="n7-guide-main" data-details={details}>
       <div className="n7-guide-figure-slot"><div ref={figureRef} className="n7-guide-figure" aria-label={mode==="assembly"?"N7 guide particle-river assembly":undefined}>
         {(mode==="original"||mode==="compare")&&<img src={figureUrl} alt="Approved N7 idle reference" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"contain",opacity:mode==="compare"?.38:1,zIndex:mode==="compare"?1:undefined}}/>}
-        <N7GuideScene key={faceChoice} source={faceChoice==="h01"?H01_FIGURE:undefined} scale={faceChoice==="h01"?H01_SCALE:undefined} mode={mode} mood={mood} effects={effects} reduced={reduced} breathing={breathing} gestures={gestures} replay={replay} manualMotion={manualMotion} diagnostics={details} onComplete={complete} onFrame={frame}/>
+        <N7GuideScene key={faceChoice} allowHacker={N7_HACKER_OUTFIT&&faceChoice==="n7"} hacker={N7_HACKER_OUTFIT&&faceChoice==="n7"&&hacker} source={faceChoice==="h01"?H01_FIGURE:undefined} scale={faceChoice==="h01"?H01_SCALE:undefined} mode={mode} mood={mood} effects={effects} reduced={reduced} breathing={breathing} gestures={gestures} replay={replay} manualMotion={manualMotion} diagnostics={details} onComplete={complete} onFrame={frame}/>
         <canvas ref={fxRef} aria-hidden="true" data-fx="assembly-burst" style={{position:"absolute",inset:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:2,mixBlendMode:"screen"}}/>
         <span ref={ignitionRef} aria-label="N7 face ignition" data-active="false" style={{position:"absolute",pointerEvents:"none"}}/>
         {mode==="assembly"&&!done&&<span aria-label="N7 visible assembly source" style={{position:"absolute",left:`${CORE.x/3.2}%`,top:`${CORE.y/4.8}%`,width:1,height:1,pointerEvents:"none"}}/>}
@@ -167,6 +169,10 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
         <button type="button" aria-label="Πρόσωπο N7" aria-pressed={faceChoice==="n7"} onClick={()=>chooseFace("n7")}>N7</button>
         <button type="button" aria-label="Πρόσωπο H01" aria-pressed={faceChoice==="h01"} onClick={()=>chooseFace("h01")}>H01</button>
       </span>
+      {N7_HACKER_OUTFIT&&faceChoice==="n7"&&<span className="n7-guide-group" aria-label="Ενδυμασία">
+        <button type="button" aria-pressed={!hacker} onClick={()=>setHacker(false)}>N7 outfit</button>
+        <button type="button" aria-pressed={hacker} onClick={()=>{setHacker(true);if(mode==="original"||mode==="compare")skip();}}>Hacker outfit</button>
+      </span>}
       <span className="n7-guide-group"><small aria-hidden="true">ΠΡΟΒΟΛΗ</small>
         <button type="button" aria-pressed={mode==="original"} onClick={()=>setMode("original")}>Original</button><button type="button" aria-pressed={mode==="particle"} onClick={()=>setMode("particle")}>Particles</button>
         <button type="button" aria-pressed={mode==="compare"} onClick={()=>{setMode("compare");setDetails(true);}}>Compare</button>

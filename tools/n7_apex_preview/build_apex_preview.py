@@ -135,6 +135,7 @@ def main():
     # gets the same figure, environment, moods and voice; only the test pages and
     # the passwordless guest chat stay in the isolated previews.
     guide=isolated or base_path=="/n7-apex"
+    hacker=base_path=="/n7-apex-step5-hacker-3d"
     if out.exists(): shutil.rmtree(out)
     out.mkdir(parents=True)
     run("git","init",str(out))
@@ -146,7 +147,7 @@ def main():
     overlay=pathlib.Path(__file__).resolve().parent
     shutil.copy2(overlay/"N7Workspace.tsx",out/"components/N7Workspace.tsx")
     shutil.copy2(overlay/"N7ApexStage.tsx",out/"components/N7ApexStage.tsx")
-    (out/"components/N7BuildFlags.ts").write_text(f"export const N7_GUIDE = {str(guide).lower()};\nexport const N7_GUEST_CHAT = {str(isolated).lower()};\n")
+    (out/"components/N7BuildFlags.ts").write_text(f"export const N7_GUIDE = {str(guide).lower()};\nexport const N7_GUEST_CHAT = {str(isolated).lower()};\nexport const N7_HACKER_OUTFIT = {str(hacker).lower()};\n")
     # Step 5/6 stays isolated; retain the normal production entry point.
     # The isolated Step 5 route must present the humanoid immediately.
     # Production /n7-apex keeps the normal button-controlled workflow.
@@ -158,7 +159,7 @@ def main():
     shutil.copy2(overlay/"N7HumanoidView.tsx",out/"components/N7HumanoidView.tsx")
     shutil.copy2(overlay/"N7Backdrop.tsx",out/"components/N7Backdrop.tsx")
     shutil.copy2(overlay/"N7HeadSurface.ts",out/"components/N7HeadSurface.ts")
-    for name in ("N7GuideScene.tsx","N7GuideView.tsx","N7GuideFx.ts","useN7Voice.ts","N7FemaleVoice.ts","N7VoiceSignal.ts","N7AgentSpeech.ts","N7Navigation.ts"):
+    for name in ("N7HackerOutfit.ts","N7GuideScene.tsx","N7GuideView.tsx","N7GuideFx.ts","useN7Voice.ts","N7FemaleVoice.ts","N7VoiceSignal.ts","N7AgentSpeech.ts","N7Navigation.ts"):
         shutil.copy2(overlay/name,out/"components"/name)
     (out/"components/N7BackdropReference.ts").write_text(f'export const N7_BACKDROP_REFERENCE = "{base_path}/n7-mountain-backdrop.webp";\n')
     shutil.copy2(overlay/"N7HumanoidReference.ts",out/"components/N7HumanoidReference.ts")

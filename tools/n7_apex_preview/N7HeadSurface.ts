@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { createHackerOutfit, guideChestMotion } from "./N7HackerOutfit";
 
 // APEX Stage 5: the approved artwork is projected once, from the front, onto
 // a rounded head volume (face, skull/hair and neck depth). That volume is then
@@ -7,7 +8,7 @@ import * as THREE from "three";
 // point is carried by rigid joint rotations (yaw, pitch, roll); the shoulders
 // are not skinned at all. Orthographic projection, so the head never grows.
 // The approved image is untouched at rest. No eyes or facial features exist.
-export type GuideFrame={turn:number;pitch?:number;roll?:number;talk?:number;breath?:number;assembly?:number;baseMood?:number;states?:number[];ages?:number[];ignition?:number;time?:number;voiceLevel?:number};
+export type GuideFrame={turn:number;pitch?:number;roll?:number;talk?:number;breath?:number;assembly?:number;baseMood?:number;states?:number[];ages?:number[];ignition?:number;time?:number;voiceLevel?:number;hacker?:boolean};
 // `scale` only raises the raster resolution (second face option); geometry,
 // joints and limits stay in the same 320x480 layout units.
 // `faceRelief` 0 keeps the approved N7 volume exactly. 1 is for a realistic
@@ -16,7 +17,7 @@ export type GuideFrame={turn:number;pitch?:number;roll?:number;talk?:number;brea
 // `moodArt` (optional): the owner's approved Listening, Thinking and Speaking
 // pictures, aligned to the idle frame. When given, each mood shows its own
 // picture instead of a colour variation computed from the idle.
-export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,moodArt?:HTMLCanvasElement[]) {
+export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,moodArt?:HTMLCanvasElement[],allowHacker=false) {
   const renderer=new THREE.WebGLRenderer({alpha:false,antialias:false,depth:true,preserveDrawingBuffer:true});
   renderer.setSize(Math.round(320*scale),Math.round(480*scale),false);renderer.setPixelRatio(1);
   renderer.outputColorSpace=THREE.SRGBColorSpace;
@@ -71,6 +72,7 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,m
       float neck=28.*cos(min(1.,abs(tile.x-160.)/30.)*1.5707963)*smoothstep(170.,200.,tile.y);
       return smax(smax(face,skull),neck)-6.;
     }
+    ${guideChestMotion}
     void main(){
       vec2 tile=source;
       float depth=restDepth(tile);
@@ -97,12 +99,7 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,m
       float wNeck=wHead;
       wNeck=max(wNeck,wHead);
       vec3 skinned=rest.xyz*(1.-wNeck)+(neckMatrix*rest).xyz*(wNeck-wHead)+(headMatrix*rest).xyz*wHead;
-      vec2 p=skinned.xy;
-
-      // The APEX breathing effect operates below the neck only.
-      float chest=exp(-pow((tile.y-320.)/94.,2.))*smoothstep(208.,252.,tile.y)*(1.-smoothstep(420.,470.,tile.y));
-      p.x=160.+(p.x-160.)*(1.+breath*.006*chest);
-      p.y-=breath*.9*chest;
+      vec2 p=breatheChest(skinned.xy,tile.y,breath);
 
       // APEX step 5: shading completes the depth illusion. The rest normal is
       // carried by the same joints; dots that turn away darken and at a hard
@@ -298,7 +295,19 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,m
     vertexShader:`uniform float size;void main(){gl_Position=vec4(position.x/160.-1.,1.-position.y/240.,0.,1.);gl_PointSize=${(150*scale).toFixed(1)}*size;}`,
     fragmentShader:`uniform float strength;void main(){float d=length(gl_PointCoord-.5)*2.;if(d>1.)discard;float halo=pow(1.-d,3.)*.55;float ring=exp(-pow((d-.10)/.035,2.))*.9;float spark=exp(-d*d/.004);gl_FragColor=vec4(vec3(.62,.90,1.)*(halo+ring)+vec3(1.)*spark,clamp(halo+ring+spark,0.,1.)*strength);}`});
   const glow=new THREE.Points(glowGeometry,glowMaterial);glow.frustumCulled=false;scene.add(glow);
-  const camera=new THREE.OrthographicCamera(-1,1,1,-1,.1,10);camera.position.z=1;
+  // The head shader writes clip coordinates directly. This camera maps
+  // the garment's rest coordinates to those same screen and depth units.
+  const camera=allowHacker
+    ?new THREE.OrthographicCamera(0,320,0,-480,0,800)
+    :new THREE.OrthographicCamera(-1,1,1,-1,.1,10);
+  camera.position.z=allowHacker?400:1;
+  const outfit=allowHacker?createHackerOutfit():undefined;
+  if(outfit){
+    scene.add(outfit.root,new THREE.HemisphereLight(0xc7e9ff,0x253745,1.55));
+    const key=new THREE.DirectionalLight(0xb9e6ff,2.4);
+    key.position.set(-120,100,220);
+    scene.add(key);
+  }
   // Real joint hierarchy: shoulders (fixed) -> neck base -> skull base.
   // Angles are radians; the neck carries 30% and the skull joint 70%.
   // The turning axis runs inside the neck, level with the chin surface, so the
@@ -341,11 +350,12 @@ export function createHeadSurface(image:HTMLCanvasElement,scale=1,faceRelief=0,m
     const born=Math.min(1,p/.06),pulse=.85+.15*Math.sin((frame.time||0)*5.5);
     glowMaterial.uniforms.strength.value=born*(1-blend)*(p<.86?1:Math.max(0,1-(p-.86)/.10));
     glowMaterial.uniforms.size.value=(.35+.65*born)*pulse*(1+.6*Math.max(0,(p-.80)/.10));
+    outfit?.pose(!!frame.hacker&&mesh.visible,frame.breath||0,blend);
     renderer.render(scene,camera);
   };
   return {
     canvas:renderer.domElement,vertices:sources.length/2,particles:anchors.length/3,
     render,draw(turn:number){render({turn});},limits:{yaw:MAX_YAW,pitch:MAX_PITCH,roll:MAX_ROLL},
-    dispose(){artTextures.forEach(tex=>tex.dispose());geometry.dispose();material.dispose();particleGeometry.dispose();particleMaterial.dispose();glowGeometry.dispose();glowMaterial.dispose();texture.dispose();renderer.dispose();renderer.forceContextLoss();}
+    dispose(){outfit?.dispose();artTextures.forEach(tex=>tex.dispose());geometry.dispose();material.dispose();particleGeometry.dispose();particleMaterial.dispose();glowGeometry.dispose();glowMaterial.dispose();texture.dispose();renderer.dispose();renderer.forceContextLoss();}
   };
 }

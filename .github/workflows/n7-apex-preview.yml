@@ -8,7 +8,7 @@ on:
       - '.github/workflows/n7-apex-preview.yml'
       - 'ops_ftps_requests/n7-apex-preview.json'
   push:
-    branches: [main, 'preview/n7-apex-step5-guide', 'preview/n7-visual-h01']
+    branches: [main, 'preview/n7-apex-step5-guide', 'preview/n7-visual-h01', 'preview/n7-hacker-mesh']
     paths:
       - 'tools/n7_apex_preview/**'
       - '.github/workflows/n7-apex-preview.yml'
@@ -30,8 +30,8 @@ jobs:
       PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
       N7_DRY_RUN: '1'
       # The visual trial branch publishes beside the functional preview, never over it.
-      N7_APEX_BASE_PATH: ${{ github.ref == 'refs/heads/main' && '/n7-apex' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && '/n7-apex-step5-visual' || '/n7-apex-step5') }}
-      N7_APEX_TARGET: ${{ github.ref == 'refs/heads/main' && 'n7-apex' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && 'n7-apex-step5-visual' || 'n7-apex-step5') }}
+      N7_APEX_BASE_PATH: ${{ github.ref == 'refs/heads/main' && '/n7-apex' || ((github.ref == 'refs/heads/preview/n7-hacker-mesh' || github.head_ref == 'preview/n7-hacker-mesh') && '/n7-apex-step5-hacker-3d' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && '/n7-apex-step5-visual' || '/n7-apex-step5')) }}
+      N7_APEX_TARGET: ${{ github.ref == 'refs/heads/main' && 'n7-apex' || ((github.ref == 'refs/heads/preview/n7-hacker-mesh' || github.head_ref == 'preview/n7-hacker-mesh') && 'n7-apex-step5-hacker-3d' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && 'n7-apex-step5-visual' || 'n7-apex-step5')) }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -339,6 +339,12 @@ jobs:
           N7_VISUAL_URL: http://127.0.0.1:4173${{ env.N7_APEX_BASE_PATH }}/
           N7_MODEL_OUT: ${{ runner.temp }}/n7-apex-evidence/model-3d
         run: node tools/n7_apex_preview/test_model_3d.cjs
+      - name: Verify fitted Hacker outfit in Chromium
+        if: env.N7_APEX_BASE_PATH == '/n7-apex-step5-hacker-3d'
+        env:
+          NODE_PATH: ${{ runner.temp }}/n7-apex-browser/node_modules
+          N7_HACKER_OUT: ${{ runner.temp }}/n7-apex-evidence/hacker
+        run: node tools/n7_apex_preview/test_hacker_outfit.cjs
       - name: Preserve visual evidence
         if: always() && (startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex')
         uses: actions/upload-artifact@v4
@@ -362,8 +368,8 @@ jobs:
       PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
       N7_DRY_RUN: '0'
       # The visual trial branch publishes beside the functional preview, never over it.
-      N7_APEX_BASE_PATH: ${{ github.ref == 'refs/heads/main' && '/n7-apex' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && '/n7-apex-step5-visual' || '/n7-apex-step5') }}
-      N7_APEX_TARGET: ${{ github.ref == 'refs/heads/main' && 'n7-apex' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && 'n7-apex-step5-visual' || 'n7-apex-step5') }}
+      N7_APEX_BASE_PATH: ${{ github.ref == 'refs/heads/main' && '/n7-apex' || ((github.ref == 'refs/heads/preview/n7-hacker-mesh' || github.head_ref == 'preview/n7-hacker-mesh') && '/n7-apex-step5-hacker-3d' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && '/n7-apex-step5-visual' || '/n7-apex-step5')) }}
+      N7_APEX_TARGET: ${{ github.ref == 'refs/heads/main' && 'n7-apex' || ((github.ref == 'refs/heads/preview/n7-hacker-mesh' || github.head_ref == 'preview/n7-hacker-mesh') && 'n7-apex-step5-hacker-3d' || ((github.ref == 'refs/heads/preview/n7-visual-h01' || github.head_ref == 'preview/n7-visual-h01') && 'n7-apex-step5-visual' || 'n7-apex-step5')) }}
     steps:
       - uses: actions/checkout@v4
         with:

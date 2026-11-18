@@ -7,7 +7,7 @@ import { N7_HUMANOID_REFERENCE } from "./N7HumanoidReference";
 export type GuideMood="idle"|"listening"|"thinking"|"speaking";
 export type GuideMode="assembly"|"particle"|"original"|"compare";
 export type GuideFrameInfo={turn:number;breath:number;progress:number;shock:number;ignition:number;renderMs:number;particles:number;frameMs:number};
-export type GuideSceneProps={mode:GuideMode;mood:GuideMood;effects:boolean;reduced:boolean;breathing:boolean;gestures?:boolean;source?:string;scale?:number;replay:number;manualMotion:boolean;diagnostics:boolean;onComplete:()=>void;onFrame:(f:GuideFrameInfo)=>void};
+export type GuideSceneProps={mode:GuideMode;mood:GuideMood;effects:boolean;reduced:boolean;breathing:boolean;gestures?:boolean;source?:string;scale?:number;replay:number;manualMotion:boolean;hacker?:boolean;allowHacker?:boolean;diagnostics:boolean;onComplete:()=>void;onFrame:(f:GuideFrameInfo)=>void};
 const moods:GuideMood[]=["idle","listening","thinking","speaking"];
 
 // A single Three.js scene owns source tiles, moods, assembly and breathing.
@@ -60,7 +60,7 @@ export default function N7GuideScene(props:GuideSceneProps){
       if(scale===1)ctx.drawImage(image,0,0);else ctx.drawImage(image,0,0,W,H);
       ctx.putImageData(ctx.getImageData(0,0,W,H),0,0);
       host.dataset.moodArt=art?"approved-pictures":"computed";
-      try{surface=createHeadSurface(reference,scale,config.current.source?1:0,art);}catch(e){host.dataset.renderError=String(e);reference.style.display="block";return;}
+      try{surface=createHeadSurface(reference,scale,config.current.source?1:0,art,config.current.allowHacker);}catch(e){host.dataset.renderError=String(e);reference.style.display="block";return;}
       Object.assign(surface.canvas.style,{width:"100%",height:"100%",display:"none"});host.append(surface.canvas);
       // Freeze each reduced-motion state on a native 2D canvas. Keeping a
       // constantly re-composited WebGL canvas visible was not byte-stable
@@ -156,7 +156,9 @@ export default function N7GuideScene(props:GuideSceneProps){
         talk+=(wantTalk-talk)*(1-Math.exp(-dt/(wantTalk?160:140)));if(Math.abs(wantTalk-talk)<.002)talk=wantTalk;if(c.reduced)talk=wantTalk;
         const poseYaw=Math.max(-1,Math.min(1,current+gestureYaw)),posePitch=Math.max(-1,Math.min(1,currentPitch+gesturePitch+voiceNod)),poseRoll=gestureRoll;
         const still=poseYaw===0&&posePitch===0&&poseRoll===0;
-        const exact=mode==="original"||!c.effects||progress===1&&still&&breath===0&&baseMood===0&&!transitions.length&&ignition===0&&talk===0;
+        const hacker=!!c.hacker&&mode!=="original";
+        const exact=mode==="original"||!hacker&&(!c.effects||progress===1&&still&&breath===0&&baseMood===0&&!transitions.length&&ignition===0&&talk===0);
+        host.dataset.outfit=hacker?"hacker":"original";
         host.dataset.voiceLevel=voiceLevel.toFixed(4);
         const start=performance.now();
         if(exact){
@@ -168,9 +170,9 @@ export default function N7GuideScene(props:GuideSceneProps){
           reference.style.display="none";
           const frameKey=c.reduced
             ?[progress.toFixed(5),baseMood,poseYaw.toFixed(5),posePitch.toFixed(5),
-              transitions.length,c.effects,talk.toFixed(3)].join(":"):"";
+              transitions.length,c.effects,hacker,talk.toFixed(3)].join(":"):"";
           if(!c.reduced||stillFrameKey!==frameKey){
-            surface!.render({turn:poseYaw,pitch:posePitch,roll:poseRoll,talk,breath,assembly:progress,baseMood,states:transitions.map(t=>t.mood),ages:transitions.map(t=>Math.min(1,(now-t.start)/1000)),ignition,voiceLevel,time:c.reduced?0:now/1000});
+            surface!.render({hacker,turn:poseYaw,pitch:posePitch,roll:poseRoll,talk,breath,assembly:progress,baseMood,states:transitions.map(t=>t.mood),ages:transitions.map(t=>Math.min(1,(now-t.start)/1000)),ignition,voiceLevel,time:c.reduced?0:now/1000});
             if(c.reduced&&stillContext){
               // Once per actual state: preserve the frame pixels, then
               // stop presenting WebGL while reduced motion is requested.
