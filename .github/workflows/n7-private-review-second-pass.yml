@@ -113,7 +113,15 @@ jobs:
           root=pathlib.Path('evidence/runs')/os.environ['SOURCE_RUN']
           os.environ['PCT_PRIVATE_REVIEW_PREFLIGHT_ONLY']='1'
           old=root/'previous_model_answer/answer.json'
-          result=execute(root, None, config={'configured':True,'missing':[]},
+          request={}
+          for manifest in sorted(root.glob('*/run_manifest/manifest.json')):
+              request=json.loads(manifest.read_text()).get('normalized_request') or {}
+              if request.get('target'): break
+          question=request.get('target','')
+          if request.get('date_range'): question+=' ('+request['date_range']+')'
+          if request.get('purpose'): question+='\nResearch scope: '+request['purpose']
+          if not question: question=json.loads(old.read_text()).get('question') or 'Historical research'
+          result=execute(root, question, config={'configured':True,'missing':[]},
                          resume_private_proposals_from=old)
           issues=(result.get('rejected') or [])
           reasons=collections.Counter(str(e.get('reason') or 'UNSPECIFIED') for e in issues)
