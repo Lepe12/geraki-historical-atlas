@@ -23,7 +23,11 @@ export default function useN7Voice(onTranscript:(text:string)=>void,onTurn?:(tex
     setPhase(null);
   },[]);
   const failConversation=useCallback((message:string)=>{active.current=false;current.current.enabled=false;setEnabled(false);setConversation(false);stop();setStatus(message);},[stop]);
-  const suspend=useCallback(()=>{current.current.enabled=false;setEnabled(false);failConversation("Ο ήχος και το μικρόφωνο σταμάτησαν.");},[failConversation]);
+  const suspend=useCallback(()=>{
+    failConversation(active.current||recognition.current||utterance.current||current.current.enabled
+      ?"Η φωνητική συνομιλία σταμάτησε. Πάτησε «Μίλα στο N7» για να συνεχίσεις."
+      :"");
+  },[failConversation]);
   const arm=useCallback((delay=700)=>{
     if(rearm.current)clearTimeout(rearm.current);
     if(!active.current||document.hidden)return;

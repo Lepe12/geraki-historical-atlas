@@ -9,17 +9,22 @@ async function verifyHumanoidHome(browser, homeUrl) {
     const page = await browser.newPage({viewport:{width,height:844},reducedMotion:"reduce"});
     try {
       let authenticated = false;
+      let releaseTasks;
+      const tasksReady = new Promise(resolve=>{releaseTasks=resolve;});
       await page.addInitScript(()=>{
         sessionStorage.setItem("n7-apex-greeted-v1","1");
+        localStorage.setItem("n7-shared-state-v1",JSON.stringify({schema:"n7-shared-state/v1",conversationId:"previous-chat"}));
+        window.n7MicAborts = 0;
         window.SpeechRecognition = class {
           start() { this.onstart(); }
-          abort() {}
+          abort() { window.n7MicAborts++; }
         };
       });
-      await page.route("**/api/**",route=>{
+      await page.route("**/api/**",async route=>{
         const endpoint = new URL(route.request().url()).pathname;
         if (endpoint === "/api/login") authenticated = true;
-        return route.fulfill({json:{authenticated,conversations:[],tasks:[]}});
+        if (endpoint === "/api/tasks") await tasksReady;
+        return route.fulfill({json:{authenticated,conversations:[{id:"previous-chat",title:"Previous chat"}],tasks:[],conversation:{messages:[]}}});
       });
       await page.goto(homeUrl);
       const dialog = page.getByRole("dialog",{name:"N7 Humanoid preview"});
@@ -41,6 +46,12 @@ async function verifyHumanoidHome(browser, homeUrl) {
       await password.waitFor({state:"hidden"});
       await speak.click();
       await dialog.getByText("Ακούω…",{exact:true}).waitFor();
+      const restored = page.waitForResponse("**/api/conversations/previous-chat");
+      releaseTasks();
+      await restored;
+      await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+      assert.equal(await page.evaluate(()=>window.n7MicAborts),0,"Restoring the saved chat stopped the microphone");
+      assert(await dialog.getByText("Ακούω…",{exact:true}).isVisible());
       await dialog.getByRole("button",{name:"Σταμάτα τη φωνητική συνομιλία N7"}).click();
       await speak.waitFor();
       await dialog.getByRole("button",{name:"Πίσω στο Workspace"}).click();

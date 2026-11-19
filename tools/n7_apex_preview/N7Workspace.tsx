@@ -184,13 +184,14 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   adopt.current=list=>{
     if(guest||activeConversation.current)return;
     const shared=readConversationId();
-    if(shared&&list.some(item=>item.id===shared))void chooseConversation(shared);
+    if(shared&&list.some(item=>item.id===shared))void chooseConversation(shared,true);
   };
-  async function chooseConversation(id: string) {
-    voice.suspend();setError("");
+  async function chooseConversation(id: string, restoring=false) {
+    if(!restoring){voice.suspend();setError("");}
     try {
       const d = await n7("/api/conversations/" + idPath(id));
       const c = d.conversation as { messages?: Msg[] } | undefined;
+      if(restoring&&(activeConversation.current||sending.current))return;
       activeConversation.current=id;setConversationId(id);
       const messages=c?.messages||[];heard.current[id]=messages.filter(m=>m.role==="assistant").length;setMessages(messages);
     } catch(e) { setError(String(e)); }
