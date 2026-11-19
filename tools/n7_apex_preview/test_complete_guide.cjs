@@ -4,9 +4,65 @@ const hostSelector='[aria-label="N7 guide artwork-tile humanoid"]';
 const result={url,scope:'unmocked rendering; separate local-only API lifecycle fixture',checks:[],limitations:['No owner-supplied assembly audio; silent timeline.','Browser voice/microphone have a separate lifecycle suite; manual mood buttons are visual previews.','Webcam is optional and not enabled.']};
 function diff(a,b,region){let n=0,max=0;for(let y=region?.y??0;y<(region?.bottom??a.height);y++)for(let x=region?.x??0;x<(region?.right??a.width);x++){const i=(y*a.width+x)*4;let d=0;for(let c=0;c<3;c++){let v=Math.abs(a.data[i+c]-b.data[i+c]);max=Math.max(max,v);d+=v;}n+=d>9;}return {pixels:n,max};}
 function metrics(png){let n=0,cyan=0,minX=png.width,maxX=-1,sumX=0,minY=png.height,maxY=-1;for(let y=0;y<png.height;y++)for(let x=0;x<png.width;x++){const i=(y*png.width+x)*4,r=png.data[i],g=png.data[i+1],b=png.data[i+2];if(r+g+b>45){n++;minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y);sumX+=x;}if(b>80&&g>70&&b>r*1.2)cyan++;}return {visible:n,cyan,width:maxX-minX+1,height:maxY-minY+1,centroid:sumX/n};}
+async function verifyHumanoidHome(browser, homeUrl) {
+  for (const width of [390, 1440]) {
+    const page = await browser.newPage({viewport:{width,height:844},reducedMotion:"reduce"});
+    try {
+      let authenticated = false;
+      await page.addInitScript(()=>{
+        sessionStorage.setItem("n7-apex-greeted-v1","1");
+        window.SpeechRecognition = class {
+          start() { this.onstart(); }
+          abort() {}
+        };
+      });
+      await page.route("**/api/**",route=>{
+        const endpoint = new URL(route.request().url()).pathname;
+        if (endpoint === "/api/login") authenticated = true;
+        return route.fulfill({json:{authenticated,conversations:[],tasks:[]}});
+      });
+      await page.goto(homeUrl);
+      const dialog = page.getByRole("dialog",{name:"N7 Humanoid preview"});
+      const speak = dialog.getByRole("button",{name:"Μίλα στο N7",exact:true});
+      await speak.waitFor();
+      await dialog.getByRole("link",{name:"Γραπτή συνομιλία"}).waitFor();
+      assert.equal(await dialog.getByRole("link",{name:"Γραπτή συνομιλία"}).getAttribute("href"),"/?view=chat");
+      assert.deepEqual(await dialog.getByRole("button").allTextContents(),["🎙 Μίλα στο N7","Πίσω στο Workspace"]);
+      await speak.click();
+      await dialog.getByLabel("Κωδικός N7").waitFor();
+      assert.equal(await speak.getAttribute("aria-expanded"),"true");
+      await speak.click();
+      const password = dialog.getByLabel("Κωδικός N7");
+      await password.waitFor({state:"hidden"});
+      await speak.click();
+      await password.fill("fixture");
+      await dialog.getByRole("button",{name:"Σύνδεση",exact:true}).click();
+      await password.waitFor({state:"hidden"});
+      await speak.click();
+      await dialog.getByText("Ακούω…",{exact:true}).waitFor();
+      await dialog.getByRole("button",{name:"Σταμάτα τη φωνητική συνομιλία N7"}).click();
+      await speak.waitFor();
+      await dialog.getByRole("button",{name:"Πίσω στο Workspace"}).click();
+      await dialog.waitFor({state:"hidden"});
+      const workspace = page.getByRole("region",{name:"N7 workspace"});
+      const nabou = workspace.getByRole("link",{name:"NABOU"});
+      await nabou.waitFor();
+      assert.equal(await nabou.getAttribute("href"),"/?view=nabou");
+    } finally {
+      await page.close();
+    }
+  }
+}
+
 (async()=>{
  const b=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/chromium',...(process.env.N7_BROWSER_PROXY?{proxy:{server:process.env.N7_BROWSER_PROXY}}:{}),args:['--no-sandbox','--disable-dev-shm-usage','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  try{
+  const homeUrl = new URL(url);
+  homeUrl.search = "";
+  if (homeUrl.pathname === "/n7-apex/") {
+    await verifyHumanoidHome(b, homeUrl.href);
+    result.checks.push({humanoidHome: "passed at 390px and 1440px"});
+  }
   const p=await b.newPage({viewport:{width:1440,height:900}}),errors=[];
   p.on('pageerror',e=>errors.push(e.message));p.on('console',m=>{if(m.type()==='error'&&m.text().includes('WebGLProgram'))errors.push(m.text());});
   await p.goto(url,{waitUntil:'networkidle'});const h=p.locator(hostSelector);await p.waitForFunction(s=>document.querySelector(s)?.dataset.engine==='three-shared-scene',hostSelector);
