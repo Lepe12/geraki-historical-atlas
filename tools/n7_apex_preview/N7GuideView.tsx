@@ -11,7 +11,7 @@ type Face="n7"|"h01";
 const H01_FIGURE=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/"))+"/n7-humanoid-h01-v2.webp";
 const H01_SCALE=2.5;
 
-export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigate}:{open:boolean;onClose:()=>void;activity?:GuideMood|null;onWorkspace?:()=>void;onNavigate?:(target:"chat"|"nabou")=>void}){
+export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigate,onBackToWorkspace}:{open:boolean;onClose:()=>void;onBackToWorkspace?:()=>void;activity?:GuideMood|null;onWorkspace?:()=>void;onNavigate?:(target:"chat"|"nabou")=>void}){
   const [reduced,setReduced]=useState(false),[effects,setEffects]=useState(true),[breathing,setBreathing]=useState(true),[gestures,setGestures]=useState(true);
   const [mode,setMode]=useState<GuideMode>("assembly"),[mood,setMood]=useState<GuideMood>("idle");
   const [replay,setReplay]=useState(0),[done,setDone]=useState(false),[manualMotion,setManualMotion]=useState(false),[details,setDetails]=useState(false);
@@ -33,9 +33,7 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
   const chooseFace=(next:Face)=>{setFace(next);try{window.localStorage.setItem("n7-face",next);}catch{}};
   const figureUrl=faceChoice==="h01"?H01_FIGURE:N7_HUMANOID_REFERENCE;
   const dialogRef=useRef<HTMLElement>(null);
-  // In the authenticated home screen only «Συνομιλία», «Chat», «NABOU» and «Exit» are shown, at the bottom. The
-  // technical controls stay in the code and in the page; the class below hides them unless ?controls=1 is in the
-  // address (used by the browser tests). A class set after mount, not React state: no extra render of the scene.
+  // Keep the technical controls available via ?controls=1.
   useEffect(()=>{
     if(!home||!open)return;const el=dialogRef.current;if(!el)return;
     let controls=false;try{controls=new URLSearchParams(window.location.search).get("controls")==="1";}catch{/* ignore */}
@@ -132,11 +130,13 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
       #n7-guide-voice p{font-size:12px;line-height:1.5;margin:6px 0;color:#a9cfd9}
       /* N7_APEX_HOME_V1: the two navigation buttons must fit a phone beside the existing ones. */
       @media(max-width:480px){.n7-guide-header{padding:10px 10px;gap:6px}.n7-guide-brand{letter-spacing:.12em;font-size:12px}.n7-guide-header>div{gap:4px!important}.n7-guide-header button{padding:5px 6px}}
-      .n7-home-buttons{display:none}
+      .n7-home-navigation,.n7-home-back{display:none}
       .n7-guide-view.n7-minimal .n7-guide-header,.n7-guide-view.n7-minimal .n7-guide-controls{display:none}
-            .n7-home-buttons{flex:none;z-index:5;justify-content:center;gap:10px;padding:10px 12px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(to top,rgba(0,0,0,.55),transparent)}
-      .n7-guide-view.n7-minimal .n7-home-buttons{display:flex;gap:10px}
-      .n7-home-buttons button{padding:9px 16px;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+      .n7-guide-view.n7-minimal .n7-home-navigation{display:flex;flex:none;z-index:5;justify-content:center;padding:4px 12px calc(14px + env(safe-area-inset-bottom))}
+      .n7-guide-view.n7-minimal .n7-home-back{display:block;position:absolute;top:12px;right:12px;z-index:6}
+      .n7-home-navigation a{color:#cdf9ff;padding:8px 12px;font-size:13px;text-underline-offset:3px}
+      .n7-guide-view.n7-minimal #n7-guide-voice>div{width:min(680px,calc(100% - 24px));text-align:center}
+      .n7-guide-view.n7-minimal #n7-guide-voice button[data-n7-conversation-toggle]{text-transform:none;letter-spacing:normal;font-size:14px}
       .n7-guide-details{padding:14px;background:rgba(2,9,14,.88);border:1px solid rgba(120,220,240,.16);border-radius:12px;overflow:auto;font-size:12px;line-height:1.6;min-height:0}
       @media(max-width:700px), (max-width:1000px) and (max-height:500px){.n7-guide-main[data-details=true]{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) 115px}.n7-guide-controls{align-self:stretch;margin:0;max-width:none;border-radius:0;border-width:1px 0 0;padding:6px 8px;gap:4px 10px;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;min-height:42px}#n7-guide-voice>div{width:100%;border-radius:0;border-width:1px 0 0}.n7-guide-controls>*{flex-shrink:0}.n7-guide-cluster{flex-wrap:nowrap}.n7-guide-group{padding-left:10px}.n7-guide-view button{padding:6px 8px;font-size:11px}}
     `}</style>
@@ -154,7 +154,10 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
       {details&&<aside className="n7-guide-details" aria-label="Technical details"><strong>Guide diagnostics</strong><p>Three.js · one humanoid scene<br/>sRGB · tone mapping OFF<br/>Sample 320×480 · assembly 6s<br/>Shockwave 2.5s · breathing 7.2s<br/>Reduced motion: {reduced?"ON":"OFF"}</p><p>Particles {stats?.particles??"loading"}<br/>Render {stats?.renderMs.toFixed(2)??"—"} ms<br/>Frame {stats?.frameMs.toFixed(2)??"—"} ms</p><label style={{display:"block"}}><input type="checkbox" checked={breathing} onChange={e=>setBreathing(e.target.checked)}/> Breathing</label><label style={{display:"block"}}><input type="checkbox" checked={gestures} onChange={e=>setGestures(e.target.checked)}/> Head gestures</label><p>Listening and Speaking buttons are visual previews. Live Listening follows microphone start; live Speaking follows audio playback.</p><p>Assembly is silent: no owner-supplied audio file. Camera tracking is optional and not enabled.</p>{mode==="compare"&&<p>REFERENCE 38% + PARTICLE RECONSTRUCTION</p>}</aside>}
     </div>
     <div id="n7-guide-voice" style={{position:"relative",zIndex:5,flex:"none"}}/>
-    {home&&<nav className="n7-home-buttons" aria-label="N7 πλοήγηση">{onWorkspace&&<button type="button" onClick={onWorkspace}>Συνομιλία</button>}{onNavigate&&<button type="button" data-nav="chat" onClick={()=>onNavigate("chat")}>Chat</button>}{onNavigate&&<button type="button" data-nav="nabou" onClick={()=>onNavigate("nabou")}>NABOU</button>}<button type="button" data-exit="" onClick={onClose}>Exit</button></nav>}
+    {home&&<>
+      <button type="button" className="n7-home-back" onClick={onBackToWorkspace??onClose}>Πίσω στο Workspace</button>
+      <nav className="n7-home-navigation" aria-label="Πλοήγηση N7"><a href="/?view=chat">Γραπτή συνομιλία</a></nav>
+    </>}
     <footer className="n7-guide-controls">
       <div className="n7-guide-cluster">
       <span role="status" aria-label="N7 mood status" className="n7-guide-status">{mode==="assembly"?`ASSEMBLY · ${done?"COMPLETE":"BUILDING"}`:`MOOD · ${(realMood||mood).toUpperCase()}${realMood?" · LIVE N7 REQUEST":mood!=="idle"?" · PREVIEW":""}`}</span>

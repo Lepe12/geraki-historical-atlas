@@ -5,7 +5,7 @@ import useN7Voice from "./useN7Voice";
 import {FEMALE_VOICE_ID} from "./N7FemaleVoice";
 import {N7_GUIDE,N7_GUEST_CHAT} from "./N7BuildFlags";
 import {speakable} from "./N7AgentSpeech";
-import {GREETING,GREETED_KEY,describeAgents,go,isAgentsStatus,markGreeted,navCommand,readConversationId,wasGreeted,writeConversationId} from "./N7Navigation";
+import {GREETING,GREETED_KEY,describeAgents,go,isAgentsStatus,markGreeted,navCommand,readConversationId,targetUrl,wasGreeted,writeConversationId} from "./N7Navigation";
 import type { OrbState } from "./ApexHeroOrb";
 
 type Msg = { role: string; content: string };
@@ -69,6 +69,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   const [online, setOnline] = useState<boolean | null>(null);
   const [authenticated, setAuthenticated] = useState(false);
   const guest=!authenticated&&N7_GUEST_CHAT;
+  const home=N7_GUIDE&&!N7_GUEST_CHAT;
   const wasAuthenticated=useRef(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [conversationId, setConversationId] = useState("");
@@ -92,9 +93,9 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
     if(!authenticated||guest||!guideOpen||!voiceHost||wasGreeted()||!voice.supported.output)return;
     let locked=true;
     try{const AudioCtor=window.AudioContext;if(AudioCtor){const probe=new AudioCtor();locked=probe.state!=="running";void probe.close();}}catch{locked=true;}
-    if(locked){setGreetGate(true);return;}
+    if(locked){if(!home)setGreetGate(true);return;}
     markGreeted();voiceRef.current.speak(GREETING,true);
-  },[authenticated,guest,guideOpen,voiceHost,voice.supported.output]);
+  },[authenticated,guest,guideOpen,voiceHost,voice.supported.output,home]);
   const startGreeting=()=>{markGreeted();setGreetGate(false);voiceRef.current.speak(GREETING,true);};
   const [taskPrompt, setTaskPrompt] = useState("");
   const [kind, setKind] = useState("analysis");
@@ -314,6 +315,10 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
     </>}
     {error&&<p role="alert" style={{color:"#ffba9a"}}>{error}</p>}
   </div>;
+  const needsLogin=!authenticated&&!guest;
+  const voiceUnavailable=!voice.supported.input||!voice.supported.output;
+  const waitingForAnswer=busy||pendingJobs.some(j=>j.conversationId===conversationId);
+  const voiceStatus=voice.phase==="listening"?"Ακούω…":voice.phase==="speaking"?"Μιλάω…":waitingForAnswer?"Ετοιμάζω απάντηση…":voice.status;
   return (
     <>
       {guideOpen&&voiceHost&&createPortal(<div style={{position:"relative",zIndex:5,padding:"6px 12px",background:"#04121beb",flex:"none",maxHeight:"38dvh",overflow:"auto"}}>
@@ -321,24 +326,31 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
           <p style={{margin:"0 0 6px",color:"#cdf9ff",fontSize:13}}>{GREETING}</p>
           <button type="button" data-n7-start="" style={{...buttonStyle,fontWeight:700,letterSpacing:1.5}} onClick={startGreeting}>Έναρξη N7</button>
         </div>}
-        <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:home?"center":undefined,gap:8,flexWrap:"wrap"}}>
           <button type="button" data-n7-conversation-toggle=""
-            aria-pressed={voice.conversation}
+            aria-pressed={needsLogin?undefined:voice.conversation}
+            aria-expanded={home&&needsLogin?voiceOpen:undefined}
             aria-label={voice.conversation?"Σταμάτα τη φωνητική συνομιλία N7":"Μίλα στο N7"}
             style={{...buttonStyle,fontWeight:700,background:voice.conversation?"#713c25":"#12516a"}}
-            disabled={!voice.conversation&&(busy||pendingJobs.some(j=>j.conversationId===conversationId)||!voice.supported.input||!voice.supported.output)}
-            onClick={()=>{if(voice.conversation)voice.suspend();else if(!authenticated&&!guest)setVoiceOpen(true);else voice.startConversation();}}>
+            disabled={!needsLogin&&!voice.conversation&&(waitingForAnswer||voiceUnavailable)}
+            onClick={()=>{
+              if(voice.conversation)voice.suspend();
+              else if(needsLogin)setVoiceOpen(open=>home?!open:true);
+              else voice.startConversation();
+            }}>
             {voice.conversation?"■ Τέλος συνομιλίας":"🎙 Μίλα στο N7"}
           </button>
-          <button type="button" aria-expanded={voiceOpen}
-            onClick={()=>{setVoiceOpen(x=>!x);if(voiceOpen)voice.suspend();}}>Φωνητική συνομιλία</button>
-          <span role="status" aria-label="Φωνητική κατάσταση N7" style={{fontSize:12,color:"#b8e6ee"}}>
-            {voice.phase==="listening"?"Ακούω…":voice.phase==="speaking"?"Μιλάω…":voice.status||"Η φωνητική συνομιλία ξεκινά με ένα πάτημα"}
-          </span>
+          {!home&&<button type="button" aria-expanded={voiceOpen}
+            onClick={()=>{setVoiceOpen(x=>!x);if(voiceOpen)voice.suspend();}}>Φωνητική συνομιλία</button>}
+          {(voiceStatus||(!needsLogin&&voiceUnavailable))&&<span role="status" aria-label="Φωνητική κατάσταση N7" style={{fontSize:12,color:"#b8e6ee"}}>
+            {voiceStatus||"Η φωνή δεν είναι διαθέσιμη σε αυτόν τον browser."}
+          </span>}
         </div>
-        {voiceOpen&&voiceControls}
+        {voiceOpen&&(!home||needsLogin)&&voiceControls}
+        {home&&!needsLogin&&error&&<p role="alert" style={{color:"#ffba9a"}}>{error}</p>}
+        {home&&!needsLogin&&notice&&<p role="status">{notice}</p>}
       </div>,voiceHost)}
-      <button type="button" onClick={() => {if(onOpenFigure&&N7_GUIDE&&window.matchMedia("(max-width:700px), (max-width:1000px) and (max-height:500px)").matches){setVoiceOpen(true);onOpenFigure();return;}setOpen(x => !x);}}
+      <button type="button" onClick={() => {if(onOpenFigure&&N7_GUIDE&&!home&&window.matchMedia("(max-width:700px), (max-width:1000px) and (max-height:500px)").matches){setVoiceOpen(true);onOpenFigure();return;}setOpen(x => !x);}}
         aria-expanded={open} aria-controls="n7-workspace"
         style={{ position:"fixed",right:18,bottom:18,zIndex:80,...buttonStyle,
           boxShadow:"0 0 22px #00dafa45",fontWeight:700,letterSpacing:2 }}>
@@ -355,6 +367,9 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
             {guest?"Συνομιλία χωρίς κωδικό":authenticated ? "Συνδεδεμένο" : online ? "Απαιτείται σύνδεση N7" : "Μη διαθέσιμο"}
           </span>
         </header>
+        {home&&<nav aria-label="Πλοήγηση Workspace" style={{marginTop:12}}>
+          <a href={targetUrl("nabou")} style={{color:"#65e8f5"}}>NABOU</a>
+        </nav>}
         {!authenticated&&!guest ? (
           <div style={{marginTop:18,fontSize:13,lineHeight:1.6}}>
             {loginForm}
