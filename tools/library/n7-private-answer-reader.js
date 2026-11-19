@@ -69,6 +69,10 @@ function readOwnerAnswer(dataDir,runId,keyFile=path.join(__dirname,".n7-library-
         proposed_statement:typeof claim.statement==="string"?claim.statement.slice(0,600):"",
         exact_acquired_quote:claim.quote.slice(0,1100),
         source_title:String(source.title||"Πηγή χωρίς τίτλο").slice(0,250),
+        source_creator:typeof source.source_bibliography?.creator==="string"?
+          source.source_bibliography.creator.slice(0,250):"",
+        reported_archival_reference:typeof source.reported_archival_reference?.display==="string"?
+          source.reported_archival_reference.display.slice(0,500):"",
         page_locator:page,source_lines:lines,
         source_text_sha256:/^[a-f0-9]{64}$/.test(source.source_text_sha256||"")?
           source.source_text_sha256:null,

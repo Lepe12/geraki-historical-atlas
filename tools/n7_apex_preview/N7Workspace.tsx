@@ -5,13 +5,31 @@ import useN7Voice from "./useN7Voice";
 import {FEMALE_VOICE_ID} from "./N7FemaleVoice";
 import {N7_GUIDE,N7_GUEST_CHAT} from "./N7BuildFlags";
 import {speakable} from "./N7AgentSpeech";
-import {GREETING,GREETED_KEY,describeAgents,go,isAgentsStatus,markGreeted,navCommand,readConversationId,targetUrl,wasGreeted,writeConversationId} from "./N7Navigation";
+import {GREETING,GREETED_KEY,describeAgents,go,isAgentsStatus,markGreeted,navCommand,privateReportRun,readConversationId,targetUrl,wasGreeted,writeConversationId} from "./N7Navigation";
 import type { OrbState } from "./ApexHeroOrb";
 
 type Msg = { role: string; content: string };
 type Conversation = { id: string; title: string };
 type Task = { id: string; kind?: string; prompt: string; status: string; result?: string; error?: string };
 type ApiData = Record<string, unknown>;
+type PrivateReport = {
+  schema: "n7-private-research-owner-answer-v1";
+  run_id: string;
+  paragraphs: string[];
+  references: string[];
+  source_candidates: {
+    claim_id: string;
+    proposed_statement: string;
+    exact_acquired_quote: string;
+    source_title: string;
+    source_creator?: string;
+    reported_archival_reference?: string;
+    page_locator: string;
+    source_lines: string;
+    model_review_decision: string;
+    review_reason: string;
+  }[];
+};
 type Tab = "chat" | "tasks" | "research";
 
 async function n7(path: string, payload?: Record<string, unknown>): Promise<ApiData> {
@@ -113,6 +131,41 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   const adopt=useRef<(list:Conversation[])=>void>(()=>{});
   const [greetGate,setGreetGate]=useState(false);
   const [notice,setNotice]=useState("");
+  const [privateReport,setPrivateReport]=useState<PrivateReport|null>(null);
+  const [reportStatus,setReportStatus]=useState("");
+  const reportRequest=useRef(0);
+  const loadPrivateReport=useCallback(async (id:string)=>{
+    if(!/^[0-9]{8,20}$/.test(id))return false;
+    const request=++reportRequest.current;
+    setPrivateReport(null);
+    setReportStatus("Ανάκτηση ιδιωτικής έρευνας…");
+    try {
+      const data=await n7("/api/research/corpus/"+id);
+      if(data.schema!=="n7-private-research-owner-answer-v1"||data.run_id!==id||
+        !Array.isArray(data.paragraphs)||!Array.isArray(data.references)||!Array.isArray(data.source_candidates))
+        throw Error("Invalid research report");
+      if(request!==reportRequest.current)return false;
+      setPrivateReport(data as PrivateReport);
+      setReportStatus("");
+      return true;
+    } catch {
+      if(request===reportRequest.current)setReportStatus("Η ιδιωτική αναφορά δεν είναι διαθέσιμη. Έλεγξε τη σύνδεσή σου στο N7.");
+      return false;
+    }
+  },[]);
+  useEffect(()=>{
+    if(!authenticated){
+      reportRequest.current++;
+      setPrivateReport(null);
+      setReportStatus("");
+      return;
+    }
+    if(guideOpen){
+      const id=new URLSearchParams(window.location.search).get("report");
+      if(id)void loadPrivateReport(id);
+    }
+  },[authenticated,guideOpen,loadPrivateReport]);
+
   useEffect(()=>{activeConversation.current=conversationId;},[conversationId]);
   useEffect(()=>{if(conversationId&&!guest)writeConversationId(conversationId);},[conversationId,guest]);
   useEffect(()=>{onActivity(voice.phase||(busy||pendingJobs.some(j=>j.conversationId===conversationId)?"thinking":null));},[busy,pendingJobs,conversationId,onActivity,voice.phase]);
@@ -220,6 +273,15 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
       finally{sending.current=false;setBusy(false);}
       return;
     }
+    const reportId=privateReportRun(draft);
+    if(reportId){
+      voice.stop();setMessage("");setError("");
+      const loaded=await loadPrivateReport(reportId);
+      if(spoken)voiceRef.current.speak(loaded
+        ?"Άνοιξα την ιδιωτική αναφορά με τους ισχυρισμούς και τις πηγές της."
+        :"Η ιδιωτική αναφορά δεν είναι διαθέσιμη.");
+      return;
+    }
     if(isAgentsStatus(draft)){
       // Real report of this installation: nothing is invented and the model is not asked.
       voice.stop();setMessage("");setError("");
@@ -316,6 +378,33 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
     </>}
     {error&&<p role="alert" style={{color:"#ffba9a"}}>{error}</p>}
   </div>;
+  const reportView=authenticated&&<div aria-label="Ιδιωτική έρευνα N7">
+    {reportStatus&&<p role="status">{reportStatus}</p>}
+    {privateReport&&<article style={{textAlign:"start",whiteSpace:"pre-wrap",padding:8}}>
+      <h3>Ιδιωτική αναφορά · {privateReport.run_id}</h3>
+      <p>Η ιστορική επαλήθευση των πρωτοτύπων και η ανεξαρτησία των πηγών εκκρεμούν.</p>
+      {privateReport.paragraphs.map((text,i)=><p key={i}>{richText(text)}</p>)}
+      {privateReport.source_candidates.length>0&&<h4>Ισχυρισμοί και τεκμήρια</h4>}
+      {privateReport.source_candidates.map((claim,i)=><details key={claim.claim_id||i}>
+        <summary>{i+1}. {claim.source_title} · {claim.page_locator}</summary>
+        {claim.source_creator&&<p>Συγγραφέας · {claim.source_creator}</p>}
+        <p>{claim.proposed_statement}</p>
+        <blockquote>{claim.exact_acquired_quote}</blockquote>
+        {claim.source_lines&&<p>{claim.source_lines}</p>}
+        {claim.reported_archival_reference&&<p>Αρχειακή παραπομπή όπως αναφέρεται στην πηγή · {claim.reported_archival_reference}</p>}
+        <p>{({
+          SUPPORTED_QUOTATION_ONLY:"Το απόσπασμα στηρίζει την απόδοση στην πηγή.",
+          UNSUPPORTED:"Το απόσπασμα δεν στηρίζει τον ισχυρισμό.",
+          UNCERTAIN:"Η στήριξη από το απόσπασμα παραμένει αβέβαιη.",
+          NOT_REVIEWED:"Εκκρεμεί ο έλεγχος του αποσπάσματος."
+        } as Record<string,string>)[claim.model_review_decision]||"Εκκρεμεί έλεγχος."} {claim.review_reason}</p>
+      </details>)}
+      {privateReport.references.length>0&&<><h4>Παραπομπές</h4>
+        <ul>{privateReport.references.map((reference,i)=><li key={i}>{richText(reference)}</li>)}</ul>
+      </>}
+      <button type="button" onClick={()=>setPrivateReport(null)}>Κλείσιμο αναφοράς</button>
+    </article>}
+  </div>;
   const needsLogin=!authenticated&&!guest;
   const voiceUnavailable=!voice.supported.input||!voice.supported.output;
   const waitingForAnswer=busy||pendingJobs.some(j=>j.conversationId===conversationId);
@@ -350,6 +439,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
         {voiceOpen&&(needsLogin?voiceControls:<div className="n7-voice-preview">{voiceControls}</div>)}
         {home&&!needsLogin&&error&&<p role="alert" style={{color:"#ffba9a"}}>{error}</p>}
         {home&&!needsLogin&&notice&&<p role="status">{notice}</p>}
+        {guideOpen&&(privateReport||reportStatus)&&reportView}
       </div>,voiceHost)}
       <button type="button" onClick={() => {if(onOpenFigure&&N7_GUIDE&&!home&&window.matchMedia("(max-width:700px), (max-width:1000px) and (max-height:500px)").matches){setVoiceOpen(true);onOpenFigure();return;}setOpen(x => !x);}}
         aria-expanded={open} aria-controls="n7-workspace"
@@ -387,6 +477,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
             </nav>}
             {(guest||tab === "chat") && <div>
               {!guideOpen&&voiceControls}
+              {!guideOpen&&(privateReport||reportStatus)&&reportView}
               {pendingJobs.some(j=>j.conversationId===conversationId)&&<p role="status" style={{fontSize:12}}>Αναμονή απάντησης N7. Μπορείς να συνεχίσεις τη συνομιλία.</p>}
               {!guest&&<select aria-label="Conversation" style={inputStyle} value={conversationId}
                 onChange={e => void chooseConversation(e.target.value)}>

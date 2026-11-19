@@ -17,6 +17,15 @@ function plain(text: string): string {
     .replace(/[.,!;:·…«»"'()?]/g, " ").replace(/\s+/g, " ").trim();
 }
 
+// Explicit retrieval commands go to the owner-only corpus route.
+export function privateReportRun(text: string): string | null {
+  const request = plain(text);
+  const run = request.match(/^(?:(?:n7|ν7) )?(?:ανοιξε|δειξε(?: μου)?|φερε(?: μου)?|ανακτησε) (?:την )?(?:ιδιωτικη )?(?:αναφορα|εργασια|ερευνα) (?:του )?(?:run )?([0-9]{8,20})$/);
+  if (run) return run[1];
+  if (/^(?:(?:n7|ν7) )?(?:ανοιξε|δειξε(?: μου)?|φερε(?: μου)?|ανακτησε) (?:την )?(?:ολοκληρωμενη |ιδιωτικη )?(?:αναφορα|εργασια|ερευνα) (?:για |του )?(?:creveliers|crevellier|κρεβελιερ|κρεβελιε)(?: ιεραπετρα)?$/.test(request)) return "44486434472";
+  return null;
+}
+
 // A navigation request is recognised only when the whole phrase is a command ("N7, άνοιξε το Chat"),
 // never when the words appear inside a longer question or research request.
 const NAME = "(?:n7|ν7|ενεπτα|εν 7|η n7|n 7)";

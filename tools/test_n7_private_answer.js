@@ -27,6 +27,7 @@ function fixture(){
       source_occurrences:[{
         title:"Test historical source",url:"https://example.org/document",
         source_text_sha256:"a".repeat(64),
+        source_bibliography:{creator:"Fixture author"},reported_archival_reference:{display:"Fixture archive, fol. 7"},
         locator:{printed_page:42,start_line:3,end_line:4}
       }]}],
     review:{supported_claim_ids:[],flagged_claims:[
@@ -59,6 +60,8 @@ test("private owner answer decrypts and preserves citations without asserting ve
     assert.equal(result.raw_source_text,undefined);
     assert.equal(result.source_candidates.length,1);
     assert.equal(result.source_candidates[0].page_locator,"έντυπη σ. 42");
+    assert.equal(result.source_candidates[0].source_creator,"Fixture author");
+    assert.equal(result.source_candidates[0].reported_archival_reference,"Fixture archive, fol. 7");
     assert.match(result.source_candidates[0].exact_acquired_quote,/original acquired excerpt/);
     assert.equal(result.source_candidates[0].source_text_sha256,"a".repeat(64));
     assert.equal(result.source_candidates[0].model_review_decision,"UNSUPPORTED");

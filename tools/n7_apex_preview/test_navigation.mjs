@@ -51,3 +51,11 @@ test('the status of the agents is asked in plain words and answered from the rea
   assert.match(describeAgents({summary:{total:2,ready:2},agents:[{ready:true},{ready:true}]}),/Δεν λείπει καμία απαίτηση/);
   assert.equal(describeAgents({}),'Δεν έλαβα κατάσταση των Agents από τον server.');
 });
+
+
+test("a request for the saved Creveliers report resolves without launching research", async () => {
+  const {privateReportRun}=await import("./N7Navigation.ts");
+  assert.equal(privateReportRun("N7, δείξε μου την ολοκληρωμένη εργασία Creveliers"),"44486434472");
+  assert.equal(privateReportRun("Άνοιξε την ιδιωτική αναφορά 44486434472"),"44486434472");
+  assert.equal(privateReportRun("Ψάξε για Creveliers στην Ιεράπετρα το 1675"),null);
+});

@@ -24,6 +24,15 @@ async function verifyHumanoidHome(browser, homeUrl) {
         const endpoint = new URL(route.request().url()).pathname;
         if (endpoint === "/api/login") authenticated = true;
         if (endpoint === "/api/tasks") await tasksReady;
+        if (endpoint === "/api/research/corpus/44486434472") {
+          assert(authenticated);
+          return route.fulfill({json:{
+            schema:"n7-private-research-owner-answer-v1",run_id:"44486434472",
+            paragraphs:["Private report fixture"],references:["Fixture source https://example.org/source"],
+            source_candidates:[{claim_id:"fixture-1",source_title:"Fixture",page_locator:"σ. 1",
+              proposed_statement:"Fixture claim",exact_acquired_quote:"Fixture quotation",model_review_decision:"SUPPORTED_QUOTATION_ONLY"}]
+          }});
+        }
         return route.fulfill({json:{authenticated,conversations:[{id:"previous-chat",title:"Previous chat"}],tasks:[],conversation:{messages:[]}}});
       });
       await page.goto(homeUrl);
@@ -60,6 +69,11 @@ async function verifyHumanoidHome(browser, homeUrl) {
       const nabou = workspace.getByRole("link",{name:"NABOU"});
       await nabou.waitFor();
       assert.equal(await nabou.getAttribute("href"),"/?view=nabou");
+      await page.goto(new URL("?report=44486434472",homeUrl).href);
+      await dialog.getByText("Private report fixture",{exact:true}).waitFor();
+      await dialog.getByText("1. Fixture · σ. 1",{exact:true}).click();
+      await dialog.getByText("Fixture quotation",{exact:true}).waitFor();
+      assert.equal(await dialog.getByRole("link",{name:"example.org ↗"}).getAttribute("href"),"https://example.org/source");
     } finally {
       await page.close();
     }
