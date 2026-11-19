@@ -927,8 +927,14 @@ def resume_private_proposals(path, question, records, question_kind, requested_r
     for proposal in original['claims']:
         eid=proposal.get('evidence_id')
         row=current.get(eid);old=previous.get(eid)
-        if not row or not old or digest(model_evidence(row))!=digest(model_evidence(old)):
-            rejected.append({'reason':'PRIVATE_REVIEW_SOURCE_CONTEXT_CHANGED','evidence_id':eid})
+        # Prompt compaction is a rendering option. Compare the underlying
+        # context and durable occurrences independently of that option.
+        fields=('text','years_in_scope','date_basis','date_evidence',
+                'source_bibliography','uncertainties','occurrences')
+        differences=[key for key in fields if row and old and digest(row.get(key))!=digest(old.get(key))]
+        if not row or not old or differences:
+            rejected.append({'reason':'PRIVATE_REVIEW_SOURCE_CONTEXT_CHANGED','evidence_id':eid,
+                             'binding_fields':differences or ['missing_context']})
             continue
         item={k:proposal.get(k) for k in ('statement','evidence_id','quote','kind','actors','places','dates')}
         item.update(passage_kind=proposal.get('passage_kind','NARRATIVE_EVIDENCE'),

@@ -45,6 +45,14 @@ class N7PrivateCitationReview(unittest.TestCase):
             self.assertFalse(receipt['new_evidence_extraction'])
             self.assertEqual(replayed[0]['source_occurrences'],claims[0]['source_occurrences'])
 
+    def test_prompt_compaction_does_not_change_source_identity(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p,records,claims,_=self.proposals(tmp)
+            records[0].update(model_view='compact',model_window=True)
+            replayed,rejections,_=resume_private_proposals(p,'Naxos source check',records,None,None,None,tmp)
+            self.assertEqual(rejections,[])
+            self.assertEqual(replayed[0]['source_occurrences'],claims[0]['source_occurrences'])
+
     def test_citation_mutation_cannot_survive_private_review(self):
         with tempfile.TemporaryDirectory() as tmp:
             p,records,claims,old=self.proposals(tmp)

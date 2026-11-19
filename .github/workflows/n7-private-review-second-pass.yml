@@ -128,6 +128,11 @@ jobs:
           # A reason code is safe to share; free-form errors can contain private source text.
           public={k:v for k,v in reasons.items() if k.isupper() and len(k)<100}
           print('N7_PRIVATE_REPLAY_REJECTION_REASON_COUNTS',json.dumps(public,sort_keys=True))
+          allowed_fields={'text','years_in_scope','date_basis','date_evidence',
+                          'source_bibliography','uncertainties','occurrences','missing_context'}
+          counts=collections.Counter(field for item in issues for field in item.get('binding_fields',[])
+                                     if field in allowed_fields)
+          print('N7_PRIVATE_REPLAY_BINDING_FIELD_COUNTS',json.dumps(counts,sort_keys=True))
           print('N7_PRIVATE_REPLAY_STILL_UNVERIFIED',len(result.get('claims') or []))
           PY
               exit 1
