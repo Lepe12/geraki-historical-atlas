@@ -51,7 +51,7 @@ jobs:
           sed -i "s/32df1aba20ef7bcc0a048e9edfff2d756d8db38913ebfd111ceb662369dab489/$PINNED_SHA/g" "$RUNNER_TEMP/n7-niki-browser/n7-niki-voice-worker-v1.js"
           cp "$RUNNER_TEMP/n7-niki-voice-v1.bin" "$RUNNER_TEMP/n7-niki-browser/n7-niki-voice-v1.bin"
           printf '<!doctype html><html lang="el"><meta charset="utf-8"><title>N7 Niki voice smoke test</title><body>N7 voice smoke test</body></html>' > "$RUNNER_TEMP/n7-niki-browser/index.html"
-          node --check tools/n7_apex_preview/N7NikiVoiceWorker.js
+          node --input-type=module --check < tools/n7_apex_preview/N7NikiVoiceWorker.js
           npm install --prefix "$RUNNER_TEMP/n7-niki-browser-modules" --ignore-scripts --no-audit --no-fund playwright-core@1.56.1
           python3 -m http.server 4219 --directory "$RUNNER_TEMP/n7-niki-browser" > "$RUNNER_TEMP/n7-niki-http.log" 2>&1 &
       - name: Assert real Greek wave from downloaded browser ONNX and Niki voice
