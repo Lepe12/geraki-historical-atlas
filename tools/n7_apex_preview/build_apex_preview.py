@@ -168,6 +168,27 @@ def main():
     shutil.copy2(overlay/"N7HumanoidIdle.ts",out/"components/N7HumanoidIdle.ts")
     (out/"public").mkdir(parents=True, exist_ok=True)
     shutil.copy2(overlay/"N7FemaleVoiceWorker.js",out/"public/n7-female-voice-worker-v3.js")
+    # New owner-approved natural Greek Niki voice — preserve legacy Piper as rollback.
+    # The model executes in the visitor's browser; this file is an exact, generated
+    # attention state of the verified CC0 reference, never a remote speech API.
+    if guide:
+        niki_path=os.getenv("N7_NIKI_KV_PATH","")
+        if not niki_path: raise RuntimeError("N7_NIKI_APPROVED_KV_MISSING")
+        state=pathlib.Path(niki_path).read_bytes()
+        if len(state)!=4374548 or state[:4]!=b"PKV1":
+            raise RuntimeError("N7_NIKI_KV_FORMAT_INVALID")
+        import struct
+        if struct.unpack_from("<IIII",state,4)!=(6,178,16,64):
+            raise RuntimeError("N7_NIKI_KV_SHAPE_INVALID")
+        checksum=hashlib.sha256(state).hexdigest()
+        shutil.copy2(overlay/"N7PocketCore.js",out/"public/n7-pocket-core-v1.js")
+        worker=(overlay/"N7NikiVoiceWorker.js").read_text()
+        previous="32df1aba20ef7bcc0a048e9edfff2d756d8db38913ebfd111ceb662369dab489"
+        if worker.count(previous)!=1:raise RuntimeError("N7_NIKI_WORKER_HASH_ANCHOR_INVALID")
+        (out/"public/n7-niki-voice-worker-v1.js").write_text(worker.replace(previous,checksum))
+        (out/"public/n7-niki-voice-v1.bin").write_bytes(state)
+        print("N7_NIKI_STATIC_VOICE_READY=true bytes="+str(len(state))+" sha256="+checksum)
+
     chunks = sorted((overlay/"assets_v3").glob("chunk*.b64"))
     if len(chunks) != 15:
         raise RuntimeError(f"expected 15 humanoid asset chunks, found {len(chunks)}")

@@ -65,7 +65,7 @@ export default function useN7Voice(onTranscript:(text:string)=>void,onTurn?:(tex
       if(index>=chunks.length){utterance.current=null;setPhase(null);setStatus(active.current?"Σε λίγο σε ακούω ξανά…":"Η εκφώνηση ολοκληρώθηκε.");arm();return;}
       if(useFemale){
         const text=chunks[index++];female.current!.play(text,{
-          start:()=>{if(token===generation.current){setPhase("speaking");setStatus("Το N7 μιλά με την ελληνική γυναικεία φωνή.");}},
+          start:()=>{if(token===generation.current){setPhase("speaking");setStatus("Η Νίκη μιλά ελληνικά.");}},
           end:()=>{if(token===generation.current)next();},
           error:message=>{if(token===generation.current)failConversation(message);},
           progress:message=>{if(token===generation.current){setPhase(null);setStatus(message);}}

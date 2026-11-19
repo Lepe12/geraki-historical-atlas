@@ -1,0 +1,23 @@
+name: N7 Niki browser voice state export probe
+on:
+  pull_request:
+    paths:
+      - 'tools/n7_apex_preview/probe_niki_native_state.py'
+      - '.github/workflows/n7-niki-browser-probe.yml'
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7_apex_preview/probe_niki_native_state.py
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install --disable-pip-version-check --no-input pocket-tts
+      - run: python tools/n7_apex_preview/probe_niki_native_state.py
