@@ -150,9 +150,12 @@ jobs:
           python3 tools/verify_request_integrity.py
       - id: matrix
         name: Build bounded research lane matrix
-        # Production (eval fast mode off): blank selection = all eleven lanes,
-        # specialists always run. Fast mode: 1-3 explicit lanes; specialists run
-        # only for travellers, the one lane that consumes their output.
+        # Encrypted owner corpus explicitly requires all eleven lanes. The
+        # signed dispatcher may select a focused subset for planning, but that
+        # subset is insufficient for the private archival provenance contract.
+        # Public/review/evaluation runs retain their existing selection.
+        env:
+          PCT_SELECTED_AGENTS: ${{ startsWith(inputs.request_id, 'n7mission-') && 'greek,travellers,spanish_simancas,venetian,french,british,dutch,german,italian_states,ottoman,north_african' || inputs.selected_agents }}
         run: |
           python3 tools/eval_fast_mode.py matrix | tee -a "$GITHUB_OUTPUT"
       - name: Announce request preparation complete
