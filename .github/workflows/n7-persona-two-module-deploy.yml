@@ -1,0 +1,44 @@
+name: N7 persona two-module guarded release
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/n7-persona-two-module-deploy.yml'
+      - 'ops_ftps_requests/n7-persona-v3/**'
+  push:
+    branches: [main]
+    paths:
+      - 'ops_ftps_requests/n7-persona-v3/request.json'
+permissions:
+  contents: read
+concurrency:
+  group: n7-persona-guarded-release
+  cancel-in-progress: false
+jobs:
+  verify-and-install:
+    if: (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact reviewed canonical N7 modules and JavaScript syntax
+        env:
+          N7_OFFLINE: '1'
+        run: python3 ops_ftps_requests/n7-persona-v3/deploy.py
+      - name: Review live module hashes and health before any write
+        env:
+          N7_DRY_RUN: '1'
+        run: python3 ops_ftps_requests/n7-persona-v3/deploy.py
+      - name: Apply only the two approved modules, retain backups, verify or rollback
+        if: github.event_name == 'push'
+        env:
+          N7_DRY_RUN: '0'
+        run: python3 ops_ftps_requests/n7-persona-v3/deploy.py
