@@ -1,0 +1,22 @@
+name: N7 Creveliers verify existing source-bound claims
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/n7-creveliers-existing-citations-review-20261119.yml'
+permissions:
+  contents: read
+  actions: write
+jobs:
+  review-existing-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Recheck existing encrypted four claims against retained sources
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run n7-private-review-second-pass.yml --repo Lepe12/geraki-historical-atlas --ref main -f run_id=44486434472
+          echo "N7_EXISTING_SOURCE_BOUND_CITATION_REVIEW_DISPATCHED run_id=44486434472"
+          echo "No new source search; original eleven source lanes retained"
