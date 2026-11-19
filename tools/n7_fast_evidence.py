@@ -52,7 +52,7 @@ def main():
     output={"status":"SOURCE_EXCERPTS_FOUND" if hits else "NO_LEXICAL_MATCH",
             "method":"DETERMINISTIC_LEXICAL_RETRIEVAL_NO_LLM",
             "model_used":False,"verified":False,"historically_verified":False,
-            "candidate_excerpts":hits,"candidate_count":len(hits),
+            "claims":[], "candidate_excerpts":hits,"candidate_count":len(hits),
             "corpus_record_count":len(records),"excluded_count":len(excluded),
             "limitations":["Candidate excerpts are not verified historical claims; inspect full source and context."]}
     dest=root/"research_answer"/"fast_evidence.json"
