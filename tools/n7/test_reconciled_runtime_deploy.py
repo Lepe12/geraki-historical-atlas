@@ -285,7 +285,9 @@ class GuardedDeployTest(unittest.TestCase):
         release = deploy.contract()
         new = set(release['files']) - set(release.get('previous_files', {}))
         self.assertEqual(new - deploy.WRITABLE, set(), 'new release files the installer would refuse')
-        self.assertIn('n7-apex-public-chat.cjs', new, 'public guest route must be included in release contract')
+        self.assertIn('n7-apex-public-chat.cjs', release['files'], 'public guest route must be included in release contract')
+        self.assertEqual(release['previous_files']['n7-apex-public-chat.cjs'],
+                         'ffb11a9b0cffb23b9b019985c59f0e51b6b9dcb0d4f208b9d0eb0674b63f541a')
         for name in ('n7-agents.js', 'news-geopolitics.js', 'n7-command-router.js', 'n7-apex-public-chat.cjs'):
             self.assertIn(name, deploy.PUBLIC_MODULES)
             self.assertEqual(deploy.sha((deploy.HERE / deploy.PUBLIC_MODULES[name]).read_bytes()), release['files'][name], name)
