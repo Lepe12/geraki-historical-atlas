@@ -44,9 +44,11 @@ jobs:
       - name: Read-only TopHost FTPS preflight
         env:
           N7_DRY_RUN: '1'
+          N7_SKIP_SYNTH: '1'
         run: python ops_ftps_requests/n7-niki-voice/acquire.py
       - name: Stage exact Niki WAV under isolated N7 voice-assets without activating
         if: github.event_name == 'push'
         env:
           N7_DRY_RUN: '0'
+          N7_SKIP_SYNTH: '1'
         run: python ops_ftps_requests/n7-niki-voice/acquire.py
