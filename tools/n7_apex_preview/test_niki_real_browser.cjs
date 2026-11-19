@@ -13,7 +13,8 @@ const url=process.env.N7_NIKI_BROWSER_TEST_URL||'http://127.0.0.1:4219/';
   assert(response&&response.ok());
   await page.evaluate(()=>{
    window.__niki={state:'pending',progress:0,events:[]};
-   const worker=new Worker('/n7-niki-voice-worker-v1.js',{type:'module'});
+   const base=new URL(window.location.href).pathname.replace(/\\/?$/,'/');
+   const worker=new Worker(base+'n7-niki-voice-worker-v1.js',{type:'module'});
    worker.onmessage=e=>{
     const m=e.data;
     if(m.type==='progress'){window.__niki.progress=m.total?m.loaded/m.total:0;return;}
