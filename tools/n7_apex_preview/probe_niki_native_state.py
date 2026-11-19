@@ -5,6 +5,10 @@ from pocket_tts import TTSModel
 URL="https://raw.githubusercontent.com/Lepe12/geraki-historical-atlas/assets/n7-niki-cc0-20261119/tools/n7_apex_preview/n7-voice-assets/niki/pocket_ref.wav"
 SHA="f9c67aa1d2951e6338af84245c1770e070cb6bc85960a6f249f7d7bf4357c3e0"
 def main():
+    meta=json.load(urllib.request.urlopen("https://huggingface.co/api/models/justdataplz/pocket-tts-web",timeout=30))
+    print("N7_BROWSER_GREEK_ONNX_PIN "+json.dumps({"sha":meta.get("sha"),"license":(meta.get("cardData") or {}).get("license")}),flush=True)
+    bundle=json.load(urllib.request.urlopen("https://huggingface.co/justdataplz/pocket-tts-web/resolve/"+meta["sha"]+"/greek/bundle.json",timeout=30))
+    print("N7_BROWSER_GREEK_BUNDLE "+json.dumps({"language":bundle.get("language"),"layers":bundle.get("layers"),"heads":bundle.get("heads"),"head_dim":bundle.get("head_dim"),"capacity":bundle.get("capacity"),"files":len(bundle.get("files",[]))}),flush=True)
     raw=urllib.request.urlopen(URL,timeout=60).read()
     assert hashlib.sha256(raw).hexdigest()==SHA
     with __import__('tempfile').TemporaryDirectory() as td:
