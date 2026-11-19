@@ -53,6 +53,13 @@ jobs:
       - name: Reconstruct pinned Greek female voice assets
         if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex'
         run: python3 tools/n7_apex_preview/prepare_female_voice.py --out "$RUNNER_TEMP/n7-female-assets"
+      - name: Build exact native Greek Niki voice state for browser Humanoid
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex'
+        run: |
+          python3 -m pip install --disable-pip-version-check --no-input pocket-tts
+          N7_NIKI_KV_PATH="$RUNNER_TEMP/n7-niki-voice-v1.bin" python3 tools/n7_apex_preview/probe_niki_native_state.py
+          test "$(wc -c < "$RUNNER_TEMP/n7-niki-voice-v1.bin")" -eq 4374548
+          echo "N7_NIKI_KV_PATH=$RUNNER_TEMP/n7-niki-voice-v1.bin" >> "$GITHUB_ENV"
       - name: Reconstruct exact upstream APEX source with reviewed N7 overlay
         run: python3 tools/n7_apex_preview/build_apex_preview.py --out "$RUNNER_TEMP/n7-apex-src"
       - name: Build static /n7-apex export
@@ -390,6 +397,13 @@ jobs:
             'backup_and_rollback':True
           }
           PY
+      - name: Build exact native Greek Niki voice state for production Humanoid
+        if: startsWith(env.N7_APEX_BASE_PATH, '/n7-apex-step5') || env.N7_APEX_BASE_PATH == '/n7-apex'
+        run: |
+          python3 -m pip install --disable-pip-version-check --no-input pocket-tts
+          N7_NIKI_KV_PATH="$RUNNER_TEMP/n7-niki-voice-v1.bin" python3 tools/n7_apex_preview/probe_niki_native_state.py
+          test "$(wc -c < "$RUNNER_TEMP/n7-niki-voice-v1.bin")" -eq 4374548
+          echo "N7_NIKI_KV_PATH=$RUNNER_TEMP/n7-niki-voice-v1.bin" >> "$GITHUB_ENV"
       - name: Reconstruct and build exact preview
         run: |
           python3 tools/n7_apex_preview/build_apex_preview.py --out "$RUNNER_TEMP/n7-apex-src"
