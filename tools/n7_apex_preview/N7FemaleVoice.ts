@@ -17,16 +17,16 @@ export function createFemaleVoice(){
   try{
    if(!context)context=new AudioContext();
    ensureWorker();
-   callbacks.progress(ready?"Το N7 ετοιμάζει τη φωνή…":"Προετοιμασία ελληνικής γυναικείας φωνής…");worker!.postMessage({id,text});
+   callbacks.progress(ready?"Το N7 ετοιμάζει τη φωνή…":"Προετοιμασία της Νίκης (ελληνική φωνή)…");worker!.postMessage({id,text});
   }catch{fail("Η ελληνική φωνή δεν υποστηρίζεται εδώ. Μπορείς να επιλέξεις φωνή συσκευής.");}
  };
  function ensureWorker(){
-   if(!worker){const parent=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf('/')+1);worker=new Worker(parent+'n7-female-voice-worker-v3.js');
-    worker.onerror=()=>{if(job){const c=job.callbacks;cancel();c.error("Η ελληνική φωνή δεν φορτώθηκε. Δοκίμασε ξανά ή επίλεξε φωνή συσκευής.");}};
+   if(!worker){const parent=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf('/')+1);worker=new Worker(parent+'n7-niki-voice-worker-v1.js',{type:'module'});
+    worker.onerror=()=>{if(job){const c=job.callbacks;cancel();c.error("Η φωνή Νίκη δεν φορτώθηκε. Δοκίμασε ξανά ή επίλεξε φωνή συσκευής.");}};
     worker.onmessage=async({data})=>{
      if(data.type==='ready'){ready=true;return;}
      const current=job;if(!current||data.id!==current.id)return;
-     if(data.type==='progress'){const percent=data.total?Math.round(data.loaded/data.total*100):0;current.callbacks.progress(`Φόρτωση ελληνικής γυναικείας φωνής${percent?` · ${percent}%`:''}. Η πρώτη λήψη είναι περίπου 90 MB.`);return;}
+     if(data.type==='progress'){const percent=data.total?Math.round(data.loaded/data.total*100):0;current.callbacks.progress(`Φόρτωση ελληνικής γυναικείας φωνής${percent?` · ${percent}%`:''}. Η πρώτη λήψη του μοντέλου είναι περίπου 120 MB.`);return;}
      if(data.type==='error'){clearTimeout(current.timer);const c=current.callbacks;cancel();c.error(String(data.message));return;}
      if(data.type!=='audio')return;
      try{
