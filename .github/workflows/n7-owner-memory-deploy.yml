@@ -51,6 +51,40 @@ jobs:
           node --check tools/n7/owner-chat-ui.js
           node --test tools/n7/test_owner_chat_memory.cjs
           python3 -m py_compile tools/n7/deploy_owner_chat_memory.py
+      - name: Load unchanged installer dependencies through read-only FTPS
+        run: |
+          python3 - <<'PYCODE'
+          import sys
+          from pathlib import Path
+
+          sys.path.insert(0, 'tools/n7')
+          import deploy_reconciled_runtime as deploy
+
+          release = deploy.contract()
+          root = Path.cwd().resolve()
+          files = release['files']
+          previous = release['previous_files']
+          missing = {}
+          for name, source in deploy.PUBLIC_MODULES.items():
+              path = (deploy.HERE / source).resolve()
+              if not path.is_relative_to(root):
+                  raise RuntimeError('N7_DEPENDENCY_PATH_INVALID ' + name)
+              if path.is_file():
+                  continue
+              if name not in files or previous.get(name) != files[name]:
+                  raise RuntimeError('N7_DEPENDENCY_NOT_IN_APPROVED_BASELINE ' + name)
+              missing[name] = path
+
+          if missing:
+              with deploy.connect() as ftp:
+                  for name, path in missing.items():
+                      data = deploy.read(ftp, name)
+                      if deploy.sha(data) != files[name]:
+                          raise RuntimeError('N7_DEPENDENCY_LIVE_HASH_MISMATCH ' + name)
+                      path.parent.mkdir(parents=True, exist_ok=True)
+                      path.write_bytes(data)
+          print(f'N7_VERIFIED_BASELINE_DEPENDENCIES={len(missing)}')
+          PYCODE
       - name: Verify reviewed canonical runtime upgrade without writing
         run: |
           python3 tools/check_n7_distribution.py
