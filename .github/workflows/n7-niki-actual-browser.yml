@@ -8,7 +8,7 @@ on:
       - 'tools/n7_apex_preview/test_niki_real_browser.cjs'
       - '.github/workflows/n7-niki-actual-browser.yml'
 permissions:
-  contents: write
+  contents: read
 concurrency:
   group: n7-niki-voice-browser-test
   cancel-in-progress: true
@@ -59,20 +59,3 @@ jobs:
           NODE_PATH: ${{ runner.temp }}/n7-niki-browser-modules/node_modules
           CHROME_BIN: /usr/bin/google-chrome
         run: node tools/n7_apex_preview/test_niki_real_browser.cjs
-      - name: Preserve only the approved CC0 Niki KV cache in owner-controlled source branch
-        run: |
-          git config user.name "N7 browser voice export"
-          git config user.email "n7-voice@users.noreply.github.com"
-          DEST=assets/n7-niki-pocket-kv-v1
-          if git ls-remote --exit-code --heads origin "refs/heads/$DEST" >/dev/null 2>&1; then
-            echo "N7_NIKI_KV_BRANCH_ALREADY_EXISTS — do not overwrite existing artifact"
-            exit 0
-          fi
-          git switch -c "$DEST"
-          mkdir -p tools/n7_apex_preview/n7-voice-assets/niki
-          cp "$RUNNER_TEMP/n7-niki-voice-v1.bin" tools/n7_apex_preview/n7-voice-assets/niki/niki.bin
-          printf '%s\n' 'N7 Niki derived Greek Pocket voice state PKV1' 'Source WAV SHA256: f9c67aa1d2951e6338af84245c1770e070cb6bc85960a6f249f7d7bf4357c3e0' "Derived PKV1 SHA256: $(sha256sum "$RUNNER_TEMP/n7-niki-voice-v1.bin" | cut -d' ' -f1)" 'Model: myned-ai/pocket-tts-greek (CC BY 4.0); reference: Ditto Common Voice CC0' > tools/n7_apex_preview/n7-voice-assets/niki/PROVENANCE.txt
-          git add --sparse -f tools/n7_apex_preview/n7-voice-assets/niki/niki.bin tools/n7_apex_preview/n7-voice-assets/niki/PROVENANCE.txt
-          git commit -m "assets(N7): pinned Niki Greek browser voice state PKV1, real speech verified"
-          git push origin HEAD:refs/heads/assets/n7-niki-pocket-kv-v1
-          echo "N7_NIKI_BROWSER_KV_STORED=true"
