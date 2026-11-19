@@ -134,15 +134,6 @@ def ftp_read(ftp,path):
 def install(raw,meta):
     ftp=connect()
     try:
-        parts=["n7-voice-assets","n7-voice-assets/niki"]
-        made=[]
-        for name in parts:
-            path=ROOT+"/"+name
-            try:
-                ftp.mkd(path)
-                made.append(path)
-            except ftplib.error_perm as e:
-                if not str(e).startswith("550"):raise
         targets=[(REMOTE_FOLDER+"/pocket_ref.wav",raw),(REMOTE_FOLDER+"/source.json",meta)]
         present=[]
         for dest,data in targets:
@@ -153,6 +144,10 @@ def install(raw,meta):
         if os.environ.get("N7_DRY_RUN","1")!="0":
             print("N7_NIKI_FTPS_PREFLIGHT_PASS write=false already_present="+str(sum(present)),flush=True)
             return
+        for name in ("n7-voice-assets","n7-voice-assets/niki"):
+            try:ftp.mkd(ROOT+"/"+name)
+            except ftplib.error_perm as e:
+                if not str(e).startswith("550"):raise
         written=[]
         try:
             for (dest,data),exists in zip(targets,present):
