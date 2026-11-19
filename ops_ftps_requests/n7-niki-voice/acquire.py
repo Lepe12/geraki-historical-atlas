@@ -104,14 +104,24 @@ def connect():
     port=int(os.getenv("PCT_FTPS_PORT","21"))
     ips=lambda name:{a[4][0] for a in socket.getaddrinfo(name,port,type=socket.SOCK_STREAM)}
     if not ips(host).intersection(ips(TLS)):raise RuntimeError("N7_NIKI_UNEXPECTED_FTPS_HOST")
-    ftps=ftplib.FTP_TLS(timeout=40,context=ssl.create_default_context())
-    ftps.connect(host,port)
-    ftps.host=TLS
-    ftps.login(os.environ["PCT_FTPS_USER"],os.environ["PCT_FTPS_PASSWORD"])
-    ftps.prot_p()
-    ftps.cwd(ROOT)
-    if ftps.pwd().rstrip("/")!=ROOT:raise RuntimeError("N7_NIKI_UNEXPECTED_REMOTE_ROOT")
-    return ftps
+    import time
+    for attempt in range(1,4):
+        ftps=ftplib.FTP_TLS(timeout=19,context=ssl.create_default_context())
+        try:
+            ftps.connect(host,port)
+            ftps.host=TLS
+            ftps.login(os.environ["PCT_FTPS_USER"],os.environ["PCT_FTPS_PASSWORD"])
+            ftps.prot_p()
+            ftps.cwd(ROOT)
+            if ftps.pwd().rstrip("/")!=ROOT:raise RuntimeError("N7_NIKI_UNEXPECTED_REMOTE_ROOT")
+            print("N7_NIKI_FTPS_CONNECTED attempt="+str(attempt),flush=True)
+            return ftps
+        except (OSError,TimeoutError,EOFError) as e:
+            try:ftps.close()
+            except Exception:pass
+            print("N7_NIKI_FTPS_RETRY attempt="+str(attempt)+" reason="+type(e).__name__,flush=True)
+            if attempt==3:raise
+            time.sleep(4*attempt)
 
 def ftp_read(ftp,path):
     parts=[]
@@ -166,7 +176,7 @@ def install(raw,meta):
 
 def main():
     raw,meta=acquire()
-    synth_test(raw)
+    if os.environ.get("N7_SKIP_SYNTH")!="1":synth_test(raw)
     if os.environ.get("N7_OFFLINE")=="1":
         print("N7_NIKI_ACQUIRED_SYNTHESIZED_NO_INSTALL",flush=True)
         return
