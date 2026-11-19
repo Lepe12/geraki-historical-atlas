@@ -62,3 +62,42 @@ jobs:
             print('claim_'+str(i)+'='+json.dumps({'source_occurrences':len(occ),'page_locator_present':page,'line_locator_present':lines,'statement_present':statement,'quote_present':quotation,'review_decision':'SUPPORTED_QUOTATION_ONLY' if identifier in supported else flags.get(identifier,'NOT_REVIEWED'),'original_page_verified':False,'historically_verified':False},sort_keys=True))
           print('N7_EXISTING_PRIVATE_ANSWER_AUDIT_COMPLETED')
           PY
+
+      - name: Verify the owner answer reader against the real encrypted report
+        run: |
+          set -euo pipefail
+          PYTHONPATH=tools python3 - <<'PY'
+          import json, os, pathlib, shutil, subprocess, tempfile
+          from n7_private_corpus_store import checked_run, connect, key_from_bot, remote_read, root
+          run=checked_run(os.environ["SOURCE_RUN"])
+          with tempfile.TemporaryDirectory(prefix="n7-owner-reader-") as tmp:
+              base=pathlib.Path(tmp)
+              store=base/"n7-corpora"/run
+              store.mkdir(parents=True)
+              with connect() as ftp:
+                  key=key_from_bot(ftp)
+                  root(ftp,run)
+                  (store/"answer-index.json").write_bytes(remote_read(ftp,"answer-index.json",100000))
+                  (store/"answer.json.enc").write_bytes(remote_read(ftp,"answer.json.enc",10000000))
+              keyfile=base/"private-key"
+              keyfile.touch(mode=0o600)
+              keyfile.write_bytes(key)
+              for local in ("tools/n7_private_aead.js","tools/library/n7-private-answer-reader.js"):
+                  shutil.copyfile(local,base/pathlib.Path(local).name)
+              check=subprocess.run(["node","-e", """
+              const [base,run,key]=process.argv.slice(1);
+              const {readOwnerAnswer}=require(base+"/n7-private-answer-reader.js");
+              const out=readOwnerAnswer(base,run,key);
+              if(out.run_id!==run||out.historically_verified!==false||out.claims_examined!==4||
+                 out.source_candidates.length!==4||out.references.length!==4||
+                 !out.source_candidates.every(c=>c.proposed_statement&&c.exact_acquired_quote&&c.source_title))
+                process.exit(2);
+              process.stdout.write(JSON.stringify({
+                claims:out.claims_examined, references:out.references.length,
+                has_paragraphs:out.paragraphs.length>0,
+                historically_verified:out.historically_verified
+              }));
+              """,str(base),run,str(keyfile)],capture_output=True,timeout=20)
+              if check.returncode!=0:raise SystemExit("N7_REAL_ENCRYPTED_OWNER_READER_CHECK_FAILED")
+              print("N7_REAL_ENCRYPTED_OWNER_READER_PASS",json.dumps(json.loads(check.stdout),sort_keys=True))
+          PY
