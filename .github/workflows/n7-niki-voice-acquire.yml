@@ -9,7 +9,7 @@ on:
     paths:
       - 'ops_ftps_requests/n7-niki-voice/owner-approved.json'
 permissions:
-  contents: read
+  contents: write
 concurrency:
   group: n7-niki-approved-voice-acquire
   cancel-in-progress: false
@@ -29,6 +29,7 @@ jobs:
         with:
           sparse-checkout: |
             ops_ftps_requests/n7-niki-voice
+            tools/n7_apex_preview/n7-voice-assets/niki
           sparse-checkout-cone-mode: false
       - uses: actions/setup-python@v5
         with:
@@ -41,6 +42,22 @@ jobs:
           HF_HUB_DISABLE_TELEMETRY: '1'
           CUDA_VISIBLE_DEVICES: ''
         run: python ops_ftps_requests/n7-niki-voice/acquire.py
+      - name: Acquire and permanently retain the verified CC0 Niki WAV in owner-controlled source branch
+        if: github.event_name == 'push'
+        env:
+          N7_OFFLINE: '1'
+          N7_SKIP_SYNTH: '1'
+          N7_SAVE_SOURCE_DIR: tools/n7_apex_preview/n7-voice-assets/niki
+        run: |
+          set -euo pipefail
+          python ops_ftps_requests/n7-niki-voice/acquire.py
+          git config user.name "N7 voice source acquisition"
+          git config user.email "n7-voice@users.noreply.github.com"
+          git switch -c assets/n7-niki-cc0-20261119
+          git add --sparse -f tools/n7_apex_preview/n7-voice-assets/niki/pocket_ref.wav tools/n7_apex_preview/n7-voice-assets/niki/source.json
+          git commit -m "assets(N7): verified original Niki CC0 Pocket Greek reference"
+          git push origin HEAD:refs/heads/assets/n7-niki-cc0-20261119
+          echo "N7_NIKI_GITHUB_SOURCE_PERSISTED branch=assets/n7-niki-cc0-20261119 sha256=f9c67aa1d2951e6338af84245c1770e070cb6bc85960a6f249f7d7bf4357c3e0"
       - name: Read-only TopHost FTPS preflight
         env:
           N7_DRY_RUN: '1'
