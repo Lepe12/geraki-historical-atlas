@@ -1,5 +1,5 @@
 name: N7 Private Source-Bound Citation Re-review
-run-name: N7 re-review retained exact citations ${{ inputs.run_id || '42434462262' }}
+run-name: N7 re-review retained exact citations ${{ inputs.run_id || '44486434472' }}
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
       run_id:
         type: string
         required: true
-        default: '42434462262'
+        default: '44486434472'
         description: Original completed N7 research run, with source data already encrypted in Plesk
 
 permissions:
@@ -19,7 +19,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: n7-private-re-review-${{ inputs.run_id || '42434462262' }}
+  group: n7-private-re-review-${{ inputs.run_id || '44486434472' }}
   cancel-in-progress: false
 
 jobs:
@@ -28,7 +28,7 @@ jobs:
     environment: nabou-production
     timeout-minutes: 70
     env:
-      SOURCE_RUN: ${{ inputs.run_id || '42434462262' }}
+      SOURCE_RUN: ${{ inputs.run_id || '44486434472' }}
       PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
       PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
       PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
@@ -101,10 +101,29 @@ jobs:
         run: |
           set -euo pipefail
           if [ "$N7_REVIEW_MODE" = "replay" ]; then
-            PYTHONPATH=tools python3 tools/semantic_research_answer.py \
+            # Keep source text, proposals, and individual evidence identifiers private.
+            # Print only the validation-rule histogram when exact replay fails.
+            if ! PYTHONPATH=tools python3 tools/semantic_research_answer.py \
               --run-id "$SOURCE_RUN" \
               --resume-private-proposals \
-              --check-private-proposals-only
+              --check-private-proposals-only; then
+              PYTHONPATH=tools python3 - <<'PY'
+          import collections, json, os, pathlib
+          from semantic_research_answer import execute
+          root=pathlib.Path('evidence/runs')/os.environ['SOURCE_RUN']
+          os.environ['PCT_PRIVATE_REVIEW_PREFLIGHT_ONLY']='1'
+          old=root/'previous_model_answer/answer.json'
+          result=execute(root, None, config={'configured':True,'missing':[]},
+                         resume_private_proposals_from=old)
+          issues=(result.get('rejected') or [])
+          reasons=collections.Counter(str(e.get('reason') or 'UNSPECIFIED') for e in issues)
+          # A reason code is safe to share; free-form errors can contain private source text.
+          public={k:v for k,v in reasons.items() if k.isupper() and len(k)<100}
+          print('N7_PRIVATE_REPLAY_REJECTION_REASON_COUNTS',json.dumps(public,sort_keys=True))
+          print('N7_PRIVATE_REPLAY_STILL_UNVERIFIED',len(result.get('claims') or []))
+          PY
+              exit 1
+            fi
             echo "N7_SOURCE_CITATION_PREFLIGHT_PASS_NO_MODEL_CALLS"
           else
             echo "N7_PRIOR_OUTPUT_IS_ZERO_CLAIM_TIMEOUT; fresh model extraction from the same 11 restored private source lanes only"
