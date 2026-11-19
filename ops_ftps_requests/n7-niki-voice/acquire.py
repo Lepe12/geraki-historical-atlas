@@ -171,6 +171,17 @@ def install(raw,meta):
 
 def main():
     raw,meta=acquire()
+    if os.environ.get("N7_SAVE_SOURCE_DIR"):
+        folder=Path(os.environ["N7_SAVE_SOURCE_DIR"]).resolve()
+        root=Path.cwd().resolve()
+        if not folder.is_relative_to(root) or folder.is_symlink():
+            raise RuntimeError("N7_NIKI_SOURCE_OUTPUT_PATH_INVALID")
+        folder.mkdir(parents=True,exist_ok=True)
+        (folder/"pocket_ref.wav").write_bytes(raw)
+        (folder/"source.json").write_bytes(meta)
+        if sha((folder/"pocket_ref.wav").read_bytes())!=EXPECTED_SHA:
+            raise RuntimeError("N7_NIKI_SOURCE_PERSIST_VERIFY_FAILED")
+        print("N7_NIKI_SOURCE_FILES_WRITTEN bytes="+str(len(raw))+" sha256="+EXPECTED_SHA,flush=True)
     if os.environ.get("N7_SKIP_SYNTH")!="1":synth_test(raw)
     if os.environ.get("N7_OFFLINE")=="1":
         print("N7_NIKI_ACQUIRED_SYNTHESIZED_NO_INSTALL",flush=True)
