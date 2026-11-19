@@ -39,12 +39,16 @@ jobs:
           N7_NIKI_KV_PATH: ${{ runner.temp }}/n7-niki-voice-v1.bin
         run: |
           python tools/n7_apex_preview/probe_niki_native_state.py
-          echo "32df1aba20ef7bcc0a048e9edfff2d756d8db38913ebfd111ceb662369dab489  $RUNNER_TEMP/n7-niki-voice-v1.bin" | sha256sum -c -
+          test "$(wc -c < "$RUNNER_TEMP/n7-niki-voice-v1.bin")" -eq 4374548
+          test "$(head -c4 "$RUNNER_TEMP/n7-niki-voice-v1.bin")" = "PKV1"
+          sha256sum "$RUNNER_TEMP/n7-niki-voice-v1.bin"
       - name: Create minimal same-origin voice browser test
         run: |
           mkdir -p "$RUNNER_TEMP/n7-niki-browser"
           cp tools/n7_apex_preview/N7PocketCore.js "$RUNNER_TEMP/n7-niki-browser/n7-pocket-core-v1.js"
           cp tools/n7_apex_preview/N7NikiVoiceWorker.js "$RUNNER_TEMP/n7-niki-browser/n7-niki-voice-worker-v1.js"
+          PINNED_SHA="$(sha256sum "$RUNNER_TEMP/n7-niki-voice-v1.bin" | cut -d' ' -f1)"
+          sed -i "s/32df1aba20ef7bcc0a048e9edfff2d756d8db38913ebfd111ceb662369dab489/$PINNED_SHA/g" "$RUNNER_TEMP/n7-niki-browser/n7-niki-voice-worker-v1.js"
           cp "$RUNNER_TEMP/n7-niki-voice-v1.bin" "$RUNNER_TEMP/n7-niki-browser/n7-niki-voice-v1.bin"
           printf '<!doctype html><html lang="el"><meta charset="utf-8"><title>N7 Niki voice smoke test</title><body>N7 voice smoke test</body></html>' > "$RUNNER_TEMP/n7-niki-browser/index.html"
           node --check tools/n7_apex_preview/N7NikiVoiceWorker.js
@@ -67,7 +71,7 @@ jobs:
           git switch -c "$DEST"
           mkdir -p tools/n7_apex_preview/n7-voice-assets/niki
           cp "$RUNNER_TEMP/n7-niki-voice-v1.bin" tools/n7_apex_preview/n7-voice-assets/niki/niki.bin
-          printf '%s\n' 'N7 Niki derived Greek Pocket voice state PKV1' 'Source WAV SHA256: f9c67aa1d2951e6338af84245c1770e070cb6bc85960a6f249f7d7bf4357c3e0' 'Derived PKV1 SHA256: 32df1aba20ef7bcc0a048e9edfff2d756d8db38913ebfd111ceb662369dab489' 'Model: myned-ai/pocket-tts-greek (CC BY 4.0); reference: Ditto Common Voice CC0' > tools/n7_apex_preview/n7-voice-assets/niki/PROVENANCE.txt
+          printf '%s\n' 'N7 Niki derived Greek Pocket voice state PKV1' 'Source WAV SHA256: f9c67aa1d2951e6338af84245c1770e070cb6bc85960a6f249f7d7bf4357c3e0' "Derived PKV1 SHA256: $(sha256sum "$RUNNER_TEMP/n7-niki-voice-v1.bin" | cut -d' ' -f1)" 'Model: myned-ai/pocket-tts-greek (CC BY 4.0); reference: Ditto Common Voice CC0' > tools/n7_apex_preview/n7-voice-assets/niki/PROVENANCE.txt
           git add --sparse -f tools/n7_apex_preview/n7-voice-assets/niki/niki.bin tools/n7_apex_preview/n7-voice-assets/niki/PROVENANCE.txt
           git commit -m "assets(N7): pinned Niki Greek browser voice state PKV1, real speech verified"
           git push origin HEAD:refs/heads/assets/n7-niki-pocket-kv-v1
