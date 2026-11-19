@@ -11,35 +11,11 @@ jobs:
     environment: nabou-production
     timeout-minutes: 10
     env:
-      GH_TOKEN: ${{ secrets.PCT_GITHUB_DISPATCH_TOKEN }}
       PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
       PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
       PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
       PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
-      N7_CANONICAL_COMMIT: 61d172eb46287b2639cfc8d4d25cf8ff5e36b384
-      N7_DRY_RUN: '1'
     steps:
-      - name: Read GitHub scheduler diagnostics
-        run: |
-          set -euo pipefail
-          repo=Lepe12/independent-ai-bot
-          for pair in 'check-runs/135531674520/annotations annotations' 'actions/permissions permissions' 'environments/production environment' 'actions/runs/44515633558/jobs jobs' 'actions/runners runners' 'users/Lepe12/settings/billing/usage billing'; do
-            read -r route label <<< "$pair"
-            endpoint="repos/$repo/$route"
-            if [[ "$label" == billing ]]; then endpoint="$route"; fi
-            if gh api "$endpoint" > "$RUNNER_TEMP/n7-$label.json" 2>/dev/null; then
-              case "$label" in
-                annotations) jq -c '[.[] | {annotation_level, title, message}]' "$RUNNER_TEMP/n7-$label.json" ;;
-                permissions) jq -c '{enabled,allowed_actions}' "$RUNNER_TEMP/n7-$label.json" ;;
-                environment) jq -c '{name, rules:[.protection_rules[]?.type],deployment_branch_policy}' "$RUNNER_TEMP/n7-$label.json" ;;
-                jobs) jq -c '[.jobs[] | {status,conclusion,runner_id,steps:(.steps|length)}]' "$RUNNER_TEMP/n7-$label.json" ;;
-                runners) jq -c '{total_count}' "$RUNNER_TEMP/n7-$label.json" ;;
-                billing) echo 'N7_BILLING_USAGE_ACCESSIBLE' ;;
-              esac
-            else
-              echo "N7_DIAGNOSTIC_UNAVAILABLE $label"
-            fi
-          done
       - uses: actions/checkout@v4
         with:
           sparse-checkout: tools/n7
@@ -50,9 +26,23 @@ jobs:
           import json
           import deploy_reconciled_runtime as d
           with d.connect() as ftp:
-              for name in ('server.js','skills/mcp-client.js','skills/mcp-builtin-server.js',
-                           'n7-security-agent.js','skills/cybersecurity-audit/SKILL.md'):
-                  data=d.read(ftp,name,optional=True)
+              paths=('server.js','n7-agents.js','n7-stream-attachments.js',
+                     'n7-release-info.js','skills/registry.js','skills/mcp-client.js',
+                     'skills/mcp-builtin-server.js','skills/mcp-builder-runtime.js',
+                     'n7-security-agent.js','skills/cybersecurity-audit/SKILL.md')
+              files={name:d.read(ftp,name,optional=True) for name in paths}
+              for name,data in files.items():
                   print('N7_SECURITY_LIVE_FINGERPRINT',json.dumps({
-                      'path':name,'sha256':d.sha(data) if data else None}))
+                      'path':name,'sha256':d.sha(data) if data is not None else None}))
+              server=files['server.js'] or b''
+              stream=files['n7-stream-attachments.js'] or b''
+              receipt=json.loads(d.read(ftp,'release-manifest.json'))
+              print('N7_SECURITY_ROUTE_PREFLIGHT',json.dumps({
+                  'chat_dispatch':b"require('./n7-agents.js').dispatch(history" in server,
+                  'stream_dispatch':b"agents:require('./n7-agents.js')" in server and b'agents.dispatch(history' in stream,
+                  'reporting_release':b"readReleaseInfo(__dirname)" in server,
+                  'manifest_schema':receipt.get('schema'),
+                  'manifest_files':len(receipt.get('files',{})),
+                  'manifest_id':receipt.get('release_id')
+              },sort_keys=True))
           PYCODE
