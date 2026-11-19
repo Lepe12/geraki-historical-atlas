@@ -272,6 +272,13 @@ def plan(ftp, release, canonical_commit, transformer=transform_server):
             allowed = {expected, previous_files.get(name)} - {None}
             if name == 'server.js':
                 allowed.add(release['previous_server_sha256'])
+                # Exact, independently observed and approved live predecessor.
+                # No wildcard hashes, no bypass for unreviewed server changes.
+                reviewed = release.get('reviewed_live_server_sha256')
+                if reviewed:
+                    if not re.fullmatch(r'[a-f0-9]{64}', reviewed):
+                        raise RuntimeError('N7_REVIEWED_LIVE_HASH_INVALID')
+                    allowed.add(reviewed)
             if name == 'server.js' and current is not None and APEX_MARKER in current:
                 # Already-installed approved guest routes are PRESERVED, not removed.
                 if (sha(current) not in allowed or current.count(APEX_PUBLIC_SHIM.encode()) != 1
