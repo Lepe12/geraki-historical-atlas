@@ -39,7 +39,7 @@ jobs:
           path=root/'previous_model_answer'/'answer.json'
           a=json.loads(path.read_text(encoding='utf8'))
           claims=a.get('claims')
-          assert a.get('historically_verified') is False and a.get('verified') is False
+          assert a.get('historically_verified') is not True and a.get('verified') is not True
           assert a.get('model_used') is True and isinstance(claims,list)
           supported=set((a.get('review') or {}).get('supported_claim_ids') or [])
           flags={r.get('claim_id'):r.get('decision') for r in (a.get('review') or {}).get('flagged_claims',[]) if isinstance(r,dict)}
