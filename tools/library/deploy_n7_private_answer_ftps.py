@@ -14,6 +14,9 @@ from n7_private_corpus_store import BOT,connect,remote_read,write
 
 FILES=("server.js","n7_private_aead.js","n7-private-answer-reader.js")
 HELPER=b'const {readOwnerAnswer}=require("./n7-private-answer-reader");\n'
+READ_ANSWER=b'        return json(res,200,readOwnerAnswer(DATA_DIR,researchRunId));'
+OWNER_GUARD=b"        if(!session(req))return json(res,401,{error:'Authentication required'});"
+
 ROUTE=b'''    if(req.method==='GET'&&/^\\/api\\/research\\/corpus\\/[0-9]{8,20}$/.test(p)){
       try{
         const researchRunId=p.split('/').pop();
@@ -29,8 +32,10 @@ def patched(source:bytes)->bytes:
     if b"if(!session(req))" not in source or b"n7OwnerMission(" not in source:
         raise RuntimeError("N7_LIVE_AUTH_OR_MISSION_MISSING")
     if b"readOwnerAnswer(DATA_DIR," in source:
-        if source.count(b"readOwnerAnswer(DATA_DIR,")!=1 or HELPER not in source:
+        if source.count(b"readOwnerAnswer(DATA_DIR,")!=1 or HELPER not in source or source.count(READ_ANSWER)!=1:
             raise RuntimeError("N7_PRIVATE_ANSWER_PARTIAL_OR_INCONSISTENT")
+        if OWNER_GUARD+b"\n"+READ_ANSWER not in source:
+            source=source.replace(READ_ANSWER,OWNER_GUARD+b"\n"+READ_ANSWER,1)
         return source
     if source.count(b"'use strict';\n")!=1:
         raise RuntimeError("N7_LIVE_MODULE_ANCHOR_CHANGED")
@@ -60,7 +65,7 @@ def patched(source:bytes)->bytes:
         raise RuntimeError("N7_AUTHENTICATED_RESEARCH_BOUNDARY_NOT_FOUND")
     _,last_end=max(usable,key=lambda item:item[0])
     source=source[:last_end+1]+ROUTE+source[last_end+1:]
-    return source
+    return patched(source)
 
 
 def hash_bytes(data):return hashlib.sha256(data).hexdigest()
@@ -75,7 +80,7 @@ def validate(files):
             subprocess.run(["node","--check",str(f)],check=True,capture_output=True,timeout=15)
     server=files["server.js"]
     assert b"readOwnerAnswer(DATA_DIR" in server and b"PRIVATE_ANSWER_NOT_READY" in server
-    assert server.index(b"if(!session(req))")<server.index(b"readOwnerAnswer(DATA_DIR")
+    assert server.count(OWNER_GUARD+b"\n"+READ_ANSWER)==1
     assert b"PRIVATE_ANSWER_NOT_READY" in server
     assert patched(server)==server
 

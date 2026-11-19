@@ -61,6 +61,12 @@ jobs:
           assert output.index(b"if(!session(req))")<output.index(b"readOwnerAnswer(DATA_DIR")
           assert output.count(b"readOwnerAnswer")==2
           assert m.patched(output)==output
+          assert m.OWNER_GUARD+b"\n"+m.READ_ANSWER in output
+          hoisted=original.replace(b"async function handler(req,res){\n",
+            b"async function handler(req,res){\n"+m.ROUTE).replace(b"'use strict';\n",b"'use strict';\n"+m.HELPER)
+          guarded=m.patched(hoisted)
+          assert guarded.index(m.OWNER_GUARD)<guarded.index(m.READ_ANSWER)
+          assert m.patched(guarded)==guarded
           try:m.patched(b"'use strict';\nif(!session(req))return json(res,401,{});")
           except RuntimeError:pass
           else:raise AssertionError('missing mission guard accepted')
