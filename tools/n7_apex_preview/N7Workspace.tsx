@@ -286,7 +286,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
 
   const lastAnswer=messages.filter(m=>m.role==="assistant").at(-1)?.content;
   const loginForm=<form onSubmit={event=>void login(event)} style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-    <label>Κωδικός N7 <input name="password" type="password" autoComplete="current-password" required style={{...inputStyle,width:170}}/></label>
+    <label>Κωδικός N7 <input name="password" type="password" autoComplete="current-password" autoFocus={home&&guideOpen} required style={{...inputStyle,width:170}}/></label>
     <button type="submit" disabled={loginBusy} style={buttonStyle}>{loginBusy?"Σύνδεση…":"Σύνδεση"}</button>
     <p style={{fontSize:12,margin:0}}>Ο ίδιος κωδικός που χρησιμοποιείς στο N7. Δεν χρειάζεται νέος λογαριασμός.</p>
   </form>;

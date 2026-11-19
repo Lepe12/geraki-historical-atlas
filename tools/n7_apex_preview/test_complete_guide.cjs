@@ -31,6 +31,7 @@ async function verifyHumanoidHome(browser, homeUrl) {
       await speak.click();
       await dialog.getByLabel("Κωδικός N7").waitFor();
       assert.equal(await speak.getAttribute("aria-expanded"),"true");
+      assert.equal(await dialog.getByLabel("Κωδικός N7").evaluate(input=>input===document.activeElement),true);
       await speak.click();
       const password = dialog.getByLabel("Κωδικός N7");
       await password.waitFor({state:"hidden"});
