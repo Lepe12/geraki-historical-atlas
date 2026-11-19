@@ -12,7 +12,7 @@ permissions:
   contents: read
 concurrency:
   group: n7-persona-guarded-release
-  cancel-in-progress: false
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   verify-and-install:
     if: (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'push' && github.ref == 'refs/heads/main')
@@ -26,6 +26,12 @@ jobs:
       PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            ops_ftps_requests/n7-persona-v3
+            tools/n7/owner-chat-memory.js
+            tools/n7/apex-public-chat.cjs
+          sparse-checkout-cone-mode: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
