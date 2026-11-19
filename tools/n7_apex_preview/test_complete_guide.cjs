@@ -66,6 +66,16 @@ async function verifyHumanoidHome(browser, homeUrl) {
   }
   const p=await b.newPage({viewport:{width:1440,height:900}}),errors=[];
   p.on('pageerror',e=>errors.push(e.message));p.on('console',m=>{if(m.type()==='error'&&m.text().includes('WebGLProgram'))errors.push(m.text());});
+  await p.addInitScript(()=>{
+    window.n7WaveFrames = [];
+    const selector = '[aria-label="N7 completion shockwave"]';
+    const observer = new MutationObserver(records=>{
+      for (const record of records) {
+        if (record.target.matches(selector)) window.n7WaveFrames.push(Number(record.oldValue));
+      }
+    });
+    observer.observe(document,{subtree:true,attributes:true,attributeFilter:["data-progress"],attributeOldValue:true});
+  });
   await p.goto(url,{waitUntil:'networkidle'});const h=p.locator(hostSelector);await p.waitForFunction(s=>document.querySelector(s)?.dataset.engine==='three-shared-scene',hostSelector);
   const pose=async(name)=>{const png=await h.evaluate(h=>[...h.querySelectorAll('canvas')].find(c=>c.style.display!=='none').toDataURL());fs.writeFileSync(path.join(out,name+'.png'),Buffer.from(png.split(',')[1],'base64'));return PNG.sync.read(Buffer.from(png.split(',')[1],'base64'));};
   const progress=async n=>p.waitForFunction(({s,n})=>Number(document.querySelector(s)?.dataset.assemblyProgress)>=n,{s:hostSelector,n});
@@ -85,15 +95,16 @@ async function verifyHumanoidHome(browser, homeUrl) {
   else result.limitations.push('Early galaxy frame arrived late (progress '+a25.progress.toFixed(2)+'); growth not compared in this run.');
   assert(Math.abs(a25.centroid-a60.centroid)<a60.width*.25,'Galaxy did not stay centred: '+JSON.stringify({a25,a60}));
   await progress(1);await p.getByText('ASSEMBLY · COMPLETE',{exact:true}).waitFor();
-  await p.waitForFunction(()=>Number(document.querySelector('[aria-label="N7 completion shockwave"]').dataset.progress)>=0);
-  await p.screenshot({path:path.join(out,'completion-wave-start.png')});
-  await p.waitForTimeout(750);const mid=Number(await p.getByLabel('N7 completion shockwave',{exact:true}).getAttribute('data-progress'));assert(mid>0&&mid<1,'Shockwave is not followable');
-  await p.screenshot({path:path.join(out,'completion-wave-mid.png')});await p.waitForTimeout(2100);
-  assert.equal(await p.getByLabel('N7 completion shockwave',{exact:true}).isVisible(),false,'Wave did not finish');
+  const wave=p.getByLabel("N7 completion shockwave",{exact:true});
+  await p.waitForFunction(()=>window.n7WaveFrames.some(progress=>progress>0&&progress<1));
+  await wave.waitFor({state:"hidden"});
+  const waveFrames=await p.evaluate(()=>window.n7WaveFrames.filter(progress=>progress>=0));
+  assert(waveFrames.at(-1)>=.6&&waveFrames.some(progress=>progress>0&&progress<waveFrames.at(-1)),"Shockwave did not progress through visible frames");
   const scene=PNG.sync.read(await p.screenshot());const fb=await p.locator('.n7-guide-figure').boundingBox();const corner=(Math.round(fb.y+2)*scene.width+Math.round(fb.x+2))*4;assert(scene.data[corner]+scene.data[corner+1]+scene.data[corner+2]>15,'Opaque black artwork rectangle hides backdrop');
-  result.checks.push({step:4,automaticBuild:true,...{a25,a60}},{step:7,durationMs:2500,oneWave:true});
+  result.checks.push({step:4,automaticBuild:true,...{a25,a60}},{step:7,durationMs:2500,oneWave:true,progressSamples:waveFrames.length});
   // Replay during a completed-state wave and cancel: no overlapping/later wave.
-  await p.getByRole('button',{name:'Replay Assembly',exact:true}).click();await p.waitForTimeout(200);assert(Number(await h.getAttribute('data-assembly-progress'))<.2);
+  await p.getByRole('button',{name:'Replay Assembly',exact:true}).click();
+  await p.waitForFunction(selector=>Number(document.querySelector(selector)?.dataset.assemblyProgress)<.2,hostSelector);
   assert.equal(await p.getByLabel('N7 completion shockwave',{exact:true}).isVisible(),false);
   await progress(1);await p.waitForTimeout(300);await p.getByRole('button',{name:'Skip',exact:true}).click();await p.waitForTimeout(2800);
   assert.equal(await p.getByLabel('N7 completion shockwave',{exact:true}).isVisible(),false,'Skip left a delayed wave');
