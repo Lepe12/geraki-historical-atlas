@@ -1,0 +1,22 @@
+name: N7 Creveliers finalize existing private corpus 44486434472
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/n7-creveliers-existing-corpus-finalize-20261119.yml'
+permissions:
+  contents: read
+  actions: write
+jobs:
+  finalize-existing-corpus:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Resume only encrypted source reading and final private synthesis, no rediscovery
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run n7-private-corpus-synthesis.yml --ref main -f run_id=44486434472
+          echo 'N7_EXISTING_CORPUS_RESYNTHESIS_DISPATCHED source_run=44486434472'
+          echo 'Only existing checksum-bound source artifacts; no new research mission or source discovery.'
