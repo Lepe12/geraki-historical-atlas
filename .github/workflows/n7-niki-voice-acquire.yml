@@ -1,0 +1,52 @@
+name: N7 acquire verified Niki CC0 Greek reference
+on:
+  pull_request:
+    paths:
+      - 'ops_ftps_requests/n7-niki-voice/**'
+      - '.github/workflows/n7-niki-voice-acquire.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'ops_ftps_requests/n7-niki-voice/owner-approved.json'
+permissions:
+  contents: read
+concurrency:
+  group: n7-niki-approved-voice-acquire
+  cancel-in-progress: false
+jobs:
+  acquire-and-verify:
+    if: (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || github.ref == 'refs/heads/main'
+    environment: nabou-production
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            ops_ftps_requests/n7-niki-voice
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install CPU voice runtime for real Niki test
+        run: python -m pip install --disable-pip-version-check --no-input pocket-tts numpy
+      - name: Verify original reference SHA, CC0 license and synthesize actual Greek speech
+        env:
+          N7_OFFLINE: '1'
+          HF_HUB_DISABLE_TELEMETRY: '1'
+          CUDA_VISIBLE_DEVICES: ''
+        run: python ops_ftps_requests/n7-niki-voice/acquire.py
+      - name: Read-only TopHost FTPS preflight
+        env:
+          N7_DRY_RUN: '1'
+        run: python ops_ftps_requests/n7-niki-voice/acquire.py
+      - name: Stage exact Niki WAV under isolated N7 voice-assets without activating
+        if: github.event_name == 'push'
+        env:
+          N7_DRY_RUN: '0'
+        run: python ops_ftps_requests/n7-niki-voice/acquire.py
