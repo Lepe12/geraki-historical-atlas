@@ -11,7 +11,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: n7-persona-guarded-release
+  group: n7-persona-${{ github.event_name == 'pull_request' && github.sha || 'production' }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   verify-and-install:
