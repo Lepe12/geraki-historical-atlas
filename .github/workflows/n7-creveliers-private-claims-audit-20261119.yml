@@ -1,0 +1,64 @@
+name: N7 Creveliers existing answer private citation audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/n7-creveliers-private-claims-audit-20261119.yml'
+permissions:
+  contents: read
+concurrency:
+  group: n7-private-audit-44486434472
+  cancel-in-progress: false
+jobs:
+  audit-existing-answer:
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      SOURCE_RUN: '44486434472'
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            tools
+      - name: Restore and authenticate existing private answer only
+        run: |
+          set -euo pipefail
+          PYTHONPATH=tools python3 tools/n7_private_corpus_store.py answer-restore --run-id "$SOURCE_RUN"
+      - name: Audit exact source-binding metadata without publishing private text
+        run: |
+          python3 - <<'PY'
+          import collections,json,os,pathlib
+          root=pathlib.Path('evidence/runs')/os.environ['SOURCE_RUN']
+          path=root/'previous_model_answer'/'answer.json'
+          a=json.loads(path.read_text(encoding='utf8'))
+          claims=a.get('claims')
+          assert a.get('historically_verified') is False and a.get('verified') is False
+          assert a.get('model_used') is True and isinstance(claims,list)
+          supported=set((a.get('review') or {}).get('supported_claim_ids') or [])
+          flags={r.get('claim_id'):r.get('decision') for r in (a.get('review') or {}).get('flagged_claims',[]) if isinstance(r,dict)}
+          print('N7_PRIVATE_AUDIT_SCHEMA_V1')
+          print('run_id='+os.environ['SOURCE_RUN'])
+          print('model_status='+str(a.get('status')))
+          print('claim_count='+str(len(claims)))
+          print('review_supported_count='+str(len(supported)))
+          print('review_flagged_decisions='+json.dumps(dict(collections.Counter(flags.values())),sort_keys=True))
+          print('answer_sections='+str(len(a.get('answer_sections') or [])))
+          print('greek_paragraphs='+str(len((a.get('greek_narrative') or {}).get('paragraphs') or [])))
+          for i,claim in enumerate(claims,1):
+            occ=claim.get('source_occurrences') or []
+            loc=[x.get('locator') or {} for x in occ if isinstance(x,dict)]
+            page=any(x.get('printed_page') is not None or x.get('scan_indexes_0_based') for x in loc)
+            lines=any(x.get('start_line') is not None for x in loc)
+            statement=bool((claim.get('statement') or '').strip())
+            quotation=bool((claim.get('quote') or '').strip())
+            identifier=claim.get('claim_id')
+            print('claim_'+str(i)+'='+json.dumps({'source_occurrences':len(occ),'page_locator_present':page,'line_locator_present':lines,'statement_present':statement,'quote_present':quotation,'review_decision':'SUPPORTED_QUOTATION_ONLY' if identifier in supported else flags.get(identifier,'NOT_REVIEWED'),'original_page_verified':False,'historically_verified':False},sort_keys=True))
+          print('N7_EXISTING_PRIVATE_ANSWER_AUDIT_COMPLETED')
+          PY
