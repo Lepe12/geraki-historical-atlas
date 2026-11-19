@@ -16,10 +16,20 @@ def get(url):
     except urllib.error.HTTPError as e:return e.code,url,e.read(3000).decode("utf-8","replace")
     except Exception as e:return 0,url,type(e).__name__+": "+str(e)[:100]
 def main():
-    for url in [URL,"https://ditto.audio/v1/audio/voices/pocket-el-niki","https://ditto.audio/v1/audio/voices?language=el&q=Niki"]:
+    for url in [URL,"https://ditto.audio/v1/models/pocket-el-niki","https://ditto.audio/v1/models/pocket-el-niki/download","https://ditto.audio/v1/audio/voices/pocket-el-niki"]:
         status,real,page=get(url)
         print("N7_VOICE_SOURCE_HTTP",json.dumps({"url":url,"status":status,"bytes":len(page)},ensure_ascii=False),flush=True)
         if status != 200:continue
+
+        if url.endswith("/download") and status==200:
+            try:
+                data=json.loads(page)
+                if isinstance(data,dict):
+                    safe={k:v for k,v in data.items() if k not in ("files","url","downloadUrl")}
+                    if isinstance(data.get("files"),list):
+                        safe["files"]=[{k:v for k,v in f.items() if not any(z in k.lower() for z in ("url","token","secret"))} for f in data["files"]]
+                    print("N7_VOICE_DOWNLOAD_MANIFEST",json.dumps(safe,ensure_ascii=False)[:2500],flush=True)
+            except Exception: pass
         if url==URL:
             for term in ["pocket-el-niki","Niki","CC0-1.0","reference","voiceSamples","audio"]:
                 at=page.lower().find(term.lower())
