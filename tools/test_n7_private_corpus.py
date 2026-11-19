@@ -82,6 +82,33 @@ class N7PrivateCorpusTests(unittest.TestCase):
                 private_visibility_check("42434462262")
 
 
+    def test_authenticated_legacy_fast_evidence_can_be_replaced_without_weakening_checks(self):
+        run_id="42434462262"
+        secret=bytes(range(32))
+        legacy={"status":"SOURCE_EXCERPTS_FOUND",
+                "method":"DETERMINISTIC_LEXICAL_RETRIEVAL_NO_LLM",
+                "model_used":False,"verified":False,"historically_verified":False,
+                "candidate_excerpts":[{"evidence_id":"test-1","excerpt":"source only"}]}
+        old_plain=json.dumps(legacy).encode()
+        sealed=crypt("seal",old_plain,secret,"research:"+run_id+":answer")
+        index={"schema":"n7-private-answer-index-v1","run_id":run_id,
+               "sealed_sha256":digest(sealed),"historically_verified":False}
+        restored,normalised=decode_private_answer(index,sealed,secret,run_id)
+        self.assertEqual(restored,old_plain)
+        self.assertEqual(normalised["claims"],[])
+        self.assertNotIn("claims",json.loads(restored))
+        for mutation in ({"verified":True},
+                         {"historically_verified":True},
+                         {"model_used":True},
+                         {"method":"UNKNOWN"},
+                         {"candidate_excerpts":None},
+                         {"status":"MODEL_ANSWER_PENDING_HUMAN_REVIEW"}):
+            bad={**legacy,**mutation}
+            bad_sealed=crypt("seal",json.dumps(bad).encode(),secret,"research:"+run_id+":answer")
+            bad_index={**index,"sealed_sha256":digest(bad_sealed)}
+            with self.subTest(mutation=mutation),self.assertRaisesRegex(RuntimeError,"PRIVATE_PREVIOUS_ANSWER_UNSAFE"):
+                decode_private_answer(bad_index,bad_sealed,secret,run_id)
+
     def test_encrypted_answer_restore_enforces_run_sha_and_verification(self):
         run_id="42434462262"
         secret=bytes(range(32))
