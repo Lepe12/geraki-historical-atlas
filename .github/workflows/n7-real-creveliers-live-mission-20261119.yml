@@ -34,12 +34,23 @@ jobs:
           def readkey(chunk):
               key.extend(chunk)
               if len(key)>32:raise RuntimeError('N7_INVALID_BRIDGE_KEY')
-          with ftplib.FTP_TLS(timeout=30,context=ctx) as ftp:
-              ftp.connect(host,port);ftp.host=tls_name
-              ftp.login(os.environ['PCT_FTPS_USER'],os.environ['PCT_FTPS_PASSWORD'])
-              ftp.prot_p()
-              ftp.retrbinary('RETR /piratecartography-gateway/server/command-center-live/.n7-library-bridge-key',readkey)
-          if len(key)!=32:raise RuntimeError('N7_INVALID_BRIDGE_KEY')
+          # Use existing, authorized production FTPS identity. Retry transient
+          # hosting connection timeouts; never bypass HMAC or print the key.
+          for attempt in range(1,5):
+              key.clear()
+              try:
+                  with ftplib.FTP_TLS(timeout=45,context=ctx) as ftp:
+                      ftp.connect(host,port);ftp.host=tls_name
+                      ftp.login(os.environ['PCT_FTPS_USER'],os.environ['PCT_FTPS_PASSWORD'])
+                      ftp.prot_p()
+                      ftp.retrbinary('RETR /piratecartography-gateway/server/command-center-live/.n7-library-bridge-key',readkey)
+                  if len(key)!=32:raise RuntimeError('N7_INVALID_BRIDGE_KEY')
+                  print('N7_AUTHORIZED_BRIDGE_KEY_VERIFIED=true',flush=True)
+                  break
+              except (TimeoutError,OSError,EOFError,ftplib.error_temp) as exc:
+                  print('N7_FTPS_CONNECTION_RETRY attempt='+str(attempt)+' error='+type(exc).__name__,flush=True)
+                  if attempt==4:raise
+                  time.sleep(5*attempt)
           def signed(kind,data):
               body=json.dumps(data,ensure_ascii=False,separators=(',',':')).encode()
               ts=str(int(time.time()))
