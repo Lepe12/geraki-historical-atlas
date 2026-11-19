@@ -40,14 +40,19 @@ jobs:
               echo "N7_DIAGNOSTIC_UNAVAILABLE $label"
             fi
           done
-      - name: Fetch pinned private source only into this runner
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          repository: Lepe12/independent-ai-bot
-          ref: ${{ env.N7_CANONICAL_COMMIT }}
-          token: ${{ secrets.PCT_GITHUB_DISPATCH_TOKEN }}
+          sparse-checkout: tools/n7
           persist-credentials: false
-          path: private-n7
-      - name: Check guarded installer without changing production
-        working-directory: private-n7
-        run: python3 tools/n7/deploy_reconciled_runtime.py
+      - name: Fingerprint only the live runtime and security paths
+        run: |
+          PYTHONPATH=tools/n7 python3 - <<'PYCODE'
+          import json
+          import deploy_reconciled_runtime as d
+          with d.connect() as ftp:
+              for name in ('server.js','skills/mcp-client.js','skills/mcp-builtin-server.js',
+                           'n7-security-agent.js','skills/cybersecurity-audit/SKILL.md'):
+                  data=d.read(ftp,name,optional=True)
+                  print('N7_SECURITY_LIVE_FINGERPRINT',json.dumps({
+                      'path':name,'sha256':d.sha(data) if data else None}))
+          PYCODE
