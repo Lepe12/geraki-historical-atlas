@@ -255,6 +255,18 @@ def decode_private_answer(index, encrypted, secret, run_id):
     if len(clear) > 8_000_000:
         raise RuntimeError("PRIVATE_ANSWER_PLAINTEXT_TOO_LARGE")
     answer = json.loads(clear)
+    # Previously published deterministic excerpts did not carry 'claims'.
+    # Accept ONLY that exact unaudited legacy format, after the existing
+    # authenticated run binding, AEAD decrypt and SHA verification. Keep the
+    # original ciphertext and plaintext bytes unchanged for archival history.
+    if (isinstance(answer, dict) and "claims" not in answer
+            and answer.get("method") == "DETERMINISTIC_LEXICAL_RETRIEVAL_NO_LLM"
+            and answer.get("status") in ("SOURCE_EXCERPTS_FOUND", "NO_LEXICAL_MATCH")
+            and answer.get("model_used") is False
+            and answer.get("verified") is False
+            and answer.get("historically_verified") is False
+            and isinstance(answer.get("candidate_excerpts"), list)):
+        answer = {**answer, "claims": []}
     if (not isinstance(answer, dict) or not isinstance(answer.get("status"), str)
             or answer.get("verified") is True or answer.get("historically_verified") is True
             or not isinstance(answer.get("claims"), list)):
