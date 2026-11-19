@@ -135,6 +135,7 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
       .n7-guide-view.n7-minimal .n7-home-navigation{display:flex;flex:none;z-index:5;justify-content:center;padding:4px 12px calc(14px + env(safe-area-inset-bottom))}
       .n7-guide-view.n7-minimal .n7-home-back{display:block;position:absolute;top:12px;right:12px;z-index:6}
       .n7-home-navigation a{color:#cdf9ff;padding:8px 12px;font-size:13px;text-underline-offset:3px}
+      .n7-guide-view.n7-minimal .n7-voice-preview{display:none}
       .n7-guide-view.n7-minimal #n7-guide-voice>div{width:min(680px,calc(100% - 24px));text-align:center}
       .n7-guide-view.n7-minimal #n7-guide-voice button[data-n7-conversation-toggle]{text-transform:none;letter-spacing:normal;font-size:14px}
       .n7-guide-details{padding:14px;background:rgba(2,9,14,.88);border:1px solid rgba(120,220,240,.16);border-radius:12px;overflow:auto;font-size:12px;line-height:1.6;min-height:0}
