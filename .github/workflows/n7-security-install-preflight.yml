@@ -24,6 +24,7 @@ jobs:
         run: |
           PYTHONPATH=tools/n7 python3 - <<'PYCODE'
           import json
+          from pathlib import Path
           import deploy_reconciled_runtime as d
           with d.connect() as ftp:
               paths=('server.js','n7-agents.js','n7-stream-attachments.js',
@@ -44,5 +45,31 @@ jobs:
                   'manifest_schema':receipt.get('schema'),
                   'manifest_files':len(receipt.get('files',{})),
                   'manifest_id':receipt.get('release_id')
+              },sort_keys=True))
+
+              from hashlib import sha256
+              incoming = {'n7-security-agent.js': 'ba259213a7fa19d4e4e1bc38feaef5c1bd2a39c420b7b3c3f29b448d72c486cc', 'skills/cybersecurity-audit/SKILL.md': '19e2840d5ade84f6655d9b08ef7f611656db7034ebb78cf3a042a67569d58d3a', 'skills/mcp-builtin-server.js': 'c13aa699187b0b516853c9d29be002207080e158e9a576d0c9d108af198254db', 'skills/mcp-client.js': 'b52dd45f68c9496af73ba615efe884afb2505ea6f44212d3806fcdc9390aaaa3', 'n7-agents.js': 'c42d0a8b9c83579f129a0ea6f93d95d77dc726a44917a2eac2aef31beb8852f9'}
+              predecessor = {'n7-security-agent.js': None, 'skills/cybersecurity-audit/SKILL.md': None, 'skills/mcp-builtin-server.js': '70bd1c4c65cc10b8c7e451136a623a59e5d1be961f4b4e07322c6246deb9ad99', 'skills/mcp-client.js': '77652e2170f80b0483faf03ede0bc264059ee711dc59bce8f98a423402aadc54', 'n7-agents.js': '38e3738cf099db6b433f4d6beeed28691ee9246b7f849fce483ce6541b3051a1'}
+              expected_inventory = json.loads(Path('tools/n7/reconciled-runtime-contract.json').read_text())['files']
+              if not set(receipt['files']) <= set(expected_inventory):
+                  raise SystemExit('N7_SECURITY_UNKNOWN_MANIFEST_PATH')
+              if any(
+                  (d.sha(files[name]) if files[name] is not None else None) not in (before,incoming[name])
+                  for name,before in predecessor.items()
+              ):
+                  raise SystemExit('N7_SECURITY_TARGET_DRIFT')
+              preserved={}
+              for name in sorted(set(receipt['files']) | (set(paths)-set(incoming))):
+                  if name in incoming:
+                      continue
+                  data=files[name] if name in files else d.read(ftp,name)
+                  if data is None:
+                      raise SystemExit('N7_SECURITY_DEPENDENCY_NOT_AVAILABLE')
+                  preserved[name]=d.sha(data)
+              manifest={**preserved,**incoming}
+              planned_release=sha256(json.dumps(manifest,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+              print('N7_SECURITY_READ_ONLY_DELTA',json.dumps({
+                  'verified_predecessors':len(predecessor),'files_preserved':len(preserved),
+                  'candidate_release_id':planned_release,'writes':0
               },sort_keys=True))
           PYCODE
