@@ -87,10 +87,66 @@ def read(ftp, name, optional=False):
 
 def transform_server(original):
     source = original.decode('utf8')
+    # Some previously reviewed releases already contain release-info but still
+    # carry the unreachable owner mission routes. Normalize those exact anchors
+    # before the idempotent release transforms, without bypassing authentication.
+    if ("require('./n7-release-info')" in source and
+            "    // Owner mission endpoints: the global session guard above applies." not in source):
+        old_head = (
+            "    // Owner-reviewed writing knowledge: authenticated only, never silently derived from chats.\\n"
+            "    if(req.method==='GET'&&p==='/api/n7/approved-lessons'){\\n"
+            "    if(req.method==='GET'&&p==='/n7-mission-owner-ui.js')return serve(res,p);\\n"
+            "      if(!session(req))return json(res,401,{error:'Authentication required'});\\n"
+        )
+        new_head = (
+            "    // Owner mission endpoints: the global session guard above applies.\\n"
+            "    if(req.method==='GET'&&p==='/n7-mission-owner-ui.js')return serve(res,p);\\n"
+        )
+        old_tail = (
+            "    }\\n"
+            "      if(!originOK(req))return json(res,403,{error:'Invalid origin'});\\n"
+            "      try{return json(res,200,{lessons:ownerChatMemory.list()});}"
+        )
+        new_tail = (
+            "    }\\n"
+            "    // Owner-reviewed writing knowledge: authenticated only, never silently derived from chats.\\n"
+            "    if(req.method==='GET'&&p==='/api/n7/approved-lessons'){\\n"
+            "      if(!originOK(req))return json(res,403,{error:'Invalid origin'});\\n"
+            "      try{return json(res,200,{lessons:ownerChatMemory.list()});}"
+        )
+        # Use actual newline characters in verified Python anchor strings.
+        old_head, new_head = old_head.replace('\\n', '\n'), new_head.replace('\\n', '\n')
+        old_tail, new_tail = old_tail.replace('\\n', '\n'), new_tail.replace('\\n', '\n')
+        research_anchor = "    if(req.method==='GET'&&/^\\/api\\/research\\/corpus\\/[0-9]{8,20}$/.test(p)){"
+        lesson_anchor = "    // Owner-reviewed writing knowledge: authenticated only, never silently derived from chats."
+        if source.count(research_anchor) == 1 and source.count(lesson_anchor) == 1 and source.index(research_anchor) < source.index(lesson_anchor):
+            # Older review-stage release already hoisted the handlers, but has
+            # not yet gained the explicit owner-mission marker.
+            source = source.replace(research_anchor,
+                                    "    // Owner mission endpoints: the global session guard above applies.\n" + research_anchor, 1)
+            old_guard = (
+                "    if(req.method==='GET'&&p==='/api/n7/approved-lessons'){\n"
+                "      if(!session(req))return json(res,401,{error:'Authentication required'});\n"
+            )
+            if source.count(old_guard) != 1:
+                raise RuntimeError('N7_MISSION_ROUTE_ANCHOR_CHANGED')
+            source = source.replace(old_guard,
+                "    if(req.method==='GET'&&p==='/api/n7/approved-lessons'){\n", 1)
+        else:
+            if source.count(old_head) != 1 or source.count(old_tail) != 1:
+                raise RuntimeError('N7_MISSION_ROUTE_ANCHOR_CHANGED')
+            source = source.replace(old_head, new_head, 1).replace(old_tail, new_tail, 1)
     if "require('./n7-release-info')" not in source:
         start = source.index("    if(req.method==='GET'&&/^\\/api\\/research\\/corpus")
-        end = source.index("      if(!originOK(req))return json(res,403,{error:'Invalid origin'});\n      try{return json(res,200,{lessons:ownerChatMemory.list()});}", start)
-        block = source[start:end]
+        # Reviewed mission-routing fix places mission handlers immediately before
+        # approved-lessons. Keep the legacy anchor for older captured runtimes.
+        if "    // Owner mission endpoints: the global session guard above applies." in source:
+            end = source.index("    // Owner-reviewed writing knowledge: authenticated only, never silently derived from chats.", start)
+            block = source[start:end].rstrip("\n") + "\n"
+        else:
+            end = source.index("      if(!originOK(req))return json(res,403,{error:'Invalid origin'});\n      try{return json(res,200,{lessons:ownerChatMemory.list()});}", start)
+            block = ("    // Owner mission endpoints: the global session guard above applies.\n"
+                     + source[start:end])
         source = source[:start] + source[end:]
         replacements = [
             ("    if(req.method==='GET'&&p==='/n7-mission-owner-ui.js')return serve(res,p);\n", ''),
