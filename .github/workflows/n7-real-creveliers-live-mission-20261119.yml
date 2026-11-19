@@ -1,0 +1,81 @@
+name: N7 real signed Creveliers research mission — 2026-11-19
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/n7-real-creveliers-live-mission-20261119.yml']
+permissions:
+  contents: read
+concurrency:
+  group: n7-real-creveliers-live-mission-20261119
+  cancel-in-progress: false
+jobs:
+  real-mission:
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+    steps:
+      - name: Dispatch one genuine N7 historical mission via existing signed operator gateway
+        run: |
+          python3 - <<'PY'
+          import ftplib,hashlib,hmac,json,os,re,socket,ssl,time,urllib.request,urllib.error
+          ctx=ssl.create_default_context()
+          host=os.environ['PCT_FTPS_HOST']
+          port=int(os.environ['PCT_FTPS_PORT'])
+          tls_name=os.environ.get('PCT_FTPS_TLS_SERVER_NAME') or 'linux3087.grserver.gr'
+          addresses=lambda name:{rec[4][0] for rec in socket.getaddrinfo(name,port,type=socket.SOCK_STREAM)}
+          if not addresses(host)&addresses(tls_name):raise RuntimeError('N7_FTPS_TLS_NAME_MISMATCH')
+          key=bytearray()
+          def readkey(chunk):
+              key.extend(chunk)
+              if len(key)>32:raise RuntimeError('N7_INVALID_BRIDGE_KEY')
+          with ftplib.FTP_TLS(timeout=30,context=ctx) as ftp:
+              ftp.connect(host,port);ftp.host=tls_name
+              ftp.login(os.environ['PCT_FTPS_USER'],os.environ['PCT_FTPS_PASSWORD'])
+              ftp.prot_p()
+              ftp.retrbinary('RETR /piratecartography-gateway/server/command-center-live/.n7-library-bridge-key',readkey)
+          if len(key)!=32:raise RuntimeError('N7_INVALID_BRIDGE_KEY')
+          def signed(kind,data):
+              body=json.dumps(data,ensure_ascii=False,separators=(',',':')).encode()
+              ts=str(int(time.time()))
+              signature=hmac.new(key,ts.encode()+b'.'+body,hashlib.sha256).hexdigest()
+              req=urllib.request.Request('https://pct-live.piratecartography.com/pct-api/live/n7/mission/'+kind+'-signed',
+                  data=body,method='POST',headers={'Content-Type':'application/json','X-N7-Library-Ts':ts,'X-N7-Library-Signature':signature})
+              try:
+                  with urllib.request.urlopen(req,timeout=30,context=ctx) as resp:return resp.status,json.loads(resp.read(100000))
+              except urllib.error.HTTPError as exc:
+                  print('N7_SIGNED_HTTP='+str(exc.code)+' body='+exc.read(1000).decode(errors='replace'),flush=True)
+                  raise
+          status,payload=signed('dispatch',{
+              'target':'Ierapetra, Crete',
+              'purpose':'Investigate the alleged 1675 raid of Hugues de Creveuil (Creveliers) on Ierapetra, Crete. Locate and actually inspect independent historical sources, full available PDFs and cited pages. Distinguish primary testimony, secondary bibliography, and unverified claims. Assess whether the raid is historically corroborated, quote inspected passages accurately, give references and explicitly state any evidence gaps. Produce the private source-grounded final synthesis.',
+              'date_range':'1665-1680',
+              'aliases':'Ιεράπετρα|Ierapetra|Hierapetra|Creveliers|Crevellier|Hugues de Creveuil'})
+          print('N7_DISPATCH_HTTP='+str(status)+' RESPONSE='+json.dumps(payload,ensure_ascii=False),flush=True)
+          rid=payload.get('request_id','')
+          if status!=202 or not re.fullmatch('n7mission-[a-f0-9]{24}',rid):
+              raise RuntimeError('N7_REAL_MISSION_NOT_ACCEPTED')
+          print('N7_REAL_MISSION_ID='+rid,flush=True)
+          last=None
+          for i in range(52):
+              time.sleep(15)
+              try: http,report=signed('status',{'request_id':rid})
+              except Exception as exc:
+                  print('N7_STATUS_RETRY='+str(type(exc).__name__),flush=True);continue
+              summary={k:report.get(k) for k in ('status','planner_run_id','research_run_id','research_url','private_synthesis_run_id','private_synthesis_status','private_synthesis_conclusion','research_conclusion','historically_verified')}
+              if summary!=last:print('N7_REAL_MISSION_STATUS='+json.dumps(summary,ensure_ascii=False),flush=True);last=summary
+              if report.get('status') in ('PIPELINE_FAILED','DISPATCH_FAILED','PRIVATE_SYNTHESIS_FAILED'):
+                  raise RuntimeError('N7_REAL_MISSION_FAILED '+str(report.get('status')))
+              if report.get('status') in ('PRIVATE_SYNTHESIS_COMPLETED','PIPELINE_COMPLETED'):
+                  print('N7_REAL_MISSION_PIPELINE_FINISHED='+json.dumps(summary,ensure_ascii=False),flush=True)
+                  break
+          else:
+              print('N7_REAL_MISSION_STILL_RUNNING_OR_STATUS_UNAVAILABLE '+rid,flush=True)
+          # Do not conflate dispatch, status, or research completion with historical verification.
+          print('N7_REAL_MISSION_DISPATCH_VERIFIED=true',flush=True)
+          PY
