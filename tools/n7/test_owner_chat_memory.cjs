@@ -29,7 +29,12 @@ test('approved correction persists and is loaded into later editorial requests o
     assert.equal(fresh.list().length,1);
     assert.equal(fresh.list()[0].source,'owner-approved');
     assert.ok(fresh.context([{role:'user',content:'Θέλω διόρθωση κειμένου'}]).includes(text));
-    assert.equal(fresh.context([{role:'user',content:'Πώς είναι ο καιρός;'}]),'');
+    const unrelated=fresh.context([{role:'user',content:'Πώς είναι ο καιρός;'}]);
+    // General owner-approved persona applies to ordinary chat, but unrelated
+    // messages must never receive editorial rules or stored private lessons.
+    assert.match(unrelated,/N7 — NATURAL CONVERSATION/);
+    assert.equal(unrelated.includes(text),false);
+    assert.equal(unrelated.includes('GREEK LITERARY EDITING'),false);
     assert.equal(fresh.remove(item.id),true);
     assert.equal(fresh.list().length,0);
   }finally{x.cleanup();}
