@@ -101,4 +101,14 @@ for r in d['routes']:
         new.append([[round(v,4) for v in toll(x,y)] for x,y in simp])
         print(r['id'],len(ln),'->',len(simp),'land segs',crossings)
     r['lines']=new
+    ext=[]
+    for e in r.get('extStops',[]):
+        nodes=[snap(*toxy(la,lo)) for la,lo in e['stops']]
+        simp=[nodes[0]]
+        for a,b in zip(nodes,nodes[1:]):
+            if a==b:continue
+            simp+=taut(astar(a,b))[1:]
+        ext.append({'name':e['name'],'pages':e['pages'],'pts':[[round(v,4) for v in toll(x,y)] for x,y in simp]})
+        print(r['id'],'ext',e['name'][:30],len(simp))
+    r['ext']=ext
 json.dump(d,open(p,'w'),ensure_ascii=False,indent=1)
