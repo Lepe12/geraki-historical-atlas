@@ -10,8 +10,10 @@ import "./N7GuideHome.css";
 
 // Second face option: the owner-supplied H01 head composed onto the same body.
 // It is a different source raster for the same scene, rig, moods and voice.
-type Face="n7"|"h01";
-const H01_FIGURE=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/"))+"/n7-humanoid-h01-v2.webp";
+type Face="n7"|"h01"|"studio";
+const ASSET_ROOT=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/"));
+const H01_FIGURE=ASSET_ROOT+"/n7-humanoid-h01-v2.webp";
+const STUDIO_FIGURE=ASSET_ROOT+"/n7-studio-v1.webp";
 const H01_SCALE=2.5;
 
 export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigate,onBackToWorkspace}:{open:boolean;onClose:()=>void;onBackToWorkspace?:()=>void;activity?:GuideMood|null;onWorkspace?:()=>void;onNavigate?:(target:N7Target)=>void}){
@@ -29,11 +31,10 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
     return()=>{window.removeEventListener("pointerdown",unlock,true);window.removeEventListener("keydown",unlock,true);s.dispose();sfx.current=null;};
   },[open]);
   const [diagnosticsView,setDiagnosticsView]=useState(false);
-  const home=!!onNavigate&&!diagnosticsView;
-  const [faceChoice,setFace]=useState<Face>("n7");
-  useEffect(()=>{
-    try{const asked=new URLSearchParams(window.location.search).get("face"),saved=window.localStorage.getItem("n7-face");const next=asked||saved;if(next==="h01"||next==="n7")setFace(next);}catch{}
-  },[]);
+  const production=!!onNavigate;
+  const home=production&&!diagnosticsView;
+  const [faceChoice,setFace]=useState<Face>(production?"studio":"n7");
+  const studio=home&&faceChoice==="studio";
   const chooseFace=(next:Face)=>{setFace(next);try{window.localStorage.setItem("n7-face",next);}catch{}};
   const figureUrl=faceChoice==="h01"?H01_FIGURE:N7_HUMANOID_REFERENCE;
   const dialogRef=useRef<HTMLElement>(null);
@@ -44,8 +45,15 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
   useEffect(()=>{
     setMenuOpen(false);
     setAppearanceOpen(false);
-    setDiagnosticsView(new URLSearchParams(window.location.search).get("controls")==="1");
-  },[open]);
+    const params=new URLSearchParams(window.location.search);
+    const diagnostics=params.get("controls")==="1";
+    setDiagnosticsView(diagnostics);
+    let saved:string|null=null;
+    try{saved=window.localStorage.getItem("n7-face");}catch{}
+    const next=params.get("face")||saved;
+    if(next==="h01"||next==="n7")setFace(next);
+    else setFace(production&&!diagnostics?"studio":"n7");
+  },[open,production]);
   useEffect(()=>{
     if(open&&appearanceOpen)appearanceCloseButton.current?.focus();
   },[open,appearanceOpen]);
@@ -75,7 +83,7 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
     const resize=()=>{const width=Math.min(slot.clientWidth,slot.clientHeight*2/3);Object.assign(host.style,{width:`${width}px`,height:`${width*3/2}px`});const r=host.getBoundingClientRect();const x=r.left+r.width*CORE.x/320,y=r.top+r.height*CORE.y/480;face.current={x,y,max:Math.max(Math.hypot(x,y),Math.hypot(innerWidth-x,y),Math.hypot(x,innerHeight-y),Math.hypot(innerWidth-x,innerHeight-y))};};
     const observer=new ResizeObserver(resize);observer.observe(slot);window.addEventListener("resize",resize);resize();
     return()=>{observer.disconnect();window.removeEventListener("resize",resize);};
-  },[open,details]);
+  },[open,details,studio]);
   useEffect(()=>{if(open)Array.from(dialogRef.current?.querySelectorAll<HTMLButtonElement>("[data-exit]")||[]).find(b=>b.offsetParent!==null)?.focus();},[open]);
   const complete=useCallback(()=>setDone(true),[]);
   const frame=useCallback((info:GuideFrameInfo)=>{
@@ -119,7 +127,7 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
       if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
       else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
     }
-  }} role="dialog" aria-modal="true" aria-label="N7 Humanoid preview" className={"n7-guide-view"+(home?" n7-live-home":"")} data-activity={activity||"idle"}>
+  }} role="dialog" aria-modal="true" aria-label="N7 Humanoid preview" className={"n7-guide-view"+(home?" n7-live-home":"")+(studio?" n7-studio-home":"")} data-activity={activity||"idle"}>
     <style>{`
       .n7-guide-view{position:fixed;inset:0;height:100dvh;max-height:100dvh;z-index:120;background:#000;color:#e6f7fb;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column;overflow:hidden}
       .n7-guide-view button{padding:5px 7px;border:1px solid rgba(140,225,245,.18);border-radius:5px;color:#bfe9f3;background:rgba(4,14,22,.35);cursor:pointer;font:500 10px/1.2 ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase}
@@ -148,13 +156,16 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
       .n7-guide-details{padding:14px;background:rgba(2,9,14,.88);border:1px solid rgba(120,220,240,.16);border-radius:12px;overflow:auto;font-size:12px;line-height:1.6;min-height:0}
       @media(max-width:700px), (max-width:1000px) and (max-height:500px){.n7-guide-main[data-details=true]{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) 115px}.n7-guide-controls{align-self:stretch;margin:0;max-width:none;border-radius:0;border-width:1px 0 0;padding:6px 8px;gap:4px 10px;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;min-height:42px}#n7-guide-voice>div{width:100%;border-radius:0;border-width:1px 0 0}.n7-guide-controls>*{flex-shrink:0}.n7-guide-cluster{flex-wrap:nowrap}.n7-guide-group{padding-left:10px}.n7-guide-view button{padding:6px 8px;font-size:11px}}
     `}</style>
-    <N7Backdrop ref={backdrop} effects={effects} reduced={reduced}/>
+    {!studio&&<N7Backdrop ref={backdrop} effects={effects} reduced={reduced}/>}
     <div ref={waveRef} aria-label="N7 completion shockwave" data-progress="-1" style={{display:"none",position:"fixed",pointerEvents:"none",border:"2px solid #ffe0a6",boxShadow:"0 0 12px #63ddff88",borderRadius:"50%",zIndex:3}}/>
     {home&&onNavigate?<header className="n7-home-header">
       <div className="n7-home-brand"><strong>N7</strong><span>Humanoid</span></div>
       <div className="n7-home-menu-anchor">
         <button ref={menuButton} className="n7-home-menu-button" type="button"
-          aria-expanded={menuOpen} aria-controls="n7-home-menu" onClick={()=>setMenuOpen(value=>!value)}>
+          aria-expanded={menuOpen} aria-controls="n7-home-menu" onClick={()=>{
+            if(appearanceOpen){setAppearanceOpen(false);setDetails(false);}
+            setMenuOpen(value=>!value);
+          }}>
           {menuOpen?<X size={17} aria-hidden="true"/>:<Menu size={17} aria-hidden="true"/>} Μενού
         </button>
         {menuOpen&&<nav id="n7-home-menu" className="n7-home-menu" aria-label="Πλοήγηση N7">
@@ -169,7 +180,12 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
         </nav>}
       </div>
     </header>:<header className="n7-guide-header"><strong className="n7-guide-brand">N7 <i>·</i> HUMANOID</strong><div style={{display:"flex",gap:8}}>{onWorkspace&&<button type="button" onClick={onWorkspace}>Συνομιλία</button>}{onNavigate&&<button type="button" data-nav="chat" onClick={()=>onNavigate("chat")}>Chat</button>}{onNavigate&&<button type="button" data-nav="nabou" onClick={()=>onNavigate("nabou")}>NABOU</button>}<button type="button" data-exit="" onClick={onClose}>Exit</button></div></header>}
-    <div className="n7-guide-main" data-details={details}>
+    {studio?<div className="n7-guide-main n7-studio-stage">
+      <div className="n7-studio-frame" data-effects={effects&&!reduced?"on":"off"}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- This app is a static export; WebP is supplied by the build. */}
+        <img className="n7-studio-image" src={STUDIO_FIGURE} alt="Το N7 με χάλκινη και κυανή θωράκιση στον θάλαμο παρατήρησης" fetchPriority="high"/>
+      </div>
+    </div>:<div className="n7-guide-main" data-details={details}>
       <div className="n7-guide-figure-slot">
         {home&&<div className="n7-home-stage-light" aria-hidden="true"/>}
         <div ref={figureRef} className="n7-guide-figure" aria-label={mode==="assembly"?"N7 guide particle-river assembly":undefined}>
@@ -180,13 +196,19 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
         {mode==="assembly"&&!done&&<span aria-label="N7 visible assembly source" style={{position:"absolute",left:`${CORE.x/3.2}%`,top:`${CORE.y/4.8}%`,width:1,height:1,pointerEvents:"none"}}/>}
       </div></div>
       {details&&<aside className="n7-guide-details" aria-label="Technical details"><strong>Guide diagnostics</strong><p>Three.js · one humanoid scene<br/>sRGB · tone mapping OFF<br/>Sample 320×480 · assembly 6s<br/>Shockwave 2.5s · breathing 7.2s<br/>Reduced motion: {reduced?"ON":"OFF"}</p><p>Particles {stats?.particles??"loading"}<br/>Render {stats?.renderMs.toFixed(2)??"—"} ms<br/>Frame {stats?.frameMs.toFixed(2)??"—"} ms</p><label style={{display:"block"}}><input type="checkbox" checked={breathing} onChange={e=>setBreathing(e.target.checked)}/> Breathing</label><label style={{display:"block"}}><input type="checkbox" checked={gestures} onChange={e=>setGestures(e.target.checked)}/> Head gestures</label><p>Listening and Speaking buttons are visual previews. Live Listening follows microphone start; live Speaking follows audio playback.</p><p>Assembly is silent: no owner-supplied audio file. Camera tracking is optional and not enabled.</p>{mode==="compare"&&<p>REFERENCE 38% + PARTICLE RECONSTRUCTION</p>}</aside>}
-    </div>
+    </div>}
     <div id="n7-guide-voice" style={{position:"relative",zIndex:5,flex:"none"}}/>
     <footer className="n7-guide-controls" hidden={home&&!appearanceOpen}>
       {home&&<div className="n7-home-settings-title">
         <strong>Εμφάνιση Humanoid</strong>
         <button ref={appearanceCloseButton} type="button" aria-label="Κλείσιμο ρυθμίσεων εμφάνισης" onClick={closeAppearance}><X size={16} aria-hidden="true"/></button>
       </div>}
+      {home&&<div className="n7-guide-group n7-studio-choices" role="group" aria-label="Avatar N7">
+        <button type="button" aria-pressed={studio} onClick={()=>chooseFace("studio")}>Θωράκιση</button>
+        <button type="button" aria-pressed={faceChoice==="n7"} onClick={()=>chooseFace("n7")}>Φωτεινό N7</button>
+        <button type="button" aria-pressed={faceChoice==="h01"} onClick={()=>chooseFace("h01")}>H01</button>
+      </div>}
+      {studio?<div className="n7-guide-group n7-studio-choices"><button type="button" aria-pressed={effects} onClick={changeEffects}>Φωτισμός κλήσης</button></div>:<>
       <div className="n7-guide-cluster">
       <span role="status" aria-label="N7 mood status" className="n7-guide-status">{mode==="assembly"?`ASSEMBLY · ${done?"COMPLETE":"BUILDING"}`:`MOOD · ${(realMood||mood).toUpperCase()}${realMood?" · LIVE N7 REQUEST":mood!=="idle"?" · PREVIEW":""}`}</span>
       <span className="n7-guide-group"><small aria-hidden="true">ΔΙΑΘΕΣΗ</small>
@@ -194,10 +216,10 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
       </span>
       </div>
       <div className="n7-guide-cluster">
-      <span className="n7-guide-group"><small aria-hidden="true">ΠΡΟΣΩΠΟ</small>
+      {!home&&<span className="n7-guide-group"><small aria-hidden="true">ΠΡΟΣΩΠΟ</small>
         <button type="button" aria-label="Πρόσωπο N7" aria-pressed={faceChoice==="n7"} onClick={()=>chooseFace("n7")}>N7</button>
         <button type="button" aria-label="Πρόσωπο H01" aria-pressed={faceChoice==="h01"} onClick={()=>chooseFace("h01")}>H01</button>
-      </span>
+      </span>}
       <span className="n7-guide-group"><small aria-hidden="true">ΠΡΟΒΟΛΗ</small>
         <button type="button" aria-pressed={mode==="original"} onClick={()=>setMode("original")}>Original</button><button type="button" aria-pressed={mode==="particle"} onClick={()=>setMode("particle")}>Particles</button>
         <button type="button" aria-pressed={mode==="compare"} onClick={()=>{setMode("compare");setDetails(true);}}>Compare</button>
@@ -206,12 +228,13 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
         <button type="button" aria-pressed={effects} onClick={changeEffects}>Effects {effects?"On":"Off"}</button>
         <button type="button" aria-pressed={sound} onClick={()=>setSound(v=>!v)}>Sound {sound?"On":"Off"}</button>
         <button type="button" aria-expanded={details} onClick={()=>setDetails(v=>!v)}>Technical details</button>
-        <a href={N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/"))+"/avatar-3d/"} target="_blank" rel="noopener noreferrer">Πραγματικό 3D</a>
+        <a href={ASSET_ROOT+"/avatar-3d/"} target="_blank" rel="noopener noreferrer">Πραγματικό 3D</a>
         <button type="button" className="n7-guide-assembly" disabled={!effects} onClick={replayAssembly}>{mode==="assembly"?"Replay Assembly":"Assembly"}</button>
         {/* Skip keeps its slot when it does not apply, so the dock and the figure never jump. */}
         {mode==="assembly"||!done?<button type="button" onClick={skip}>Skip</button>:<button type="button" disabled aria-hidden="true" tabIndex={-1} style={{visibility:"hidden"}}>Skip</button>}
       </span>
       </div>
+      </>}
     </footer>
   </section>;
 }

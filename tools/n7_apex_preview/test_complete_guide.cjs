@@ -40,6 +40,7 @@ async function verifyHumanoidHome(browser, homeUrl) {
       const menu = dialog.getByRole("button",{name:"Μενού",exact:true});
       const loginToggle = dialog.locator("[data-n7-conversation-toggle]");
       await dialog.getByRole("button",{name:"Σύνδεση",exact:true}).waitFor();
+      await page.waitForFunction(()=>document.querySelector(".n7-studio-image")?.naturalWidth>0);
       assert.deepEqual((await dialog.getByRole("button").allTextContents()).map(label=>label.trim()),["Μενού","Σύνδεση"]);
       await menu.click();
       const navigation = dialog.getByRole("navigation",{name:"Πλοήγηση N7"});
@@ -107,7 +108,7 @@ async function verifyHumanoidHome(browser, homeUrl) {
     });
     observer.observe(document,{subtree:true,attributes:true,attributeFilter:["data-progress"],attributeOldValue:true});
   });
-  await p.goto(url,{waitUntil:'networkidle'});const h=p.locator(hostSelector);await p.waitForFunction(s=>document.querySelector(s)?.dataset.engine==='three-shared-scene',hostSelector);
+  await p.goto(url,{waitUntil:'domcontentloaded'});const h=p.locator(hostSelector);await p.waitForFunction(s=>document.querySelector(s)?.dataset.engine==='three-shared-scene',hostSelector);
   const pose=async(name)=>{const png=await h.evaluate(h=>[...h.querySelectorAll('canvas')].find(c=>c.style.display!=='none').toDataURL());fs.writeFileSync(path.join(out,name+'.png'),Buffer.from(png.split(',')[1],'base64'));return PNG.sync.read(Buffer.from(png.split(',')[1],'base64'));};
   const progress=async n=>p.waitForFunction(({s,n})=>Number(document.querySelector(s)?.dataset.assemblyProgress)>=n,{s:hostSelector,n});
   const center=async()=>{const r=await h.boundingBox();await p.mouse.move(r.x+r.width/2,r.y+r.height*.5);await p.waitForFunction(s=>{const h=document.querySelector(s);return Number(h.dataset.currentTurn)===0&&Number(h.dataset.headTarget)===0&&Number(h.dataset.currentPitch)===0&&Number(h.dataset.headPitchTarget)===0;},hostSelector);await p.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));};
