@@ -98,13 +98,14 @@ export function isAgentsStatus(text: string): boolean {
 
 type AgentObservation = {last_run_at?: string; last_status?: string; last_success_at?: string; last_error?: string; last_error_at?: string};
 type AgentRow = { greek?: string; id?: string; ready?: boolean; reason?: string; observed?: AgentObservation | null };
-type AgentsReport = { agents?: AgentRow[]; summary?: { total?: number; ready?: number; observed?: number } };
+export type AgentsReport = { agents?: AgentRow[]; summary?: { total?: number; ready?: number; observed?: number } };
 
 const OUTCOMES: Record<string,string> = {ok:"επιτυχία", no_results:"καμία εγγραφή", provider_unavailable:"η πηγή δεν απάντησε", unavailable:"εργαλείο μη διαθέσιμο", needs_place:"χρειάζεται τοποθεσία", place_not_found:"άγνωστη τοποθεσία", invalid_input:"μη έγκυρη είσοδος"};
-const shortDate = (value?: string) => {
+export const agentRunDate = (value?: string) => {
   const time=value?Date.parse(value):NaN;
   return Number.isFinite(time)?new Intl.DateTimeFormat("el-GR",{dateStyle:"short",timeStyle:"short",timeZone:"Europe/Athens"}).format(time):"";
 };
+export const agentOutcome=(status?: string)=>OUTCOMES[status||""]||"άγνωστο αποτέλεσμα";
 
 export function describeAgents(report: AgentsReport): string {
   const agents = Array.isArray(report?.agents) ? report.agents : [];
@@ -119,8 +120,8 @@ export function describeAgents(report: AgentsReport): string {
   const observations=agents.flatMap(agent=>{
     const run=agent.observed;
     if(!run)return [];
-    const latest=[OUTCOMES[run.last_status||""]||"άγνωστο αποτέλεσμα",shortDate(run.last_run_at)].filter(Boolean).join(" · ");
-    const success=shortDate(run.last_success_at),error=shortDate(run.last_error_at);
+    const latest=[agentOutcome(run.last_status),agentRunDate(run.last_run_at)].filter(Boolean).join(" · ");
+    const success=agentRunDate(run.last_success_at),error=agentRunDate(run.last_error_at);
     return [`${agent.greek||agent.id}: ${latest}${success?`. Τελευταία επιτυχία ${success}`:""}${error?`. Τελευταίο σφάλμα ${error}`:""}.`];
   });
   if(observations.length)return text+" Καταγεγραμμένες εκτελέσεις από την τελευταία εκκίνηση. "+observations.join(" ");

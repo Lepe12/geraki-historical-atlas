@@ -5,7 +5,7 @@ import useN7Voice from "./useN7Voice";
 import {FEMALE_VOICE_ID} from "./N7FemaleVoice";
 import {N7_GUIDE,N7_GUEST_CHAT} from "./N7BuildFlags";
 import {speakable} from "./N7AgentSpeech";
-import {GREETING,GREETED_KEY,describeAgents,go,isAgentsStatus,markGreeted,navCommand,privateReportRun,readConversationId,targetUrl,wasGreeted,writeConversationId} from "./N7Navigation";
+import {GREETING,GREETED_KEY,agentOutcome,agentRunDate,describeAgents,go,isAgentsStatus,markGreeted,navCommand,privateReportRun,readConversationId,targetUrl,wasGreeted,writeConversationId,type AgentsReport} from "./N7Navigation";
 import type { OrbState } from "./ApexHeroOrb";
 
 type Msg = { role: string; content: string };
@@ -142,6 +142,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   const adopt=useRef<(list:Conversation[])=>void>(()=>{});
   const [greetGate,setGreetGate]=useState(false);
   const [notice,setNotice]=useState("");
+  const [agentReport,setAgentReport]=useState<AgentsReport|null>(null);
   const [privateReport,setPrivateReport]=useState<PrivateReport|null>(null);
   const [reportStatus,setReportStatus]=useState("");
   const reportRequest=useRef(0);
@@ -296,8 +297,8 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
     if(isAgentsStatus(draft)){
       // Real report of this installation: nothing is invented and the model is not asked.
       voice.stop();setMessage("");setError("");
-      try{const text=describeAgents(await n7("/api/agents") as never);setNotice(text);voiceRef.current.speak(text,true);}
-      catch(e){const reason=e instanceof Error?e.message:String(e);setNotice("Η κατάσταση των Agents δεν διαβάστηκε: "+reason);}
+      try{const report=await n7("/api/agents") as AgentsReport;setAgentReport(report);setNotice("");voiceRef.current.speak(describeAgents(report),true);}
+      catch(e){const reason=e instanceof Error?e.message:String(e);setAgentReport(null);setNotice("Η κατάσταση των Agents δεν διαβάστηκε: "+reason);}
       return;
     }
     const requested=navCommand(draft);
@@ -434,6 +435,20 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
       <button type="button" onClick={()=>setPrivateReport(null)}>Κλείσιμο αναφοράς</button>
     </article>}
   </div>;
+  const agentStatusView=authenticated&&agentReport?.agents?.length?<details open>
+    <summary>Κατάσταση agents</summary>
+    <div style={{overflowX:"auto"}}><table aria-label="Κατάσταση agents" style={{width:"100%",textAlign:"start",fontSize:12}}>
+      <caption>Ρυθμισμένοι {agentReport.agents.filter(agent=>agent.ready).length} από {agentReport.agents.length} · Εκτελέσεις από την τελευταία εκκίνηση</caption>
+      <thead><tr>{["Agent","Ρύθμιση","Τελευταία εκτέλεση","Τελευταία επιτυχία","Τελευταίο σφάλμα"].map(label=><th key={label} scope="col">{label}</th>)}</tr></thead>
+      <tbody>{agentReport.agents.map(agent=><tr key={agent.id}>
+        <th scope="row">{agent.greek||agent.id}</th>
+        <td>{agent.ready?"Έχει ρυθμιστεί":agent.reason||"Εκκρεμεί"}</td>
+        <td>{agent.observed?[agentOutcome(agent.observed.last_status),agentRunDate(agent.observed.last_run_at)].filter(Boolean).join(" · "):"Χωρίς καταγραφή"}</td>
+        <td>{agentRunDate(agent.observed?.last_success_at)||"—"}</td>
+        <td>{agent.observed?.last_error?[agentOutcome(agent.observed.last_error),agentRunDate(agent.observed.last_error_at)].filter(Boolean).join(" · "):"—"}</td>
+      </tr>)}</tbody>
+    </table></div>
+  </details>:null;
   const needsLogin=!authenticated&&!guest;
   const voiceUnavailable=!voice.supported.input||!voice.supported.output;
   const waitingForAnswer=busy||pendingJobs.some(j=>j.conversationId===conversationId);
@@ -468,6 +483,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
         {voiceOpen&&(needsLogin?voiceControls:<div className="n7-voice-preview">{voiceControls}</div>)}
         {home&&!needsLogin&&error&&<p role="alert" style={{color:"#ffba9a"}}>{error}</p>}
         {home&&!needsLogin&&notice&&<p role="status">{notice}</p>}
+        {agentStatusView}
         {guideOpen&&(privateReport||reportStatus)&&reportView}
       </div>,voiceHost)}
       <button type="button" onClick={() => {if(onOpenFigure&&N7_GUIDE&&!home&&window.matchMedia("(max-width:700px), (max-width:1000px) and (max-height:500px)").matches){setVoiceOpen(true);onOpenFigure();return;}setOpen(x => !x);}}
@@ -506,6 +522,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
             </nav>}
             {(guest||tab === "chat") && <div>
               {!guideOpen&&voiceControls}
+              {!guideOpen&&agentStatusView}
               {!guideOpen&&(privateReport||reportStatus)&&reportView}
               {pendingJobs.some(j=>j.conversationId===conversationId)&&<p role="status" style={{fontSize:12}}>Αναμονή απάντησης N7. Μπορείς να συνεχίσεις τη συνομιλία.</p>}
               {!guest&&<select aria-label="Conversation" style={inputStyle} value={conversationId}
