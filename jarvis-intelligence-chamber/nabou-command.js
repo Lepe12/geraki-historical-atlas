@@ -455,9 +455,9 @@
   body.classList.toggle('nbc-old-on',ui.old);$('nbcOld')?.setAttribute('aria-pressed',String(ui.old));if(oldPanel)oldPanel.hidden=!ui.old;}
  let oldPanel=null;
  function buildOldPanel(){if(oldPanel||!OLD)return;const slot=$('n7MapSlot');if(!slot)return;
-  let op=0.7;try{op=+(localStorage.getItem('nbc.oldOp')||0.7);}catch(e){}osvg.style.opacity=op;
+  let op=0.7;try{op=+(localStorage.getItem('nbc.oldOp')||0.7);}catch(e){}osvg.style.setProperty('--op',op);
   const rng=h('input',{type:'range',min:'0',max:'100',value:String(Math.round(op*100)),'aria-label':'Διαφάνεια ιστορικού χάρτη'});
-  rng.addEventListener('input',()=>{osvg.style.opacity=rng.value/100;try{localStorage.setItem('nbc.oldOp',String(rng.value/100));}catch(e){}});
+  rng.addEventListener('input',()=>{osvg.style.setProperty('--op',rng.value/100);try{localStorage.setItem('nbc.oldOp',String(rng.value/100));}catch(e){}});
   oldPanel=h('aside',{class:'nbc-oldpanel',hidden:!ui.old},
    h('div',{class:'nbc-old-h'},h('b',{text:OLD.short}),h('button',{type:'button',class:'nbc-x','aria-label':'Κλείσιμο ιστορικού χάρτη',onclick:()=>setOld(false)},'✕')),
    h('label',{class:'nbc-old-r'},h('span',{text:'σήμερα'}),rng,h('span',{text:'1650'})),
