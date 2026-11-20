@@ -1,25 +1,35 @@
 # Re-route the Belavilas sea lanes (data/belavilas.json "stops") through the chart's sea.
-# landmask.png comes from tools/atlas/chart_land_mask.cjs (rasterises #landP of the 2D chart).
+# Land mask: data/coast-detail.json (tools/atlas/build_detail_coast.py). Usage: belavilas_route_sea.py belavilas.json coast-detail.json
 import json,math,heapq,sys
 import numpy as np
 from PIL import Image
 from scipy import ndimage
-SC=1
-im=np.array(Image.open('landmask.png').convert('L').resize((1800,1105)))>127
-land=im
+# Land mask: the detailed coastline (data/coast-detail.json, Natural Earth 1:10m in chart pixels) at SC× resolution,
+# so the lanes keep to the sea that the zoomed-in map draws.
+from PIL import ImageDraw
+import re as _re
+SC=3
+def coast_mask(path):
+    d=json.load(open(path))['d'];img=Image.new('L',(1800*SC,1105*SC),0);dr=ImageDraw.Draw(img)
+    for sub in _re.findall(r'M[^M]*',d):
+        nums=[float(v) for v in _re.findall(r'-?\d+(?:\.\d+)?',sub)];x,y=nums[0],nums[1];pts=[(x*SC,y*SC)]
+        for i in range(2,len(nums)-1,2):x+=nums[i];y+=nums[i+1];pts.append((x*SC,y*SC))
+        if len(pts)>2:dr.polygon(pts,fill=255)
+    return np.array(img)>127
+land=coast_mask(sys.argv[2] if len(sys.argv)>2 else 'jarvis-intelligence-chamber/data/coast-detail.json')
 dist=ndimage.distance_transform_edt(~land)  # distance to land for sea pixels
 my1=66.48233060009922;k=30;lon0=-20
 M=lambda la: math.degrees(math.log(math.tan(math.pi/4+math.radians(la)/2)))
 Mi=lambda m: math.degrees(2*math.atan(math.exp(math.radians(m)))-math.pi/2)
-def toxy(la,lo):return ((lo-lon0)*k,(my1-M(la))*k)
-def toll(x,y):return (Mi(my1-y/k),x/k+lon0)
+def toxy(la,lo):return ((lo-lon0)*k*SC,(my1-M(la))*k*SC)
+def toll(x,y):return (Mi(my1-y/SC/k),x/SC/k+lon0)
 H,W=land.shape
-cost=np.where(land,80.0,1.0+np.where(dist<3,2.0,0.0))
+cost=np.where(land,80.0,1.0+np.where(dist<3*SC,2.0,0.0))
 def snap(x,y):
     xi,yi=int(round(x)),int(round(y))
     if not land[yi,xi]:return xi,yi
     best=None
-    for r in range(1,25):
+    for r in range(1,25*SC):
         for dy in range(-r,r+1):
             for dx in range(-r,r+1):
                 X,Y=xi+dx,yi+dy
@@ -30,7 +40,7 @@ def snap(x,y):
     return xi,yi
 def astar(a,b):
     (ax,ay),(bx,by)=a,b
-    x0,x1=max(0,min(ax,bx)-60),min(W-1,max(ax,bx)+60);y0,y1=max(0,min(ay,by)-60),min(H-1,max(ay,by)+60)
+    x0,x1=max(0,min(ax,bx)-60*SC),min(W-1,max(ax,bx)+60*SC);y0,y1=max(0,min(ay,by)-60*SC),min(H-1,max(ay,by)+60*SC)
     st=(ax,ay);g={st:0};prev={};pq=[(0,st)]
     N=[(1,0,1),(-1,0,1),(0,1,1),(0,-1,1),(1,1,1.414),(1,-1,1.414),(-1,1,1.414),(-1,-1,1.414)]
     while pq:
@@ -63,7 +73,7 @@ def taut(pts):
     out=[pts[0]];i=0
     while i<len(pts)-1:
         j=len(pts)-1
-        while j>i+1 and segland(pts[i],pts[j],1.6):j-=1
+        while j>i+1 and segland(pts[i],pts[j],1.6*SC):j-=1
         out.append(pts[j]);i=j
     return out
 def rdp_safe(pts,eps):
@@ -88,7 +98,7 @@ for r in d['routes']:
             if a==b:continue
             simp+=taut(astar(a,b))[1:]
         crossings=sum(segland(a,b) for a,b in zip(simp,simp[1:]))
-        new.append([[round(v,3) for v in toll(x,y)] for x,y in simp])
+        new.append([[round(v,4) for v in toll(x,y)] for x,y in simp])
         print(r['id'],len(ln),'->',len(simp),'land segs',crossings)
     r['lines']=new
 json.dump(d,open(p,'w'),ensure_ascii=False,indent=1)

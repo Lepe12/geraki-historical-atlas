@@ -15,11 +15,16 @@ await p.evaluate(()=>NABOU_PRO_ATLAS.select('corfu'));await p.waitForTimeout(500
 assert.equal(await p.evaluate(()=>NABOU_PRO_ATLAS.selected),'corfu');
 assert(await p.isVisible('#proPlaceInfo'));assert.match(await p.textContent('#nbcRecord'),/Κέρκυρα/);ok('reference place Κέρκυρα: card + linked GERAKI record');
 for(const t of ['towns','monuments','people','routes','sources']){await p.click(`.nbc-tab[data-tab="${t}"]`);const n=await p.$$eval('#nbcRecord .nbc-item,#nbcRecord .nbc-person,#nbcRecord .nbc-src',x=>x.length);assert(n>0,t);ok('tab '+t+' '+n);}
-await p.screenshot({path:'/home/claude/nabou-work/ch/t-people.png'});
+await p.screenshot({path:'t-people.png'});
 // book + timeline
 await p.click('.nbc-seg button[data-book="Book III"]');const vis=await p.$$eval('.nbc-pin:not([hidden])',x=>x.length);ok('book III visible pins '+vis);
-await p.click('.nbc-yr:not(.nbc-yr-ev)');await p.waitForTimeout(300);const per=await p.evaluate(()=>NABOU_COMMAND.state);assert.equal(per.from,per.to);ok('timeline year → period '+per.from);
-await p.click('.nbc-tl-all');await p.click('.nbc-seg button[data-book="All"]');
+await p.click('.nbc-seg button[data-book="All"]');
+await p.click('.nbc-yr-ev');await p.waitForTimeout(300);{const per=await p.evaluate(()=>NABOU_COMMAND.state);assert.equal(per.from,1500);assert.equal(per.to,1700);
+ assert(/Γεγονότα πειρατείας/.test(await p.textContent('#nbcKicker')));ok('timeline event bin → events list, period unchanged');}
+{const R=await p.$eval('#n7TimelineRange',e=>e.getBoundingClientRect().toJSON());await p.mouse.click(R.x+R.width*.25,R.y+R.height/2);await p.waitForTimeout(200);
+ const per=await p.evaluate(()=>NABOU_COMMAND.state);assert.equal(per.from,1550);assert.equal(per.to,1700);ok('timeline press moves only the nearest end');
+ await p.evaluate(()=>{const [a,b]=document.querySelectorAll('#n7TimelineRange input[type=range]');a.value='1500';a.dispatchEvent(new Event('input',{bubbles:true}));});}
+assert.equal(await p.$$eval('.nbc-person',x=>x.filter(e=>/Adel|Artemis|Kontokal/i.test(e.textContent)).length),0);ok('no novel characters in people');
 // nav panel button + layers
 await p.click('.n7-nav [data-nbc-panel="towns"]');assert.equal(await p.evaluate(()=>NABOU_COMMAND.state.tab),'towns');ok('Neocom panel button');
 await p.click('.n7-nav [data-n7-nav="layers"]');await p.waitForTimeout(300);assert(await p.isVisible('#nbcLayers'));ok('layers panel with GERAKI section');

@@ -300,4 +300,33 @@ body.nbc-on .nbc-legend-btn{display:inline-flex!important;align-items:center;gap
 .nbc-geo.far .nbc-pin.nbc-bv:not([data-sel]):not(:hover) span{display:none}
 .nbc-pin.nbc-bv[hidden],.nbc-pin3d.nbc-bv[hidden]{display:none!important}
 .nbc-pin.nbc-bv[data-sel] .nbc-bvi,.nbc-pin3d.nbc-bv[data-sel] .nbc-bvi{filter:drop-shadow(0 0 6px #4fd3e6)}
-.nbc-lg-route{display:block;width:40px;height:0;border-top:2.5px dashed #9fd8e6;box-shadow:0 0 0 1px #0008}
+.nbc-lg-route{display:block;width:40px;height:0;border-top:2.5px solid #9fd8e6;box-shadow:0 0 0 1px #0008}
+body.nbc-on .nbc-link{all:unset;cursor:pointer;color:#7fe0ef;font-weight:600;text-decoration:underline;text-underline-offset:2px}
+/* banners stand free on the map: no parchment box around the art */
+body.nbc-on .nbc-pin .nbc-power-art,body.nbc-on .nbc-pin3d .nbc-power-art{background:none!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;border-radius:0!important}
+body.nbc-on .nbc-pin .nbc-power-art svg,body.nbc-on .nbc-pin3d .nbc-power-art svg{filter:drop-shadow(0 2px 2px #000c) drop-shadow(0 0 1px #000a)}
+/* timeline: thumbs sit on the line; the whole bar is a grab area for the nearest end */
+body.nbc-on #n7Shell #n7TimelineRange{touch-action:none;cursor:pointer;height:22px}
+body.nbc-on #n7Shell #n7TimelineRange input[type=range]{top:2px!important;bottom:auto!important;height:18px!important;min-height:0!important;max-height:18px!important}
+body.nbc-on #n7Shell #n7TimelineRange::before,body.nbc-on #n7Shell #n7TimelineRange .n7-range-fill{top:10px}
+body.nbc-on #n7Shell #n7TimelineRange input[type=range]:focus,body.nbc-on #n7Shell #n7TimelineRange input[type=range]:focus-visible{outline:none!important;box-shadow:none!important;border:0!important}
+/* sea routes: clean solid lines with a dark casing and their name on the line */
+.nbc-sea .ln{stroke-dasharray:none!important;stroke-width:calc(2.2px * var(--nbc-inv,1))!important;opacity:1}
+.nbc-sea .cas{stroke-opacity:.7}
+.nbc-sea-label{font:italic 700 calc(12px * var(--nbc-inv,1)) 'EB Garamond','Noto Serif',Georgia,serif;fill:var(--c);paint-order:stroke;stroke:#0b0806;stroke-width:calc(3.5px * var(--nbc-inv,1));stroke-linejoin:round;letter-spacing:.04em;pointer-events:none}
+.nbc-geo.far .nbc-sea-label{display:none}
+.nbc-geo.far .nbc-sea.hi .nbc-sea-label{display:inline}
+/* route focus: the chosen route above everything, the rest of the map steps back */
+body.nbc-route-focus .nbc-routes{z-index:6}
+body.nbc-route-focus .nbc-pin:not([data-sel]),body.nbc-route-focus .nbc-pin3d:not([data-sel]),body.nbc-route-focus .pro-place-marker{opacity:.28;transition:opacity .2s}
+body.nbc-route-focus .nbc-route:not(.hi),body.nbc-route-focus .nbc-sea:not(.hi){opacity:.25}
+.nbc-route.hi{stroke-dasharray:none}
+.nbc-sea3d{font:italic 700 12px 'EB Garamond','Noto Serif',Georgia,serif;color:var(--c);text-shadow:0 0 3px #000,0 0 6px #000;white-space:nowrap;transform:translate(-50%,-50%);cursor:pointer}
+.nbc-sea3d[hidden]{display:none}
+/* detailed coastline when zoomed in (2D) */
+.nbc-coast{position:absolute;left:0;top:0;overflow:visible;pointer-events:none;opacity:0;transition:opacity .25s;visibility:hidden}
+.nbc-geo.detail .nbc-coast{opacity:1;visibility:visible}
+.nbc-coast .sea{fill:#1e3a34}
+.nbc-coast .shoal{fill:none;stroke:#5f9a8c;stroke-opacity:.38;stroke-width:calc(7px * var(--nbc-inv,1));stroke-linejoin:round}
+.nbc-coast .land{fill:#d6bf8f}
+.nbc-coast .coast{fill:none;stroke:#4a2f16;stroke-width:calc(1.1px * var(--nbc-inv,1));stroke-linejoin:round}
