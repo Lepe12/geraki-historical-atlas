@@ -13,7 +13,7 @@ import "./N7GuideHome.css";
 type Face="n7"|"h01";
 const ASSET_ROOT=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/"));
 const H01_FIGURE=ASSET_ROOT+"/n7-humanoid-h01-v2.webp";
-const AMBIENT_BACKGROUND=ASSET_ROOT+"/n7-ambient-v1.webp";
+const AMBIENT_BACKGROUND={wide:ASSET_ROOT+"/n7-ambient-v1.webp",portrait:ASSET_ROOT+"/n7-ambient-portrait-v1.webp"};
 const H01_SCALE=2.5;
 
 export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigate,onBackToWorkspace}:{open:boolean;onClose:()=>void;onBackToWorkspace?:()=>void;activity?:GuideMood|null;onWorkspace?:()=>void;onNavigate?:(target:N7Target)=>void}){

@@ -40,7 +40,11 @@ async function verifyHumanoidHome(browser, homeUrl) {
       const menu = dialog.getByRole("button",{name:"Μενού",exact:true});
       const loginToggle = dialog.locator("[data-n7-conversation-toggle]");
       await dialog.getByRole("button",{name:"Σύνδεση",exact:true}).waitFor();
-      await page.waitForFunction(()=>document.querySelector(".n7-ambient-field img")?.naturalWidth>0);
+      const backdrop=width===390?"n7-ambient-portrait-v1.webp":"n7-ambient-v1.webp";
+      await page.waitForFunction(expected=>{
+        const picture=document.querySelector(".n7-ambient-field img");
+        return picture?.naturalWidth>0&&picture.currentSrc.endsWith("/"+expected);
+      },backdrop);
       await dialog.locator(hostSelector+" canvas").first().waitFor({state:"attached"});
       assert.deepEqual((await dialog.getByRole("button").allTextContents()).map(label=>label.trim()),["Μενού","Σύνδεση"]);
       await menu.click();

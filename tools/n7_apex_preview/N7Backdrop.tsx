@@ -5,8 +5,10 @@ import { N7_BACKDROP_REFERENCE } from "./N7BackdropReference";
 type Highlight={x:number;y:number;phase:number;sprite:HTMLCanvasElement};
 
 export type N7BackdropHandle={wave:(x:number,y:number,radius:number,fade:number)=>void;clear:()=>void};
-const N7Backdrop=forwardRef<N7BackdropHandle,{effects:boolean;reduced:boolean;ambience?:string}>(function N7Backdrop({effects,reduced,ambience},ref) {
-  const source=ambience||N7_BACKDROP_REFERENCE;
+type BackdropProps={effects:boolean;reduced:boolean;ambience?:{wide:string;portrait:string}};
+const N7Backdrop=forwardRef<N7BackdropHandle,BackdropProps>(function N7Backdrop({effects,reduced,ambience},ref) {
+  const source=ambience?.wide??N7_BACKDROP_REFERENCE;
+  const portrait=ambience?.portrait;
   const hostRef=useRef<HTMLDivElement>(null);
   const imageRef=useRef<HTMLImageElement>(null);
   const layerRef=useRef<HTMLDivElement>(null);
@@ -19,7 +21,7 @@ const N7Backdrop=forwardRef<N7BackdropHandle,{effects:boolean;reduced:boolean;am
   useEffect(()=>{
     const host=hostRef.current,image=imageRef.current,layer=layerRef.current;
     if(!host||!image||!layer) return;
-    let disposed=false,loaded=false;
+    let disposed=false,loadedSource="";
     const highlights:Highlight[]=[];
     let centers:{x:number;y:number}[]=[];
     const start=()=>{
@@ -29,8 +31,13 @@ const N7Backdrop=forwardRef<N7BackdropHandle,{effects:boolean;reduced:boolean;am
     let layout=()=>{};
     const observer=new ResizeObserver(()=>layout());observer.observe(host);
     const load=()=>{
-      if(disposed||loaded) return;
-      loaded=true;
+      const currentSource=image.currentSrc;
+      if(disposed||!image.naturalWidth||!currentSource||loadedSource===currentSource) return;
+      loadedSource=currentSource;
+      for(const point of highlights)point.sprite.remove();
+      highlights.length=0;
+      const smoke=layer.querySelector<HTMLElement>("[data-smoke-drift]");
+      if(smoke)smoke.style.backgroundImage=`url("${currentSource}")`;
       const w=418,h=Math.round(w*image.naturalHeight/image.naturalWidth);
       const sample=document.createElement("canvas");sample.width=w;sample.height=h;
       const sctx=sample.getContext("2d",{willReadFrequently:true});
@@ -122,16 +129,19 @@ const N7Backdrop=forwardRef<N7BackdropHandle,{effects:boolean;reduced:boolean;am
     image.addEventListener("load",load);
     if(image.complete&&image.naturalWidth) load();
     return()=>{disposed=true;cancelAnimationFrame(strandRaf);observer.disconnect();for(const point of highlights)point.sprite.remove();image.removeEventListener("load",load);restart.current=()=>{};waveRef.current=()=>{};};
-  },[source]);
+  },[source,portrait]);
 
   return <div ref={hostRef} className={ambience?"n7-ambient-field":undefined} aria-hidden={ambience?true:undefined}
     aria-label={ambience?undefined:"N7 Step 6 living backdrop"} data-effects={effects&&!reduced?"on":"off"}
     style={{position:"absolute",inset:0,zIndex:0,pointerEvents:"none",overflow:"hidden"}}>
-    <img ref={imageRef} src={source} alt={ambience?"":"Cinematic mountain landscape"} style={{position:"absolute",width:"100%",height:"100%",objectFit:"cover"}} />
+    <picture>
+      {portrait&&<source media="(max-width: 720px) and (orientation: portrait)" srcSet={portrait}/>}
+      <img ref={imageRef} src={source} alt={ambience?"":"Cinematic mountain landscape"} style={{position:"absolute",width:"100%",height:"100%",objectFit:"cover"}} />
+    </picture>
     <style>{`@keyframes n7-ridge-light {0%,100% {opacity:.08} 50% {opacity:.78}}@keyframes n7-smoke-drift {0% {transform:scale(1.10) translate(-1.8%,.8%)} 100% {transform:scale(1.14) translate(1.8%,-1.2%)}}`}</style>
     <div ref={layerRef} data-ridge-layer="" aria-label="Existing ridge illumination" style={{position:"absolute",inset:0}}>
       {/* Slow smoke drift: a soft, faint copy of the same raster moving very slowly. */}
-      <div aria-hidden="true" data-smoke-drift="" style={{position:"absolute",inset:0,backgroundImage:`url(${source})`,backgroundSize:"cover",backgroundPosition:"center",opacity:.32,mixBlendMode:"screen",filter:"blur(6px)",animation:"n7-smoke-drift 48s ease-in-out infinite alternate"}}/>
+      <div aria-hidden="true" data-smoke-drift="" style={{position:"absolute",inset:0,backgroundSize:"cover",backgroundPosition:"center",opacity:.32,mixBlendMode:"screen",filter:"blur(6px)",animation:"n7-smoke-drift 48s ease-in-out infinite alternate"}}/>
       <canvas data-strands="" aria-hidden="true" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/>
     </div>
   </div>;

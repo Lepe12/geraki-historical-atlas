@@ -106,7 +106,7 @@
   left: var(--n7-home-gutter);
   bottom: max(26px, env(safe-area-inset-bottom));
   z-index: 5;
-  width: min(352px, calc(100% - 2 * var(--n7-home-gutter)));
+  width: min(320px, calc(100% - 2 * var(--n7-home-gutter)));
 }
 
 .n7-guide-view.n7-live-home #n7-guide-voice > .n7-home-voice {
@@ -121,11 +121,8 @@
 }
 
 .n7-home-dock {
-  padding: 8px 10px;
-  border: 1px solid var(--n7-home-edge);
-  border-radius: 10px;
-  background: #07121deb;
-  box-shadow: inset 0 1px 0 #b0e5f318, 0 12px 34px #0005;
+  padding: 3px 2px;
+  background: linear-gradient(90deg, #050e17b3, #050e1733 74%, transparent);
 }
 
 .n7-home-dock-row,
@@ -166,8 +163,8 @@
 .n7-live-home .n7-home-call {
   padding: 0 12px;
   color: #e2f8fc;
-  border-color: #7fe6f56b;
-  background: #113348a8;
+  border-color: #7fe6f54d;
+  background: #0e2939c9;
 }
 
 .n7-live-home .n7-home-call:hover:not(:disabled) {
@@ -183,15 +180,30 @@
   box-shadow: none;
 }
 
-.n7-live-home .n7-home-caption-button { width: 42px; padding: 0; color: var(--n7-home-cyan); }
+.n7-live-home .n7-home-caption-button {
+  width: 42px;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--n7-home-dim);
+}
+
+.n7-live-home .n7-home-caption-button[aria-pressed="true"] {
+  border-color: transparent;
+  background: #14384b;
+  color: var(--n7-home-cyan);
+  box-shadow: none;
+}
 .n7-live-home .n7-home-audio-unlock { min-height: 32px; padding: 0 7px; margin: 3px 0 0; border: 0; color: var(--n7-home-dim); }
 
 .n7-home-captions {
   max-height: 7em;
   overflow: auto;
   margin-top: 8px;
-  padding: 9px 4px 1px;
+  padding: 8px 10px;
   border-top: 1px solid var(--n7-home-edge);
+  border-radius: 7px;
+  background: #050e17ed;
   color: var(--n7-home-text);
   font-size: 13px;
   line-height: 1.5;
@@ -262,7 +274,6 @@
 
 @media (max-width: 440px) {
   .n7-home-brand { gap: 8px; }
-  .n7-home-dock { padding-inline: 7px; }
   .n7-home-meter { padding-inline: 0; }
   .n7-home-voice-state { gap: 5px; font-size: 12px; }
   .n7-live-home .n7-home-call { padding-inline: 7px; font-size: 12px; }
