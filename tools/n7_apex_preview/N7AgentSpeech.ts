@@ -6,6 +6,8 @@ const MONTHS=["Ιανουαρίου","Φεβρουαρίου","Μαρτίου","
 const DAYS:Record<string,string>={"Δευ":"Δευτέρα","Τρί":"Τρίτη","Τετ":"Τετάρτη","Πέμ":"Πέμπτη","Παρ":"Παρασκευή","Σάβ":"Σάββατο","Κυρ":"Κυριακή"};
 const WIND:Record<string,string>={"Β":"βόρεια","ΒΑ":"βορειοανατολικά","Α":"ανατολικά","ΝΑ":"νοτιοανατολικά","Ν":"νότια","ΝΔ":"νοτιοδυτικά","Δ":"δυτικά","ΒΔ":"βορειοδυτικά"};
 const SECTION:Record<string,string>={
+  "ΣΧΕΤΙΚΟΙ ΤΙΤΛΟΙ ΑΠΟ ΠΕΡΙΣΣΟΤΕΡΑ ΜΕΣΑ":"Σχετικοί τίτλοι από περισσότερα μέσα.",
+  "ΛΟΙΠΟΙ ΤΙΤΛΟΙ ΕΙΔΗΣΕΩΝ":"Λοιποί τίτλοι ειδήσεων.",
   "ΓΕΓΟΝΟΤΑ ΜΕ ΔΙΑΣΤΑΥΡΩΣΗ":"Γεγονότα που διασταυρώθηκαν από περισσότερα μέσα.",
   "ΑΝΑΦΟΡΕΣ ΧΩΡΙΣ ΔΙΑΣΤΑΥΡΩΣΗ":"Αναφορές που δεν έχουν διασταυρωθεί.",
   "ΙΣΧΥΡΙΣΜΟΙ, ΔΗΛΩΣΕΙΣ":"Ισχυρισμοί και δηλώσεις.",
@@ -33,7 +35,7 @@ export function speakable(text:string):string{
   const lines=text.slice(agent[0].length).split("\n").map(l=>l.trim()).filter(Boolean);
   const out:string[]=[];
   for(const line of lines){
-    if(/^(?:[^:\n]{1,90}: )?https:\/\/\S+$/.test(line)||/^(?:Πηγή|Σημείωση):/.test(line)||/^Ενημέρωση:/.test(line))continue;
+    if(/^(?:[^:\n]{1,90}: )?https:\/\/\S+$/.test(line)||/^(?:Πηγή|Σημείωση|Ενημέρωση):/.test(line)||/^\[(Weather|News & Geopolitics) Agent\]$/.test(line))continue;
     const header=Object.keys(SECTION).find(k=>line.startsWith(k));
     if(header){out.push(SECTION[header]);continue;}
     const headline=line.match(/^\[S\d+\]\s+(.+?)\s+—\s+\d{2}\/\d{2}\/\d{4}\s+—\s+(.+)$/);

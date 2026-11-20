@@ -923,8 +923,18 @@ def resume_private_proposals(path, question, records, question_kind, requested_r
         raise ValueError('PRIVATE_REVIEW_ANSWER_IDENTITY_INVALID')
     current={row['evidence_id']:row for row in records}
     previous={row['evidence_id']:row for row in original['evidence']}
-    retained=[];rejected=[];seen=set()
-    for proposal in original['claims']:
+    retained=[];rejected=[];seen=set();decisions=[]
+    for index, proposal in enumerate(original['claims'],1):
+        sources=proposal.get('source_occurrences')
+        saved_occurrence=sources[0] if isinstance(sources,list) and sources and isinstance(sources[0],dict) else {}
+        locator=saved_occurrence.get('locator') if isinstance(saved_occurrence.get('locator'),dict) else {}
+        bibliography=saved_occurrence.get('source_bibliography')
+        decision={'proposal':index,'status':'REJECTED','claim_id':proposal.get('claim_id'),
+                  'statement':proposal.get('statement'),'saved_quote':proposal.get('quote'),
+                  'source_title':saved_occurrence.get('title'),'source_creator':bibliography.get('creator') if isinstance(bibliography,dict) else None,
+                  'printed_page':locator.get('printed_page'),'scan_indexes':locator.get('scan_indexes_0_based'),
+                  'reasons':[]}
+        decisions.append(decision)
         eid=proposal.get('evidence_id')
         row=current.get(eid);old=previous.get(eid)
         # Prompt compaction is a rendering option. Compare the underlying
@@ -933,8 +943,9 @@ def resume_private_proposals(path, question, records, question_kind, requested_r
                 'source_bibliography','uncertainties','occurrences')
         differences=[key for key in fields if row and old and digest(row.get(key))!=digest(old.get(key))]
         if not row or not old or differences:
-            rejected.append({'reason':'PRIVATE_REVIEW_SOURCE_CONTEXT_CHANGED','evidence_id':eid,
-                             'binding_fields':differences or ['missing_context']})
+            issue={'reason':'PRIVATE_REVIEW_SOURCE_CONTEXT_CHANGED' if row and old else 'PRIVATE_REVIEW_SOURCE_EXCERPT_NOT_AVAILABLE','evidence_id':eid,
+                   'binding_fields':differences or ['missing_context']}
+            rejected.append(issue);decision['reasons']=[issue]
             continue
         item={k:proposal.get(k) for k in ('statement','evidence_id','quote','kind','actors','places','dates')}
         item.update(passage_kind=proposal.get('passage_kind','NARRATIVE_EVIDENCE'),
@@ -944,27 +955,32 @@ def resume_private_proposals(path, question, records, question_kind, requested_r
                                        requested_range,target_names,identity_linkage,
                                        section_records=records)
         if len(accepted)!=1:
-            rejected.extend(issues or [{'reason':'PRIVATE_REVIEW_REVALIDATION_REJECTED','evidence_id':eid}])
+            decision['reasons']=issues or [{'reason':'PRIVATE_REVIEW_REVALIDATION_REJECTED','evidence_id':eid}]
+            rejected.extend(decision['reasons'])
             continue
         claim=accepted[0]
         start=proposal.get('quote_offset_in_excerpt')
         if (type(start) is not int or start<0 or row['text'][start:start+len(claim['quote'])]!=claim['quote']
             or start!=claim['quote_offset_in_excerpt'] or claim['claim_id']!=proposal.get('claim_id')
             or claim['claim_id'] in seen):
-            rejected.append({'reason':'PRIVATE_REVIEW_QUOTE_OFFSET_OR_ID_MISMATCH','evidence_id':eid})
+            issue={'reason':'PRIVATE_REVIEW_QUOTE_OFFSET_OR_ID_MISMATCH','evidence_id':eid}
+            rejected.append(issue);decision['reasons']=[issue]
             continue
         original_occurrences=proposal.get('source_occurrences')
         if (not isinstance(original_occurrences,list)
             or digest(original_occurrences)!=digest(claim['source_occurrences'])):
-            rejected.append({'reason':'PRIVATE_REVIEW_ORIGINAL_CITATION_CHANGED','evidence_id':eid})
+            issue={'reason':'PRIVATE_REVIEW_ORIGINAL_CITATION_CHANGED','evidence_id':eid}
+            rejected.append(issue);decision['reasons']=[issue]
             continue
+        decision['status']='REPLAYED'
         seen.add(claim['claim_id']);retained.append(claim)
     return retained,rejected,{
         'source':'AEAD_DECRYPTED_PREVIOUS_MODEL_ANSWER',
         'source_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),
         'proposal_count':len(original['claims']),
         'replayed_source_bound_proposals':len(retained),
-        'rejected_source_bound_proposals':len(rejected),
+        'rejected_source_bound_proposals':len(decisions)-len(retained),
+        'proposal_decisions':decisions,
         'carried_over_review_verdicts':False,
         'original_history_verified':False,
         'new_archive_search':False,
@@ -1344,12 +1360,14 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
                       'selected_excerpts':sum(len(g) for g in grouped)}
     queue.inventory(all_records,grouped,deferred,filtered_items)
     selected=list({r['evidence_id']:r for b in grouped for r in b}.values())
+    missing_private_sources=set()
     if resume_private_proposals_from:
         bound_ids={c.get('evidence_id') for c in previous_private['claims']}
         lookup={r['evidence_id']:r for r in all_records}
-        if any(eid not in lookup for eid in bound_ids):
+        missing_private_sources=bound_ids-set(lookup)
+        if missing_private_sources and os.getenv('PCT_PRIVATE_REVIEW_PREFLIGHT_ONLY')!='1':
             raise ValueError('PRIVATE_REVIEW_SOURCE_EXCERPT_NOT_AVAILABLE')
-        selected=[lookup[eid] for eid in bound_ids]
+        selected=[lookup[eid] for eid in bound_ids if eid in lookup]
         grouped=[]
         deferred=[{'evidence_id':r['evidence_id'],'reason':'REVIEW_ONLY_NO_NEW_EXTRACTION'}
                   for r in all_records if r['evidence_id'] not in bound_ids]
@@ -1387,7 +1405,8 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         out['software_revision']=revision.stdout.strip() if revision.returncode==0 else None
     except (OSError,subprocess.TimeoutExpired):out['software_revision']=None
     if not conf['configured']:return documentary_answer(out,all_records,run_root)
-    if not selected:out['status']='INSUFFICIENT_ACQUIRED_EVIDENCE';return out
+    if not selected and not resume_private_proposals_from:
+        out['status']='INSUFFICIENT_ACQUIRED_EVIDENCE';return out
     out['status']='RUNNING_SEMANTIC_ANALYSIS'
     pass_started=time.monotonic();new_calls=0;response_occurrences={}
     response_cache_enabled=caller is call or os.getenv('PCT_ENABLE_RESPONSE_CACHE')=='1'
@@ -1483,7 +1502,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         out['rejected'].extend(issues)
         out['private_proposal_replay']=receipt
         out['coverage']['pass_priority']='REVALIDATE_PREVIOUS_PRIVATE_PROPOSALS_ONLY'
-        if not replayed:
+        if not replayed or missing_private_sources:
             out['status']='PRIVATE_PREVIOUS_PROPOSALS_NOT_SOURCE_REPLAYABLE'
             return out
         if os.getenv('PCT_PRIVATE_REVIEW_PREFLIGHT_ONLY')=='1':
@@ -1881,6 +1900,14 @@ def main():
                 resume_private_proposals_from=previous if args.resume_private_proposals else None)
     if args.check_private_proposals_only:
         receipt=out.get('private_proposal_replay') or {}
+        if receipt.get('proposal_decisions'):
+            destination=root/'research_answer'
+            destination.mkdir(exist_ok=True)
+            replay_file=destination/'citation-replay.json'
+            with open(replay_file,'w',encoding='utf-8',opener=lambda path,flags:os.open(path,flags|os.O_NOFOLLOW,0o600)) as stream:
+                json.dump({'schema':'n7-private-citation-replay-v1','run_id':args.run_id,
+                           'status':out['status'],'historically_verified':False,
+                           'proposal_decisions':receipt['proposal_decisions']},stream,ensure_ascii=False)
         print('N7_PRIVATE_SOURCE_REPLAY_PREFLIGHT',json.dumps({
             'status':out.get('status'),
             'replayed_proposals':receipt.get('replayed_source_bound_proposals',0),

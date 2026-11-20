@@ -2,6 +2,8 @@
 import copy
 import json
 import os
+import subprocess
+import sys
 import tempfile
 from pathlib import Path
 import unittest
@@ -72,6 +74,39 @@ class N7PrivateCitationReview(unittest.TestCase):
                                                              None,None,None,tmp)
             self.assertFalse(replayed)
             self.assertEqual(rejections[0]['reason'],'PRIVATE_REVIEW_SOURCE_CONTEXT_CHANGED')
+
+    def test_proposals_using_the_same_evidence_have_separate_decisions(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p,records,claims,old=self.proposals(tmp,2)
+            old['claims'][1]['quote_offset_in_excerpt']+=1
+            p.write_text(json.dumps(old))
+            replayed,_,receipt=resume_private_proposals(p,'Naxos source check',records,None,None,None,tmp)
+            self.assertEqual([claim['claim_id'] for claim in replayed],[claims[0]['claim_id']])
+            first,second=receipt['proposal_decisions']
+            self.assertEqual((first['proposal'],first['status']),(1,'REPLAYED'))
+            self.assertEqual((second['proposal'],second['status']),(2,'REJECTED'))
+            self.assertEqual(second['claim_id'],claims[1]['claim_id'])
+            self.assertEqual(second['saved_quote'],claims[1]['quote'])
+            self.assertEqual(second['reasons'][0]['reason'],'PRIVATE_REVIEW_QUOTE_OFFSET_OR_ID_MISMATCH')
+
+    def test_blocked_preflight_saves_private_decision_before_exiting(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            run='42434462262';root=Path(tmp)/'evidence'/'runs'/run
+            original,_,_,answer=self.proposals(root)
+            answer['claims'][0]['evidence_id']='missing-synthetic-evidence'
+            original.write_text(json.dumps(answer))
+            manifest=root/'travellers'/'run_manifest'/'manifest.json'
+            manifest.parent.mkdir(parents=True)
+            manifest.write_text(json.dumps({'normalized_request':{'target':'Naxos source check'}}))
+            result=subprocess.run([sys.executable,str(Path(__file__).with_name('semantic_research_answer.py')),
+                '--repo',tmp,'--run-id',run,'--resume-private-proposals','--check-private-proposals-only'],
+                capture_output=True,text=True,timeout=30)
+            self.assertIn('N7_PRIVATE_REVIEW_CITATION_REPLAY_NOT_COMPLETE',result.stderr)
+            self.assertNotIn(TEXT,result.stdout+result.stderr)
+            decision_file=root/'research_answer'/'citation-replay.json'
+            decision=json.loads(decision_file.read_text())['proposal_decisions'][0]
+            self.assertEqual(decision['reasons'][0]['reason'],'PRIVATE_REVIEW_SOURCE_EXCERPT_NOT_AVAILABLE')
+            self.assertEqual(decision_file.stat().st_mode&0o777,0o600)
 
     def test_cross_run_and_wrong_question_are_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:

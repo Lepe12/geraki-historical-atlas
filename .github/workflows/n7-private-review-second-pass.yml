@@ -142,6 +142,15 @@ jobs:
             echo "N7_PRIOR_OUTPUT_IS_ZERO_CLAIM_TIMEOUT; fresh model extraction from the same 11 restored private source lanes only"
           fi
 
+      - name: Store per-proposal citation decisions only in private encrypted storage
+        if: ${{ !cancelled() && env.N7_REVIEW_MODE == 'replay' }}
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          if test -s "evidence/runs/$SOURCE_RUN/research_answer/citation-replay.json"; then
+            PYTHONPATH=tools python3 tools/n7_private_corpus_store.py citation-replay-upload --run-id "$SOURCE_RUN"
+          fi
+
       - name: Prepare same checksum-verified, local and free CPU Qwen
         uses: ./.github/actions/research-model
 

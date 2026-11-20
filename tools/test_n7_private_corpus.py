@@ -1,20 +1,47 @@
 """N7 private corpus: actual AES-GCM tamper tests and manifest identity fixtures."""
 import json
 import os
+from contextlib import nullcontext
 from pathlib import Path
 import subprocess
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 import urllib.error
 
-from n7_private_corpus_store import checked_run, handoffs_on_disk, private_visibility_check, decode_private_answer, crypt, digest
+from n7_private_corpus_store import checked_run, handoffs_on_disk, private_visibility_check, decode_private_answer, crypt, digest, citation_replay_upload
 from research_lane_handoff import pack, LANES
 
 NODE=Path(__file__).with_name("n7_private_aead.js")
 
 
 class N7PrivateCorpusTests(unittest.TestCase):
+    def test_citation_replay_upload_keeps_only_bound_ciphertext(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            run='42434462262'
+            path=root/'evidence'/'runs'/run/'research_answer'/'citation-replay.json'
+            path.parent.mkdir(parents=True)
+            path.write_text(json.dumps({'schema':'n7-private-citation-replay-v1','run_id':run,
+                'status':'BLOCKED','historically_verified':False,
+                'proposal_decisions':[{'proposal':1,'saved_quote':'synthetic quotation'}]}))
+            key=bytes(range(32));received={};ftp=Mock()
+            ftp.rename.side_effect=lambda staged,final:received.update({final:received.pop(staged)})
+            with patch('n7_private_corpus_store.REPO',root), \
+                 patch('n7_private_corpus_store.connect',return_value=nullcontext(ftp)), \
+                 patch('n7_private_corpus_store.key_from_bot',return_value=key), \
+                 patch('n7_private_corpus_store.root'), \
+                 patch('n7_private_corpus_store.maybe_read',return_value=b'source index'), \
+                 patch('n7_private_corpus_store.write',side_effect=lambda _,name,data:received.update({name:data})), \
+                 patch('n7_private_corpus_store.remote_read',side_effect=lambda _,name,limit:received[name]):
+                citation_replay_upload(run)
+            self.assertEqual(set(received),{'citation-replay.json.enc'})
+            cipher=received['citation-replay.json.enc']
+            self.assertNotIn(b'synthetic quotation',cipher)
+            self.assertEqual(crypt('open',cipher,key,'research:'+run+':citation_replay:manifest'),path.read_bytes())
+            with self.assertRaisesRegex(RuntimeError,'N7_AEAD_OPEN_FAILED'):
+                crypt('open',cipher,key,'research:'+run+':answer')
+
     def test_aead_roundtrip_no_plaintext_leak_and_tamper_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory)

@@ -61,6 +61,16 @@ class AgentPlannerTests(unittest.TestCase):
         self.assertEqual(len(plan["selected_agents"]),11)
         self.assertEqual(plan["confidence"],"HIGH")
 
+    def test_crete_and_french_archives_route_equally_in_greek_and_english(self):
+        greek = plan_agents({"target":"Κρεβελιέρ στην Ιεράπετρα της Κρήτης",
+                             "purpose":"Γαλλικές πηγές για την επιδρομή"}, self.policy())
+        english = plan_agents({"target":"Creveliers in Ierapetra, Crete",
+                               "purpose":"French sources about the raid"}, self.policy())
+        self.assertEqual(greek['selected_agents'], english['selected_agents'])
+        self.assertLess(len(greek['selected_agents']), 11)
+        self.assertIn('french', greek['selected_agents'])
+        self.assertIn('explicit_source_request', greek['ranking'][0]['reasons'])
+
 
 if __name__=="__main__":
     unittest.main()

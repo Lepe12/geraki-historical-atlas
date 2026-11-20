@@ -96,8 +96,15 @@ export function isAgentsStatus(text: string): boolean {
   return !!clean && clean.length <= 80 && STATUS.test(clean);
 }
 
-type AgentRow = { greek?: string; id?: string; ready?: boolean; reason?: string };
-type AgentsReport = { agents?: AgentRow[]; summary?: { total?: number; ready?: number; notReady?: string[] } };
+type AgentObservation = {last_run_at?: string; last_status?: string; last_success_at?: string; last_error?: string; last_error_at?: string};
+type AgentRow = { greek?: string; id?: string; ready?: boolean; reason?: string; observed?: AgentObservation | null };
+type AgentsReport = { agents?: AgentRow[]; summary?: { total?: number; ready?: number; observed?: number } };
+
+const OUTCOMES: Record<string,string> = {ok:"επιτυχία", no_results:"καμία εγγραφή", provider_unavailable:"η πηγή δεν απάντησε", unavailable:"εργαλείο μη διαθέσιμο", needs_place:"χρειάζεται τοποθεσία", place_not_found:"άγνωστη τοποθεσία", invalid_input:"μη έγκυρη είσοδος"};
+const shortDate = (value?: string) => {
+  const time=value?Date.parse(value):NaN;
+  return Number.isFinite(time)?new Intl.DateTimeFormat("el-GR",{dateStyle:"short",timeStyle:"short",timeZone:"Europe/Athens"}).format(time):"";
+};
 
 export function describeAgents(report: AgentsReport): string {
   const agents = Array.isArray(report?.agents) ? report.agents : [];
@@ -105,9 +112,17 @@ export function describeAgents(report: AgentsReport): string {
   const ready = Number.isInteger(report?.summary?.ready) ? Number(report.summary!.ready) : agents.filter(a => a.ready).length;
   if (!total) return "Δεν έλαβα κατάσταση των Agents από τον server.";
   const waiting = agents.filter(a => a.ready === false);
-  let text = `Από τους ${total} Agents, οι ${ready} είναι έτοιμοι.`;
+  let text = `Από τους ${total} Agents, οι ${ready} έχουν τις απαραίτητες ρυθμίσεις.`;
   if (waiting.length) {
-    text += " Δεν είναι έτοιμοι: " + waiting.map(a => `${a.greek || a.id}${a.reason ? " (" + String(a.reason).replace(/\.$/, "") + ")" : ""}`).join("· ") + ".";
+    text += " Εκκρεμούν ρυθμίσεις: " + waiting.map(a => `${a.greek || a.id}${a.reason ? " (" + String(a.reason).replace(/\.$/, "") + ")" : ""}`).join(" · ") + ".";
   } else text += " Δεν λείπει καμία απαίτηση.";
-  return text + " «Έτοιμος» σημαίνει ότι υπάρχουν οι απαιτήσεις του, όχι ότι η έξοδός του έχει επαληθευτεί.";
+  const observations=agents.flatMap(agent=>{
+    const run=agent.observed;
+    if(!run)return [];
+    const latest=[OUTCOMES[run.last_status||""]||"άγνωστο αποτέλεσμα",shortDate(run.last_run_at)].filter(Boolean).join(" · ");
+    const success=shortDate(run.last_success_at),error=shortDate(run.last_error_at);
+    return [`${agent.greek||agent.id}: ${latest}${success?`. Τελευταία επιτυχία ${success}`:""}${error?`. Τελευταίο σφάλμα ${error}`:""}.`];
+  });
+  if(observations.length)return text+" Καταγεγραμμένες εκτελέσεις από την τελευταία εκκίνηση. "+observations.join(" ");
+  return text+(Number.isInteger(report.summary?.observed)?" Δεν έχουν καταγραφεί εκτελέσεις από την τελευταία εκκίνηση.":" Αυτή η έκδοση του server αναφέρει μόνο ρυθμίσεις.");
 }

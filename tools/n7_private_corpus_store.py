@@ -399,9 +399,44 @@ def answer_upload(run_id):
               "model_used", meta["model_used"], "historically_verified=false")
 
 
+def citation_replay_upload(run_id):
+    run_id = checked_run(run_id)
+    replay_file = REPO / 'evidence' / 'runs' / run_id / 'research_answer' / 'citation-replay.json'
+    raw = replay_file.read_bytes()
+    if len(raw) > 1_000_000:
+        raise RuntimeError('PRIVATE_CITATION_REPLAY_TOO_LARGE')
+    report = json.loads(raw)
+    if (report.get('schema') != 'n7-private-citation-replay-v1' or report.get('run_id') != run_id
+        or report.get('historically_verified') is not False
+        or not isinstance(report.get('proposal_decisions'), list) or len(report['proposal_decisions']) > 100):
+        raise RuntimeError('PRIVATE_CITATION_REPLAY_INVALID')
+    purpose = 'research:' + run_id + ':citation_replay:manifest'
+    with connect() as ftp:
+        secret = key_from_bot(ftp)
+        root(ftp, run_id)
+        if not maybe_read(ftp, 'index.json', 100000):
+            raise RuntimeError('PRIVATE_SOURCE_INDEX_MISSING')
+        filename = 'citation-replay.json.enc'
+        sealed = crypt('seal', raw, secret, purpose)
+        staged = filename + '.' + digest(sealed)
+        try:
+            write(ftp, staged, sealed)
+            readback = remote_read(ftp, staged, 1_000_100)
+            if readback != sealed or crypt('open', readback, secret, purpose) != raw:
+                raise RuntimeError('PRIVATE_CITATION_REPLAY_READBACK_FAILED')
+            ftp.rename(staged, filename)
+        except BaseException:
+            try:
+                ftp.delete(staged)
+            except ftplib.all_errors:
+                pass
+            raise
+    print('N7_PRIVATE_CITATION_REPLAY_STORED proposals=' + str(len(report['proposal_decisions'])))
+
+
 def main():
     p=argparse.ArgumentParser()
-    p.add_argument("mode", choices=("upload", "restore", "answer-upload", "answer-restore"))
+    p.add_argument("mode", choices=("upload", "restore", "answer-upload", "answer-restore", "citation-replay-upload"))
     p.add_argument("--run-id", required=True)
     p.add_argument("--incoming", default="lane_handoffs")
     args=p.parse_args()
@@ -411,6 +446,8 @@ def main():
         restore(args.run_id)
     elif args.mode == "answer-restore":
         answer_restore(args.run_id)
+    elif args.mode == "citation-replay-upload":
+        citation_replay_upload(args.run_id)
     else:
         answer_upload(args.run_id)
 

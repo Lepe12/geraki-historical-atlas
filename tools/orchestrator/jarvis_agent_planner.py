@@ -88,7 +88,7 @@ PROFILE_RULES: dict[str, dict[str, Any]] = {
     "venetian_adriatic": {
         "patterns": [
             r"\bvenice\b", r"\bvenetian\b", r"\bvenez", r"\badriatic\b",
-            r"\bdalmat", r"\bcret", r"\bcandia\b",
+            r"\bdalmat", r"\bcret", r"\bcandia\b", r"\bκρητ", r"\bβενετ",
         ],
         "weights": {
             "venetian": 42, "italian_states": 16,
@@ -119,7 +119,7 @@ PROFILE_RULES: dict[str, dict[str, Any]] = {
     },
     "french": {
         "patterns": [
-            r"\bfrance\b", r"\bfrench\b", r"\bmarseille\b",
+            r"\bfrance\b", r"\bfrench\b", r"\bmarseille\b", r"\bγαλλ",
             r"\bprovence\b", r"\bparis\b", r"\bcorsica\b",
         ],
         "weights": {
@@ -185,6 +185,23 @@ BASE_SCORES = {
 }
 
 
+# Explicit requests carry more weight than incidental mentions of countries.
+SOURCE_TERMS = r"(?:πηγ\w*|αρχει\w*|τεκμηρι\w*|sources?\b|archives?\b|records?\b)"
+SOURCE_ADJECTIVES = {
+    "greek": r"greek|ελλην\w*",
+    "travellers": r"travell?er(?:s['’]?)?|περιηγητικ\w*",
+    "spanish_simancas": r"spanish|simancas|ισπαν\w*",
+    "venetian": r"venetian|βενετ\w*|ενετ\w*",
+    "french": r"french|γαλλ\w*",
+    "british": r"british|english|βρεταν\w*|αγγλικ\w*",
+    "dutch": r"dutch|ολλανδ\w*",
+    "german": r"german|γερμαν\w*",
+    "italian_states": r"italian|ιταλικ\w*",
+    "ottoman": r"ottoman|οθωμαν\w*",
+    "north_african": r"north african|βορειοαφρικαν\w*",
+}
+
+
 def _fold(value: str) -> str:
     value = unicodedata.normalize("NFKD", str(value or ""))
     return "".join(ch for ch in value if not unicodedata.combining(ch)).casefold()
@@ -229,6 +246,12 @@ def plan_agents(payload: dict[str, Any], policy: dict[str, Any]) -> dict[str, An
             scores[agent] += int(weight)
             reasons[agent].append("context:" + profile)
 
+    explicit = [agent for agent in allowed if re.search(
+        rf"\b(?:{SOURCE_ADJECTIVES[agent]})\s+{SOURCE_TERMS}", folded)]
+    for agent in explicit:
+        scores[agent] += 1000
+        reasons[agent].append("explicit_source_request")
+
     broad_requested = any(marker in folded for marker in BROAD_MARKERS)
     ranked = sorted(allowed, key=lambda a: (-scores[a], allowed.index(a), a))
 
@@ -236,7 +259,7 @@ def plan_agents(payload: dict[str, Any], policy: dict[str, Any]) -> dict[str, An
         selected = list(allowed)
         confidence = "HIGH"
         strategy = "explicit_broad_coverage"
-    elif not profiles:
+    elif not profiles and not explicit:
         # Historical discovery must prefer recall when JARVIS lacks enough
         # geographic clues. Do not silently exclude archives on weak context.
         selected = list(allowed)
@@ -252,7 +275,7 @@ def plan_agents(payload: dict[str, Any], policy: dict[str, Any]) -> dict[str, An
             desired = max(desired, 4)
         if "caribbean_atlantic" in profiles:
             desired = max(desired, 5)
-        desired = min(max_agents, desired)
+        desired = max(len(explicit), min(max_agents, desired))
         selected = ranked[:desired]
         confidence = "HIGH" if len(profiles) == 1 else "MEDIUM"
         strategy = "context_ranked"

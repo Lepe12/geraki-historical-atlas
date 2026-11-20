@@ -47,7 +47,10 @@ test('the status of the agents is asked in plain words and answered from the rea
   for(const text of ['Δείξε μου την κατάσταση των Agents','N7, δείξε μου την κατάσταση των agents.','κατάσταση των agents','πες μου την κατάσταση των agents']) assert.equal(isAgentsStatus(text),true,text);
   for(const text of ['Τι κάνουν οι agents','Ξεκίνα έρευνα για τους agents','άνοιξε τους agents']) assert.equal(isAgentsStatus(text),false,text);
   const report={summary:{total:3,ready:2,notReady:['browser_reader']},agents:[{greek:'Συντονιστής',ready:true},{greek:'Καιρός',ready:true},{greek:'Browser Reader',ready:false,reason:'Λείπει: επιτρεπόμενα domains (BROWSER_ALLOWED_DOMAINS).'}]};
-  assert.equal(describeAgents(report),'Από τους 3 Agents, οι 2 είναι έτοιμοι. Δεν είναι έτοιμοι: Browser Reader (Λείπει: επιτρεπόμενα domains (BROWSER_ALLOWED_DOMAINS)). «Έτοιμος» σημαίνει ότι υπάρχουν οι απαιτήσεις του, όχι ότι η έξοδός του έχει επαληθευτεί.');
+  assert.match(describeAgents(report),/^Από τους 3 Agents, οι 2 έχουν τις απαραίτητες ρυθμίσεις/);
+  assert.match(describeAgents(report),/Browser Reader.*server αναφέρει μόνο ρυθμίσεις/);
+  report.agents[1].observed={last_status:'provider_unavailable',last_run_at:'2026-11-20T12:00:00Z',last_success_at:'2026-11-19T12:00:00Z',last_error_at:'2026-11-20T12:00:00Z'};
+  assert.match(describeAgents(report),/Καιρός: η πηγή δεν απάντησε.*Τελευταία επιτυχία.*Τελευταίο σφάλμα/);
   assert.match(describeAgents({summary:{total:2,ready:2},agents:[{ready:true},{ready:true}]}),/Δεν λείπει καμία απαίτηση/);
   assert.equal(describeAgents({}),'Δεν έλαβα κατάσταση των Agents από τον server.');
 });

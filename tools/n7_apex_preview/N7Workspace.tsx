@@ -17,6 +17,17 @@ type PrivateReport = {
   run_id: string;
   paragraphs: string[];
   references: string[];
+  citation_replay?: {proposals: {
+    proposal: number;
+    status: "REPLAYED" | "REJECTED";
+    statement: string;
+    saved_quote: string;
+    source_title: string;
+    source_creator: string;
+    printed_page: string;
+    scan_pages: number[];
+    reasons: {code: string; fields: string[]}[];
+  }[]} | null;
   source_candidates: {
     claim_id: string;
     proposed_statement: string;
@@ -383,6 +394,24 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
     {privateReport&&<article style={{textAlign:"start",whiteSpace:"pre-wrap",padding:8}}>
       <h3>Ιδιωτική αναφορά · {privateReport.run_id}</h3>
       <p>Η ιστορική επαλήθευση των πρωτοτύπων και η ανεξαρτησία των πηγών εκκρεμούν.</p>
+      {!!privateReport.citation_replay?.proposals.length&&<>
+        <h4>Επανέλεγχος αποθηκευμένων παραπομπών</h4>
+        <p>Ο έλεγχος αφορά την αντιστοίχιση της αρχικής πρότασης με το απόσπασμα και τη θέση του στην πηγή.</p>
+        {privateReport.citation_replay.proposals.map(row=><details key={row.proposal}>
+          <summary>Πρόταση {row.proposal} · {row.status==="REPLAYED"?"Η παραπομπή αναπαράχθηκε":"Η παραπομπή απορρίφθηκε"}</summary>
+          <p>{row.statement}</p>
+          <p>{[row.source_title,row.source_creator,row.printed_page?"έντυπη σ. "+row.printed_page:
+            row.scan_pages.length?"σαρωμένη σελίδα "+row.scan_pages.join(", "):""].filter(Boolean).join(" · ")}</p>
+          {row.saved_quote&&<blockquote>{row.saved_quote}</blockquote>}
+          {row.reasons.map((reason,i)=><p key={i}>{({
+            PRIVATE_REVIEW_SOURCE_CONTEXT_CHANGED:"Άλλαξε ή λείπει το αποθηκευμένο τεκμήριο.",
+            PRIVATE_REVIEW_SOURCE_EXCERPT_NOT_AVAILABLE:"Το απόσπασμα της αρχικής πρότασης δεν βρέθηκε στο υλικό που ανακτήθηκε.",
+            PRIVATE_REVIEW_REVALIDATION_REJECTED:"Η πρόταση δεν πέρασε τους ελέγχους τεκμηρίωσης.",
+            PRIVATE_REVIEW_QUOTE_OFFSET_OR_ID_MISMATCH:"Η θέση του αποσπάσματος ή η ταυτότητα του ισχυρισμού δεν συμφωνεί.",
+            PRIVATE_REVIEW_ORIGINAL_CITATION_CHANGED:"Δεν αναπαράχθηκε η καταγεγραμμένη πηγή ή σελίδα."
+          } as Record<string,string>)[reason.code]||reason.code} {reason.fields.join(", ")}</p>)}
+        </details>)}
+      </>}
       {privateReport.paragraphs.map((text,i)=><p key={i}>{richText(text)}</p>)}
       {privateReport.source_candidates.length>0&&<h4>Ισχυρισμοί και τεκμήρια</h4>}
       {privateReport.source_candidates.map((claim,i)=><details key={claim.claim_id||i}>
