@@ -6,6 +6,7 @@ import N7Backdrop,{type N7BackdropHandle,type N7BackdropTuning} from "./N7Backdr
 import { N7_HUMANOID_REFERENCE } from "./N7HumanoidReference";
 import { CORE, createAssemblySound, createFx } from "./N7GuideFx";
 import type {N7Target} from "./N7Navigation";
+import {N7MiraOverview} from "./N7MiraHud";
 import "./N7GuideHome.css";
 
 // Second face option: the owner-supplied H01 head composed onto the same body.
@@ -186,10 +187,10 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
       .n7-guide-details{padding:14px;background:rgba(2,9,14,.88);border:1px solid rgba(120,220,240,.16);border-radius:12px;overflow:auto;font-size:12px;line-height:1.6;min-height:0}
       @media(max-width:700px), (max-width:1000px) and (max-height:500px){.n7-guide-main[data-details=true]{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) 115px}.n7-guide-controls{align-self:stretch;margin:0;max-width:none;border-radius:0;border-width:1px 0 0;padding:6px 8px;gap:4px 10px;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;min-height:42px}#n7-guide-voice>div{width:100%;border-radius:0;border-width:1px 0 0}.n7-guide-controls>*{flex-shrink:0}.n7-guide-cluster{flex-wrap:nowrap}.n7-guide-group{padding-left:10px}.n7-guide-view button{padding:6px 8px;font-size:11px}}
     `}</style>
-    <N7Backdrop ref={backdrop} effects={effects} reduced={reduced} ambience={home?AMBIENT_BACKGROUND:undefined} tuning={home?tuning:undefined}/>
+    <N7Backdrop ref={backdrop} effects={effects} reduced={reduced} ambience={home?AMBIENT_BACKGROUND:undefined} tuning={home?tuning:undefined} activity={activity||"idle"}/>
     <div ref={waveRef} aria-label="N7 completion shockwave" data-progress="-1" style={{display:"none",position:"fixed",pointerEvents:"none",border:"2px solid #ffe0a6",boxShadow:"0 0 12px #63ddff88",borderRadius:"50%",zIndex:3}}/>
     {home&&onNavigate?<header className="n7-home-header">
-      <div className="n7-home-brand"><strong>N7</strong><span>Humanoid</span></div>
+      <N7MiraOverview/>
       <div className="n7-home-actions">
         <div className="n7-home-menu-anchor">
           <button ref={menuButton} className="n7-home-pill n7-home-menu-button" type="button"

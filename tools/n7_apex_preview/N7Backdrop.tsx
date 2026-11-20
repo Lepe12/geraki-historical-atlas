@@ -1,13 +1,51 @@
 "use client";
 import { forwardRef, useEffect, useImperativeHandle, useRef, type CSSProperties } from "react";
 import { N7_BACKDROP_REFERENCE } from "./N7BackdropReference";
+import N7MiraField from "./N7MiraField";
+import type {GuideMood} from "./N7GuideScene";
 
 type Highlight={x:number;y:number;phase:number;sprite:HTMLCanvasElement};
 
 export type N7BackdropHandle={wave:(x:number,y:number,radius:number,fade:number)=>void;clear:()=>void;setVoiceLevel:(level:number)=>void};
 export type N7BackdropTuning={fog:number;brightness:number;motion:number};
-type BackdropProps={effects:boolean;reduced:boolean;ambience?:{wide:string;portrait:string};tuning?:N7BackdropTuning};
-const N7Backdrop=forwardRef<N7BackdropHandle,BackdropProps>(function N7Backdrop({effects,reduced,ambience,tuning},ref) {
+type BackdropProps={effects:boolean;reduced:boolean;ambience?:{wide:string;portrait:string};tuning?:N7BackdropTuning;activity?:GuideMood};
+
+// MIRA CoreMatter's harmonic orbit paths projected behind the N7 figure.
+// Adapted from MIRA-HUD (MIT). See N7-MIRA-HUD-LICENSE.txt.
+const ORBIT_TILTS=[-.95,.65,-.35,1.12,.24,-1.34];
+function paintOrbits(ctx:CanvasRenderingContext2D,w:number,h:number,time:number,energy:number,brightness:number){
+  const radius=Math.min(w*.405,h*.37),cx=w*.5,cy=h*.48;
+  ctx.save();
+  ctx.globalCompositeOperation="screen";
+  for(const [i,tilt] of ORBIT_TILTS.entries()){
+    const phase=i*1.29;
+    const az=tilt+.12*Math.sin(time*.09+phase);
+    const cos=Math.cos(az),sin=Math.sin(az);
+    const oval=.64+(i%3)*.13;
+    const warm=i%3===1;
+    const gradient=ctx.createLinearGradient(cx-radius,cy-radius,cx+radius,cy+radius);
+    gradient.addColorStop(0,warm?"#dd8d43":"#4bbfdf");
+    gradient.addColorStop(.44,warm?"#ffe1ae":"#bcf6ff");
+    gradient.addColorStop(1,warm?"#9d5f39":"#2b7fb3");
+    ctx.strokeStyle=gradient;
+    ctx.shadowColor=warm?"#f7af64":"#59dfff";
+    ctx.shadowBlur=4+energy*8;
+    ctx.globalAlpha=Math.min(.82,(.29+(i%2)*.17+energy*.24)*brightness);
+    ctx.lineWidth=.65+(i%2)*.28+energy*.4;
+    ctx.beginPath();
+    for(let step=0;step<=96;step++){
+      const a=(step%96)/96*Math.PI*2;
+      const rr=radius*(.91+i*.037)*(1+.10*Math.sin(3*a+phase+time*.12)+.043*Math.sin(5*a-phase-time*.2));
+      const x=Math.cos(a)*rr,y=Math.sin(a)*rr*oval;
+      const px=cx+x*cos-y*sin,py=cy+(x*sin+y*cos)*1.12;
+      if(step===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+    }
+    ctx.closePath();ctx.stroke();
+  }
+  ctx.restore();
+}
+
+const N7Backdrop=forwardRef<N7BackdropHandle,BackdropProps>(function N7Backdrop({effects,reduced,ambience,tuning,activity="idle"},ref) {
   const source=ambience?.wide??N7_BACKDROP_REFERENCE;
   const portrait=ambience?.portrait;
   const hostRef=useRef<HTMLDivElement>(null);
@@ -141,6 +179,7 @@ const N7Backdrop=forwardRef<N7BackdropHandle,BackdropProps>(function N7Backdrop(
           sctx2.stroke();
         }
       }
+      if(tuning)paintOrbits(sctx2,w,h,t,level,tuning.brightness/100);
     };
     strandRaf=requestAnimationFrame(drawStrands);
     image.addEventListener("load",load);
@@ -162,6 +201,7 @@ const N7Backdrop=forwardRef<N7BackdropHandle,BackdropProps>(function N7Backdrop(
       {portrait&&<source media="(max-width: 720px) and (orientation: portrait)" srcSet={portrait}/>}
       <img ref={imageRef} src={source} alt={ambience?"":"Cinematic mountain landscape"} style={{position:"absolute",width:"100%",height:"100%",objectFit:"cover"}} />
     </picture>
+    {ambience&&tuning&&effects&&!reduced&&<N7MiraField tuning={tuning} activity={activity} voiceLevel={voiceLevel}/>}
     <style>{`@keyframes n7-ridge-light {0%,100% {opacity:.08} 50% {opacity:.78}}@keyframes n7-smoke-drift {0% {transform:scale(1.10) translate(-1.8%,.8%)} 100% {transform:scale(1.14) translate(1.8%,-1.2%)}}`}</style>
     <div ref={layerRef} data-ridge-layer="" aria-label="Existing ridge illumination" style={{position:"absolute",inset:0}}>
       {/* Slow smoke drift: a soft, faint copy of the same raster moving very slowly. */}

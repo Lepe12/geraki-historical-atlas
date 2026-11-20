@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {createPortal} from "react-dom";
 import {Captions} from "lucide-react";
+import {N7MiraStatus} from "./N7MiraHud";
 import useN7Voice from "./useN7Voice";
 import {FEMALE_VOICE_ID} from "./N7FemaleVoice";
 import {N7_GUIDE,N7_GUEST_CHAT} from "./N7BuildFlags";
@@ -488,13 +489,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
       {guideOpen&&voiceHost&&createPortal(<div className={compactGuide?"n7-home-voice":undefined} style={compactGuide?undefined:{position:"relative",zIndex:5,padding:"6px 12px",background:"#04121beb",flex:"none",maxHeight:"38dvh",overflow:"auto"}}>
         {compactGuide?<div className="n7-home-dock" data-phase={livePhase}>
           <div className="n7-home-dock-row">
-            <div className="n7-home-voice-state">
-              <div className="n7-home-meter" aria-hidden="true">
-                {[3,5,4,8,6,11,8,14,10,16,9,13,8,10,5,6,3].map((height,i)=><i key={i} style={{height}}/>)}
-              </div>
-              <span role="status" aria-label="Φωνητική κατάσταση N7">{liveStatus}</span>
-              {!callDisabled&&<span className="n7-home-call-hint">{coreHint}</span>}
-            </div>
+            <N7MiraStatus label={liveStatus} hint={callDisabled?undefined:coreHint}/>
             {!needsLogin&&<button type="button" className="n7-home-caption-button" aria-pressed={captionsOpen}
               aria-controls="n7-home-captions" title="Υπότιτλοι" aria-label="Υπότιτλοι" onClick={()=>setCaptionsOpen(value=>!value)}>
               <Captions size={18} aria-hidden="true"/>

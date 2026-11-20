@@ -20,26 +20,29 @@
   padding: max(18px, env(safe-area-inset-top)) var(--n7-home-gutter) 12px;
 }
 
-.n7-home-brand {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  color: var(--n7-home-dim);
-  font-size: 13px;
+/* Lamp and clock arrangement from MIRA-HUD's Overview (MIT). */
+.n7-mira-overview { width: min(380px, 47vw); pointer-events: none; }
+.n7-mira-filament {
+  position: relative;
+  height: 2px;
+  border-radius: 2px;
+  background: #d2f4ff;
+  box-shadow: 0 0 10px #71d6f9, 0 0 26px #52bfe8a0;
 }
-
-.n7-home-brand strong {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border: 1px solid var(--n7-home-edge);
-  border-radius: 5px;
-  color: var(--n7-home-cyan);
-  background: #0814219e;
-  font-size: 17px;
-  letter-spacing: -.06em;
+.n7-mira-filament::before {
+  content: "";
+  position: absolute;
+  inset: -3px auto auto 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e7faff;
+  box-shadow: 0 0 13px #7ae4ff;
 }
+.n7-mira-name { margin-top: 5px; color: #a1c5d1; font: 9px ui-monospace,monospace; letter-spacing: .34em; text-transform: uppercase; }
+.n7-mira-overview time { display: grid; gap: 4px; margin-top: 17px; color: #eff9fc; }
+.n7-mira-overview time span { font-size: 34px; font-weight: 300; line-height: 1; letter-spacing: .04em; text-shadow: 0 0 22px #55c9e750; }
+.n7-mira-overview time small { font-size: 10px; letter-spacing: .17em; color: var(--n7-home-dim); text-transform: uppercase; }
 
 .n7-home-menu-anchor { position: relative; grid-area: menu; }
 .n7-home-actions {
@@ -80,7 +83,7 @@
   background: #06112085;
   color: #d5e7ec;
   font-size: 11px;
-  letter-spacing: .20em;
+  letter-spacing: .24em;
   backdrop-filter: blur(6px);
 }
 
@@ -157,7 +160,7 @@
   bottom: max(16px, env(safe-area-inset-bottom));
   transform: translateX(-50%);
   z-index: 5;
-  width: min(460px, calc(100% - 2 * var(--n7-home-gutter)));
+  width: min(520px, calc(100% - 2 * var(--n7-home-gutter)));
 }
 
 .n7-guide-view.n7-live-home #n7-guide-voice > .n7-home-voice {
@@ -177,7 +180,7 @@
 
 .n7-home-dock-row {
   display: grid;
-  grid-template-columns: 42px minmax(0, 194px) 42px;
+  grid-template-columns: 42px minmax(0, 420px) 42px;
   justify-content: center;
   align-items: center;
   gap: 8px;
@@ -191,31 +194,27 @@
   color: var(--n7-home-text);
   text-shadow: 0 1px 9px #000;
   font-size: 12px;
-  letter-spacing: .06em;
 }
 
-.n7-home-call-hint { color: #b2c6d0; font-size: 11px; letter-spacing: 0; }
+.n7-mira-state { color: #b9e7f0; font: 500 11px ui-monospace,monospace; letter-spacing: .36em; text-transform: uppercase; }
+.n7-home-call-hint { color: #9ab5c0; font: 10px ui-monospace,monospace; letter-spacing: .08em; text-transform: uppercase; }
+.n7-mira-status-dots { display: flex; justify-content: center; gap: 7px; padding: 2px 0; }
+.n7-mira-status-dots i { width: 4px; height: 4px; border-radius: 50%; background: #7ddaf0; opacity: .66; }
 
 .n7-home-meter {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 22px;
-  gap: 3px;
+  display: block;
+  width: 100%;
+  overflow: visible;
   color: var(--n7-home-dim);
 }
 
-.n7-home-meter::before,
-.n7-home-meter::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, currentColor); opacity: .45; }
-.n7-home-meter::after { transform: scaleX(-1); }
-.n7-home-meter i {
-  flex: 0 0 2px;
-  border-radius: 2px;
-  background: currentColor;
-  transform: scaleY(calc(.18 + .95 * var(--n7-status-energy, 0)));
+.n7-mira-bar {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scaleY(calc(.13 + 1.22 * var(--n7-status-energy, 0)));
 }
 
-.n7-home-dock[data-phase="listening"] .n7-home-meter i { transform: scaleY(.42); }
+.n7-home-dock[data-phase="listening"] .n7-mira-bar { transform: scaleY(.42); }
 .n7-home-dock[data-phase="listening"] .n7-home-meter,
 .n7-home-dock[data-phase="speaking"] .n7-home-meter { color: var(--n7-home-cyan); }
 .n7-home-dock[data-phase="thinking"] .n7-home-meter { color: var(--n7-home-gold); }
@@ -260,8 +259,8 @@
   top: max(96px, calc(env(safe-area-inset-top) + 80px));
   right: var(--n7-home-gutter);
   z-index: 8;
-  width: min(376px, calc(100vw - 36px));
-  max-height: min(60dvh, 330px);
+  width: min(340px, calc(100vw - 36px));
+  max-height: min(70dvh, 545px);
   overflow: auto;
   display: grid;
   gap: 12px;
@@ -287,6 +286,18 @@
   opacity: var(--n7-fog-opacity, 1);
   filter: brightness(var(--n7-field-brightness, 1));
 }
+
+.n7-mira-field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.n7-mira-field[data-rendered="true"] { opacity: .9; }
 
 /* Light across the full-screen backdrop, beneath the existing figure. */
 .n7-ambient-field::after {
@@ -326,12 +337,16 @@
     grid-template-areas: "appearance menu";
   }
 
+  .n7-mira-overview { width: min(245px, 66vw); }
+  .n7-mira-overview time { margin-top: 10px; }
+  .n7-mira-overview time span { font-size: 26px; }
+
   .n7-live-home .n7-home-actions button.n7-home-pill { min-height: 34px; letter-spacing: .12em; }
 
   .n7-home-menu { top: auto; right: 0; bottom: calc(100% + 8px); }
 
   .n7-live-home .n7-guide-main {
-    inset: max(55px, calc(env(safe-area-inset-top) + 46px)) 0 calc(var(--n7-status-bottom) + 64px);
+    inset: max(82px, calc(env(safe-area-inset-top) + 69px)) 0 calc(var(--n7-status-bottom) + 76px);
   }
 
   .n7-guide-view.n7-live-home #n7-guide-voice {
