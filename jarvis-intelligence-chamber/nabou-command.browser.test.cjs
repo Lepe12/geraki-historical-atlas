@@ -18,7 +18,7 @@ for(const t of ['towns','monuments','people','routes','sources']){await p.click(
 await p.screenshot({path:'/home/claude/nabou-work/ch/t-people.png'});
 // book + timeline
 await p.click('.nbc-seg button[data-book="Book III"]');const vis=await p.$$eval('.nbc-pin:not([hidden])',x=>x.length);ok('book III visible pins '+vis);
-await p.click('.nbc-yr');await p.waitForTimeout(300);const per=await p.evaluate(()=>NABOU_COMMAND.state);assert.equal(per.from,per.to);ok('timeline year → period '+per.from);
+await p.click('.nbc-yr:not(.nbc-yr-ev)');await p.waitForTimeout(300);const per=await p.evaluate(()=>NABOU_COMMAND.state);assert.equal(per.from,per.to);ok('timeline year → period '+per.from);
 await p.click('.nbc-tl-all');await p.click('.nbc-seg button[data-book="All"]');
 // nav panel button + layers
 await p.click('.n7-nav [data-nbc-panel="towns"]');assert.equal(await p.evaluate(()=>NABOU_COMMAND.state.tab),'towns');ok('Neocom panel button');
