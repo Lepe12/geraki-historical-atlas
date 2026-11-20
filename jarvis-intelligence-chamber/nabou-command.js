@@ -319,7 +319,9 @@
  new MutationObserver(queueDeclutter).observe(plane,{attributes:true,attributeFilter:['style']});
  addEventListener('resize',queueDeclutter);
  // The 3D camera moves without DOM events we can observe; while 3D is on, re-check a few times a second.
- setInterval(()=>{if(M3()?.enabled&&!document.hidden)declutter();},350);
+ // The 3D camera and late layout (landing page, docked map) give no event we can observe: re-check
+ // often while 3D is on, and every second in 2D (cheap: one box read per pin).
+ let clTick=0;setInterval(()=>{if(document.hidden)return;if(M3()?.enabled||++clTick%3===0)declutter();},350);
 
  /* ───── timeline: year marks from the records, on the existing range ───── */
  const track=shell.querySelector('.n7-timeline-track');const marksEl=h('div',{class:'nbc-tl',id:'nbcTimeline','aria-label':'Έτη με εγγραφές'});
