@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {createPortal} from "react-dom";
-import {Captions, LogIn, Mic, PhoneOff} from "lucide-react";
+import {Captions} from "lucide-react";
 import useN7Voice from "./useN7Voice";
 import {FEMALE_VOICE_ID} from "./N7FemaleVoice";
 import {N7_GUIDE,N7_GUEST_CHAT} from "./N7BuildFlags";
@@ -114,6 +114,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   const readAnswer=(id:string,messages:Msg[])=>{const replies=messages.filter(m=>m.role==="assistant");if(replies.length>(heard.current[id]||0)){heard.current[id]=replies.length;voiceRef.current.speak(speakable(replies.at(-1)!.content));}};
   const readAnswerRef=useRef(readAnswer);readAnswerRef.current=readAnswer;
   const [voiceOpen,setVoiceOpen]=useState(false),[voiceHost,setVoiceHost]=useState<HTMLElement|null>(null);
+  const [callHost,setCallHost]=useState<HTMLElement|null>(null);
   const [captionsOpen,setCaptionsOpen]=useState(false);
   const [diagnosticsView,setDiagnosticsView]=useState(false);
   const compactGuide=home&&!diagnosticsView;
@@ -121,6 +122,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   const [loginBusy,setLoginBusy]=useState(false);
   useEffect(()=>{
     setVoiceHost(guideOpen?document.getElementById("n7-guide-voice"):null);
+    setCallHost(guideOpen?document.getElementById("n7-guide-call"):null);
     setDiagnosticsView(new URLSearchParams(window.location.search).get("controls")==="1");
     if(!guideOpen)voiceRef.current.suspend();
   },[guideOpen]);
@@ -474,28 +476,29 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
     }
   };
   const liveCaptions=voice.phase==="listening"&&message.trim()?message.trim():lastAnswer;
+  const callLabel=needsLogin?"Σύνδεση":voice.conversation?"Λήξη κλήσης":"Έναρξη κλήσης";
+  const callDisabled=!needsLogin&&!voice.conversation&&(waitingForAnswer||voiceUnavailable);
+  const coreHint=needsLogin?"Πάτησε το φως για σύνδεση":voice.conversation?"Πάτησε το φως για λήξη":"Πάτησε το φως για κλήση";
   return (
     <>
+      {guideOpen&&compactGuide&&callHost&&createPortal(<button type="button" data-n7-conversation-toggle="" className="n7-home-call"
+        aria-label={callLabel} title={callLabel} aria-pressed={needsLogin?undefined:voice.conversation}
+        aria-expanded={needsLogin?voiceOpen:undefined}
+        disabled={callDisabled} onClick={toggleConversation}/>,callHost)}
       {guideOpen&&voiceHost&&createPortal(<div className={compactGuide?"n7-home-voice":undefined} style={compactGuide?undefined:{position:"relative",zIndex:5,padding:"6px 12px",background:"#04121beb",flex:"none",maxHeight:"38dvh",overflow:"auto"}}>
         {compactGuide?<div className="n7-home-dock" data-phase={livePhase}>
           <div className="n7-home-dock-row">
             <div className="n7-home-voice-state">
-              <div className="n7-home-meter" aria-hidden="true"><i/><i/><i/><i/><i/></div>
+              <div className="n7-home-meter" aria-hidden="true">
+                {[3,5,4,8,6,11,8,14,10,16,9,13,8,10,5,6,3].map((height,i)=><i key={i} style={{height}}/>)}
+              </div>
               <span role="status" aria-label="Φωνητική κατάσταση N7">{liveStatus}</span>
+              {!callDisabled&&<span className="n7-home-call-hint">{coreHint}</span>}
             </div>
-            <div className="n7-home-dock-controls">
-              {!needsLogin&&<button type="button" className="n7-home-caption-button" aria-pressed={captionsOpen}
-                aria-controls="n7-home-captions" title="Υπότιτλοι" aria-label="Υπότιτλοι" onClick={()=>setCaptionsOpen(value=>!value)}>
-                <Captions size={16} aria-hidden="true"/><span>Υπότιτλοι</span>
-              </button>}
-              <button type="button" data-n7-conversation-toggle="" className="n7-home-call"
-                aria-pressed={needsLogin?undefined:voice.conversation} aria-expanded={needsLogin?voiceOpen:undefined}
-                disabled={!needsLogin&&!voice.conversation&&(waitingForAnswer||voiceUnavailable)}
-                onClick={toggleConversation}>
-                {needsLogin?<LogIn size={17} aria-hidden="true"/>:voice.conversation?<PhoneOff size={17} aria-hidden="true"/>:<Mic size={17} aria-hidden="true"/>}
-                {needsLogin?"Σύνδεση":voice.conversation?"Λήξη κλήσης":"Έναρξη κλήσης"}
-              </button>
-            </div>
+            {!needsLogin&&<button type="button" className="n7-home-caption-button" aria-pressed={captionsOpen}
+              aria-controls="n7-home-captions" title="Υπότιτλοι" aria-label="Υπότιτλοι" onClick={()=>setCaptionsOpen(value=>!value)}>
+              <Captions size={18} aria-hidden="true"/>
+            </button>}
           </div>
           {!needsLogin&&<div id="n7-home-captions" hidden={!captionsOpen} className="n7-home-captions" aria-live="polite">
             {liveCaptions?richText(liveCaptions):"Δεν υπάρχει ακόμα απομαγνητοφώνηση."}

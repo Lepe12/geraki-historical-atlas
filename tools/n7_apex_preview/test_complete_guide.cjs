@@ -38,22 +38,22 @@ async function verifyHumanoidHome(browser, homeUrl) {
       await page.goto(homeUrl);
       const dialog = page.getByRole("dialog",{name:"N7 Humanoid preview"});
       const menu = dialog.getByRole("button",{name:"Μενού",exact:true});
-      const loginToggle = dialog.locator("[data-n7-conversation-toggle]");
-      await dialog.getByRole("button",{name:"Σύνδεση",exact:true}).waitFor();
+      const loginToggle = dialog.locator("#n7-guide-call").getByRole("button",{name:"Σύνδεση",exact:true});
+      const appearance = dialog.getByRole("button",{name:"Εμφάνιση",exact:true});
+      await loginToggle.waitFor();
       const backdrop=width===390?"n7-ambient-portrait-v1.webp":"n7-ambient-v1.webp";
       await page.waitForFunction(expected=>{
         const picture=document.querySelector(".n7-ambient-field img");
         return picture?.naturalWidth>0&&picture.currentSrc.endsWith("/"+expected);
       },backdrop);
       await dialog.locator(hostSelector+" canvas").first().waitFor({state:"attached"});
-      assert.deepEqual((await dialog.getByRole("button").allTextContents()).map(label=>label.trim()),["Μενού","Σύνδεση"]);
+      assert.equal(await dialog.getByRole("button").count(),3);
       await menu.click();
       const navigation = dialog.getByRole("navigation",{name:"Πλοήγηση N7"});
       await navigation.getByRole("button",{name:"Γραπτή συνομιλία"}).waitFor();
       await page.keyboard.press("Escape");
       await navigation.waitFor({state:"hidden"});
-      await menu.click();
-      await navigation.getByRole("button",{name:"Εμφάνιση",exact:true}).click();
+      await appearance.click();
       const fog=dialog.getByRole("slider",{name:"Ομίχλη",exact:true});
       await fog.fill("50");
       const background=dialog.locator(".n7-ambient-field img");
@@ -62,6 +62,7 @@ async function verifyHumanoidHome(browser, homeUrl) {
       assert.equal(await fog.inputValue(),"100");
       await page.keyboard.press("Escape");
       await fog.waitFor({state:"hidden"});
+      assert.equal(await appearance.evaluate(button=>button===document.activeElement),true);
       await loginToggle.click();
       const password = dialog.getByLabel("Κωδικός N7");
       await password.waitFor();
