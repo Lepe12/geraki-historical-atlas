@@ -49,7 +49,7 @@
  const atlas=()=>window.NABOU_PRO_ATLAS,M3=()=>window.NABOU_MAP3D,reader=()=>window.N7_READER;
 
  let DATA={places:[],routes:[]},byId=new Map(),linked=new Map(),proToRec=new Map();
- let BASES={bases:[]},baseById=new Map(),EVENTS={events:[]},THESIS={};
+ let TOPO={bases:[],extra:[]},topoByBase=new Map(),BASES={bases:[]},baseById=new Map(),EVENTS={events:[]},THESIS={};
  /* ───── pirate bases (M. Gourgourini, thesis 2024 · ArcGIS layers): flag symbols of the thesis legend ─────
     red flag = Christian base, green = Muslim; grey pole = 16th c., black = 17th; a base whose faith changes
     between the centuries shows both colours (16th c. half at the pole). */
@@ -72,6 +72,7 @@
    +`<rect x="3.6" y="3.4" width=".7" height="25" rx=".35" fill="#fff" opacity=".3"/>`
    +`<circle cx="4.3" cy="2.4" r="1.8" fill="#c9a24e" stroke="#4a3216" stroke-width=".6"/><circle cx="3.7" cy="1.8" r=".55" fill="#fff4cc" opacity=".85"/>`;return s;}
  function flagSvg(b,size=26){const f=baseFaiths(b),c16=f['16'],c17=f['17'];return flagArt(FAITH[c16||c17][1],FAITH[c17||c16][1],c16,c17,size);}
+ const oldNames=b=>(topoByBase.get(b.id)?.names||[]).map(n=>n.name).join(' ');
  const baseName=b=>b.port&&b.port!==b.area?b.port+' · '+b.area:b.area;
  function baseVisible(b){const {from,to}=period(),f=baseFaiths(b);
   return Object.entries(f).some(([c,fa])=>(c==='16'?from<=1599:to>=1600)&&ui.layers[fa]!==false&&(ui.century==='all'||ui.century===c)&&(ui.faith==='all'||ui.faith===fa));}
@@ -187,6 +188,11 @@
   out.push(h('div',{class:'nbc-card'},h('div',{class:'nbc-type'},flagSvg(b,16),' Πειρατικό ορμητήριο'),h('h3',{class:'nbc-name',text:b.port||b.area}),
    h('p',{class:'nbc-alt',text:b.port&&b.port!==b.area?b.area:''}),
    h('div',{class:'nbc-pills'},...Object.entries(baseFaiths(b)).map(([c,fa])=>h('span',{class:'nbc-pill',style:'border-color:'+FAITH[fa][1]+'99;color:#f0e6d4;background:'+FAITH[fa][1]+'33'},CENT[c]+' · '+FAITH[fa][0])),stChip(b.coordinateStatus))));
+  {const t=topoByBase.get(b.id);if(t&&t.names.length){const msc=t.names.filter(n=>n.src==='msc'),cl=t.names.filter(n=>n.src==='claude'),CONF={high:'υψηλή',medium:'μέτρια',low:'χαμηλή'};
+   out.push(sect('Ονόματα στις πηγές',
+    msc.length?h('div',{class:'nbc-names-row'},h('span',{class:'nbc-pill ok',text:'Επιβεβαιωμένα'}),h('b',{text:msc.map(n=>n.name).join(' · ')}),t.modern?h('small',{text:' → σήμερα '+t.modern}):null):null,
+    cl.length?h('div',{class:'nbc-names-row'},h('span',{class:'nbc-pill warn',text:'Claude · προς έλεγχο'}),h('span',{text:cl.map(n=>n.name+(n.level==='area'?' (νησί/περιοχή)':'')).join(' · ')}),h('small',{text:' · βεβαιότητα: '+[...new Set(cl.map(n=>CONF[n.conf]||n.conf))].join('/')})):null,
+    h('p',{class:'nbc-miss',style:'margin:6px 0 0',text:(msc.length?'Επιβεβαιωμένα: μεταπτυχιακή Μ. Γουργουρίνη (2026), Παράρτημα Α. ':'')+(cl.length?'Προτάσεις του Claude με τη μέθοδο της εργασίας· δεν είναι τεκμηρίωση.':'')})));}}
   {const rs=ruleSect(b);if(rs)out.push(rs);}
   {const cs=(BV.cites||[]).filter(c=>c.area===b.area);if(cs.length)out.push(sect('Και στον Μπελαβίλα (1992)',...cs.map(c=>h('div',{class:'nbc-ev th context'},h('div',{class:'nbc-ev-h'},h('b',{class:'nbc-ev-y',text:'σελ. '+c.pages}),h('span',{text:'Πειρατικό καταφύγιο / ενέδρα'})),h('p',{text:c.text}),h('small',{class:'nbc-ev-src',text:BV.source?.cite||''})))));}
   for(const [c,list] of Object.entries(b.centuries))for(const e of list){
@@ -216,7 +222,7 @@
  function baseN7(b){const cs=Object.keys(b.centuries);const from=cs.includes('16')?1500:1600,to=cs.includes('17')?1700:1599;
   return 'https://bot.piratecartography.com/#atlas='+encodeURIComponent(JSON.stringify({schema:'n7-atlas-handoff/v1',place:baseName(b).slice(0,100),from,to,sources:[]}));}
  function basesView(){const q=fold(ui.q.bases);
-  const all=BASES.bases.filter(baseVisible).filter(b=>!q||fold(b.area+' '+b.port+' '+Object.values(b.centuries).flat().map(e=>e.pirates||'').join(' ')).includes(q));
+  const all=BASES.bases.filter(baseVisible).filter(b=>!q||fold(b.area+' '+b.port+' '+oldNames(b)+' '+Object.values(b.centuries).flat().map(e=>e.pirates||'').join(' ')).includes(q));
   const f=(key,v,l)=>h('button',{type:'button',class:'nbc-filter','aria-pressed':String(ui[key]===v),onclick:()=>{ui[key]=v;marks();paint();}},l);
   const groups=new Map();for(const b of all.sort((a,c)=>a.area.localeCompare(c.area,'el')||a.port.localeCompare(c.port,'el')))(groups.get(b.area)||groups.set(b.area,[]).get(b.area)).push(b);
   const out=[search('bases','Αναζήτηση ορμητηρίου ή πειρατών…'),
@@ -633,7 +639,8 @@
   const search0=a.search,select0=a.select;
   a.search=v=>{const base=search0(v)||[],q=fold(v);if(!q)return base;const have=new Set(base.map(x=>x.id));
    const extra=DATA.places.filter(p=>!linked.get(p.id)&&fold([p.place,p.historicalNames,p.modernName].join(' ')).includes(q)).slice(0,6).map(p=>({id:p.id,name:nameOf(p)+' · GERAKI'}));
-   const bx=BASES.bases.filter(b=>fold(b.area+' '+b.port).includes(q)).slice(0,6).map(b=>({id:b.id,name:baseName(b)+' · ορμητήριο'}));
+   const bx=BASES.bases.filter(b=>fold(b.area+' '+b.port+' '+oldNames(b)).includes(q)).slice(0,6).map(b=>{const hit=(topoByBase.get(b.id)?.names||[]).find(n=>fold(n.name).includes(q));
+    return {id:b.id,name:(hit&&!fold(b.area+' '+b.port).includes(q)?hit.name+' → ':'')+baseName(b)+' · ορμητήριο'};});
    return [...bx,...base,...extra.filter(x=>!have.has(x.id))];};
   // Reference-place ids keep the original path (also used by the N7 map link); GERAKI ids open the record.
   a.select=(id,opt)=>{if(byId.has(id))return selectRec(id);if(baseById.has(id))return selectBase(id);const r=select0(id,opt);if(a.selected===id){ui.base=null;ui.pro=id;ui.rec=proToRec.get(id)||null;openTab('history');marks();}return r;};
@@ -647,6 +654,7 @@
  // Dated events: the thesis (ch. 2, with page) and the site's harbour pages.
  Promise.all(['./data/thesis-events.json','./data/pirate-events.json'].map(u=>fetch(u,{cache:'no-cache'}).then(r=>r.ok?r.json():null).catch(()=>null))).then(([t,site])=>{
   if(t)THESIS=t;EVENTS={events:[...(t?.events||[]),...(site?.events||[])]};buildTimeline();if(!dock.hidden)paint();body.dataset.nbcEvents=String(EVENTS.events.length);});
+ fetch('./data/toponyms.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(d=>{if(!d)return;TOPO=d;topoByBase=new Map(d.bases.map(e=>[e.base,e]));for(const [id,e] of [...bpins,...bpins3d]){const t=topoByBase.get(id);if(t)e.title=e.title+' · '+t.names.map(n=>n.name).slice(0,4).join(', ');}body.dataset.nbcTopo=String(d.bases.length);}).catch(()=>{});
  fetch('./data/belavilas.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(d=>{if(!d)return;BV=d;BVById=new Map([...d.routes,...d.points].map(x=>[x.id,x]));buildBV();body.dataset.nbcBv=String(d.points.length);}).catch(()=>{});
  fetch('./data/pirate-bases.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.json();}).then(d=>{
   BASES=d;baseById=new Map(d.bases.map(b=>[b.id,b]));buildBases();body.dataset.nbcBases=String(d.bases.length);if(!dock.hidden)paint();
