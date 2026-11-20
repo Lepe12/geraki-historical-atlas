@@ -217,7 +217,7 @@
  const layer=h('div',{class:'nbc-geo',id:'nbcGeo'});layer.style.width=C.W+'px';layer.style.height=C.H+'px';
  const rsvg=document.createElementNS(NS,'svg');rsvg.setAttribute('class','nbc-routes');rsvg.setAttribute('viewBox','0 0 '+C.W+' '+C.H);rsvg.setAttribute('width',C.W);rsvg.setAttribute('height',C.H);
  layer.append(rsvg);plane.append(layer);
- const syncScale=()=>{const sc=view2d().s;layer.style.setProperty('--nbc-inv',String(1/sc));layer.classList.toggle('far',sc<1.8);};
+ const syncScale=()=>{const sc=view2d().s;layer.style.setProperty('--nbc-inv',String(1/sc));layer.classList.toggle('far',sc<1.3);};
  new MutationObserver(syncScale).observe(plane,{attributes:true,attributeFilter:['style']});syncScale();
  const routePts=r=>{const a=byId.get(r.from?.[0]?.id),b=byId.get(r.to?.[0]?.id);if(!a||!b)return [];
   return [Array.isArray(r.displayStart)?r.displayStart:[a.lat,a.lon],...(r.waypoints||[]).filter(Array.isArray),Array.isArray(r.displayEnd)?r.displayEnd:[b.lat,b.lon]];};
@@ -239,7 +239,32 @@
  function marks(){
   for(const [id,b] of [...pins,...pins3d]){const p=byId.get(id),on=visible(p)&&ui.status[p.coordinateStatus||'NEEDS RESEARCH']!==false&&(LABEL_ONLY.has(String(p.atlasSymbol).toLowerCase())?ui.layers.labels:ui.layers.towns);b.hidden=!on;b.toggleAttribute('data-sel',ui.rec===id);}
   for(const [id,l] of lines){const r=DATA.routes.find(x=>x.id===id);l.style.display=ui.layers.routes&&visible(r)&&ui.rtypes.get(r.type)!==false?'':'none';}
+  if(typeof queueDeclutter==='function')queueDeclutter();
  }
+
+ /* ───── decluttering: nearby pins fold into the nearest shown marker («+n»), in 2D and 3D ─────
+    Screen-space only (element boxes); no position changes. Larger towns and reference places stay. */
+ const R=38;let clT=0;
+ function declutter(){
+  const three=!!M3()?.enabled,box=view.getBoundingClientRect();
+  for(const e of document.querySelectorAll('[data-nbc-more]'))e.removeAttribute('data-nbc-more'),e.removeAttribute('data-nbc-names');
+  for(const e of document.querySelectorAll('[data-nbc-fold]'))e.removeAttribute('data-nbc-fold');
+  const refs=[...document.querySelectorAll(three?'.pro-3d-place':'.pro-place-marker')].filter(e=>!e.hidden&&e.offsetParent);
+  const mine=[...(three?pins3d:pins).values()].filter(e=>!e.hidden&&e.offsetParent);
+  const rank=e=>e.hasAttribute('data-sel')?0:e.classList.contains('major')?1:e.classList.contains('lab')?3:2;
+  mine.sort((a,b)=>rank(a)-rank(b));
+  const pt=e=>{const r=e.getBoundingClientRect();return {x:r.left+r.width/2,y:e.classList.contains('lab')?r.top+r.height/2:r.bottom-6,ok:r.width>0&&r.right>box.left&&r.left<box.right&&r.bottom>box.top&&r.top<box.bottom};};
+  const heads=refs.map(e=>({e,...pt(e),n:[]}));
+  for(const e of mine){const q=pt(e);if(!q.ok)continue;if(e.hasAttribute('data-sel')){heads.push({e,...q,n:[]});continue;}
+   const h0=heads.find(hd=>Math.hypot(hd.x-q.x,hd.y-q.y)<R);
+   if(h0){h0.n.push(e.querySelector('span')?.textContent||'');e.setAttribute('data-nbc-fold','');}else heads.push({e,...q,n:[]});}
+  for(const hd of heads)if(hd.n.length){hd.e.setAttribute('data-nbc-more','+'+hd.n.length);hd.e.setAttribute('data-nbc-names','Κοντά: '+hd.n.join(', ')+' · μεγέθυνε για να φανούν');}
+ }
+ const queueDeclutter=()=>{cancelAnimationFrame(clT);clT=requestAnimationFrame(declutter);};
+ new MutationObserver(queueDeclutter).observe(plane,{attributes:true,attributeFilter:['style']});
+ addEventListener('resize',queueDeclutter);
+ // The 3D camera moves without DOM events we can observe; while 3D is on, re-check a few times a second.
+ setInterval(()=>{if(M3()?.enabled&&!document.hidden)declutter();},350);
 
  /* ───── timeline: year marks from the records, on the existing range ───── */
  const track=shell.querySelector('.n7-timeline-track');const marksEl=h('div',{class:'nbc-tl',id:'nbcTimeline','aria-label':'Έτη με εγγραφές'});
