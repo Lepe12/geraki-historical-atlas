@@ -18,6 +18,10 @@ html,body{height:100%;margin:0}body{font-family:'Plus Jakarta Sans',sans-serif;b
 #realMap .maplibregl-marker{z-index:700!important;overflow:visible!important}
 #realMap .settlement-wrap{min-width:90px;min-height:70px;overflow:visible!important}
 #realMap .label-only{position:relative;z-index:710}
+/* Marker roots must stay absolutely positioned (MapLibre places them by transform). The relative
+   rules above and below otherwise put settlements and labels in normal flow, stacked away from their
+   stored coordinates. Placement fix only: coordinates, sizes and artwork are unchanged. */
+#realMap .settlement-wrap.maplibregl-marker,#realMap .label-only.maplibregl-marker{position:absolute}
 .maplibregl-canvas{filter:saturate(1.06) contrast(1.08) brightness(.98)}
 .maplibregl-ctrl-attrib{background:rgba(20,17,13,.72)!important;color:#c9b48d!important;font-size:10px!important}
 .maplibregl-ctrl-attrib a{color:#e1bd78!important}

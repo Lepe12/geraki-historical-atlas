@@ -74,6 +74,10 @@ async function routes(ctx){
   ok('map ready on preview origin');
   const markers=await page.evaluate(()=>document.querySelectorAll('#realMap .settlement-wrap,#realMap .label-only').length);
   assert.ok(markers>=40,'markers '+markers);ok('real data.json markers drawn',String(markers));
+  await page.waitForFunction(()=>!atlasMap.isMoving()&&atlasMap.loaded(),null,{timeout:20000});await page.waitForTimeout(300);
+  const off=await page.evaluate(()=>[...document.querySelectorAll('#realMap .settlement-wrap,#realMap .label-only')].map(e=>{const p=byId.get(e.dataset.placeId),r=e.getBoundingClientRect(),q=atlasMap.project([p.lon,p.lat]);
+    return {n:p.place,dx:Math.round(r.left+r.width/2-q.x),dy:Math.round(r.bottom-q.y)};}).filter(x=>Math.abs(x.dx)>60||Math.abs(x.dy)>200));
+  assert.deepEqual(off,[],'markers away from stored coordinates');ok('every marker sits at its stored coordinate');
   await page.waitForFunction(()=>[...document.querySelectorAll('.settlement-img')].every(i=>i.complete&&i.naturalWidth>0),null,{timeout:15000}).catch(()=>{});
   const imgs=await page.evaluate(()=>[...document.querySelectorAll('.settlement-img')].map(i=>({ok:i.complete&&i.naturalWidth>0,src:i.currentSrc})));
   assert.ok(imgs.length&&imgs.every(i=>i.ok),'settlement art loaded: '+JSON.stringify(imgs.filter(i=>!i.ok).slice(0,3)));
