@@ -77,7 +77,7 @@
   return Object.entries(f).some(([c,fa])=>(c==='16'?from<=1599:to>=1600)&&ui.layers[fa]!==false&&(ui.century==='all'||ui.century===c)&&(ui.faith==='all'||ui.faith===fa));}
 
  const ui={tab:'history',rec:null,pro:null,base:null,faith:'all',century:'all',book:'All',typeFilter:'all',q:{towns:'',people:'',sources:'',bases:''},personOpen:null,
-  layers:{towns:true,labels:true,routes:false,christian:true,muslim:true,powers:true,bvroutes:true,bvpoints:true},status:{VERIFIED:true,APPROXIMATE:true,'NEEDS RESEARCH':true},rtypes:new Map()};
+  layers:{towns:true,labels:true,routes:false,christian:true,muslim:true,powers:true,bvroutes:false,bvpoints:true},status:{VERIFIED:true,APPROXIMATE:true,'NEEDS RESEARCH':true},rtypes:new Map()};
 
  /* ───── period: the existing timeline inputs are the single source of truth ───── */
  const rangeInputs=()=>[...document.querySelectorAll('#n7TimelineRange input[type=range]')];
@@ -303,8 +303,26 @@
    d.addEventListener('toggle',()=>{if(d.open)ui.personOpen=x.n;});out.push(d);}
   if(!list.length)out.push(empty('Δεν βρέθηκαν πρόσωπα.'));
   if(ui.personOpen)requestAnimationFrame(()=>recBox.querySelector('.nbc-person[open]')?.scrollIntoView({block:'nearest'}));return out;}
+ function seaRoutesSect(){if(!BV.routes.length)return null;
+  const on=!!ui.routesOnly;
+  return sect('Ναυτικές ρότες του Αιγαίου · Μπελαβίλας 1992',
+   h('p',{class:'nbc-note',style:'margin:0 0 8px',text:on?'Ο χάρτης δείχνει μόνο τις ρότες. Διάλεξε μία για να τη δεις μόνη της.':'Οι ρότες δεν μένουν μόνιμα στον χάρτη: ανοίγουν εδώ, μόνες τους, χωρίς σημαίες και άλλα σημάδια.'}),
+   h('div',{class:'nbc-actions',style:'margin:0 0 8px'},on?h('button',{type:'button',class:'nbc-btn',onclick:()=>setRoutesOnly(false)},'✕ Κλείσιμο ροτών'):h('button',{type:'button',class:'nbc-btn primary',onclick:()=>setRoutesOnly(true)},'Δείξε μόνο τις ρότες'),
+    on&&ui.routePick?h('button',{type:'button',class:'nbc-btn',onclick:()=>{ui.routePick=null;for(const l of bvLines.values())l.classList.remove('hi');marks();paint();}},'Όλες οι ρότες'):null),
+   h('ul',{class:'nbc-list'},...BV.routes.map(r=>h('li',null,h('button',{type:'button',class:'nbc-item'+(ui.routePick===r.id?' on':''),onclick:()=>pickSeaRoute(r.id)},h('i',{class:'nbc-sw',style:'--c:'+r.color}),
+    h('span',{class:'nbc-im'},h('b',{text:r.short||r.name}),h('small',{text:'σελ. '+r.pages})))))));}
+ function pickSeaRoute(id){const r=BVById.get(id);if(!r)return;ui.routePick=id;if(!ui.routesOnly)setRoutesOnly(true,{frame:false});
+  for(const [k,l] of bvLines)l.classList.toggle('hi',k===id);marks();paint();frameLines(r.lines);}
+ function frameLines(lines){const pts=lines.flat();if(!pts.length)return;let a=1e9,b=-1e9,c=1e9,d=-1e9;for(const [la,lo] of pts){const q=project(lo,la);a=Math.min(a,q.x);b=Math.max(b,q.x);c=Math.min(c,q.y);d=Math.max(d,q.y);}
+  const cx=(a+b)/2,cy=(c+d)/2,want=Math.min(view.clientWidth/((b-a)*1.25+1),view.clientHeight/((d-c)*1.25+1),9);
+  if(M3()?.enabled){const ll=[(c+d)/2,(a+b)/2];M3().camera({lon:cx/C.k+C.lon0,lat:pts.reduce((s,p)=>s+p[0],0)/pts.length,tilt:30,dist:2.6});return;}
+  const stage=$('chartStage');if(!stage)return;const v=view2d(),r=stage.getBoundingClientRect(),vr=view.getBoundingClientRect();
+  const sx=vr.left+cx*v.s+v.x,sy=vr.top+cy*v.s+v.y;stage.dispatchEvent(new WheelEvent('wheel',{deltaY:-Math.log(want/v.s)/0.0015,clientX:sx,clientY:sy,bubbles:true,cancelable:true}));
+  const lon=cx/C.k+C.lon0;const lat=pts.reduce((s,p)=>s+p[0],0)/pts.length;requestAnimationFrame(()=>pan2d(lon,lat));}
+ function setRoutesOnly(v,{frame=true}={}){ui.routesOnly=!!v;if(!v){ui.routePick=null;for(const l of bvLines.values())l.classList.remove('hi');}
+  routeChip.hidden=!v;marks();if(ui.tab==='routes')paint();if(v&&frame)frameLines(BV.routes.flatMap(r=>r.lines));if(v&&ui.tab!=='routes')openTab('routes');}
  function routesView(){const base=DATA.routes.filter(visible).sort((a,b)=>(a.sequence??99)-(b.sequence??99)),g=new Map();for(const r of base)(g.get(r.type)||g.set(r.type,[]).get(r.type)).push(r);
-  const out=[];for(const [t,l] of g)out.push(sect(RTYPE[t]||t,routeList(l)));if(!base.length)out.push(empty('Καμία διαδρομή στην επιλεγμένη περίοδο.'));
+  const out=[seaRoutesSect()].filter(Boolean);for(const [t,l] of g)out.push(sect(RTYPE[t]||t,routeList(l)));if(!base.length)out.push(empty('Καμία διαδρομή στην επιλεγμένη περίοδο.'));
   out.push(h('p',{class:'nbc-note',text:'Οι γραμμές είναι σχηματικές· τα δίκτυα πληροφοριών και τα σχέδια που δεν εκτελέστηκαν φαίνονται διακεκομμένα και δεν είναι ταξίδια.'}));return out;}
  function sourcesView(){const q=fold(ui.q.sources);
   const items=[...DATA.places.filter(p=>p.sources).map(p=>({t:nameOf(p),x:p,text:p.sources,place:true})),...DATA.routes.filter(r=>r.evidence).map(r=>({t:r.name,x:r,text:r.evidence}))].filter(i=>!q||fold(i.t+' '+i.text).includes(q));
@@ -404,6 +422,8 @@
  function applyRule(){const {from,to}=period();for(const m of [bpins,bpins3d])for(const [id,e] of m){const b=baseById.get(id);const s=b&&rulerAt(b,from,to);
    if(s){e.style.setProperty('--rule',RULERS[s[2]][1]);e.dataset.rule=RULERS[s[2]][0];}else{e.style.removeProperty('--rule');delete e.dataset.rule;}}}
 
+ const routeChip=h('button',{type:'button',class:'nbc-only-chip',hidden:true,onclick:()=>setRoutesOnly(false)},h('b',{text:'Ναυτικές ρότες'}),' · μόνο οι ρότες ',h('span',{text:'✕'}));
+ $('n7MapSlot')?.append(routeChip);
  /* ───── map legend: what the flags, numbers, banners and colour bars mean ───── */
  function buildLegend(){const slot=$('n7MapSlot');if(!slot||$('nbcLegend'))return;
   const row=(art,txt)=>h('div',{class:'nbc-lg-row'},h('span',{class:'nbc-lg-art'},art),h('p',null,...txt));
@@ -420,7 +440,7 @@
    row(badge('+3',R,R),[h('b',{text:'Αριθμός'}),': τόσα ακόμη ορμητήρια κρύβονται εκεί, γιατί είναι πολύ κοντά. Μεγέθυνε ή πέρνα το ποντίκι από πάνω.']),
    row(badge('+5',R,G),['Μισό κόκκινο, μισό πράσινο: η ομάδα έχει και τα δύο.']),
    h('h4',{text:'Ρότες & πειρατεία (Μπελαβίλας 1992)'}),
-   row(h('span',{class:'nbc-lg-route'}),[h('b',{text:'Χρωματιστή γραμμή'}),': ναυτική ρότα του Αιγαίου (Βαλκανική, Κυκλαδίτικη, Μικρασιάτικη). Το όνομα φαίνεται πάνω στη γραμμή όταν μεγεθύνεις· με κλικ ξεχωρίζει.']),
+   row(h('span',{class:'nbc-lg-route'}),[h('b',{text:'Χρωματιστή γραμμή'}),': ναυτική ρότα του Αιγαίου. Οι ρότες δεν μένουν μόνιμα: ανοίγουν από «Διαδρομές» → «Δείξε μόνο τις ρότες» και φαίνονται μόνες τους, με το όνομά τους.']),
    row(bvIcon('refuge',22),[h('b',{text:'Άγκυρα'}),': πειρατικό καταφύγιο ή ενέδρα.']),
    row(bvIcon('market',22),[h('b',{text:'Ζυγαριά'}),': πειρατικό παζάρι, όπου πουλιόταν η λεία.']),
    row(bvIcon('vigla',22),[h('b',{text:'Βίγλα'}),': παρατηρητήριο με φωτιά τη νύχτα και καπνό τη μέρα.']),
@@ -464,7 +484,7 @@
     const A=ln[bi],B=ln[bi+1];let ang=Math.atan2(B.y-A.y,B.x-A.x)*180/Math.PI;if(ang>90)ang-=180;if(ang<-90)ang+=180;
     const lab=document.createElementNS(NS,'text');lab.setAttribute('class','nbc-sea-label');lab.setAttribute('x',((A.x+B.x)/2).toFixed(1));lab.setAttribute('y',((A.y+B.y)/2).toFixed(1));
     lab.setAttribute('transform',`rotate(${ang.toFixed(1)} ${((A.x+B.x)/2).toFixed(1)} ${((A.y+B.y)/2).toFixed(1)})`);lab.setAttribute('dy','-4');lab.setAttribute('text-anchor','middle');lab.textContent=r.short||r.name;g.append(lab);}
-   g.addEventListener('click',ev=>{ev.stopPropagation();selectBV(r.id);});rsvg.append(g);bvLines.set(r.id,g);}
+   g.addEventListener('click',ev=>{ev.stopPropagation();pickSeaRoute(r.id);});rsvg.append(g);bvLines.set(r.id,g);}
   for(const pt of BV.points){const e=bvPin(pt,false),q=project(pt.lon,pt.lat);e.style.left=q.x+'px';e.style.top=q.y+'px';layer.append(e);bvPins.set(pt.id,e);}
   mountBV3d();marks();}
  function mountBV3d(){const m=M3();if(bvPins3d.size||!m?.enabled||!m.ready||!BV.points.length)return;
@@ -473,7 +493,7 @@
     const geo=new T.BufferGeometry().setFromPoints(ps),mat=new T.LineBasicMaterial({color:r.color,transparent:true,opacity:.95});
     const line=new T.Line(geo,mat);line.computeLineDistances();line.userData.bvr=r.id;m.scene.add(line);bv3d.push(line);}
    for(const r of BV.routes){const ln=r.lines[0];const k=Math.floor(ln.length/2);const lab=h('div',{class:'nbc-sea3d',style:'--c:'+r.color,text:r.short||r.name,title:r.name});bvLab3d.push(lab);
-    lab.addEventListener('click',ev=>{ev.stopPropagation();selectBV(r.id);});m.addObject(lab,{lon:ln[k][1],lat:ln[k][0],z:.03});}}catch(e){console.warn('nabou: 3D routes',e);}
+    lab.addEventListener('click',ev=>{ev.stopPropagation();pickSeaRoute(r.id);});m.addObject(lab,{lon:ln[k][1],lat:ln[k][0],z:.03});}}catch(e){console.warn('nabou: 3D routes',e);}
   marks();}
  const bpins=new Map(),bpins3d=new Map();
  function basePin(b,three){const e=h('button',{type:'button',class:(three?'nbc-pin3d':'nbc-pin')+' nbc-base major',dataset:{base:b.id},'aria-label':baseName(b)+' · πειρατικό ορμητήριο',title:baseName(b)+' · '+Object.entries(baseFaiths(b)).map(([c,fa])=>CENT[c]+' '+FAITH[fa][0].toLowerCase()).join(', '),
@@ -486,7 +506,7 @@
  function routeHi(id){for(const [k,l] of lines)l.classList.toggle('hi',k===id);}
  function marks(){try{applyRule();}catch(e){}
   for(const e of [...bvPins.values(),...bvPins3d.values()]){e.hidden=!ui.layers.bvpoints;e.toggleAttribute('data-sel',ui.bv===e.dataset.bv);}
-  for(const g of bvLines.values())g.style.display=ui.layers.bvroutes?'':'none';for(const l of bv3d)l.visible=!!ui.layers.bvroutes;for(const l of bvLab3d)l.hidden=!ui.layers.bvroutes;
+  {const on=!!ui.routesOnly;for(const [k,g] of bvLines)g.style.display=on&&(!ui.routePick||ui.routePick===k)?'':'none';for(const l of bv3d)l.visible=on&&(!ui.routePick||ui.routePick===l.userData.bvr);for(const l of bvLab3d)l.hidden=!on;body.classList.toggle('nbc-routes-only',on);}
   for(const [id,b] of [...pins,...pins3d]){const p=byId.get(id),on=visible(p)&&ui.status[p.coordinateStatus||'NEEDS RESEARCH']!==false&&(LABEL_ONLY.has(String(p.atlasSymbol).toLowerCase())?ui.layers.labels:ui.layers.towns);b.hidden=!on;b.toggleAttribute('data-sel',ui.rec===id);}
   {const {from,to}=period();for(const e of [...pPins.values(),...pPins3d.values()])e.hidden=!ui.layers.powers||+e.dataset.to<from||+e.dataset.from>to;}
   for(const [id,e] of [...bpins,...bpins3d]){const b=baseById.get(id);e.hidden=!baseVisible(b);e.toggleAttribute('data-sel',ui.base===id);}
@@ -572,7 +592,7 @@
   const box=h('fieldset',{class:'nbc-layers',id:'nbcLayers'},h('legend',{text:'Εγγραφές GERAKI'}),
    sw('Οικισμοί',()=>ui.layers.towns,v=>ui.layers.towns=v),sw('Τοπωνύμια (νησιά, θάλασσες)',()=>ui.layers.labels,v=>ui.layers.labels=v),sw('Διαδρομές (2D)',()=>ui.layers.routes,v=>ui.layers.routes=v),
    h('p',{class:'nbc-lg',text:'Δυνάμεις της εποχής'}),sw('Λάβαρα στις έδρες τους',()=>ui.layers.powers,v=>ui.layers.powers=v),
-   h('p',{class:'nbc-lg',text:'Μπελαβίλας 1992 (ΕΜΠ)'}),sw('Ναυτικές ρότες',()=>ui.layers.bvroutes,v=>ui.layers.bvroutes=v),sw('Καταφύγια, παζάρια, βίγλες',()=>ui.layers.bvpoints,v=>ui.layers.bvpoints=v),
+   h('p',{class:'nbc-lg',text:'Μπελαβίλας 1992 (ΕΜΠ)'}),h('button',{type:'button',class:'nbc-btn nbc-routes-btn',onclick:()=>setRoutesOnly(true)},'Δείξε τις ναυτικές ρότες (μόνες τους)'),sw('Καταφύγια, παζάρια, βίγλες',()=>ui.layers.bvpoints,v=>ui.layers.bvpoints=v),
    h('p',{class:'nbc-lg',text:'Πειρατικά ορμητήρια (διατριβή Μ. Γουργουρίνη)'}),
    h('p',{class:'nbc-lg',text:'Κυριαρχία (χρώμα κάτω από τη σημαία)'}),h('div',{class:'nbc-rule-lg'},...['venice','ottoman','latin','tributary','genoa','knights','spain','tuscany'].map(k=>h('span',null,h('i',{style:'background:'+RULERS[k][1]}),RULERS[k][0].split(' (')[0]))),sw('Χριστιανικά',()=>ui.layers.christian,v=>ui.layers.christian=v,h('i',{class:'nbc-dot',style:'background:#c8322d'})),sw('Μουσουλμανικά',()=>ui.layers.muslim,v=>ui.layers.muslim=v,h('i',{class:'nbc-dot',style:'background:#2f8f4e'})),
    h('p',{class:'nbc-lg',text:'Κατάσταση σημείου (GERAKI)'}),...Object.entries(STATUS).map(([k,[l,c]])=>sw(l,()=>ui.status[k],v=>ui.status[k]=v,h('i',{class:'nbc-dot '+c}))),
