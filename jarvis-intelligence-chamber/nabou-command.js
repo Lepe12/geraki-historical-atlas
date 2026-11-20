@@ -56,10 +56,22 @@
  const FAITH={christian:['Χριστιανικό','#c8322d'],muslim:['Μουσουλμανικό','#2f8f4e']};
  const CENT={'16':'16ος αι.','17':'17ος αι.'};
  const baseFaiths=b=>{const f={};for(const [c,l] of Object.entries(b.centuries))f[c]=l[0]?.faith;return f;};
- function flagSvg(b,size=26){const f=baseFaiths(b),c16=f['16'],c17=f['17'];const left=FAITH[c16||c17][1],right=FAITH[c17||c16][1];
-  const pole=c16&&c17?'#2b2b2b':c16?'#9a9a9a':'#111';
-  const s=document.createElementNS(NS,'svg');s.setAttribute('viewBox','0 0 24 28');s.setAttribute('width',size);s.setAttribute('height',Math.round(size*28/24));s.setAttribute('aria-hidden','true');s.setAttribute('class','nbc-flag');
-  s.innerHTML=`<rect x="3" y="2" width="2.2" height="25" rx="1" fill="${pole}"/>${c16&&c17?'<rect x="3" y="2" width="2.2" height="9" rx="1" fill="#9a9a9a"/>':''}<path d="M5.2 3h8v11h-8z" fill="${left}"/><path d="M13.2 3H21l-2.6 5.5L21 14h-7.8z" fill="${right}"/><path d="M5.2 3H21l-2.6 5.5L21 14H5.2" fill="none" stroke="#1c140c" stroke-width=".9" stroke-linejoin="round"/>`;return s;}
+ // A cloth flag on a turned pole (thesis code: red Christian, green Muslim; grey pole 16th c., black 17th c.).
+ let flagN=0;
+ function flagArt(left,right,c16,c17,size){const pole=c16&&c17?'#2b2b2b':c16?'#9b9b9b':'#151515',g='nbcfg'+(++flagN);
+  const s=document.createElementNS(NS,'svg');s.setAttribute('viewBox','0 0 26 30');s.setAttribute('width',size);s.setAttribute('height',Math.round(size*30/26));s.setAttribute('aria-hidden','true');s.setAttribute('class','nbc-flag');
+  const cloth='M5.4 4.6C9 1.6 12 7.2 15.6 4.8S21.6 2 25.4 4.4L22.4 9.6 25.4 14.8C21.6 12.4 19 17.4 15.6 15S9 12.6 5.4 15.4Z';
+  s.innerHTML=`<defs><linearGradient id="${g}" x1="5" x2="25.5" y1="0" y2="0" gradientUnits="userSpaceOnUse">`
+   +`<stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset=".2" stop-color="#fff" stop-opacity=".05"/><stop offset=".38" stop-color="#000" stop-opacity=".32"/>`
+   +`<stop offset=".55" stop-color="#fff" stop-opacity=".2"/><stop offset=".74" stop-color="#000" stop-opacity=".3"/><stop offset=".9" stop-color="#fff" stop-opacity=".12"/><stop offset="1" stop-color="#000" stop-opacity=".2"/></linearGradient></defs>`
+   +`<path d="${cloth}" fill="${right}"/>`
+   +`<path d="M5.4 4.6C9 1.6 12 7.2 15.6 4.8V15C12 12.6 9 12.6 5.4 15.4Z" fill="${left}"/>`
+   +`<path d="${cloth}" fill="url(#${g})"/>`
+   +`<path d="${cloth}" fill="none" stroke="#1a120a" stroke-width=".7" stroke-linejoin="round" opacity=".8"/>`
+   +`<rect x="3.1" y="3" width="2.4" height="26" rx="1.1" fill="${pole}"/>${c16&&c17?'<rect x="3.1" y="3" width="2.4" height="10" rx="1.1" fill="#9b9b9b"/>':''}`
+   +`<rect x="3.6" y="3.4" width=".7" height="25" rx=".35" fill="#fff" opacity=".3"/>`
+   +`<circle cx="4.3" cy="2.4" r="1.8" fill="#c9a24e" stroke="#4a3216" stroke-width=".6"/><circle cx="3.7" cy="1.8" r=".55" fill="#fff4cc" opacity=".85"/>`;return s;}
+ function flagSvg(b,size=26){const f=baseFaiths(b),c16=f['16'],c17=f['17'];return flagArt(FAITH[c16||c17][1],FAITH[c17||c16][1],c16,c17,size);}
  const baseName=b=>b.port&&b.port!==b.area?b.port+' · '+b.area:b.area;
  function baseVisible(b){const {from,to}=period(),f=baseFaiths(b);
   return Object.entries(f).some(([c,fa])=>(c==='16'?from<=1599:to>=1600)&&ui.layers[fa]!==false&&(ui.century==='all'||ui.century===c)&&(ui.faith==='all'||ui.faith===fa));}
@@ -243,7 +255,7 @@
   const art=h('span',{class:'nbc-power-art'});art.innerHTML=powerSvg(p);e.dataset.t0=e.title;e.append(art,h('span',{class:'nbc-power-name'},h('span',{text:nm.split(' · ')[0]}),h('b',{class:'nbc-power-count'})));return e;}
  function buildPowers(){const E=window.NABOU_EMBLEMS;Promise.resolve(E?.ready).catch(()=>{}).then(()=>{
   for(const p of POWERS)for(const [i,seat] of p.seats.entries()){const e=powerPin(p,seat,false),pt=project(seat[2],seat[1]);e.style.left=pt.x+'px';e.style.top=pt.y+'px';layer.append(e);pPins.set(p.id+i,e);}
-  mountPowers3d();marks();});}
+  mountPowers3d();buildLegend();marks();});}
  function mountPowers3d(){if(pPins3d.size||!M3()?.enabled||!pPins.size)return;for(const p of POWERS)for(const [i,seat] of p.seats.entries()){const e=powerPin(p,seat,true);pPins3d.set(p.id+i,e);M3().addObject(e,{lon:seat[2],lat:seat[1],z:.05});}marks();}
  function powerView(p){const {from,to}=period();const art=h('span',{class:'nbc-power-big'});art.innerHTML=powerSvg(p);
   return [h('div',{class:'nbc-card nbc-power-card'},art,h('div',null,h('div',{class:'nbc-type',text:'Δύναμη της εποχής'}),h('h3',{class:'nbc-name',style:'font-size:24px',text:p.name}))),
@@ -371,6 +383,30 @@
    h('p',{class:'nbc-miss',style:'margin:6px 0 0',text:'Γενικό ιστορικό πλαίσιο με τις καθιερωμένες χρονολογίες· όχι τεκμηρίωση της έρευνας.'}));}
  function applyRule(){const {from,to}=period();for(const m of [bpins,bpins3d])for(const [id,e] of m){const b=baseById.get(id);const s=b&&rulerAt(b,from,to);
    if(s){e.style.setProperty('--rule',RULERS[s[2]][1]);e.dataset.rule=RULERS[s[2]][0];}else{e.style.removeProperty('--rule');delete e.dataset.rule;}}}
+
+ /* ───── map legend: what the flags, numbers, banners and colour bars mean ───── */
+ function buildLegend(){const slot=$('n7MapSlot');if(!slot||$('nbcLegend'))return;
+  const row=(art,txt)=>h('div',{class:'nbc-lg-row'},h('span',{class:'nbc-lg-art'},art),h('p',null,...txt));
+  const F=(l,r,a,b)=>flagArt(l,r,a,b,28),R='#c8322d',G='#2f8f4e';
+  const badge=(t,c1,c2)=>h('i',{class:'nbc-lg-badge',style:'--nbc-f1:'+c1+';--nbc-f2:'+c2,text:t});
+  const banner=h('span',{class:'nbc-lg-ban'});const vp=POWERS.find(p=>p.id==='venice');if(vp)banner.innerHTML=powerSvg(vp);
+  const bars=h('span',{class:'nbc-rule-lg'},...['venice','ottoman','latin','tributary','genoa','knights','spain','tuscany'].map(k=>h('span',null,h('i',{style:'background:'+RULERS[k][1]}),RULERS[k][0].split(' (')[0])));
+  const panel=h('div',{class:'nbc-legend-body'},
+   h('h4',{text:'Πειρατικά ορμητήρια (διατριβή)'}),
+   row(F(R,R,'christian'),[h('b',{text:'Κόκκινη σημαία'}),' χριστιανικό ορμητήριο']),
+   row(F(G,G,'muslim'),[h('b',{text:'Πράσινη σημαία'}),' μουσουλμανικό ορμητήριο']),
+   row(h('span',null,F(R,R,'x',null),F(R,R,null,'x')),[h('b',{text:'Κοντάρι'}),': γκρι = 16ος αι., μαύρο = 17ος αι.']),
+   row(F(R,G,'christian','muslim'),['Δύο χρώματα και δίχρωμο κοντάρι: άλλαξε από τον 16ο στον 17ο αι.']),
+   row(badge('+3',R,R),[h('b',{text:'Αριθμός'}),': τόσα ακόμη ορμητήρια κρύβονται εκεί, γιατί είναι πολύ κοντά. Μεγέθυνε ή πέρνα το ποντίκι από πάνω.']),
+   row(badge('+5',R,G),['Μισό κόκκινο, μισό πράσινο: η ομάδα έχει και τα δύο.']),
+   h('h4',{text:'Δυνάμεις της εποχής'}),
+   row(banner,[h('b',{text:'Λάβαρο'}),': έδρα μιας δύναμης (π.χ. Βενετία, Νάπολη). Εμφανίζεται μόνο για τα χρόνια που ισχύει. «Νάπολη +2» = άλλα 2 σημεία κοντά.']),
+   h('h4',{text:'Ποιος κυβερνούσε'}),
+   h('p',{class:'nbc-lg-p',text:'Η γραμμή κάτω από κάθε σημαία δείχνει ποιος κυβερνούσε την περιοχή στην περίοδο του χρονολογίου.'}),bars,
+   h('p',{class:'nbc-lg-p dim',text:'Ορμητήρια: Μ. Γουργουρίνη, διατριβή (piratecartography.com). Δυνάμεις και κυριαρχία: γενικό ιστορικό πλαίσιο.'}));
+  let open=true;try{open=localStorage.getItem('nbc.legend')!=='0';}catch(e){}
+  const btn=h('button',{type:'button',class:'nbc-legend-btn','aria-expanded':String(open),onclick:()=>{open=!open;box.dataset.open=open;btn.setAttribute('aria-expanded',String(open));try{localStorage.setItem('nbc.legend',open?'1':'0');}catch(e){}}},h('b',{text:'i'}),'Υπόμνημα');
+  const box=h('aside',{class:'nbc-legend',id:'nbcLegend','aria-label':'Υπόμνημα χάρτη',dataset:{open:String(open)}},btn,panel);slot.append(box);}
  const bpins=new Map(),bpins3d=new Map();
  function basePin(b,three){const e=h('button',{type:'button',class:(three?'nbc-pin3d':'nbc-pin')+' nbc-base major',dataset:{base:b.id},'aria-label':baseName(b)+' · πειρατικό ορμητήριο',title:baseName(b)+' · '+Object.entries(baseFaiths(b)).map(([c,fa])=>CENT[c]+' '+FAITH[fa][0].toLowerCase()).join(', '),
    onclick:ev=>{ev.stopPropagation();selectBase(b.id,{focus:false});}},flagSvg(b,three?22:24),h('span',{text:b.port||b.area}));return e;}
