@@ -49,7 +49,7 @@
  const atlas=()=>window.NABOU_PRO_ATLAS,M3=()=>window.NABOU_MAP3D,reader=()=>window.N7_READER;
 
  let DATA={places:[],routes:[]},byId=new Map(),linked=new Map(),proToRec=new Map();
- let BASES={bases:[]},baseById=new Map(),EVENTS={events:[]};
+ let BASES={bases:[]},baseById=new Map(),EVENTS={events:[]},THESIS={};
  /* ───── pirate bases (M. Gourgourini, thesis 2024 · ArcGIS layers): flag symbols of the thesis legend ─────
     red flag = Christian base, green = Muslim; grey pole = 16th c., black = 17th; a base whose faith changes
     between the centuries shows both colours (16th c. half at the pole). */
@@ -189,8 +189,12 @@
   out.push(h('div',{class:'nbc-actions'},h('button',{type:'button',class:'nbc-btn primary',onclick:()=>focusAt(b.lon,b.lat)},ico(I.focus),'Εστίαση στον χάρτη'),
    h('a',{class:'nbc-btn',href:baseN7(b),target:'_blank',rel:'noopener noreferrer'},h('b',{text:'N7'}),'Ρώτησε τον N7')));
   return out;}
- function eventItem(e){return h('div',{class:'nbc-ev'},h('div',{class:'nbc-ev-h'},h('b',{class:'nbc-ev-y',text:e.years.length?e.years.join(', '):'χωρίς έτος'}),h('span',{text:e.person})),
-  h('p',{text:e.text}),e.source?h('a',{href:e.source,target:'_blank',rel:'noopener noreferrer',class:'nbc-ev-src',text:'piratecartography.com · '+e.area+' ↗'}):h('small',{class:'nbc-ev-src',text:'Πρόχειρη σελίδα του site (αδημοσίευτη)'}));}
+ const KIND={raid:'Επιδρομή / επίθεση',control:'Αλλαγή κυριαρχίας',context:'Πλαίσιο'};
+ function eventItem(e){const th=!!e.page;
+  const src=th?h('a',{href:THESIS.repository,target:'_blank',rel:'noopener noreferrer',class:'nbc-ev-src',text:'Διατριβή, σελ. '+e.page+(e.cites?.length?' · '+e.cites.join('; '):'')+' ↗'})
+   :e.source?h('a',{href:e.source,target:'_blank',rel:'noopener noreferrer',class:'nbc-ev-src',text:'piratecartography.com · '+e.area+' ↗'}):h('small',{class:'nbc-ev-src',text:'Πρόχειρη σελίδα του site (αδημοσίευτη)'});
+  const yrs=e.years.length>4?e.years.slice(0,3).join(', ')+' … '+e.years[e.years.length-1]:e.years.join(', ');
+  return h('div',{class:'nbc-ev'+(th?' th '+e.kind:'')},h('div',{class:'nbc-ev-h'},h('b',{class:'nbc-ev-y',text:e.years.length?yrs:'χωρίς έτος'}),h('span',{text:e.person||KIND[e.kind]||''})),h('p',{text:e.text}),src);}
  function baseN7(b){const cs=Object.keys(b.centuries);const from=cs.includes('16')?1500:1600,to=cs.includes('17')?1700:1599;
   return 'https://bot.piratecartography.com/#atlas='+encodeURIComponent(JSON.stringify({schema:'n7-atlas-handoff/v1',place:baseName(b).slice(0,100),from,to,sources:[]}));}
  function basesView(){const q=fold(ui.q.bases);
@@ -202,7 +206,7 @@
    h('div',{class:'nbc-filters'},f('century','all','16ος & 17ος'),f('century','16','16ος αι.'),f('century','17','17ος αι.')),
    h('p',{class:'nbc-note',text:all.length+' από '+BASES.bases.length+' ορμητήρια · '+(BASES.symbology||'')})];
   const {from,to}=period();if(!(from<=1500&&to>=1700)){const ev=EVENTS.events.filter(e=>e.years.some(y=>y>=from&&y<=to));
-   out.push(sect('Γεγονότα '+(from===to?from:from+'–'+to),...(ev.length?ev.map(e=>{const d=eventItem(e);d.prepend(h('button',{type:'button',class:'nbc-ev-go',text:e.area+' →',onclick:()=>{const b=BASES.bases.find(x=>x.area===e.area);if(b)selectBase(b.id);}}));return d;}):[empty('Κανένα χρονολογημένο γεγονός στην περίοδο.')])));}
+   out.push(sect('Γεγονότα '+(from===to?from:from+'–'+to),...(ev.length?ev.map(e=>{const d=eventItem(e);d.prepend(h('button',{type:'button',class:'nbc-ev-go',text:e.area+' →',onclick:()=>{const b=BASES.bases.find(x=>x.area===e.area);if(b)selectBase(b.id);else{const r=(atlas()?.places||[]).find(p=>fold(p.name)===fold(e.area));if(r)atlas().select(r.id);}}}));return d;}):[empty('Κανένα χρονολογημένο γεγονός στην περίοδο.')])));}
   for(const [a,l] of groups)out.push(l.length>1||l[0].port!==a?sect(a,baseList(l)):baseList(l));
   if(!all.length)out.push(empty('Κανένα ορμητήριο με αυτά τα φίλτρα.'));
   out.push(h('p',{class:'nbc-miss',text:'Πηγή: '+(BASES.source?.thesis||'')}));return out;}
@@ -342,10 +346,12 @@
  function buildTimeline(){if(!track)return;const cnt=new Map();
   for(const x of [...DATA.places,...DATA.routes])if(bookHit(x)&&!x.atlasHidden)for(const y of new Set(yearsIn(x.period)))cnt.set(y,(cnt.get(y)||0)+1);
   const max=Math.max(1,...cnt.values()),{from,to}=period();
-  const evY=new Map();for(const e of EVENTS.events)for(const y of e.years)evY.set(y,[...(evY.get(y)||[]),e]);
-  const evMarks=[...evY].sort((a,b)=>a[0]-b[0]).map(([y,l])=>{const on=from===y&&to===y;return h('button',{type:'button',class:'nbc-yr nbc-yr-ev'+(on?' on':''),style:'left:'+((y-1500)/2)+'%',
-    title:y+' · '+l.map(e=>e.person+' ('+e.area+')').join(', '),'aria-label':y+': '+l.length+' γεγονότα πειρατείας','aria-pressed':String(on),
-    onclick:()=>{if(on)setPeriod(1500,1700);else{setPeriod(y,y);openTab('bases');}}},h('i'),h('span',{text:y+' · '+l.map(e=>e.area).join(', ')}));});
+  // Dated piracy events in 5-year bins (many entries list several years); a bin sets that period.
+  const evB=new Map();for(const e of EVENTS.events)for(const y of new Set(e.years.map(y=>y-y%5)))evB.set(y,(evB.get(y)||0)+1);
+  const evMax=Math.max(1,...evB.values());
+  const evMarks=[...evB].sort((a,b)=>a[0]-b[0]).map(([y,n])=>{const on=from===y&&to===y+4;return h('button',{type:'button',class:'nbc-yr nbc-yr-ev'+(on?' on':''),style:'left:'+((y+2-1500)/2)+'%;--s:'+(6+Math.round(7*n/evMax))+'px',
+    title:y+'–'+(y+4)+' · '+n+' γεγονότα πειρατείας','aria-label':y+' έως '+(y+4)+': '+n+' γεγονότα πειρατείας','aria-pressed':String(on),
+    onclick:()=>{if(on)setPeriod(1500,1700);else{setPeriod(y,y+4);openTab('bases');}}},h('i'),h('span',{text:y+'–'+(y+4)+' · '+n+' γεγονότα'}));});
   marksEl.replaceChildren(...evMarks,...[...cnt].sort((a,b)=>a[0]-b[0]).map(([y,n])=>{const on=from===y&&to===y,inr=y>=from&&y<=to;
    return h('button',{type:'button',class:'nbc-yr'+(on?' on':'')+(inr?'':' out'),style:'left:'+((y-1500)/2)+'%;--h:'+Math.round(4+16*n/max)+'px',title:y+' · '+n+' εγγραφές','aria-label':y+': '+n+' εγγραφές','aria-pressed':String(on),
     onclick:()=>on?setPeriod(1500,1700):setPeriod(y,y)},h('i'),h('span',{text:String(y)}));}));
@@ -378,7 +384,9 @@
   buildTimeline();marks();if(!dock.hidden)paint();}
  document.addEventListener('input',e=>{if(e.target.closest?.('#n7TimelineRange'))requestAnimationFrame(refresh);});
 
- fetch('./data/pirate-events.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(d=>{if(d){EVENTS=d;buildTimeline();if(!dock.hidden)paint();body.dataset.nbcEvents=String(d.events.length);}}).catch(()=>{});
+ // Dated events: the thesis (ch. 2, with page) and the site's harbour pages.
+ Promise.all(['./data/thesis-events.json','./data/pirate-events.json'].map(u=>fetch(u,{cache:'no-cache'}).then(r=>r.ok?r.json():null).catch(()=>null))).then(([t,site])=>{
+  if(t)THESIS=t;EVENTS={events:[...(t?.events||[]),...(site?.events||[])]};buildTimeline();if(!dock.hidden)paint();body.dataset.nbcEvents=String(EVENTS.events.length);});
  fetch('./data/pirate-bases.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.json();}).then(d=>{
   BASES=d;baseById=new Map(d.bases.map(b=>[b.id,b]));buildBases();body.dataset.nbcBases=String(d.bases.length);if(!dock.hidden)paint();
   let n=0;const t=setInterval(()=>{if(wrapAtlas()||++n>100)clearInterval(t);},100);
