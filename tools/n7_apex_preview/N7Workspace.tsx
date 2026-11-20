@@ -479,7 +479,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   const liveCaptions=voice.phase==="listening"&&message.trim()?message.trim():lastAnswer;
   const callLabel=needsLogin?"Σύνδεση":voice.conversation?"Λήξη κλήσης":"Έναρξη κλήσης";
   const callDisabled=!needsLogin&&!voice.conversation&&(waitingForAnswer||voiceUnavailable);
-  const coreHint=needsLogin?"Πάτησε το φως για σύνδεση":voice.conversation?"Πάτησε το φως για λήξη":"Πάτησε το φως για κλήση";
+  const coreHint=`Πάτησε τον πυρήνα του avatar για ${needsLogin?"σύνδεση":voice.conversation?"λήξη κλήσης":"κλήση"}`;
   return (
     <>
       {guideOpen&&compactGuide&&callHost&&createPortal(<button type="button" data-n7-conversation-toggle="" className="n7-home-call"
