@@ -5,7 +5,8 @@ import { N7_BACKDROP_REFERENCE } from "./N7BackdropReference";
 type Highlight={x:number;y:number;phase:number;sprite:HTMLCanvasElement};
 
 export type N7BackdropHandle={wave:(x:number,y:number,radius:number,fade:number)=>void;clear:()=>void};
-const N7Backdrop=forwardRef<N7BackdropHandle,{effects:boolean;reduced:boolean}>(function N7Backdrop({effects,reduced},ref) {
+const N7Backdrop=forwardRef<N7BackdropHandle,{effects:boolean;reduced:boolean;ambience?:string}>(function N7Backdrop({effects,reduced,ambience},ref) {
+  const source=ambience||N7_BACKDROP_REFERENCE;
   const hostRef=useRef<HTMLDivElement>(null);
   const imageRef=useRef<HTMLImageElement>(null);
   const layerRef=useRef<HTMLDivElement>(null);
@@ -121,15 +122,16 @@ const N7Backdrop=forwardRef<N7BackdropHandle,{effects:boolean;reduced:boolean}>(
     image.addEventListener("load",load);
     if(image.complete&&image.naturalWidth) load();
     return()=>{disposed=true;cancelAnimationFrame(strandRaf);observer.disconnect();for(const point of highlights)point.sprite.remove();image.removeEventListener("load",load);restart.current=()=>{};waveRef.current=()=>{};};
-  },[]);
+  },[source]);
 
-  return <div ref={hostRef} aria-label="N7 Step 6 living backdrop" data-effects={effects&&!reduced?"on":"off"}
+  return <div ref={hostRef} className={ambience?"n7-ambient-field":undefined} aria-hidden={ambience?true:undefined}
+    aria-label={ambience?undefined:"N7 Step 6 living backdrop"} data-effects={effects&&!reduced?"on":"off"}
     style={{position:"absolute",inset:0,zIndex:0,pointerEvents:"none",overflow:"hidden"}}>
-    <img ref={imageRef} src={N7_BACKDROP_REFERENCE} alt="Cinematic mountain landscape" style={{position:"absolute",width:"100%",height:"100%",objectFit:"cover"}} />
+    <img ref={imageRef} src={source} alt={ambience?"":"Cinematic mountain landscape"} style={{position:"absolute",width:"100%",height:"100%",objectFit:"cover"}} />
     <style>{`@keyframes n7-ridge-light {0%,100% {opacity:.08} 50% {opacity:.78}}@keyframes n7-smoke-drift {0% {transform:scale(1.10) translate(-1.8%,.8%)} 100% {transform:scale(1.14) translate(1.8%,-1.2%)}}`}</style>
     <div ref={layerRef} data-ridge-layer="" aria-label="Existing ridge illumination" style={{position:"absolute",inset:0}}>
       {/* Slow smoke drift: a soft, faint copy of the same raster moving very slowly. */}
-      <div aria-hidden="true" data-smoke-drift="" style={{position:"absolute",inset:0,backgroundImage:`url(${N7_BACKDROP_REFERENCE})`,backgroundSize:"cover",backgroundPosition:"center",opacity:.32,mixBlendMode:"screen",filter:"blur(6px)",animation:"n7-smoke-drift 48s ease-in-out infinite alternate"}}/>
+      <div aria-hidden="true" data-smoke-drift="" style={{position:"absolute",inset:0,backgroundImage:`url(${source})`,backgroundSize:"cover",backgroundPosition:"center",opacity:.32,mixBlendMode:"screen",filter:"blur(6px)",animation:"n7-smoke-drift 48s ease-in-out infinite alternate"}}/>
       <canvas data-strands="" aria-hidden="true" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/>
     </div>
   </div>;

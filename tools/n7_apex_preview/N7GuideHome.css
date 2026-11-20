@@ -4,6 +4,7 @@
   --n7-home-dim: #9ab2bd;
   --n7-home-cyan: #7fe6f5;
   --n7-home-gold: #f5c26b;
+  --n7-home-gutter: clamp(16px, 2.6vw, 46px);
   isolation: isolate;
   background: #050b12;
 }
@@ -15,9 +16,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: min(100%, 1130px);
-  margin-inline: auto;
-  padding: max(16px, env(safe-area-inset-top)) clamp(18px, 4vw, 40px) 12px;
+  width: 100%;
+  padding: max(18px, env(safe-area-inset-top)) var(--n7-home-gutter) 12px;
 }
 
 .n7-home-brand {
@@ -34,9 +34,9 @@
   width: 40px;
   height: 40px;
   border: 1px solid var(--n7-home-edge);
-  border-radius: 11px;
+  border-radius: 5px;
   color: var(--n7-home-cyan);
-  background: #081725;
+  background: #0814219e;
   font-size: 17px;
   letter-spacing: -.06em;
 }
@@ -92,15 +92,25 @@
 .n7-home-menu svg { color: var(--n7-home-cyan); }
 .n7-home-menu-divider { border-top: 1px solid var(--n7-home-edge); margin-top: 5px; padding-top: 5px; }
 
-.n7-live-home .n7-guide-main,
+.n7-live-home .n7-guide-main {
+  position: absolute;
+  inset: clamp(18px, 3dvh, 32px) 0 0;
+  padding: 0;
+}
+
 .n7-live-home .n7-guide-figure-slot { position: relative; }
+.n7-live-home .n7-guide-details { position: relative; margin: 55px 12px 12px 0; }
 
 .n7-guide-view.n7-live-home #n7-guide-voice {
-  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  position: absolute;
+  left: var(--n7-home-gutter);
+  bottom: max(26px, env(safe-area-inset-bottom));
+  z-index: 5;
+  width: min(352px, calc(100% - 2 * var(--n7-home-gutter)));
 }
 
 .n7-guide-view.n7-live-home #n7-guide-voice > .n7-home-voice {
-  width: min(600px, calc(100% - 36px));
+  width: 100%;
   max-height: 40dvh;
   padding: 0 !important;
   overflow: auto;
@@ -113,8 +123,9 @@
 .n7-home-dock {
   padding: 8px 10px;
   border: 1px solid var(--n7-home-edge);
-  border-radius: 15px;
-  background: rgba(8, 19, 29, .96);
+  border-radius: 10px;
+  background: #07121deb;
+  box-shadow: inset 0 1px 0 #b0e5f318, 0 12px 34px #0005;
 }
 
 .n7-home-dock-row,
@@ -154,14 +165,15 @@
 
 .n7-live-home .n7-home-call {
   padding: 0 12px;
-  color: #071a24;
-  border-color: #85dce9;
-  background: #8ad9e7;
+  color: #e2f8fc;
+  border-color: #7fe6f56b;
+  background: #113348a8;
 }
 
 .n7-live-home .n7-home-call:hover:not(:disabled) {
-  color: #071a24;
-  background: #b7eaf3;
+  color: #f5feff;
+  border-color: #92dfedbd;
+  background: #19435b;
 }
 
 .n7-live-home .n7-home-call[aria-pressed="true"] {
@@ -193,7 +205,7 @@
 .n7-guide-view.n7-live-home .n7-guide-controls {
   position: absolute;
   top: max(68px, calc(env(safe-area-inset-top) + 56px));
-  right: clamp(18px, 4vw, 40px);
+  right: var(--n7-home-gutter);
   z-index: 8;
   width: min(376px, calc(100vw - 36px));
   max-height: min(60dvh, 330px);
@@ -212,122 +224,46 @@
 .n7-live-home .n7-guide-group { padding-left: 0; }
 .n7-home-settings-title { display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
 
-.n7-guide-view.n7-chamber-home {
-  background: radial-gradient(ellipse at 50% 60%, #0c2433, #050b13 66%);
-}
-
-.n7-chamber-home .n7-home-header {
-  width: min(100%, 1560px);
-  padding-inline: clamp(16px, 3vw, 42px);
-}
-
-.n7-chamber-home .n7-home-brand strong {
-  border-color: #9b704a85;
-  border-radius: 5px;
-  background: linear-gradient(145deg, #15222c, #080d13);
-  color: #f5c26b;
-}
-
-.n7-chamber-home .n7-home-brand span {
-  color: #e2edf3;
-  font-size: 14px;
-  font-weight: 550;
-}
-
-.n7-chamber-home .n7-chamber-stage {
-  width: min(100%, 1560px);
-  grid-template-rows: minmax(0, 1fr);
-  margin-inline: auto;
-  padding-inline: clamp(10px, 3vw, 42px);
-}
-
-.n7-chamber-frame {
-  position: absolute;
-  inset: 0 clamp(10px, 3vw, 42px);
-  isolation: isolate;
-  pointer-events: none;
-  overflow: hidden;
-  border: 1px solid #36556378;
-  border-radius: 12px;
-  background: #050d15;
-}
-
-.n7-chamber-image {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 39%;
-}
-
-.n7-chamber-frame::after {
+/* Light across the full-screen backdrop, beneath the existing figure. */
+.n7-ambient-field::after {
   content: "";
   position: absolute;
   inset: 0;
-  pointer-events: none;
-  background: linear-gradient(0deg, #040912b8, transparent 26%),
-    radial-gradient(ellipse at 50% 43%, transparent 53%, #050b1270);
+  background: linear-gradient(0deg, #040811b8, transparent 22%),
+    radial-gradient(ellipse at 50% 45%, transparent 46%, #03071150);
 }
 
-.n7-chamber-frame[data-effects="on"]::before {
+.n7-ambient-field[data-effects="on"]::before {
   content: "";
   position: absolute;
   z-index: 1;
   inset: 0;
-  pointer-events: none;
-  background: radial-gradient(ellipse at 50% 39%, #4ec9f354, transparent 51%);
+  background: radial-gradient(ellipse at 50% 48%, #249ab747, transparent 62%);
   mix-blend-mode: screen;
   opacity: 0;
-  transition: opacity 380ms ease;
+  transition: opacity 300ms ease;
 }
 
-.n7-chamber-home[data-activity="listening"] .n7-chamber-frame::before { opacity: .33; }
-.n7-chamber-home[data-activity="thinking"] .n7-chamber-frame::before { opacity: .15; }
-.n7-chamber-home[data-activity="speaking"] .n7-chamber-frame::before { opacity: .63; }
+.n7-live-home[data-activity="listening"] .n7-ambient-field::before { opacity: .4; }
+.n7-live-home[data-activity="thinking"] .n7-ambient-field::before { opacity: .22; }
+.n7-live-home[data-activity="speaking"] .n7-ambient-field::before { opacity: .68; }
 
-.n7-chamber-home #n7-guide-voice { padding-top: 10px; }
-.n7-chamber-home #n7-guide-voice > .n7-home-voice { width: min(500px, calc(100% - 24px)); }
-.n7-chamber-home .n7-home-dock {
-  border: 1px solid #45728166;
-  border-radius: 16px;
-  background: linear-gradient(165deg, #10212dfd, #070e17fd);
-  box-shadow: inset 0 1px 0 #a7e5fa15, 0 9px 28px #0008;
-}
+@media (max-width: 720px) {
+  .n7-live-home .n7-guide-main {
+    inset: max(55px, calc(env(safe-area-inset-top) + 46px)) 0 max(76px, calc(env(safe-area-inset-bottom) + 66px));
+  }
 
-.n7-chamber-home .n7-home-dock-row { min-height: 54px; }
-.n7-chamber-home .n7-home-menu-button { border-radius: 6px; }
-.n7-chamber-home .n7-home-call {
-  border-color: #bd8b59;
-  border-radius: 8px;
-  background: linear-gradient(130deg, #f1c186, #be8657);
-  color: #19130e;
-}
-
-.n7-chamber-home .n7-home-call:hover:not(:disabled) {
-  border-color: #ffdfac;
-  background: #f5c993;
-  color: #19130e;
-}
-
-.n7-chamber-home .n7-home-call[aria-pressed="true"] {
-  border-color: #af784e;
-  background: #392519;
-  color: #ffe5c2;
+  .n7-guide-view.n7-live-home #n7-guide-voice {
+    left: 50%;
+    bottom: max(14px, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+  }
 }
 
 @media (max-width: 440px) {
-  .n7-home-header { padding-inline: 14px; }
   .n7-home-brand { gap: 8px; }
-  .n7-guide-view.n7-live-home #n7-guide-voice > .n7-home-voice { width: calc(100% - 24px); }
   .n7-home-dock { padding-inline: 7px; }
   .n7-home-meter { padding-inline: 0; }
   .n7-home-voice-state { gap: 5px; font-size: 12px; }
   .n7-live-home .n7-home-call { padding-inline: 7px; font-size: 12px; }
-  .n7-chamber-frame { border-radius: 8px; }
-  .n7-chamber-image { object-position: 50% 23%; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .n7-chamber-frame::before { transition: none; }
 }

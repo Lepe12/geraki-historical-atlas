@@ -199,10 +199,10 @@ def main():
         raise RuntimeError(f"wrong N7 humanoid asset sha256: {humanoid_sha}")
     (out/"public/n7-humanoid-idle-v3.webp").write_bytes(humanoid_bytes)
     if guide and not isolated:
-        chamber_bytes=(overlay/"assets/n7-chamber-v1.webp").read_bytes()
-        if hashlib.sha256(chamber_bytes).hexdigest()!="7ec877e540c8421e85b23153667db8e300e631d31232d12c55ffeeb321c7c9e0":
-            raise RuntimeError("wrong N7 chamber asset")
-        (out/"public/n7-chamber-v1.webp").write_bytes(chamber_bytes)
+        ambient_bytes=(overlay/"assets/n7-ambient-v1.webp").read_bytes()
+        if hashlib.sha256(ambient_bytes).hexdigest()!="0f9efa0d98463dee4fe2e55cde2f204c4f3648e50f09749694c411cb2504087a":
+            raise RuntimeError("wrong N7 ambient asset")
+        (out/"public/n7-ambient-v1.webp").write_bytes(ambient_bytes)
     if guide:
         face_bytes=(overlay/"assets/n7-humanoid-face-v4.webp").read_bytes()
         if hashlib.sha256(face_bytes).hexdigest()!="1abf41530c4253962a46fe426c107eb2f776f54ad5c2c5e594b8765bd569ea68":
