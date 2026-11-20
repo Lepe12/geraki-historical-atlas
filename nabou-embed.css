@@ -89,3 +89,175 @@ html.n7-embed main::before{content:"";position:absolute;z-index:880;pointer-even
 html.n7-embed .settlement-label{background:linear-gradient(180deg,#f3e4bf,#dcc28f)!important;border:1px solid #8a6a36!important;color:#2a1d10!important;
   font-family:"IM Fell English",Georgia,serif!important;box-shadow:0 3px 8px rgba(0,0,0,.45)!important}
 @media (max-width:640px){html.n7-embed main::before{display:none}}
+
+
+/* NABOU_MODERN_SHELL_V2
+   UI-only: no map layers, geographic data, camera, renderer or 3D changes.
+   Scope strictly to the embedded atlas inside N7. */
+html.n7-embed {
+  --n7-ui-ink: #10171b;
+  --n7-ui-ink-soft: #1a262c;
+  --n7-ui-cyan: #58ceda;
+  --n7-ui-cyan-dim: rgba(88,206,218,.13);
+  --n7-ui-outline: rgba(172,206,212,.17);
+  --n7-ui-text: #e9f0ef;
+  --n7-ui-muted: #a6bdc0;
+  --n7-ui-paper: #e9dfcb;
+}
+html.n7-embed .n7e-bar {
+  width: 272px;
+  inset: 12px auto 12px 12px;
+  border: 1px solid var(--n7-ui-outline);
+  border-radius: 16px;
+  background: linear-gradient(160deg, rgba(19,28,33,.98), rgba(12,19,23,.97));
+  box-shadow: 0 18px 52px rgba(2,11,15,.32);
+  color: var(--n7-ui-text);
+}
+html.n7-embed .n7e-brand {
+  grid-template-columns: 1fr;
+  gap: 4px;
+  padding: 21px 19px 17px;
+  border-bottom: 1px solid var(--n7-ui-outline);
+}
+html.n7-embed .n7e-brand-mark { display: none; }
+html.n7-embed .n7e-brand-name {
+  font: 700 21px/1.15 "Plus Jakarta Sans",system-ui,sans-serif;
+  letter-spacing: .16em; color: var(--n7-ui-text);
+}
+html.n7-embed .n7e-brand-sub {
+  font: 500 10px/1.4 "Plus Jakarta Sans",system-ui,sans-serif;
+  letter-spacing: .055em; text-transform: none; color: var(--n7-ui-muted);
+}
+html.n7-embed .n7e-tabs { padding: 13px 11px; gap: 5px; }
+html.n7-embed .n7e-tab {
+  min-height: 42px; padding: 10px 12px; gap: 11px;
+  border: 1px solid transparent; border-radius: 10px;
+  color: var(--n7-ui-muted); background: transparent;
+  font: 600 13px/1.3 "Plus Jakarta Sans",system-ui,sans-serif;
+  transition: background .16s ease,border-color .16s ease,color .16s ease;
+}
+html.n7-embed .n7e-tab-icon { width: 22px; color: inherit; opacity: .9; font-size: 17px; }
+html.n7-embed .n7e-tab:hover {
+  color: var(--n7-ui-text); background: rgba(172,206,212,.07);
+}
+html.n7-embed .n7e-tab.n7e-active {
+  background: var(--n7-ui-cyan-dim);
+  border-color: rgba(88,206,218,.24);
+  color: #c3f5f5;
+  box-shadow: inset 3px 0 0 var(--n7-ui-cyan);
+}
+html.n7-embed .n7e-tab:focus-visible,
+html.n7-embed .n7e-link:focus-visible {
+  outline: 2px solid var(--n7-ui-cyan);outline-offset: 2px;
+}
+html.n7-embed .n7e-body {
+  margin: 2px 11px 11px; padding: 17px 15px;
+  border: 1px solid rgba(115,92,64,.16);
+  border-radius: 11px;
+  background: var(--n7-ui-paper);
+  box-shadow: none;
+  color: #2f2c28;
+  font: 13px/1.6 "Plus Jakarta Sans",system-ui,sans-serif;
+  scrollbar-color: #9aabac transparent;
+}
+html.n7-embed .n7e-rows dt {
+  color: #557079; font: 700 10px/1.4 "Plus Jakarta Sans",system-ui,sans-serif;
+  letter-spacing: .055em; margin-top: 15px;
+}
+html.n7-embed .n7e-rows dd { line-height: 1.55; overflow-wrap: anywhere; }
+html.n7-embed .n7e-link {
+  padding: 11px; border: 1px solid #d3c7b3; border-radius: 9px;
+  background: #f7f0e3; font: inherit; transition: border-color .16s ease;
+}
+html.n7-embed .n7e-link:hover { border-color: #648b91; }
+html.n7-embed .n7e-empty { font-style: normal; color: #667477; }
+html.n7-embed .n7e-meta { display: block; margin-top: 4px; color: #61777d; }
+
+/* One compact contextual place card instead of a large ornamental cartouche. */
+html.n7-embed .n7e-cartouche {
+  left: auto; right: 18px; top: 18px;
+  min-width: 0; width: min(330px, calc(100% - 326px));
+  max-width: 330px; padding: 17px 19px; text-align: left;
+  border: 1px solid rgba(83,101,104,.22); border-radius: 13px;
+  background: rgba(238,230,212,.96); color: #242e30;
+  box-shadow: 0 12px 32px rgba(10,20,24,.17);
+}
+html.n7-embed .n7e-cartouche .n7e-place {
+  font: 600 25px/1.2 "GFS Didot",Georgia,serif;
+  color: #24343a; letter-spacing: 0;
+}
+html.n7-embed .n7e-cartouche .n7e-alt {
+  margin: 5px 0 0; color: #596e71;
+  font: 500 12px/1.4 "Plus Jakarta Sans",system-ui,sans-serif;
+}
+html.n7-embed .n7e-cartouche .n7e-status {
+  margin-top: 10px; padding: 3px 8px;
+  border: 1px solid rgba(77,114,119,.35); border-radius: 6px;
+  background: rgba(77,114,119,.08); color: #38575a;
+  font: 700 9px/1.5 "Plus Jakarta Sans",system-ui,sans-serif;
+  letter-spacing: .04em;
+}
+html.n7-embed .n7e-cartouche .n7e-status.ok {
+  background: rgba(55,115,91,.12); border-color: rgba(55,115,91,.35); color: #285a46;
+}
+html.n7-embed .n7e-orn,
+html.n7-embed .n7e-ornament-ship,
+html.n7-embed main::before,
+html.n7-embed main::after { display: none !important; }
+html.n7-embed #realMap::after {
+  background: radial-gradient(ellipse at 50% 50%,transparent 70%,rgba(11,22,25,.13) 100%) !important;
+  opacity: 1;
+}
+html.n7-embed .n7e-badge {
+  right: 18px; bottom: 18px; padding: 7px 12px;
+  border: 1px solid rgba(88,206,218,.27); border-radius: 9px;
+  background: rgba(15,27,32,.89); color: #caf6f6;
+  box-shadow: 0 6px 20px rgba(0,0,0,.16);
+  font: 600 11px/1.3 "Plus Jakarta Sans",system-ui,sans-serif;
+}
+html.n7-embed main>.absolute.bottom-5.left-6 {
+  left: 300px !important; bottom: 26px !important;
+  transform: none !important;
+}
+html.n7-embed .n7e-compact .n7e-tabs {
+  display: flex; flex-direction: column; gap: 3px; padding: 8px;
+}
+html.n7-embed .n7e-compact .n7e-tab { font-size: 12px; padding: 7px 10px; min-height: 35px; }
+html.n7-embed .n7e-compact .n7e-brand { padding: 11px 14px; }
+html.n7-embed .n7e-compact .n7e-brand-name { font-size: 17px; }
+html.n7-embed .n7e-compact .n7e-body { padding: 12px; }
+@media (max-width: 900px) {
+  html.n7-embed .n7e-bar { width: 230px; }
+  html.n7-embed .n7e-cartouche { width: min(300px,calc(100% - 270px)); right: 12px; top: 12px; }
+  html.n7-embed main>.absolute.bottom-5.left-6 { left: 252px !important; }
+}
+@media (max-width: 640px) {
+  html.n7-embed .n7e-bar {
+    inset: auto 8px 8px; width: auto; max-height: min(45%,330px);
+    border-radius: 15px;
+  }
+  html.n7-embed .n7e-brand { display: none; }
+  html.n7-embed .n7e-tabs,
+  html.n7-embed .n7e-compact .n7e-tabs {
+    display: flex; flex-direction: row; overflow-x: auto;
+    gap: 4px; padding: 8px; flex-shrink: 0;
+  }
+  html.n7-embed .n7e-tab,
+  html.n7-embed .n7e-compact .n7e-tab {
+    white-space: nowrap; min-height: 37px; padding: 8px 11px;
+    font-size: 12px; flex-shrink: 0;
+  }
+  html.n7-embed .n7e-tab-icon { display: none; }
+  html.n7-embed .n7e-body { margin: 0 8px 8px; padding: 11px 12px; }
+  html.n7-embed .n7e-cartouche {
+    top: 8px; left: 8px; right: 8px; max-width: none; width: auto;
+    padding: 10px 13px;
+  }
+  html.n7-embed .n7e-cartouche .n7e-place { font-size: 21px; }
+  html.n7-embed .n7e-cartouche .n7e-alt { font-size: 11px; }
+  html.n7-embed .n7e-badge { right: 12px; bottom: calc(min(45%,330px) + 18px); top: auto; font-size: 10px; }
+  html.n7-embed main>.absolute.bottom-5.left-6 { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.n7-embed .n7e-tab,html.n7-embed .n7e-link { transition: none; }
+}
