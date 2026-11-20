@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import {BookOpen, ClipboardList, Map, Menu, MessageSquare, PanelTop, SlidersHorizontal, X} from "lucide-react";
+import {BookOpen, ClipboardList, Map, MessageSquare, PanelTop, X} from "lucide-react";
 import N7GuideScene,{type GuideFrameInfo,type GuideMode,type GuideMood} from "./N7GuideScene";
 import N7Backdrop,{type N7BackdropHandle,type N7BackdropTuning} from "./N7Backdrop";
 import { N7_HUMANOID_REFERENCE } from "./N7HumanoidReference";
@@ -191,18 +191,13 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
     {home&&onNavigate?<header className="n7-home-header">
       <div className="n7-home-brand"><strong>N7</strong><span>Humanoid</span></div>
       <div className="n7-home-actions">
-        <button ref={appearanceButton} type="button" className="n7-home-appearance-button" aria-expanded={appearanceOpen}
-          aria-controls="n7-appearance" onClick={()=>{
-            if(appearanceOpen)closeAppearance();
-            else{setMenuOpen(false);setAppearanceOpen(true);}
-          }}><SlidersHorizontal size={16} aria-hidden="true"/>Εμφάνιση</button>
         <div className="n7-home-menu-anchor">
-          <button ref={menuButton} className="n7-home-menu-button" type="button"
+          <button ref={menuButton} className="n7-home-pill n7-home-menu-button" type="button"
             aria-expanded={menuOpen} aria-controls="n7-home-menu" onClick={()=>{
               if(appearanceOpen){setAppearanceOpen(false);setDetails(false);}
               setMenuOpen(value=>!value);
             }}>
-            {menuOpen?<X size={17} aria-hidden="true"/>:<Menu size={17} aria-hidden="true"/>} Μενού
+            Μενού
           </button>
           {menuOpen&&<nav id="n7-home-menu" className="n7-home-menu" aria-label="Πλοήγηση N7">
             <button type="button" data-nav="nabou" onClick={()=>onNavigate("nabou")}><Map size={17} aria-hidden="true"/>Χάρτης NABOU</button>
@@ -214,6 +209,11 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
             </div>}
           </nav>}
         </div>
+        <button ref={appearanceButton} type="button" className="n7-home-pill n7-home-appearance-button" aria-expanded={appearanceOpen}
+          aria-controls="n7-appearance" onClick={()=>{
+            if(appearanceOpen)closeAppearance();
+            else{setMenuOpen(false);setAppearanceOpen(true);}
+          }}>Εμφάνιση</button>
       </div>
     </header>:<header className="n7-guide-header"><strong className="n7-guide-brand">N7 <i>·</i> HUMANOID</strong><div style={{display:"flex",gap:8}}>{onWorkspace&&<button type="button" onClick={onWorkspace}>Συνομιλία</button>}{onNavigate&&<button type="button" data-nav="chat" onClick={()=>onNavigate("chat")}>Chat</button>}{onNavigate&&<button type="button" data-nav="nabou" onClick={()=>onNavigate("nabou")}>NABOU</button>}<button type="button" data-exit="" onClick={onClose}>Exit</button></div></header>}
     <div className="n7-guide-main" data-details={details}>

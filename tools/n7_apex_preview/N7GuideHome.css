@@ -41,10 +41,20 @@
   letter-spacing: -.06em;
 }
 
-.n7-home-menu-anchor { position: relative; }
-.n7-home-actions { display: flex; align-items: center; gap: 8px; }
+.n7-home-menu-anchor { position: relative; grid-area: menu; }
+.n7-home-actions {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  right: var(--n7-home-gutter);
+  display: grid;
+  grid-template-areas: "menu" "appearance";
+  gap: 12px;
+  width: 190px;
+}
 
-.n7-live-home :is(.n7-home-menu-button, .n7-home-appearance-button, .n7-home-menu button, .n7-home-caption-button, .n7-home-audio-unlock, .n7-guide-controls button) {
+.n7-home-appearance-button { grid-area: appearance; }
+
+.n7-live-home :is(.n7-home-menu button, .n7-home-caption-button, .n7-home-audio-unlock, .n7-guide-controls button) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -59,23 +69,37 @@
   line-height: 1.2;
 }
 
-.n7-live-home :is(.n7-home-menu-button, .n7-home-appearance-button) {
-  padding: 0 12px;
-  border-color: #7fe6f54d;
-  color: #c5edf5;
-  background: #08162391;
+.n7-live-home .n7-home-actions button.n7-home-pill {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 28px;
+  padding: 0 9px;
+  border: 1px solid #7fe6f54d;
+  border-radius: 999px;
+  background: #06112085;
+  color: #d5e7ec;
+  font-size: 11px;
+  letter-spacing: .20em;
+  backdrop-filter: blur(6px);
 }
 
-.n7-live-home .n7-home-appearance-button {
-  border-radius: 999px;
-  border-color: #7fe6f56b;
-  background: #0b293c91;
+.n7-live-home .n7-home-actions button.n7-home-appearance-button {
+  border-color: #7fe6f590;
+  background: #14374b99;
+  color: #def9ff;
+  box-shadow: 0 0 15px #5acee52e;
+}
+
+.n7-live-home .n7-home-actions button.n7-home-pill:is(:hover, [aria-expanded="true"]) {
+  border-color: #7fe6f5b3;
+  background: #173a4c;
 }
 
 .n7-home-menu {
   position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
+  top: 0;
+  right: calc(100% + 10px);
   width: min(258px, calc(100vw - 36px));
   max-height: min(65dvh, 360px);
   overflow-y: auto;
@@ -205,7 +229,7 @@
   color: #c5edf5;
 }
 
-.n7-live-home :is(.n7-home-caption-button[aria-pressed="true"], .n7-home-actions button[aria-expanded="true"]) {
+.n7-live-home .n7-home-caption-button[aria-pressed="true"] {
   border-color: #7fe6f58c;
   background: #123347;
   color: var(--n7-home-cyan);
@@ -233,7 +257,7 @@
 
 .n7-guide-view.n7-live-home .n7-guide-controls {
   position: absolute;
-  top: max(68px, calc(env(safe-area-inset-top) + 56px));
+  top: max(96px, calc(env(safe-area-inset-top) + 80px));
   right: var(--n7-home-gutter);
   z-index: 8;
   width: min(376px, calc(100vw - 36px));
@@ -288,16 +312,36 @@
 .n7-live-home[data-activity="thinking"] .n7-ambient-field::before { opacity: .22; }
 .n7-live-home[data-activity="speaking"] .n7-ambient-field::before { opacity: calc(.28 + .65 * var(--n7-voice-energy, 0)); }
 
-@media (max-width: 720px) {
+@media (max-width: 700px) {
+  .n7-guide-view.n7-live-home {
+    --n7-pill-bottom: max(16px, env(safe-area-inset-bottom));
+    --n7-status-bottom: calc(var(--n7-pill-bottom) + 46px);
+  }
+
+  .n7-home-actions {
+    position: fixed;
+    inset: auto var(--n7-home-gutter) var(--n7-pill-bottom);
+    width: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas: "appearance menu";
+  }
+
+  .n7-live-home .n7-home-actions button.n7-home-pill { min-height: 34px; letter-spacing: .12em; }
+
+  .n7-home-menu { top: auto; right: 0; bottom: calc(100% + 8px); }
+
   .n7-live-home .n7-guide-main {
-    inset: max(55px, calc(env(safe-area-inset-top) + 46px)) 0 max(76px, calc(env(safe-area-inset-bottom) + 66px));
+    inset: max(55px, calc(env(safe-area-inset-top) + 46px)) 0 calc(var(--n7-status-bottom) + 64px);
   }
 
   .n7-guide-view.n7-live-home #n7-guide-voice {
-    bottom: max(14px, env(safe-area-inset-bottom));
+    bottom: var(--n7-status-bottom);
   }
-}
 
-@media (max-width: 380px) {
-  .n7-home-brand span { display: none; }
+  .n7-guide-view.n7-live-home .n7-guide-controls {
+    top: auto;
+    right: auto;
+    left: var(--n7-home-gutter);
+    bottom: var(--n7-status-bottom);
+  }
 }

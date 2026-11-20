@@ -48,6 +48,15 @@ async function verifyHumanoidHome(browser, homeUrl) {
       },backdrop);
       await dialog.locator(hostSelector+" canvas").first().waitFor({state:"attached"});
       assert.equal(await dialog.getByRole("button").count(),3);
+      const [menuBox,appearanceBox]=await Promise.all([menu.boundingBox(),appearance.boundingBox()]);
+      assert.equal(menuBox.width,appearanceBox.width);
+      if(width===390){
+        assert.equal(menuBox.y,appearanceBox.y);
+        assert(appearanceBox.x<menuBox.x&&menuBox.y>780,"The pills should be side by side at the bottom on phones");
+      }else{
+        assert.equal(menuBox.x,appearanceBox.x);
+        assert(appearanceBox.y>menuBox.y+menuBox.height&&appearanceBox.y<100,"The pills should stack at the top right on desktop");
+      }
       await menu.click();
       const navigation = dialog.getByRole("navigation",{name:"Πλοήγηση N7"});
       await navigation.getByRole("button",{name:"Γραπτή συνομιλία"}).waitFor();
