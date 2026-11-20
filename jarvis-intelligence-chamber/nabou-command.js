@@ -387,7 +387,7 @@
  const osvg=document.createElementNS(NS,'svg');osvg.setAttribute('class','nbc-oldmap');osvg.setAttribute('viewBox','0 0 '+C.W+' '+C.H);osvg.setAttribute('width',C.W);osvg.setAttribute('height',C.H);osvg.setAttribute('aria-hidden','true');
  let OLD=null,oldState=0;
  function loadOld(){if(oldState)return;oldState=1;fetch('./data/historical-maps.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(d=>{OLD=d?.maps?.[0]||null;if(!OLD){oldState=0;return;}
-   osvg.innerHTML=OLD.images.map((im,i)=>`<image class="${im.minScale?'det':'base'}" href="${im.href}" x="${im.x}" y="${im.y}" width="${im.w}" height="${im.h}" preserveAspectRatio="none" decoding="async"/>`).join('');
+   osvg.innerHTML=`<rect class="dim" x="-2000" y="-2000" width="${C.W+4000}" height="${C.H+4000}"/>`+OLD.images.map((im,i)=>`<image class="${im.minScale?'det':'base'}" href="${im.href}" x="${im.x}" y="${im.y}" width="${im.w}" height="${im.h}" preserveAspectRatio="none" decoding="async"/>`).join('');
    oldState=2;buildOldPanel();syncScale();}).catch(()=>{oldState=0;});}
  layer.append(csvg,osvg,rsvg);plane.append(layer);
  const syncScale=()=>{const sc=view2d().s;layer.style.setProperty('--nbc-inv',String(1/sc));layer.classList.toggle('far',sc<1.3);
@@ -455,7 +455,7 @@
   body.classList.toggle('nbc-old-on',ui.old);$('nbcOld')?.setAttribute('aria-pressed',String(ui.old));if(oldPanel)oldPanel.hidden=!ui.old;}
  let oldPanel=null;
  function buildOldPanel(){if(oldPanel||!OLD)return;const slot=$('n7MapSlot');if(!slot)return;
-  let op=0.85;try{op=+(localStorage.getItem('nbc.oldOp')||0.85);}catch(e){}osvg.style.opacity=op;
+  let op=0.7;try{op=+(localStorage.getItem('nbc.oldOp')||0.7);}catch(e){}osvg.style.opacity=op;
   const rng=h('input',{type:'range',min:'0',max:'100',value:String(Math.round(op*100)),'aria-label':'Διαφάνεια ιστορικού χάρτη'});
   rng.addEventListener('input',()=>{osvg.style.opacity=rng.value/100;try{localStorage.setItem('nbc.oldOp',String(rng.value/100));}catch(e){}});
   oldPanel=h('aside',{class:'nbc-oldpanel',hidden:!ui.old},
