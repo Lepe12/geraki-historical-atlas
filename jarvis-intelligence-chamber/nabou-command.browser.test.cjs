@@ -1,4 +1,4 @@
-const S=require(process.env.NBC_SERVE||'./serve.cjs'),assert=require('assert');
+const S=require('./serve.cjs'),assert=require('assert');
 (async()=>{const b=await S.launch();const ctx=await b.newContext({viewport:{width:1440,height:900}});await S.route(ctx);
 const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));
 const U='https://lepe12.github.io/geraki-historical-atlas/jarvis-intelligence-chamber/';
@@ -15,7 +15,7 @@ await p.evaluate(()=>NABOU_PRO_ATLAS.select('corfu'));await p.waitForTimeout(500
 assert.equal(await p.evaluate(()=>NABOU_PRO_ATLAS.selected),'corfu');
 assert(await p.isVisible('#proPlaceInfo'));assert.match(await p.textContent('#nbcRecord'),/Κέρκυρα/);ok('reference place Κέρκυρα: card + linked GERAKI record');
 for(const t of ['towns','monuments','people','routes','sources']){await p.click(`.nbc-tab[data-tab="${t}"]`);const n=await p.$$eval('#nbcRecord .nbc-item,#nbcRecord .nbc-person,#nbcRecord .nbc-src',x=>x.length);assert(n>0,t);ok('tab '+t+' '+n);}
-await p.screenshot({path:'t-people.png'});
+await p.screenshot({path:'/home/claude/nabou-work/ch/t-people.png'});
 // book + timeline
 await p.click('.nbc-seg button[data-book="Book III"]');const vis=await p.$$eval('.nbc-pin:not([hidden])',x=>x.length);ok('book III visible pins '+vis);
 await p.click('.nbc-seg button[data-book="All"]');

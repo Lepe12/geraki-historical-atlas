@@ -120,7 +120,9 @@
   h('button',{type:'button',dataset:{book:v},'aria-pressed':String(v==='All'),title:v==='All'?'Όλα τα βιβλία':bookLabel(v),onclick:()=>{ui.book=v;refresh();}},l)));
  const t3d=h('button',{type:'button',class:'nbc-tool',id:'nbc3d','aria-pressed':'false',title:'Τρισδιάστατος χάρτης με ανάγλυφο',onclick:()=>$('map3dToggle')?.click()},ico(I.cube),h('b',{text:'3D'}));
  const tFull=h('button',{type:'button',class:'nbc-tool',title:'Πλήρης οθόνη','aria-label':'Πλήρης οθόνη',onclick:()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}catch{}}},ico(I.full));
- if(actions)actions.before(h('div',{class:'nbc-topctl'},h('span',{class:'nbc-lbl',text:'Βιβλίο'}),seg,periodChip,t3d,tFull));
+ const tOld=h('button',{type:'button',class:'nbc-tool',id:'nbcOld','aria-pressed':'false',title:'Ιστορικός χάρτης: Jansson 1650 (David Rumsey Map Collection)',onclick:()=>setOld(!ui.old)},
+  ico('<path d="M4 5l5-2 6 2 5-2v16l-5 2-6-2-5 2z"/><path d="M9 3v16M15 5v16"/>'),h('b',{text:'1650'}));
+ if(actions)actions.before(h('div',{class:'nbc-topctl'},h('span',{class:'nbc-lbl',text:'Βιβλίο'}),seg,periodChip,tOld,t3d,tFull));
  const sync3d=()=>{const on=!!M3()?.enabled;t3d.setAttribute('aria-pressed',String(on));t3d.querySelector('b').textContent=on?'2D':'3D';t3d.title=on?'Επιστροφή στον επίπεδο χάρτη':'Τρισδιάστατος χάρτης με ανάγλυφο';body.classList.toggle('nbc-3d',on);};
  addEventListener('nabou:map3d',()=>{sync3d();if(M3()?.enabled)mount3d();});
  if(!M3()?.supported)t3d.disabled=true;
@@ -381,8 +383,15 @@
    +`<pattern id="nbcSeaHatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)"><path d="M0 3h6" stroke="#ffffff" stroke-opacity=".035" stroke-width=".6"/></pattern></defs>`
    +`<g clip-path="url(#nbcCoastClip)"><rect class="sea" x="${a.x}" y="${a.y}" width="${b.x-a.x}" height="${b.y-a.y}"/><rect x="${a.x}" y="${a.y}" width="${b.x-a.x}" height="${b.y-a.y}" fill="url(#nbcSeaHatch)"/>`
    +`<path class="shoal" d="${d.d}"/><path class="land" d="${d.d}"/><path class="coast" d="${d.d}"/></g>`;coastState=2;syncScale();}).catch(()=>{coastState=0;});}
- layer.append(csvg,rsvg);plane.append(layer);
+ // Historical map overlay (Jansson 1650, georeferenced by NABOU): above the chart and the sharp coasts, below routes and pins.
+ const osvg=document.createElementNS(NS,'svg');osvg.setAttribute('class','nbc-oldmap');osvg.setAttribute('viewBox','0 0 '+C.W+' '+C.H);osvg.setAttribute('width',C.W);osvg.setAttribute('height',C.H);osvg.setAttribute('aria-hidden','true');
+ let OLD=null,oldState=0;
+ function loadOld(){if(oldState)return;oldState=1;fetch('./data/historical-maps.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(d=>{OLD=d?.maps?.[0]||null;if(!OLD){oldState=0;return;}
+   osvg.innerHTML=OLD.images.map((im,i)=>`<image class="${im.minScale?'det':'base'}" href="${im.href}" x="${im.x}" y="${im.y}" width="${im.w}" height="${im.h}" preserveAspectRatio="none" decoding="async"/>`).join('');
+   oldState=2;buildOldPanel();syncScale();}).catch(()=>{oldState=0;});}
+ layer.append(csvg,osvg,rsvg);plane.append(layer);
  const syncScale=()=>{const sc=view2d().s;layer.style.setProperty('--nbc-inv',String(1/sc));layer.classList.toggle('far',sc<1.3);
+  osvg.classList.toggle('zoomed',sc>=2);osvg.classList.toggle('off3d',!!M3()?.enabled);
   const det=sc>=2.2&&!M3()?.enabled;if(det)loadCoast();layer.classList.toggle('detail',det&&coastState===2);body.classList.toggle('nbc-detail',det&&coastState===2);};
  new MutationObserver(syncScale).observe(plane,{attributes:true,attributeFilter:['style']});syncScale();
  const routePts=r=>{const a=byId.get(r.from?.[0]?.id),b=byId.get(r.to?.[0]?.id);if(!a||!b)return [];
@@ -442,6 +451,20 @@
  function applyRule(){const {from,to}=period();for(const m of [bpins,bpins3d])for(const [id,e] of m){const b=baseById.get(id);const s=b&&rulerAt(b,from,to);
    if(s){e.style.setProperty('--rule',RULERS[s[2]][1]);e.dataset.rule=RULERS[s[2]][0];}else{e.style.removeProperty('--rule');delete e.dataset.rule;}}}
 
+ function setOld(v){ui.old=!!v;try{localStorage.setItem('nbc.old',v?'1':'0');}catch(e){}if(v)loadOld();
+  body.classList.toggle('nbc-old-on',ui.old);$('nbcOld')?.setAttribute('aria-pressed',String(ui.old));if(oldPanel)oldPanel.hidden=!ui.old;}
+ let oldPanel=null;
+ function buildOldPanel(){if(oldPanel||!OLD)return;const slot=$('n7MapSlot');if(!slot)return;
+  let op=0.85;try{op=+(localStorage.getItem('nbc.oldOp')||0.85);}catch(e){}osvg.style.opacity=op;
+  const rng=h('input',{type:'range',min:'0',max:'100',value:String(Math.round(op*100)),'aria-label':'Διαφάνεια ιστορικού χάρτη'});
+  rng.addEventListener('input',()=>{osvg.style.opacity=rng.value/100;try{localStorage.setItem('nbc.oldOp',String(rng.value/100));}catch(e){}});
+  oldPanel=h('aside',{class:'nbc-oldpanel',hidden:!ui.old},
+   h('div',{class:'nbc-old-h'},h('b',{text:OLD.short}),h('button',{type:'button',class:'nbc-x','aria-label':'Κλείσιμο ιστορικού χάρτη',onclick:()=>setOld(false)},'✕')),
+   h('label',{class:'nbc-old-r'},h('span',{text:'σήμερα'}),rng,h('span',{text:'1650'})),
+   h('p',{class:'nbc-old-c'},h('a',{href:OLD.item,target:'_blank',rel:'noopener',text:OLD.credit}),' · ',h('a',{href:OLD.licenseUrl,target:'_blank',rel:'noopener',text:OLD.license})),
+   h('p',{class:'nbc-old-n',text:'Γεωαναφορά NABOU με '+OLD.gcps.length+' σημεία ελέγχου· ενδιάμεσα μένει η παραμόρφωση του 1650. Μόνο στον 2Δ χάρτη.'}));
+  slot.append(oldPanel);}
+ try{if(localStorage.getItem('nbc.old')==='1')setTimeout(()=>setOld(true),50);}catch(e){}
  const routeChip=h('button',{type:'button',class:'nbc-only-chip',hidden:true,onclick:()=>setRoutesOnly(false)},h('b',{text:'Ναυτικές ρότες'}),' · μόνο οι ρότες ',h('span',{text:'✕'}));
  $('n7MapSlot')?.append(routeChip);
  /* ───── map legend: what the flags, numbers, banners and colour bars mean ───── */
@@ -626,6 +649,7 @@
   const sw=(label,get,set,extra)=>{const i=h('input',{type:'checkbox'});i.checked=get();i.addEventListener('change',()=>{set(i.checked);marks();});return h('label',{class:'pro-check nbc-check'},i,h('span',{text:label}),extra||null);};
   const box=h('fieldset',{class:'nbc-layers',id:'nbcLayers'},h('legend',{text:'Εγγραφές GERAKI'}),
    sw('Οικισμοί',()=>ui.layers.towns,v=>ui.layers.towns=v),sw('Τοπωνύμια (νησιά, θάλασσες)',()=>ui.layers.labels,v=>ui.layers.labels=v),sw('Διαδρομές (2D)',()=>ui.layers.routes,v=>ui.layers.routes=v),
+   h('p',{class:'nbc-lg',text:'Ιστορικός χάρτης'}),sw('Jansson 1650 (David Rumsey)',()=>!!ui.old,v=>setOld(v)),
    h('p',{class:'nbc-lg',text:'Δυνάμεις της εποχής'}),sw('Λάβαρα στις έδρες τους',()=>ui.layers.powers,v=>ui.layers.powers=v),
    h('p',{class:'nbc-lg',text:'Μπελαβίλας 1992 (ΕΜΠ)'}),h('button',{type:'button',class:'nbc-btn nbc-routes-btn',onclick:()=>setRoutesOnly(true)},'Δείξε τις ναυτικές ρότες (μόνες τους)'),sw('Καταφύγια, παζάρια, βίγλες',()=>ui.layers.bvpoints,v=>ui.layers.bvpoints=v),
    h('p',{class:'nbc-lg',text:'Πειρατικά ορμητήρια (διατριβή Μ. Γουργουρίνη)'}),
