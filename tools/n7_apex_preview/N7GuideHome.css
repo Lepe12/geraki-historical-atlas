@@ -43,26 +43,26 @@
 
 .n7-home-menu-anchor { position: relative; }
 
-.n7-live-home :is(.n7-home-menu-button, .n7-home-menu button, .n7-home-call, .n7-home-caption-button, .n7-home-audio-unlock) {
+.n7-live-home :is(.n7-home-menu-button, .n7-home-menu button, .n7-home-call, .n7-home-caption-button, .n7-home-audio-unlock, .n7-guide-controls button) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   min-height: 42px;
-  border-radius: 10px;
-  letter-spacing: 0;
-  text-transform: none;
-  font-family: inherit;
-  font-size: 13px;
+  border-radius: 7px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 11px;
   font-weight: 600;
   line-height: 1.2;
 }
 
 .n7-live-home .n7-home-menu-button {
   padding: 0 12px;
-  border-color: var(--n7-home-edge);
-  color: var(--n7-home-text);
-  background: #081725;
+  border-color: #7fe6f54d;
+  color: #c5edf5;
+  background: #08162391;
 }
 
 .n7-home-menu {
@@ -106,7 +106,7 @@
   left: var(--n7-home-gutter);
   bottom: max(26px, env(safe-area-inset-bottom));
   z-index: 5;
-  width: min(320px, calc(100% - 2 * var(--n7-home-gutter)));
+  width: min(410px, calc(100% - 2 * var(--n7-home-gutter)));
 }
 
 .n7-guide-view.n7-live-home #n7-guide-voice > .n7-home-voice {
@@ -164,7 +164,7 @@
   padding: 0 12px;
   color: #e2f8fc;
   border-color: #7fe6f54d;
-  background: #0e2939c9;
+  background: #0a1c2baf;
 }
 
 .n7-live-home .n7-home-call:hover:not(:disabled) {
@@ -176,23 +176,22 @@
 .n7-live-home .n7-home-call[aria-pressed="true"] {
   color: #ffe5c2;
   border-color: #a77a4a;
-  background: #442a1c;
-  box-shadow: none;
+  background: #3b261abf;
+  box-shadow: inset 0 0 12px #eea3542b;
 }
 
 .n7-live-home .n7-home-caption-button {
-  width: 42px;
-  padding: 0;
-  border-color: transparent;
-  background: transparent;
-  color: var(--n7-home-dim);
+  padding: 0 10px;
+  border-color: #7fe6f533;
+  background: #08162391;
+  color: #c5edf5;
 }
 
-.n7-live-home .n7-home-caption-button[aria-pressed="true"] {
-  border-color: transparent;
-  background: #14384b;
+.n7-live-home :is(.n7-home-caption-button[aria-pressed="true"], .n7-home-menu-button[aria-expanded="true"]) {
+  border-color: #7fe6f58c;
+  background: #123347;
   color: var(--n7-home-cyan);
-  box-shadow: none;
+  box-shadow: inset 0 0 13px #7fe6f520;
 }
 .n7-live-home .n7-home-audio-unlock { min-height: 32px; padding: 0 7px; margin: 3px 0 0; border: 0; color: var(--n7-home-dim); }
 
@@ -235,6 +234,17 @@
 .n7-live-home .n7-guide-cluster, .n7-live-home .n7-guide-group { flex-wrap: wrap; }
 .n7-live-home .n7-guide-group { padding-left: 0; }
 .n7-home-settings-title { display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
+.n7-home-tuning { display: grid; gap: 9px; padding-bottom: 10px; border-bottom: 1px solid var(--n7-home-edge); }
+.n7-home-tuning label { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 8px; font-size: 12px; }
+.n7-home-tuning label span[aria-hidden] { color: var(--n7-home-cyan); font-variant-numeric: tabular-nums; }
+.n7-home-tuning input { grid-column: 1 / -1; width: 100%; margin: 0; accent-color: var(--n7-home-cyan); }
+.n7-home-tuning input:focus-visible { outline: 2px solid var(--n7-home-gold); outline-offset: 3px; }
+.n7-live-home .n7-home-tuning button { justify-self: end; min-height: 34px; }
+
+.n7-ambient-field picture img {
+  opacity: var(--n7-fog-opacity, 1);
+  filter: brightness(var(--n7-field-brightness, 1));
+}
 
 /* Light across the full-screen backdrop, beneath the existing figure. */
 .n7-ambient-field::after {
@@ -253,12 +263,12 @@
   background: radial-gradient(ellipse at 50% 48%, #249ab747, transparent 62%);
   mix-blend-mode: screen;
   opacity: 0;
-  transition: opacity 300ms ease;
+  transition: opacity 100ms linear;
 }
 
 .n7-live-home[data-activity="listening"] .n7-ambient-field::before { opacity: .4; }
 .n7-live-home[data-activity="thinking"] .n7-ambient-field::before { opacity: .22; }
-.n7-live-home[data-activity="speaking"] .n7-ambient-field::before { opacity: .68; }
+.n7-live-home[data-activity="speaking"] .n7-ambient-field::before { opacity: calc(.28 + .65 * var(--n7-voice-energy, 0)); }
 
 @media (max-width: 720px) {
   .n7-live-home .n7-guide-main {
@@ -276,5 +286,7 @@
   .n7-home-brand { gap: 8px; }
   .n7-home-meter { padding-inline: 0; }
   .n7-home-voice-state { gap: 5px; font-size: 12px; }
-  .n7-live-home .n7-home-call { padding-inline: 7px; font-size: 12px; }
+  .n7-live-home .n7-home-call { padding-inline: 8px; }
+  .n7-live-home .n7-home-caption-button { width: 42px; padding: 0; }
+  .n7-home-caption-button span { display: none; }
 }

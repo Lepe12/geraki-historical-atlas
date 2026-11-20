@@ -486,7 +486,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
             <div className="n7-home-dock-controls">
               {!needsLogin&&<button type="button" className="n7-home-caption-button" aria-pressed={captionsOpen}
                 aria-controls="n7-home-captions" title="Υπότιτλοι" aria-label="Υπότιτλοι" onClick={()=>setCaptionsOpen(value=>!value)}>
-                <Captions size={20} aria-hidden="true"/>
+                <Captions size={16} aria-hidden="true"/><span>Υπότιτλοι</span>
               </button>}
               <button type="button" data-n7-conversation-toggle="" className="n7-home-call"
                 aria-pressed={needsLogin?undefined:voice.conversation} aria-expanded={needsLogin?voiceOpen:undefined}

@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {BookOpen, ClipboardList, Map, Menu, MessageSquare, PanelTop, SlidersHorizontal, X} from "lucide-react";
 import N7GuideScene,{type GuideFrameInfo,type GuideMode,type GuideMood} from "./N7GuideScene";
-import N7Backdrop,{type N7BackdropHandle} from "./N7Backdrop";
+import N7Backdrop,{type N7BackdropHandle,type N7BackdropTuning} from "./N7Backdrop";
 import { N7_HUMANOID_REFERENCE } from "./N7HumanoidReference";
 import { CORE, createAssemblySound, createFx } from "./N7GuideFx";
 import type {N7Target} from "./N7Navigation";
@@ -14,6 +14,13 @@ type Face="n7"|"h01";
 const ASSET_ROOT=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/"));
 const H01_FIGURE=ASSET_ROOT+"/n7-humanoid-h01-v2.webp";
 const AMBIENT_BACKGROUND={wide:ASSET_ROOT+"/n7-ambient-v1.webp",portrait:ASSET_ROOT+"/n7-ambient-portrait-v1.webp"};
+const DEFAULT_TUNING:N7BackdropTuning={fog:100,brightness:100,motion:100};
+const TUNING_KEY="n7-backdrop-tuning-v1";
+const TUNING_CONTROLS=[
+  {key:"fog",label:"Ομίχλη",min:0,max:160},
+  {key:"brightness",label:"Φωτεινότητα",min:50,max:150},
+  {key:"motion",label:"Κίνηση",min:0,max:150},
+] as const;
 const H01_SCALE=2.5;
 
 export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigate,onBackToWorkspace}:{open:boolean;onClose:()=>void;onBackToWorkspace?:()=>void;activity?:GuideMood|null;onWorkspace?:()=>void;onNavigate?:(target:N7Target)=>void}){
@@ -32,6 +39,23 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
   },[open]);
   const [diagnosticsView,setDiagnosticsView]=useState(false);
   const home=!!onNavigate&&!diagnosticsView;
+  const [tuning,setTuning]=useState(DEFAULT_TUNING);
+  useEffect(()=>{
+    if(!home)return;
+    try{
+      const stored=JSON.parse(window.localStorage.getItem(TUNING_KEY)??"null");
+      const next={...DEFAULT_TUNING};
+      for(const {key,min,max} of TUNING_CONTROLS){
+        const value=stored?.[key];
+        if(Number.isFinite(value))next[key]=Math.round(Math.min(max,Math.max(min,value))/5)*5;
+      }
+      setTuning(next);
+    }catch{}
+  },[home]);
+  const saveTuning=(next:N7BackdropTuning)=>{
+    setTuning(next);
+    try{window.localStorage.setItem(TUNING_KEY,JSON.stringify(next));}catch{}
+  };
   const [faceChoice,setFace]=useState<Face>("n7");
   const chooseFace=(next:Face)=>{setFace(next);try{window.localStorage.setItem("n7-face",next);}catch{}};
   const figureUrl=faceChoice==="h01"?H01_FIGURE:N7_HUMANOID_REFERENCE;
@@ -85,6 +109,7 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
   const complete=useCallback(()=>setDone(true),[]);
   const frame=useCallback((info:GuideFrameInfo)=>{
     const ring=waveRef.current,point=face.current,s=settings.current;
+    backdrop.current?.setVoiceLevel(info.voiceLevel);
     if(ring){
       if(info.shock>=0&&s.effects&&!s.reduced){
         const radius=12+point.max*info.shock,fade=Math.sin(Math.PI*info.shock)*.55;
@@ -153,7 +178,7 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
       .n7-guide-details{padding:14px;background:rgba(2,9,14,.88);border:1px solid rgba(120,220,240,.16);border-radius:12px;overflow:auto;font-size:12px;line-height:1.6;min-height:0}
       @media(max-width:700px), (max-width:1000px) and (max-height:500px){.n7-guide-main[data-details=true]{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) 115px}.n7-guide-controls{align-self:stretch;margin:0;max-width:none;border-radius:0;border-width:1px 0 0;padding:6px 8px;gap:4px 10px;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;min-height:42px}#n7-guide-voice>div{width:100%;border-radius:0;border-width:1px 0 0}.n7-guide-controls>*{flex-shrink:0}.n7-guide-cluster{flex-wrap:nowrap}.n7-guide-group{padding-left:10px}.n7-guide-view button{padding:6px 8px;font-size:11px}}
     `}</style>
-    <N7Backdrop ref={backdrop} effects={effects} reduced={reduced} ambience={home?AMBIENT_BACKGROUND:undefined}/>
+    <N7Backdrop ref={backdrop} effects={effects} reduced={reduced} ambience={home?AMBIENT_BACKGROUND:undefined} tuning={home?tuning:undefined}/>
     <div ref={waveRef} aria-label="N7 completion shockwave" data-progress="-1" style={{display:"none",position:"fixed",pointerEvents:"none",border:"2px solid #ffe0a6",boxShadow:"0 0 12px #63ddff88",borderRadius:"50%",zIndex:3}}/>
     {home&&onNavigate?<header className="n7-home-header">
       <div className="n7-home-brand"><strong>N7</strong><span>Humanoid</span></div>
@@ -193,6 +218,14 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
       {home&&<div className="n7-home-settings-title">
         <strong>Εμφάνιση Humanoid</strong>
         <button ref={appearanceCloseButton} type="button" aria-label="Κλείσιμο ρυθμίσεων εμφάνισης" onClick={closeAppearance}><X size={16} aria-hidden="true"/></button>
+      </div>}
+      {home&&<div className="n7-home-tuning" role="group" aria-label="Ρυθμίσεις φόντου">
+        {TUNING_CONTROLS.map(({key,label,min,max})=><label key={key}>
+          <span>{label}</span><span aria-hidden="true">{tuning[key]}%</span>
+          <input type="range" min={min} max={max} step={5} value={tuning[key]} aria-valuetext={`${tuning[key]}%`}
+            onChange={event=>saveTuning({...tuning,[key]:event.currentTarget.valueAsNumber})}/>
+        </label>)}
+        <button type="button" onClick={()=>saveTuning(DEFAULT_TUNING)}>Επαναφορά</button>
       </div>}
       <div className="n7-guide-cluster">
       <span role="status" aria-label="N7 mood status" className="n7-guide-status">{mode==="assembly"?`ASSEMBLY · ${done?"COMPLETE":"BUILDING"}`:`MOOD · ${(realMood||mood).toUpperCase()}${realMood?" · LIVE N7 REQUEST":mood!=="idle"?" · PREVIEW":""}`}</span>

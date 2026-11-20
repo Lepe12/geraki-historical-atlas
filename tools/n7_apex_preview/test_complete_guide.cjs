@@ -52,6 +52,16 @@ async function verifyHumanoidHome(browser, homeUrl) {
       await navigation.getByRole("button",{name:"Γραπτή συνομιλία"}).waitFor();
       await page.keyboard.press("Escape");
       await navigation.waitFor({state:"hidden"});
+      await menu.click();
+      await navigation.getByRole("button",{name:"Εμφάνιση",exact:true}).click();
+      const fog=dialog.getByRole("slider",{name:"Ομίχλη",exact:true});
+      await fog.fill("50");
+      const background=dialog.locator(".n7-ambient-field img");
+      assert.equal(await background.evaluate(img=>getComputedStyle(img).opacity),"0.675");
+      await dialog.getByRole("button",{name:"Επαναφορά",exact:true}).click();
+      assert.equal(await fog.inputValue(),"100");
+      await page.keyboard.press("Escape");
+      await fog.waitFor({state:"hidden"});
       await loginToggle.click();
       const password = dialog.getByLabel("Κωδικός N7");
       await password.waitFor();

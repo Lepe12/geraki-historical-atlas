@@ -6,7 +6,7 @@ import { N7_HUMANOID_REFERENCE } from "./N7HumanoidReference";
 
 export type GuideMood="idle"|"listening"|"thinking"|"speaking";
 export type GuideMode="assembly"|"particle"|"original"|"compare";
-export type GuideFrameInfo={turn:number;breath:number;progress:number;shock:number;ignition:number;renderMs:number;particles:number;frameMs:number};
+export type GuideFrameInfo={turn:number;breath:number;progress:number;shock:number;ignition:number;voiceLevel:number;renderMs:number;particles:number;frameMs:number};
 export type GuideSceneProps={mode:GuideMode;mood:GuideMood;effects:boolean;reduced:boolean;breathing:boolean;gestures?:boolean;source?:string;scale?:number;replay:number;manualMotion:boolean;diagnostics:boolean;onComplete:()=>void;onFrame:(f:GuideFrameInfo)=>void};
 const moods:GuideMood[]=["idle","listening","thinking","speaking"];
 
@@ -189,7 +189,7 @@ export default function N7GuideScene(props:GuideSceneProps){
         host.dataset.referenceVisible=String(exact);host.dataset.mood=desired;
         if(c.diagnostics){host.dataset.renderMs=renderMs.toFixed(3);host.dataset.frameMs=rawDt.toFixed(3);host.dataset.moodRadius=String(transitions.length?Math.min(1,(now-transitions.at(-1)!.start)/1000)*430:430);}
         // The callback writes visual refs; React diagnostics are throttled there.
-        c.onFrame({turn:current,breath,progress,shock:wave,ignition,renderMs,particles:surface!.particles,frameMs:rawDt});
+        c.onFrame({turn:current,breath,progress,shock:wave,ignition,voiceLevel,renderMs,particles:surface!.particles,frameMs:rawDt});
         if(c.diagnostics&&now-lastStats>500){lastStats=now;host.dataset.particleCount=String(surface!.particles);}
         raf=requestAnimationFrame(draw);
       };
