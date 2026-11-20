@@ -43,7 +43,7 @@
 
 .n7-home-menu-anchor { position: relative; }
 
-.n7-live-home :is(.n7-home-menu-button, .n7-home-menu button, .n7-home-call, .n7-home-caption-button, .n7-home-audio-unlock, .n7-studio-choices button) {
+.n7-live-home :is(.n7-home-menu-button, .n7-home-menu button, .n7-home-call, .n7-home-caption-button, .n7-home-audio-unlock) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -94,32 +94,6 @@
 
 .n7-live-home .n7-guide-main,
 .n7-live-home .n7-guide-figure-slot { position: relative; }
-
-.n7-home-stage-light {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(ellipse at 50% 48%, rgba(82, 199, 231, .14), rgba(20, 67, 101, .08) 29%, transparent 64%);
-  opacity: .8;
-  transition: opacity 260ms ease;
-}
-
-.n7-home-stage-light::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 68%;
-  width: min(62vw, 520px);
-  height: 23%;
-  transform: translate(-50%, -50%);
-  border: 1px solid rgba(127, 230, 245, .16);
-  border-radius: 50%;
-  box-shadow: inset 0 -12px 34px -28px var(--n7-home-cyan);
-  opacity: .65;
-}
-
-.n7-live-home[data-activity="listening"] .n7-home-stage-light,
-.n7-live-home[data-activity="speaking"] .n7-home-stage-light { opacity: 1; }
 
 .n7-guide-view.n7-live-home #n7-guide-voice {
   padding-bottom: max(16px, env(safe-area-inset-bottom));
@@ -237,49 +211,48 @@
 .n7-live-home .n7-guide-cluster, .n7-live-home .n7-guide-group { flex-wrap: wrap; }
 .n7-live-home .n7-guide-group { padding-left: 0; }
 .n7-home-settings-title { display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
-.n7-live-home .n7-studio-choices { gap: 6px; }
-.n7-live-home .n7-studio-choices button { padding-inline: 12px; }
 
-.n7-guide-view.n7-studio-home {
+.n7-guide-view.n7-chamber-home {
   background: radial-gradient(ellipse at 50% 60%, #0c2433, #050b13 66%);
 }
 
-.n7-studio-home .n7-home-header {
+.n7-chamber-home .n7-home-header {
   width: min(100%, 1560px);
   padding-inline: clamp(16px, 3vw, 42px);
 }
 
-.n7-studio-home .n7-home-brand strong {
+.n7-chamber-home .n7-home-brand strong {
   border-color: #9b704a85;
   border-radius: 5px;
   background: linear-gradient(145deg, #15222c, #080d13);
   color: #f5c26b;
 }
 
-.n7-studio-home .n7-home-brand span {
+.n7-chamber-home .n7-home-brand span {
   color: #e2edf3;
   font-size: 14px;
   font-weight: 550;
 }
 
-.n7-studio-home .n7-studio-stage {
+.n7-chamber-home .n7-chamber-stage {
   width: min(100%, 1560px);
   grid-template-rows: minmax(0, 1fr);
   margin-inline: auto;
   padding-inline: clamp(10px, 3vw, 42px);
 }
 
-.n7-studio-frame {
-  position: relative;
+.n7-chamber-frame {
+  position: absolute;
+  inset: 0 clamp(10px, 3vw, 42px);
   isolation: isolate;
-  min-height: 0;
+  pointer-events: none;
   overflow: hidden;
   border: 1px solid #36556378;
   border-radius: 12px;
   background: #050d15;
 }
 
-.n7-studio-image {
+.n7-chamber-image {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -288,7 +261,7 @@
   object-position: 50% 39%;
 }
 
-.n7-studio-frame::after {
+.n7-chamber-frame::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -297,7 +270,7 @@
     radial-gradient(ellipse at 50% 43%, transparent 53%, #050b1270);
 }
 
-.n7-studio-frame[data-effects="on"]::before {
+.n7-chamber-frame[data-effects="on"]::before {
   content: "";
   position: absolute;
   z-index: 1;
@@ -309,35 +282,35 @@
   transition: opacity 380ms ease;
 }
 
-.n7-studio-home[data-activity="listening"] .n7-studio-frame::before { opacity: .33; }
-.n7-studio-home[data-activity="thinking"] .n7-studio-frame::before { opacity: .15; }
-.n7-studio-home[data-activity="speaking"] .n7-studio-frame::before { opacity: .63; }
+.n7-chamber-home[data-activity="listening"] .n7-chamber-frame::before { opacity: .33; }
+.n7-chamber-home[data-activity="thinking"] .n7-chamber-frame::before { opacity: .15; }
+.n7-chamber-home[data-activity="speaking"] .n7-chamber-frame::before { opacity: .63; }
 
-.n7-studio-home #n7-guide-voice { padding-top: 10px; }
-.n7-studio-home #n7-guide-voice > .n7-home-voice { width: min(500px, calc(100% - 24px)); }
-.n7-studio-home .n7-home-dock {
+.n7-chamber-home #n7-guide-voice { padding-top: 10px; }
+.n7-chamber-home #n7-guide-voice > .n7-home-voice { width: min(500px, calc(100% - 24px)); }
+.n7-chamber-home .n7-home-dock {
   border: 1px solid #45728166;
   border-radius: 16px;
   background: linear-gradient(165deg, #10212dfd, #070e17fd);
   box-shadow: inset 0 1px 0 #a7e5fa15, 0 9px 28px #0008;
 }
 
-.n7-studio-home .n7-home-dock-row { min-height: 54px; }
-.n7-studio-home .n7-home-menu-button { border-radius: 6px; }
-.n7-studio-home .n7-home-call {
+.n7-chamber-home .n7-home-dock-row { min-height: 54px; }
+.n7-chamber-home .n7-home-menu-button { border-radius: 6px; }
+.n7-chamber-home .n7-home-call {
   border-color: #bd8b59;
   border-radius: 8px;
   background: linear-gradient(130deg, #f1c186, #be8657);
   color: #19130e;
 }
 
-.n7-studio-home .n7-home-call:hover:not(:disabled) {
+.n7-chamber-home .n7-home-call:hover:not(:disabled) {
   border-color: #ffdfac;
   background: #f5c993;
   color: #19130e;
 }
 
-.n7-studio-home .n7-home-call[aria-pressed="true"] {
+.n7-chamber-home .n7-home-call[aria-pressed="true"] {
   border-color: #af784e;
   background: #392519;
   color: #ffe5c2;
@@ -346,16 +319,15 @@
 @media (max-width: 440px) {
   .n7-home-header { padding-inline: 14px; }
   .n7-home-brand { gap: 8px; }
-  .n7-home-stage-light::after { width: 84%; }
   .n7-guide-view.n7-live-home #n7-guide-voice > .n7-home-voice { width: calc(100% - 24px); }
   .n7-home-dock { padding-inline: 7px; }
   .n7-home-meter { padding-inline: 0; }
   .n7-home-voice-state { gap: 5px; font-size: 12px; }
   .n7-live-home .n7-home-call { padding-inline: 7px; font-size: 12px; }
-  .n7-studio-frame { border-radius: 8px; }
-  .n7-studio-image { object-position: 50% 23%; }
+  .n7-chamber-frame { border-radius: 8px; }
+  .n7-chamber-image { object-position: 50% 23%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .n7-home-stage-light { transition: none; }
+  .n7-chamber-frame::before { transition: none; }
 }
