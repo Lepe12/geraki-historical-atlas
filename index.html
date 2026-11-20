@@ -3,18 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Ιστορικός Άτλας της Μεσογείου</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<title>NABOU · Ιστορικός Άτλας της Μεσογείου</title>
+<meta name="theme-color" content="#0d1216">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800;900&family=GFS+Didot&family=IM+Fell+English:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./nabou-ui.css?v=nb-ui-2">
 <style>
-html,body{height:100%;margin:0}body{font-family:'Plus Jakarta Sans',sans-serif;background:#0a0d12;color:#e5ded3;overflow:hidden}
+html,body{height:100%;margin:0}body{font-family:'Plus Jakarta Sans',sans-serif;background:#0d1216;color:#e3eaec;overflow:hidden}
 .font-cinzel{font-family:'Cinzel',serif}.font-didot{font-family:'GFS Didot',serif}.font-archival{font-family:'IM Fell English',serif}
-.glass-dark{background:rgba(18,16,13,.92);backdrop-filter:blur(14px);border-color:rgba(207,163,94,.28)!important}
-.parchment-panel{background:#e9d5b7;color:#2b1f17;box-shadow:inset 0 0 100px rgba(83,51,22,.18),-14px 0 34px rgba(0,0,0,.40)}
 #realMap{position:absolute;inset:0;background:#4f7c82}
 #realMap .maplibregl-marker{z-index:700!important;overflow:visible!important}
 #realMap .settlement-wrap{min-width:90px;min-height:70px;overflow:visible!important}
@@ -50,70 +49,98 @@ linear-gradient(rgba(79,56,31,.025),rgba(31,23,17,.10));mix-blend-mode:multiply}
 
 .label-only{white-space:nowrap;color:#3a2b20;font:700 12px/1.2 'GFS Didot',serif;text-shadow:0 1px 0 #f3dfb8,0 0 5px #f3dfb8}
 .route-hit{cursor:pointer}
-.panel-scroll::-webkit-scrollbar{width:6px}.panel-scroll::-webkit-scrollbar-thumb{background:rgba(124,83,43,.4);border-radius:5px}
-.book-btn.active,.year-btn.active{background:rgba(217,119,6,.32);border-color:rgba(245,158,11,.72);color:#fde8ba}
-#sidePanel.closed{transform:translateX(100%)}
 </style>
 </head>
-<body class="h-screen w-screen flex flex-col">
-<header class="h-16 z-[1200] glass-dark flex items-center justify-between px-5 md:px-7 border-b shrink-0">
-  <div class="flex items-center gap-3">
-    <div class="w-10 h-10 rounded-full border border-amber-500/45 bg-amber-950/50 flex items-center justify-center text-amber-400"><i class="fa-solid fa-compass text-xl"></i></div>
-    <div><div class="font-cinzel text-[17px] font-bold tracking-[.14em] text-amber-100">ΙΣΤΟΡΙΚΟΣ ΑΤΛΑΣ</div><div class="font-cinzel text-[9px] tracking-[.28em] text-amber-500">ΤΗΣ ΜΕΣΟΓΕΙΟΥ</div></div>
-  </div>
-  <nav class="hidden lg:flex items-center gap-5 font-cinzel text-[11px] tracking-wider">
-    <button class="text-amber-300 border-b-2 border-amber-400 py-2">ΧΑΡΤΗΣ</button><button class="text-stone-400">ΠΕΡΙΟΔΟΙ</button><button class="text-stone-400">ΘΕΜΑΤΑ</button><button class="text-stone-400">ΠΡΟΣΩΠΑ</button><button class="text-stone-400">ΠΗΓΕΣ</button>
+<body class="nb-body">
+<div id="nbApp" class="nb-app">
+  <!-- NABOU_INTERFACE_V2: Neocom (left). Panels open on the right; the map is never replaced. -->
+  <nav id="nbNeocom" class="nb-neocom" aria-label="Κύριο μενού NABOU">
+    <div class="nb-neocom-brand" title="NABOU · Ιστορικός Άτλας της Μεσογείου">
+      <span class="nb-mark" aria-hidden="true"><i class="fa-regular fa-compass"></i></span>
+      <span class="nb-nc-label nb-brand-word">NABOU</span>
+    </div>
+    <div class="nb-nc-group" role="toolbar" aria-label="Πάνελ">
+      <button type="button" class="nb-nc-btn" data-panel="history" data-tip="Ιστορία τόπου" aria-label="Ιστορία τόπου"><i class="fa-solid fa-book-open"></i><span class="nb-nc-label">Ιστορία</span></button>
+      <button type="button" class="nb-nc-btn" data-panel="settlements" data-tip="Οικισμοί" aria-label="Οικισμοί"><i class="fa-solid fa-city"></i><span class="nb-nc-label">Οικισμοί</span></button>
+      <button type="button" class="nb-nc-btn" data-panel="monuments" data-tip="Μνημεία & οχυρά" aria-label="Μνημεία και οχυρά"><i class="fa-solid fa-chess-rook"></i><span class="nb-nc-label">Μνημεία</span></button>
+      <button type="button" class="nb-nc-btn" data-panel="people" data-tip="Πρόσωπα" aria-label="Πρόσωπα"><i class="fa-solid fa-user-group"></i><span class="nb-nc-label">Πρόσωπα</span></button>
+      <button type="button" class="nb-nc-btn" data-panel="routes" data-tip="Διαδρομές" aria-label="Διαδρομές"><i class="fa-solid fa-route"></i><span class="nb-nc-label">Διαδρομές</span></button>
+      <button type="button" class="nb-nc-btn" data-panel="sources" data-tip="Ιστορικές πηγές" aria-label="Ιστορικές πηγές"><i class="fa-solid fa-scroll"></i><span class="nb-nc-label">Πηγές</span></button>
+    </div>
+    <div class="nb-nc-sep" aria-hidden="true"></div>
+    <div class="nb-nc-group" role="toolbar" aria-label="Εργαλεία χάρτη">
+      <button type="button" class="nb-nc-btn" id="nbTimelineToggle" data-tip="Χρονολόγιο" aria-label="Εμφάνιση χρονολογίου" aria-pressed="true"><i class="fa-solid fa-timeline"></i><span class="nb-nc-label">Χρονολόγιο</span></button>
+      <button type="button" class="nb-nc-btn" id="nbLayersToggle" data-tip="Στρώματα & φίλτρα" aria-label="Στρώματα και φίλτρα" aria-expanded="false" aria-controls="nbLayers"><i class="fa-solid fa-layer-group"></i><span class="nb-nc-label">Στρώματα</span></button>
+    </div>
+    <div class="nb-nc-fill"></div>
+    <div class="nb-nc-group">
+      <a class="nb-nc-btn nb-n7" id="nbN7Link" href="https://bot.piratecartography.com/" target="_blank" rel="noopener" data-tip="Ρώτησε τον N7 για τον επιλεγμένο τόπο" aria-label="Άνοιγμα του N7 με τον επιλεγμένο τόπο"><span class="nb-n7-glyph" aria-hidden="true">N7</span><span class="nb-nc-label">Ρώτησε τον N7</span></a>
+      <button type="button" class="nb-nc-btn" id="nbNeocomExpand" data-tip="Ανάπτυξη μενού" aria-label="Ανάπτυξη μενού" aria-expanded="false"><i class="fa-solid fa-angles-right"></i><span class="nb-nc-label">Σύμπτυξη</span></button>
+    </div>
   </nav>
-  <div class="relative w-52 sm:w-72 md:w-80">
-    <input id="searchInput" class="w-full bg-stone-900/85 border border-amber-800/45 text-amber-100 text-xs rounded-md py-2 pl-9 pr-8 outline-none" placeholder="Αναζήτηση τόπων, προσώπων..." oninput="searchPlaces(this.value)">
-    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-amber-500/70"></i>
-    <div id="searchResults" class="hidden absolute top-full mt-2 left-0 right-0 bg-stone-900/95 border border-amber-700/40 rounded-md shadow-2xl max-h-72 overflow-y-auto z-[1600]"></div>
-  </div>
-</header>
 
-<main class="relative flex-1 min-h-0">
-  <div id="realMap"></div><div class="map-wash"></div>
-  <div class="absolute top-5 left-5 z-[800] flex flex-col gap-1 glass-dark p-1.5 rounded-md border">
-    <button onclick="atlasMap.zoomIn()" class="w-8 h-8 text-amber-300 hover:bg-amber-500/15 rounded"><i class="fa-solid fa-plus"></i></button>
-    <button onclick="atlasMap.zoomOut()" class="w-8 h-8 text-amber-300 hover:bg-amber-500/15 rounded"><i class="fa-solid fa-minus"></i></button>
-    <button onclick="fitAll()" class="w-8 h-8 text-amber-300 hover:bg-amber-500/15 rounded"><i class="fa-solid fa-arrows-to-dot"></i></button>
-  </div>
-  <div class="absolute bottom-5 left-6 z-[800] hidden sm:block pointer-events-none">
-    <div class="w-24 h-24 rounded-full border border-dashed border-amber-500/45 flex items-center justify-center text-amber-300 relative">
-      <span class="absolute top-1 text-[10px]">N</span><span class="absolute right-1 text-[10px]">E</span><span class="absolute bottom-1 text-[10px]">S</span><span class="absolute left-1 text-[10px]">W</span><i class="fa-regular fa-compass text-5xl opacity-90"></i>
+  <header id="nbTopbar" class="nb-topbar">
+    <div class="nb-title">
+      <div class="nb-title-main">Ιστορικός Άτλας της Μεσογείου</div>
+      <div class="nb-title-sub">NABOU · GERAKI · 16ος αιώνας</div>
     </div>
-  </div>
+    <div class="nb-search" role="search">
+      <i class="fa-solid fa-magnifying-glass nb-search-icon" aria-hidden="true"></i>
+      <input id="searchInput" type="search" autocomplete="off" spellcheck="false" placeholder="Αναζήτηση τόπων, ονομάτων, προσώπων…" aria-label="Αναζήτηση τοπωνυμίων" aria-controls="searchResults" aria-expanded="false" aria-autocomplete="list">
+      <kbd class="nb-kbd" aria-hidden="true">/</kbd>
+      <div id="searchResults" class="nb-search-results hidden" role="listbox" aria-label="Αποτελέσματα αναζήτησης"></div>
+    </div>
+    <div class="nb-period" role="group" aria-label="Βιβλίο / χρονική ενότητα">
+      <span class="nb-period-label">Βιβλίο</span>
+      <div class="nb-seg">
+        <button type="button" class="book-btn active" data-book="All">Όλα</button>
+        <button type="button" class="book-btn" data-book="Book I">I</button>
+        <button type="button" class="book-btn" data-book="Book II">II</button>
+        <button type="button" class="book-btn" data-book="Book III">III</button>
+      </div>
+      <span class="nb-period-chip" id="nbPeriodChip" title="Ενεργή χρονική περίοδος"><i class="fa-regular fa-calendar"></i><span id="nbPeriodText">Όλες οι περίοδοι</span></span>
+    </div>
+    <div class="nb-tools" role="toolbar" aria-label="Εργαλεία">
+      <button type="button" class="nb-tool" id="nbFitAll" data-tip="Προβολή όλων" aria-label="Προβολή όλων των ορατών τόπων"><i class="fa-solid fa-expand"></i></button>
+      <button type="button" class="nb-tool" id="nbFullscreen" data-tip="Πλήρης οθόνη" aria-label="Πλήρης οθόνη"><i class="fa-solid fa-up-right-and-down-left-from-center"></i></button>
+    </div>
+  </header>
 
-  <aside id="sidePanel" class="closed absolute z-[1300] right-0 top-0 bottom-0 w-full sm:w-[430px] lg:w-[470px] parchment-panel border-l border-amber-900/40 transition-transform duration-300 flex flex-col">
-    <div class="p-5 border-b border-amber-900/25 flex justify-between items-start">
-      <div><div id="panelSubtitle" class="font-cinzel text-[10px] tracking-[.16em] text-amber-900/75"></div><h2 id="panelTitle" class="font-didot text-4xl text-stone-900 leading-none mt-1"></h2></div>
-      <button onclick="closePanel()" class="w-9 h-9 rounded-full hover:bg-amber-900/10 text-amber-950"><i class="fa-solid fa-xmark text-xl"></i></button>
-    </div>
-    <div class="panel-scroll flex-1 overflow-y-auto p-5">
-      <div id="panelHero" class="h-44 rounded-md border border-amber-900/30 bg-gradient-to-br from-amber-200 to-stone-400 flex items-center justify-center text-amber-950/65 font-archival italic">Εικόνα τεκμηρίωσης μη διαθέσιμη</div>
-      <p id="panelDescription" class="font-didot text-[16px] leading-relaxed text-stone-800 mt-5"></p>
-      <div class="mt-5 space-y-2" id="panelRows"></div>
-      <div id="panelNote" class="mt-4 text-xs leading-relaxed text-stone-700 border-l-2 border-amber-800/50 pl-3"></div>
-    </div>
-  </aside>
-</main>
+  <main id="nbStage" class="nb-stage">
+    <div id="realMap"></div><div class="map-wash"></div>
 
-<footer class="h-20 z-[1200] glass-dark border-t shrink-0 px-5 flex items-center justify-between gap-4">
-  <div class="flex items-center gap-2 overflow-x-auto">
-    <span class="font-cinzel text-[10px] text-amber-500 mr-1">ΒΙΒΛΙΟ</span>
-    <button class="book-btn active px-3 py-2 rounded border border-amber-800/40 text-xs text-stone-300" data-book="All">Όλα</button>
-    <button class="book-btn px-3 py-2 rounded border border-amber-800/40 text-xs text-stone-300" data-book="Book I">Book I</button>
-    <button class="book-btn px-3 py-2 rounded border border-amber-800/40 text-xs text-stone-300" data-book="Book II">Book II</button>
-    <button class="book-btn px-3 py-2 rounded border border-amber-800/40 text-xs text-stone-300" data-book="Book III">Book III</button>
-  </div>
-  <div class="flex items-center gap-2 overflow-x-auto">
-    <span class="font-cinzel text-[10px] text-amber-500 mr-1">ΕΤΟΣ</span>
-    <button class="year-btn active px-3 py-2 rounded border border-amber-800/40 text-xs text-stone-300" data-year="All">Όλα</button>
-    <button class="year-btn px-3 py-2 rounded border border-amber-800/40 text-xs text-stone-300" data-year="1574">1574</button>
-    <button class="year-btn px-3 py-2 rounded border border-amber-800/40 text-xs text-stone-300" data-year="1577">1577</button>
-    <button class="year-btn px-3 py-2 rounded border border-amber-800/40 text-xs text-stone-300" data-year="1578">1578</button>
-  </div>
-</footer>
+    <div id="nbMapControls" class="nb-mapctl" role="toolbar" aria-label="Μεγέθυνση χάρτη">
+      <button type="button" onclick="atlasMap.zoomIn()" data-tip="Μεγέθυνση" aria-label="Μεγέθυνση"><i class="fa-solid fa-plus"></i></button>
+      <button type="button" onclick="atlasMap.zoomOut()" data-tip="Σμίκρυνση" aria-label="Σμίκρυνση"><i class="fa-solid fa-minus"></i></button>
+      <button type="button" onclick="fitAll()" data-tip="Προβολή όλων" aria-label="Προβολή όλων"><i class="fa-solid fa-arrows-to-dot"></i></button>
+    </div>
+
+    <div id="nbCompass" class="nb-compass" aria-hidden="true">
+      <span class="n">N</span><i class="fa-regular fa-compass"></i>
+    </div>
+
+    <section id="nbLayers" class="nb-layers" hidden aria-label="Στρώματα και φίλτρα">
+      <div class="nb-pop-head"><span>Στρώματα & φίλτρα</span><button type="button" class="nb-icon-btn" data-close="layers" aria-label="Κλείσιμο"><i class="fa-solid fa-xmark"></i></button></div>
+      <div class="nb-pop-body" id="nbLayersBody"></div>
+    </section>
+
+    <aside id="nbDock" class="nb-dock" aria-label="Πάνελ πληροφοριών" hidden>
+      <div class="nb-dock-tabs" role="tablist" aria-label="Ενότητες"></div>
+      <div class="nb-dock-head">
+        <div class="nb-dock-titles"><div id="nbDockKicker" class="nb-kicker"></div><h2 id="nbDockTitle" class="nb-dock-title"></h2></div>
+        <button type="button" class="nb-icon-btn" id="nbDockClose" aria-label="Κλείσιμο πάνελ"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="nbDockBody" class="nb-dock-body" role="tabpanel" aria-live="polite"></div>
+    </aside>
+
+    <section id="nbTimeline" class="nb-timeline" aria-label="Χρονολόγιο">
+      <div class="nb-tl-head"><span class="nb-tl-title"><i class="fa-solid fa-hourglass-half"></i> Χρονολόγιο</span><span id="nbTlSummary" class="nb-tl-summary"></span></div>
+      <div class="nb-tl-track" id="nbTlTrack" role="toolbar" aria-label="Έτη"></div>
+    </section>
+
+    <div id="nbStatus" class="nb-status" role="status" aria-live="polite"></div>
+  </main>
+</div>
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script>
 let DATA={places:[],routes:[]};
@@ -129,6 +156,7 @@ const placeMarkers=[];
 const morphMarkers=[];
 let morphRefreshTimer=0;
 let routeSourceReady=false;
+const ATLAS_ICON_FALLBACK="https://lepe12.github.io/geraki-historical-atlas/icons/";
 
 const symbolAsset=s=>({
   village:"diorama-village.webp",
@@ -429,6 +457,8 @@ function markerFor(p){
     const img=document.createElement("img");
     img.className="settlement-img";
     img.src="./icons/"+symbolAsset(symbol);
+    // Settlement artwork is generated at Pages build time; a branch preview borrows the published copy.
+    img.onerror=()=>{if(!img.dataset.fallback){img.dataset.fallback="1";img.src=ATLAS_ICON_FALLBACK+symbolAsset(symbol)}};
     img.alt="";
     const lab=document.createElement("div");
     lab.className="settlement-label";
@@ -549,44 +579,12 @@ function render(){
   addShips();
 }
 
-function row(icon,label,val){
-  if(!val)return"";
-  return `<div class="p-3 rounded-md bg-amber-950/5 border border-amber-900/15 flex gap-3">
-    <div class="w-8 h-8 rounded bg-amber-900/10 flex items-center justify-center text-amber-900"><i class="fa-solid ${icon}"></i></div>
-    <div><div class="font-cinzel text-[9px] tracking-wider text-amber-900/75 uppercase">${esc(label)}</div>
-    <div class="font-didot text-sm text-stone-900 mt-1">${esc(val)}</div></div></div>`;
-}
-function openPanel(){document.getElementById("sidePanel").classList.remove("closed")}
-function closePanel(){document.getElementById("sidePanel").classList.add("closed")}
-
-function showPlace(p){
-  document.getElementById("panelTitle").textContent=p.place||"";
-  document.getElementById("panelSubtitle").textContent=p.historicalNames||p.modernName||"";
-  document.getElementById("panelDescription").textContent=p.historicalContext||p.trilogyRole||"";
-  document.getElementById("panelRows").innerHTML=
-    row("fa-hourglass-half","Περίοδος",p.period)+
-    row("fa-user-group","Πρόσωπα",p.characters)+
-    row("fa-compass","Ρόλος",p.trilogyRole)+
-    row("fa-landmark","Εξουσία / έλεγχος",p.authority)+
-    row("fa-scroll","Τεκμηρίωση",p.sources||p.historicalStatus);
-  document.getElementById("panelNote").textContent=p.notes||"";
-  openPanel();
-}
-function showRoute(r){
-  const from=(r.from||[]).map(x=>x.name).join(", ");
-  const to=(r.to||[]).map(x=>x.name).join(", ");
-  document.getElementById("panelTitle").textContent=r.name||"Διαδρομή";
-  document.getElementById("panelSubtitle").textContent=r.character||"";
-  document.getElementById("panelDescription").textContent=r.evidence||"";
-  document.getElementById("panelRows").innerHTML=
-    row("fa-hourglass-half","Περίοδος",r.period)+
-    row("fa-location-dot","Από",from)+
-    row("fa-location-dot","Προς",to)+
-    row("fa-ship","Μέσο",r.medium)+
-    row("fa-scroll","Τεκμηρίωση",r.status||r.type);
-  document.getElementById("panelNote").textContent=r.note||"";
-  openPanel();
-}
+// NABOU_INTERFACE_V2: the record and route views are drawn by nabou-ui.js (right dock).
+// Markers, route clicks, search and the N7 focus hook keep calling these same functions.
+function openPanel(){window.NabouUI?.open?.()}
+function closePanel(){window.NabouUI?.close?.()}
+function showPlace(p){window.NabouUI?.showPlace?.(p)}
+function showRoute(r){window.NabouUI?.showRoute?.(r)}
 
 function fitAll(){
   if(!atlasMap)return;
@@ -597,16 +595,7 @@ function fitAll(){
   atlasMap.fitBounds(bounds,{padding:90,maxZoom:5.8,duration:900,pitch:48,bearing:-9});
 }
 
-function searchPlaces(q){
-  const box=document.getElementById("searchResults");
-  q=q.trim().toLowerCase();
-  if(!q){box.classList.add("hidden");box.innerHTML="";return}
-  const m=DATA.places.filter(p=>[p.place,p.historicalNames,p.modernName,p.characters].some(v=>String(v||"").toLowerCase().includes(q))).slice(0,12);
-  box.innerHTML=m.map(p=>`<button class="w-full text-left p-3 border-b border-stone-800 hover:bg-amber-900/20" onclick="focusPlace('${p.id}')">
-    <div class="text-amber-200 text-xs font-bold">${esc(p.place)}</div>
-    <div class="text-stone-400 text-[10px]">${esc(p.historicalNames||p.modernName||"")}</div></button>`).join("");
-  box.classList.remove("hidden");
-}
+function searchPlaces(q){window.NabouUI?.search?.(q)}
 function focusPlace(id){
   const p=byId.get(id);if(!p)return;
   atlasMap.flyTo({center:[p.lon,p.lat],zoom:7.5,pitch:55,bearing:-7,duration:1000});
@@ -679,12 +668,15 @@ document.querySelectorAll(".year-btn").forEach(b=>b.onclick=()=>{
   initMap();
 })();
 </script>
+<script src="./nabou-ui.js?v=nb-ui-2"></script>
 <script>
 // N7_SPLIT_MAP_V1: only when N7 embeds this page with its #n7map link. Ordinary visits are unchanged.
 if(window.parent!==window&&/[#&]n7map=/.test(location.hash)){
+  // Layout only: the interface shell steps aside at once; atlas-map-link.js still decides whether the link is valid.
+  document.documentElement.classList.add("nb-embedded");
   // Decoration only (not a map object): the atlas's own ship art beside the compass.
   addEventListener("DOMContentLoaded",()=>{const d=document.createElement("img");d.src=SHIP_ART_1;d.alt="";d.setAttribute("aria-hidden","true");d.className="n7e-ornament-ship";document.querySelector("main")?.append(d);});
-  const v="n7-split-1",css=document.createElement("link");css.rel="stylesheet";css.href="./nabou-embed.css?v="+v;document.head.append(css);
+  const v="n7-split-2",css=document.createElement("link");css.rel="stylesheet";css.href="./nabou-embed.css?v="+v;document.head.append(css);
   for(const f of ["n7-map-protocol.js","atlas-map-link.js","atlas-embed-panel.js"]){const sc=document.createElement("script");sc.src="./tools/n7/"+f+"?v="+v;sc.async=false;document.body.append(sc);}
 }
 </script>

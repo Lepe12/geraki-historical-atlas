@@ -1,91 +1,86 @@
 /* N7_SPLIT_MAP_V1 — the atlas as N7 embeds it (html.n7-embed only; ordinary visits are unchanged).
-   Palette from atlas-theme.css: ink, gold, parchment. N7 above supplies the command bar, so the
-   atlas header, filters and its own side panel give way to the tabbed NABOU bar. */
+   NABOU_INTERFACE_V2 (2026-11-20): same DOM contract as tools/n7/atlas-embed-panel.js (.n7e-bar, #n7ePlace,
+   #n7eBody, #n7eBadge, .n7e-tab), restyled to the atlas interface: graphite translucent panels, cyan
+   accents, a restrained historical place card. N7 above supplies the command bar, so the atlas shell
+   (Neocom, top bar, dock, timeline) gives way to this bar. Supersedes the CSS-only draft in PR #458. */
 html.n7-embed{
-  --atlas-ink:#211b16;--atlas-ink-2:#3b2d22;--atlas-gold:#caa56a;--atlas-gold-soft:#e6cf9f;
-  --atlas-paper:#ead8ae;--atlas-paper-2:#d9bf8d;--atlas-shadow:rgba(30,20,12,.28)}
+  --n7e-ink:#0f161b;--n7e-ink-2:#151f25;--n7e-line:rgba(160,200,210,.16);--n7e-line-2:rgba(160,200,210,.26);
+  --n7e-text:#e4ecee;--n7e-muted:#9bb0b6;--n7e-dim:#687d84;--n7e-cyan:#4fd3e6;--n7e-cyan-2:#8ce9f4;--n7e-cyan-soft:rgba(79,211,230,.13);
+  --n7e-paper:#e6dcc6;--n7e-font:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--n7e-serif:"GFS Didot","IM Fell English",Georgia,serif}
+/* Legacy atlas chrome (also hidden in the chamber embed, which loads this file too). */
 html.n7-embed body>header,html.n7-embed body>footer,html.n7-embed #sidePanel{display:none!important}
-html.n7-embed main>.absolute.top-5.left-5{left:auto!important;right:18px;top:auto!important;bottom:96px}
-html.n7-embed main>.absolute.bottom-5.left-6{left:272px!important}
+/* Atlas map controls move to the lower right; the compass sits beside the bar. */
+html.n7-embed #nbMapControls{right:16px!important;bottom:72px!important}
+html.n7-embed #nbCompass{left:274px!important;bottom:16px!important}
 
-.n7e-bar{position:absolute;z-index:1400;left:12px;top:12px;bottom:12px;width:244px;display:flex;flex-direction:column;
-  border:1px solid rgba(202,165,106,.55);border-radius:10px;background:linear-gradient(180deg,rgba(28,22,16,.95),rgba(18,14,10,.95));
-  box-shadow:0 10px 30px rgba(0,0,0,.45),inset 0 0 0 1px rgba(202,165,106,.12);color:#eadcbb;overflow:hidden}
-.n7e-brand{display:grid;grid-template-columns:auto 1fr;column-gap:10px;align-items:center;padding:14px 16px 12px;border-bottom:1px solid rgba(202,165,106,.3)}
-.n7e-brand-mark{grid-row:span 2;color:var(--atlas-gold);font-size:24px;line-height:1}
-.n7e-brand-name{font:700 20px/1.1 "Cinzel",Georgia,serif;letter-spacing:.14em;color:var(--atlas-gold-soft)}
-.n7e-brand-sub{font:500 9px/1.3 "Cinzel",Georgia,serif;letter-spacing:.2em;text-transform:uppercase;color:#b9975e}
-.n7e-tabs{display:flex;flex-direction:column;gap:4px;padding:10px}
-.n7e-tab{display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid transparent;border-radius:7px;background:none;color:#d9c7a1;
-  font:500 14px/1.2 "IM Fell English",Georgia,serif;cursor:pointer;text-align:left}
-.n7e-tab:hover{background:rgba(202,165,106,.1)}
-.n7e-tab.n7e-active{border-color:rgba(230,207,159,.75);background:linear-gradient(90deg,rgba(202,165,106,.24),rgba(202,165,106,.06));color:#f6e7c4;box-shadow:0 0 12px rgba(202,165,106,.18)}
-.n7e-tab-icon{width:18px;text-align:center;color:var(--atlas-gold)}
-.n7e-tab:focus-visible,.n7e-link:focus-visible{outline:2px solid var(--atlas-gold-soft);outline-offset:2px}
-.n7e-body{flex:1;min-height:0;overflow:auto;margin:0 10px 10px;padding:12px;border-radius:8px;
-  background:linear-gradient(180deg,#ead8ae,#dcc28f);color:#2a2017;font:14px/1.5 Georgia,"Times New Roman",serif;box-shadow:inset 0 0 0 1px rgba(110,80,40,.35)}
-.n7e-rows{margin:0}.n7e-rows dt{font:700 10px/1.3 "Cinzel",Georgia,serif;letter-spacing:.12em;text-transform:uppercase;color:#7a5a2c;margin-top:8px}
-.n7e-rows dt:first-child{margin-top:0}.n7e-rows dd{margin:2px 0 0}
-.n7e-text{margin:0 0 8px;white-space:pre-wrap}.n7e-empty{margin:0;color:#6d5a3e;font-style:italic}
-.n7e-list{list-style:none;margin:0;padding:0}.n7e-list li+li{margin-top:6px}
-.n7e-link{width:100%;text-align:left;padding:6px 8px;border:1px solid rgba(110,80,40,.35);border-radius:6px;background:rgba(255,248,230,.45);color:#2a2017;cursor:pointer;font:inherit}
-.n7e-meta{color:#6d5a3e;font-size:12px}
+.n7e-bar{position:absolute;z-index:1400;left:12px;top:12px;bottom:12px;width:252px;display:flex;flex-direction:column;
+  border:1px solid var(--n7e-line-2);border-radius:12px;background:linear-gradient(170deg,rgba(17,25,30,.95),rgba(11,16,20,.95));
+  -webkit-backdrop-filter:saturate(140%) blur(14px);backdrop-filter:saturate(140%) blur(14px);
+  box-shadow:0 16px 44px rgba(0,0,0,.42);color:var(--n7e-text);overflow:hidden;font-family:var(--n7e-font)}
+.n7e-brand{display:grid;grid-template-columns:auto 1fr;column-gap:10px;align-items:center;padding:14px 14px 12px;border-bottom:1px solid var(--n7e-line)}
+.n7e-brand-mark{grid-row:span 2;width:30px;height:30px;display:grid;place-items:center;border-radius:8px;border:1px solid rgba(79,211,230,.42);
+  background:radial-gradient(circle at 50% 40%,rgba(79,211,230,.22),rgba(79,211,230,.04));color:var(--n7e-cyan);font-size:16px;line-height:1}
+.n7e-brand-name{font:700 14px/1.1 var(--n7e-font);letter-spacing:.22em;color:var(--n7e-text)}
+.n7e-brand-sub{font:600 9.5px/1.35 var(--n7e-font);letter-spacing:.04em;color:var(--n7e-dim)}
+.n7e-tabs{display:flex;flex-direction:column;gap:2px;padding:8px}
+.n7e-tab{position:relative;display:flex;align-items:center;gap:11px;min-height:38px;padding:8px 12px;border:1px solid transparent;border-radius:9px;background:none;
+  color:var(--n7e-muted);font:600 13px/1.2 var(--n7e-font);cursor:pointer;text-align:left;transition:background .15s,color .15s,border-color .15s}
+.n7e-tab:hover{background:rgba(255,255,255,.05);color:var(--n7e-text)}
+.n7e-tab.n7e-active{border-color:rgba(79,211,230,.24);background:var(--n7e-cyan-soft);color:var(--n7e-cyan-2)}
+.n7e-tab.n7e-active::before{content:"";position:absolute;left:-8px;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:var(--n7e-cyan);box-shadow:0 0 10px var(--n7e-cyan)}
+.n7e-tab-icon{width:18px;text-align:center;color:inherit;opacity:.9;font-size:15px}
+.n7e-tab:focus-visible,.n7e-link:focus-visible{outline:2px solid var(--n7e-cyan);outline-offset:2px}
+.n7e-body{flex:1;min-height:0;overflow:auto;margin:0 8px 8px;padding:13px 13px 15px;border:1px solid var(--n7e-line);border-radius:10px;
+  background:rgba(255,255,255,.03);color:#d3dee1;font:13px/1.55 var(--n7e-font);scrollbar-width:thin;scrollbar-color:rgba(160,200,210,.25) transparent}
+.n7e-rows{margin:0}.n7e-rows dt{font:700 9.5px/1.3 var(--n7e-font);letter-spacing:.14em;text-transform:uppercase;color:var(--n7e-dim);margin-top:11px}
+.n7e-rows dt:first-child{margin-top:0}.n7e-rows dd{margin:3px 0 0;color:#e1e9eb;overflow-wrap:anywhere}
+.n7e-text{margin:0 0 8px;white-space:pre-wrap}.n7e-empty{margin:0;color:var(--n7e-muted)}.n7e-empty+.n7e-rows{margin-top:14px}
+.n7e-list{list-style:none;margin:0;padding:0}.n7e-list li+li{margin-top:5px}
+.n7e-link{width:100%;text-align:left;padding:8px 10px;border:1px solid var(--n7e-line);border-radius:8px;background:rgba(255,255,255,.035);color:var(--n7e-text);cursor:pointer;font:inherit}
+.n7e-link:hover{border-color:rgba(79,211,230,.42)}
+.n7e-meta{display:block;margin-top:2px;color:var(--n7e-muted);font-size:11.5px}
+.n7e-placehead{display:none}
+.n7e-place{margin:0;font:400 22px/1.1 var(--n7e-serif);color:var(--n7e-text)}
+.n7e-alt{margin:3px 0 0;font:500 12px/1.35 var(--n7e-font);color:var(--n7e-muted)}
+.n7e-status{display:inline-flex;align-items:center;gap:6px;height:22px;margin-top:9px;padding:0 9px;border-radius:999px;font:700 10px/1 var(--n7e-font);letter-spacing:.03em}
+.n7e-status::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.n7e-status.ok{color:#bdf0d8;border:1px solid rgba(98,199,157,.45);background:rgba(98,199,157,.12)}
+.n7e-status.approx{color:#f3dcab;border:1px solid rgba(220,178,94,.45);background:rgba(220,178,94,.10)}
 
-.n7e-placehead{padding:10px 16px 8px;border-bottom:1px solid rgba(202,165,106,.3);background:linear-gradient(180deg,rgba(234,216,174,.10),transparent)}
-.n7e-place{margin:0;font:italic 400 24px/1.1 "GFS Didot","IM Fell English",Georgia,serif;color:#f3e4bf}
-.n7e-alt{margin:2px 0 6px;font:italic 13px/1.3 "IM Fell English",Georgia,serif;color:#cdb382}
-.n7e-status{display:inline-block;padding:1px 9px;border-radius:999px;font:700 9.5px/1.7 "Cinzel",Georgia,serif;letter-spacing:.1em;text-transform:uppercase}
-.n7e-status.ok{background:#3e5a3a;color:#eef3df}.n7e-status.approx{color:#e6cf9f;border:1px dashed #caa56a}
+/* Place card: a restrained historical cartouche (serif name on muted paper tone), no gold frame. */
+.n7e-cartouche{position:absolute;z-index:1400;right:16px;top:16px;min-width:220px;max-width:min(360px,calc(100% - 300px));padding:14px 18px 14px;text-align:left;
+  border:1px solid rgba(217,199,163,.30);border-radius:12px;color:var(--n7e-text);
+  background:linear-gradient(160deg,rgba(217,199,163,.16),rgba(217,199,163,.04) 60%),rgba(12,18,22,.9);
+  -webkit-backdrop-filter:saturate(140%) blur(14px);backdrop-filter:saturate(140%) blur(14px);box-shadow:0 14px 36px rgba(0,0,0,.4)}
+.n7e-orn{display:none}
+.n7e-cartouche .n7e-place{font-size:32px;color:#f1e6cf;letter-spacing:.005em}
+.n7e-cartouche .n7e-alt{color:var(--n7e-muted)}
+.n7e-badge{position:absolute;z-index:1400;right:16px;bottom:16px;padding:7px 13px;border:1px solid rgba(79,211,230,.42);border-radius:999px;
+  background:rgba(10,16,20,.92);color:var(--n7e-cyan-2);font:700 11.5px/1.2 var(--n7e-font);letter-spacing:.02em;box-shadow:0 0 18px rgba(79,211,230,.22)}
 /* Short map area (laptop): smaller brand, tabs in two columns, more room for the field text. */
-.n7e-compact .n7e-brand{padding:8px 12px}.n7e-compact .n7e-brand-mark{font-size:18px}.n7e-compact .n7e-brand-name{font-size:15px}.n7e-compact .n7e-brand-sub{display:none}
-.n7e-compact .n7e-placehead{padding:6px 12px}.n7e-compact .n7e-place{font-size:19px}.n7e-compact .n7e-alt{margin-bottom:3px}
-.n7e-compact .n7e-tabs{display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:6px 8px}.n7e-compact .n7e-tab{padding:5px 8px;font-size:13px;gap:6px}
-.n7e-compact .n7e-body{margin:0 8px 8px;padding:9px 10px;font-size:13px}
-.n7e-badge{position:absolute;z-index:1400;right:16px;bottom:44px;padding:8px 16px;border:1px solid #caa56a;border-radius:999px;background:rgba(20,15,10,.92);
-  color:#f0deb5;font:600 13px/1.2 "IM Fell English",Georgia,serif;box-shadow:0 0 16px rgba(202,165,106,.25)}
+.n7e-compact .n7e-brand{padding:8px 12px}.n7e-compact .n7e-brand-mark{width:24px;height:24px;font-size:13px}.n7e-compact .n7e-brand-sub{display:none}
+.n7e-compact .n7e-tabs{display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:6px 8px}.n7e-compact .n7e-tab{min-height:30px;padding:5px 8px;font-size:12px;gap:6px}
+.n7e-compact .n7e-tab.n7e-active::before{display:none}
+.n7e-compact .n7e-body{margin:0 8px 8px;padding:9px 10px;font-size:12.5px}
 
 /* A stored APPROXIMATE point is shown as approximate; the point N7 focused is highlighted. */
-html.n7-embed [data-coordinate-status="APPROXIMATE"] .settlement-img{outline:2px dashed rgba(138,106,54,.95);outline-offset:3px;border-radius:50%}
+html.n7-embed [data-coordinate-status="APPROXIMATE"] .settlement-img{outline:2px dashed rgba(220,178,94,.95);outline-offset:3px;border-radius:50%}
 html.n7-embed [data-coordinate-status="APPROXIMATE"] .settlement-label::after{content:" ≈";color:#7a5a2c}
-html.n7-embed [data-n7-focus] .settlement-label{background:#f6e7c4!important;border-color:#8a6a36!important;box-shadow:0 0 0 2px rgba(202,165,106,.6),0 0 18px rgba(255,214,140,.55)}
+html.n7-embed [data-n7-focus] .settlement-label{box-shadow:0 0 0 2px #4fd3e6,0 0 18px rgba(79,211,230,.6)!important}
+/* Close view of one place: routes (layer) and ships are hidden, as before. */
+html.n7-embed .ship-marker,html.n7-embed .n7e-ornament-ship{display:none!important}
+html.n7-embed #realMap::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 600' preserveAspectRatio='none'%3E%3Cg stroke='%23e6cf9f' stroke-width='1' stroke-dasharray='6 7' opacity='.55' fill='none'%3E%3Cline x1='260' y1='430' x2='1660' y2='430'/%3E%3Cline x1='260' y1='430' x2='1553' y2='966'/%3E%3Cline x1='260' y1='430' x2='1250' y2='1420'/%3E%3Cline x1='260' y1='430' x2='796' y2='1723'/%3E%3Cline x1='260' y1='430' x2='260' y2='1830'/%3E%3Cline x1='260' y1='430' x2='-276' y2='1723'/%3E%3Cline x1='260' y1='430' x2='-730' y2='1420'/%3E%3Cline x1='260' y1='430' x2='-1033' y2='966'/%3E%3Cline x1='260' y1='430' x2='-1140' y2='430'/%3E%3Cline x1='260' y1='430' x2='-1033' y2='-106'/%3E%3Cline x1='260' y1='430' x2='-730' y2='-560'/%3E%3Cline x1='260' y1='430' x2='-276' y2='-863'/%3E%3Cline x1='260' y1='430' x2='260' y2='-970'/%3E%3Cline x1='260' y1='430' x2='796' y2='-863'/%3E%3Cline x1='260' y1='430' x2='1250' y2='-560'/%3E%3Cline x1='260' y1='430' x2='1553' y2='-106'/%3E%3Cline x1='780' y1='250' x2='2180' y2='250'/%3E%3Cline x1='780' y1='250' x2='2073' y2='786'/%3E%3Cline x1='780' y1='250' x2='1770' y2='1240'/%3E%3Cline x1='780' y1='250' x2='1316' y2='1543'/%3E%3Cline x1='780' y1='250' x2='780' y2='1650'/%3E%3Cline x1='780' y1='250' x2='244' y2='1543'/%3E%3Cline x1='780' y1='250' x2='-210' y2='1240'/%3E%3Cline x1='780' y1='250' x2='-513' y2='786'/%3E%3Cline x1='780' y1='250' x2='-620' y2='250'/%3E%3Cline x1='780' y1='250' x2='-513' y2='-286'/%3E%3Cline x1='780' y1='250' x2='-210' y2='-740'/%3E%3Cline x1='780' y1='250' x2='244' y2='-1043'/%3E%3Cline x1='780' y1='250' x2='780' y2='-1150'/%3E%3Cline x1='780' y1='250' x2='1316' y2='-1043'/%3E%3Cline x1='780' y1='250' x2='1770' y2='-740'/%3E%3Cline x1='780' y1='250' x2='2073' y2='-286'/%3E%3C/g%3E%3C/svg%3E") center/100% 100% no-repeat,url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .32 0 0 0 0 .25 0 0 0 0 .14 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(10,18,20,.55) 100%);mix-blend-mode:normal;opacity:.55}
+/* Settlement labels keep their parchment callout (map content), slightly crisper. */
+html.n7-embed .settlement-label{box-shadow:0 3px 8px rgba(0,0,0,.4)!important}
 
+@media (max-width:900px){.n7e-bar{width:224px}.n7e-cartouche{max-width:calc(100% - 260px)}html.n7-embed #nbCompass{left:244px!important}}
 @media (max-width:640px){
   .n7e-bar{left:8px;right:8px;top:auto;bottom:8px;width:auto;max-height:42%}
-  .n7e-brand{display:none}.n7e-tabs{flex-direction:row;overflow-x:auto;padding:6px}.n7e-tab{padding:6px 8px;font-size:12.5px;white-space:nowrap}.n7e-tab-icon{display:none}
-  .n7e-placehead{padding:6px 10px}.n7e-place{font-size:18px}
-  .n7e-badge{bottom:auto;top:10px;right:10px;font-size:11.5px;padding:5px 10px}
-  html.n7-embed main>.absolute.top-5.left-5{bottom:auto!important;top:150px!important}
+  .n7e-brand{display:none}.n7e-tabs{flex-direction:row;overflow-x:auto;padding:6px}.n7e-tab{padding:6px 9px;font-size:12px;white-space:nowrap;min-height:32px}.n7e-tab-icon{display:none}
+  .n7e-tab.n7e-active::before{display:none}
+  .n7e-cartouche{left:8px;right:8px;max-width:none;top:8px;padding:8px 12px}.n7e-cartouche .n7e-place{font-size:24px}
+  .n7e-badge{bottom:auto;top:10px;right:10px;font-size:11px;padding:5px 10px}
+  html.n7-embed #nbMapControls{bottom:auto!important;top:120px!important}
+  html.n7-embed #nbCompass{display:none}
 }
-
-/* N7_SPLIT_MAP_V1 owner's design (2026-11-13): a parchment cartouche with the Greek name, compass and a ship
-   as decoration, a gold frame; voyage routes and ships from the route layer are hidden in this close view. */
-.n7e-cartouche{position:absolute;z-index:1400;right:22px;top:18px;min-width:230px;max-width:min(380px,36%);padding:10px 30px 12px;text-align:center;
-  border:2px solid #8a6a36;border-radius:10px 10px 30px 30px/10px 10px 18px 18px;
-  background:radial-gradient(ellipse at 50% 35%,#f6e9c8,#e0c690 70%,#cfae72);color:#2a1d10;
-  box-shadow:0 10px 26px rgba(0,0,0,.45),inset 0 0 0 4px #efdcb0,inset 0 0 0 5px #9b7a43,inset 0 0 22px rgba(120,84,30,.35)}
-.n7e-orn{display:block;color:#8a6a36;font-size:20px;line-height:1;margin-bottom:2px}
-.n7e-cartouche .n7e-place{margin:0;font:italic 400 44px/1.05 "GFS Didot","IM Fell English",Georgia,serif;color:#2a1d10;letter-spacing:.01em}
-.n7e-cartouche .n7e-alt{margin:2px 0 0;font:italic 15px/1.3 "IM Fell English",Georgia,serif;color:#5a4428}
-.n7e-cartouche .n7e-status{margin-top:7px;color:#6b4a1c;border:1px dashed #8a6a36;background:transparent}
-.n7e-cartouche .n7e-status.ok{background:#3e5a3a;color:#eef3df;border-style:solid}
-.n7e-placehead{display:none}
-html.n7-embed .ship-marker{display:none!important}
-html.n7-embed main>.absolute.bottom-5.left-6{left:300px!important;bottom:84px!important;transform:scale(1.35);transform-origin:left bottom}
-.n7e-ornament-ship{position:absolute;z-index:850;left:440px;bottom:60px;width:96px;opacity:.9;pointer-events:none;filter:drop-shadow(0 6px 5px rgba(20,15,10,.35))}
-html.n7-embed main::after{content:"";position:absolute;inset:6px;z-index:900;pointer-events:none;border:1px solid rgba(202,165,106,.75);border-radius:6px;
-  box-shadow:inset 0 0 0 3px rgba(20,15,10,.35),inset 0 0 0 4px rgba(202,165,106,.35)}
-.n7e-badge{border-color:#caa56a;background:rgba(12,10,8,.9);font-size:14px}
-@media (max-width:900px){.n7e-ornament-ship{display:none}}
-@media (max-width:640px){.n7e-cartouche{left:8px;right:8px;max-width:none;top:8px;padding:6px 12px}.n7e-cartouche .n7e-place{font-size:28px}.n7e-orn{display:none}
-  html.n7-embed main>.absolute.bottom-5.left-6{display:none}}
-
-/* N7_SPLIT_MAP_V1 painted look (owner's reference image), embed only: paper grain, darkened edges, dashed
-   rhumb lines and laurel corners are decoration over the real map; they carry no data. */
-html.n7-embed #realMap::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 600' preserveAspectRatio='none'%3E%3Cg stroke='%23e6cf9f' stroke-width='1' stroke-dasharray='6 7' opacity='.55' fill='none'%3E%3Cline x1='260' y1='430' x2='1660' y2='430'/%3E%3Cline x1='260' y1='430' x2='1553' y2='966'/%3E%3Cline x1='260' y1='430' x2='1250' y2='1420'/%3E%3Cline x1='260' y1='430' x2='796' y2='1723'/%3E%3Cline x1='260' y1='430' x2='260' y2='1830'/%3E%3Cline x1='260' y1='430' x2='-276' y2='1723'/%3E%3Cline x1='260' y1='430' x2='-730' y2='1420'/%3E%3Cline x1='260' y1='430' x2='-1033' y2='966'/%3E%3Cline x1='260' y1='430' x2='-1140' y2='430'/%3E%3Cline x1='260' y1='430' x2='-1033' y2='-106'/%3E%3Cline x1='260' y1='430' x2='-730' y2='-560'/%3E%3Cline x1='260' y1='430' x2='-276' y2='-863'/%3E%3Cline x1='260' y1='430' x2='260' y2='-970'/%3E%3Cline x1='260' y1='430' x2='796' y2='-863'/%3E%3Cline x1='260' y1='430' x2='1250' y2='-560'/%3E%3Cline x1='260' y1='430' x2='1553' y2='-106'/%3E%3Cline x1='780' y1='250' x2='2180' y2='250'/%3E%3Cline x1='780' y1='250' x2='2073' y2='786'/%3E%3Cline x1='780' y1='250' x2='1770' y2='1240'/%3E%3Cline x1='780' y1='250' x2='1316' y2='1543'/%3E%3Cline x1='780' y1='250' x2='780' y2='1650'/%3E%3Cline x1='780' y1='250' x2='244' y2='1543'/%3E%3Cline x1='780' y1='250' x2='-210' y2='1240'/%3E%3Cline x1='780' y1='250' x2='-513' y2='786'/%3E%3Cline x1='780' y1='250' x2='-620' y2='250'/%3E%3Cline x1='780' y1='250' x2='-513' y2='-286'/%3E%3Cline x1='780' y1='250' x2='-210' y2='-740'/%3E%3Cline x1='780' y1='250' x2='244' y2='-1043'/%3E%3Cline x1='780' y1='250' x2='780' y2='-1150'/%3E%3Cline x1='780' y1='250' x2='1316' y2='-1043'/%3E%3Cline x1='780' y1='250' x2='1770' y2='-740'/%3E%3Cline x1='780' y1='250' x2='2073' y2='-286'/%3E%3C/g%3E%3C/svg%3E") center/100% 100% no-repeat,url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .32 0 0 0 0 .25 0 0 0 0 .14 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(10,18,20,.55) 100%);mix-blend-mode:normal}
-html.n7-embed main::before{content:"";position:absolute;z-index:880;pointer-events:none;left:262px;right:0;bottom:0;height:120px;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 90'%3E%3Cpath d='M6 86 Q60 70 130 8' stroke='%23c9a85f' stroke-width='2' fill='none'/%3E%3Cg fill='%23b8954e' stroke='%236b4a1c' stroke-width='.6'%3E%3Cellipse cx='20' cy='62' rx='11' ry='4.5' transform='rotate(-5 20 62)'/%3E%3Cellipse cx='37' cy='69' rx='11' ry='4.5' transform='rotate(-35 37 69)'/%3E%3Cellipse cx='54' cy='44' rx='11' ry='4.5' transform='rotate(-5 54 44)'/%3E%3Cellipse cx='71' cy='51' rx='11' ry='4.5' transform='rotate(-35 71 51)'/%3E%3Cellipse cx='88' cy='26' rx='11' ry='4.5' transform='rotate(-5 88 26)'/%3E%3Cellipse cx='105' cy='33' rx='11' ry='4.5' transform='rotate(-35 105 33)'/%3E%3Cellipse cx='122' cy='8' rx='11' ry='4.5' transform='rotate(-5 122 8)'/%3E%3C/g%3E%3C/svg%3E") left 6px bottom 2px/120px auto no-repeat,url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 90'%3E%3Cpath d='M6 86 Q60 70 130 8' stroke='%23c9a85f' stroke-width='2' fill='none'/%3E%3Cg fill='%23b8954e' stroke='%236b4a1c' stroke-width='.6'%3E%3Cellipse cx='20' cy='62' rx='11' ry='4.5' transform='rotate(-5 20 62)'/%3E%3Cellipse cx='37' cy='69' rx='11' ry='4.5' transform='rotate(-35 37 69)'/%3E%3Cellipse cx='54' cy='44' rx='11' ry='4.5' transform='rotate(-5 54 44)'/%3E%3Cellipse cx='71' cy='51' rx='11' ry='4.5' transform='rotate(-35 71 51)'/%3E%3Cellipse cx='88' cy='26' rx='11' ry='4.5' transform='rotate(-5 88 26)'/%3E%3Cellipse cx='105' cy='33' rx='11' ry='4.5' transform='rotate(-35 105 33)'/%3E%3Cellipse cx='122' cy='8' rx='11' ry='4.5' transform='rotate(-5 122 8)'/%3E%3C/g%3E%3C/svg%3E") right 6px bottom 2px/120px auto no-repeat;transform-origin:center;}
-/* Settlement labels as parchment callouts. */
-html.n7-embed .settlement-label{background:linear-gradient(180deg,#f3e4bf,#dcc28f)!important;border:1px solid #8a6a36!important;color:#2a1d10!important;
-  font-family:"IM Fell English",Georgia,serif!important;box-shadow:0 3px 8px rgba(0,0,0,.45)!important}
-@media (max-width:640px){html.n7-embed main::before{display:none}}
