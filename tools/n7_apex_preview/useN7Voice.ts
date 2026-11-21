@@ -61,7 +61,7 @@ export default function useN7Voice(onTranscript:(text:string)=>void,onTurn?:(tex
     const firstEnd=(()=>{const m=clean.slice(0,140).match(/^[\s\S]{20,}?[.!;;·]\s/);if(m)return m[0].length;const cut=clean.lastIndexOf(" ",90);return clean.length<=90?clean.length:cut>30?cut+1:90;})();
     const head=clean.slice(0,firstEnd).trim(),rest=clean.slice(firstEnd).trim();
     const chunks=[head,...(rest.match(/[\s\S]{1,200}(?:\s|$)|[\s\S]{1,200}/g)||[])].filter(Boolean);
-    const token=generation.current,available=window.speechSynthesis.getVoices();
+    const token=generation.current,available=window.speechSynthesis?.getVoices()||[];
     const selected=available.find(v=>v.voiceURI===current.current.voiceURI)||available.find(v=>/^el(?:-|$)/i.test(v.lang));
     let index=0;
     const next=()=>{
@@ -110,10 +110,12 @@ export default function useN7Voice(onTranscript:(text:string)=>void,onTurn?:(tex
   },[stop,arm,failConversation,suspend]);
   captureRef.current=capture;
   const listen=()=>{active.current=false;setConversation(false);capture();};
-  const startConversation=()=>{
-    if(current.current.voiceURI===FEMALE_VOICE_ID){try{if(!female.current)female.current=createFemaleVoice();void female.current.unlock().catch(()=>{});}catch{failConversation("Δεν είναι διαθέσιμος ο ήχος στον browser.");return;}}
+  const startConversation=(introduction?:string)=>{
+    if(!introduction&&current.current.voiceURI===FEMALE_VOICE_ID){try{if(!female.current)female.current=createFemaleVoice();void female.current.unlock().catch(()=>{});}catch{failConversation("Δεν είναι διαθέσιμος ο ήχος στον browser.");return;}}
     if(current.current.voiceURI!==FEMALE_VOICE_ID&&(!window.speechSynthesis||!window.SpeechSynthesisUtterance)){failConversation("Η φωνητική συζήτηση χρειάζεται διαθέσιμη εκφώνηση στον browser.");return;}
-    active.current=true;setConversation(true);current.current.enabled=true;setEnabled(true);capture();
+    active.current=true;setConversation(true);current.current.enabled=true;setEnabled(true);
+    if(introduction)speak(introduction);
+    else capture();
   };
   const toggle=()=>{const next=!current.current.enabled;current.current.enabled=next;setEnabled(next);if(!next){active.current=false;setConversation(false);stop();}setStatus(next?"Οι νέες απαντήσεις θα εκφωνούνται. Μπορείς να διακόψεις οποιαδήποτε στιγμή.":"Η αυτόματη εκφώνηση έκλεισε.");};
   return {supported,enabled,conversation,phase,status,voices,voiceURI,setVoiceURI,stop,suspend,listen,startConversation,failConversation,speak,toggle};

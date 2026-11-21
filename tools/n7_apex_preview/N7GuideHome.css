@@ -1,0 +1,362 @@
+.n7-guide-view.n7-live-home {
+  --n7-home-edge: rgba(144, 216, 232, .16);
+  --n7-home-text: #e6f7fb;
+  --n7-home-dim: #9ab2bd;
+  --n7-home-cyan: #7fe6f5;
+  --n7-home-gold: #f5c26b;
+  --n7-home-gutter: clamp(16px, 2.6vw, 46px);
+  isolation: isolate;
+  background: #050b12;
+}
+
+.n7-home-header {
+  position: relative;
+  z-index: 7;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: max(18px, env(safe-area-inset-top)) var(--n7-home-gutter) 12px;
+}
+
+/* Lamp and clock arrangement from MIRA-HUD's Overview (MIT). */
+.n7-mira-overview { width: min(380px, 47vw); pointer-events: none; }
+.n7-mira-filament {
+  position: relative;
+  height: 2px;
+  border-radius: 2px;
+  background: #d2f4ff;
+  box-shadow: 0 0 10px #71d6f9, 0 0 26px #52bfe8a0;
+}
+.n7-mira-filament::before {
+  content: "";
+  position: absolute;
+  inset: -3px auto auto 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e7faff;
+  box-shadow: 0 0 13px #7ae4ff;
+}
+.n7-mira-name { margin-top: 5px; color: #a1c5d1; font: 9px ui-monospace,monospace; letter-spacing: .34em; text-transform: uppercase; }
+.n7-mira-overview time { display: grid; gap: 4px; margin-top: 17px; color: #eff9fc; }
+.n7-mira-overview time span { font-size: 34px; font-weight: 300; line-height: 1; letter-spacing: .04em; text-shadow: 0 0 22px #55c9e750; }
+.n7-mira-overview time small { font-size: 10px; letter-spacing: .17em; color: var(--n7-home-dim); text-transform: uppercase; }
+
+.n7-home-menu-anchor { position: relative; grid-area: menu; }
+.n7-home-actions {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  right: var(--n7-home-gutter);
+  display: grid;
+  grid-template-areas: "menu" "appearance";
+  gap: 12px;
+  width: 190px;
+}
+
+.n7-home-appearance-button { grid-area: appearance; }
+
+.n7-live-home :is(.n7-home-menu button, .n7-home-caption-button, .n7-home-audio-unlock, .n7-guide-controls button) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  border-radius: 7px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.n7-live-home .n7-home-actions button.n7-home-pill {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 28px;
+  padding: 0 9px;
+  border: 1px solid #7fe6f54d;
+  border-radius: 999px;
+  background: #06112085;
+  color: #d5e7ec;
+  font-size: 11px;
+  letter-spacing: .24em;
+  backdrop-filter: blur(6px);
+}
+
+.n7-live-home .n7-home-actions button.n7-home-appearance-button {
+  border-color: #7fe6f590;
+  background: #14374b99;
+  color: #def9ff;
+  box-shadow: 0 0 15px #5acee52e;
+}
+
+.n7-live-home .n7-home-actions button.n7-home-pill:is(:hover, [aria-expanded="true"]) {
+  border-color: #7fe6f5b3;
+  background: #173a4c;
+}
+
+.n7-home-menu {
+  position: absolute;
+  top: 0;
+  right: calc(100% + 10px);
+  width: min(258px, calc(100vw - 36px));
+  max-height: min(65dvh, 360px);
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid var(--n7-home-edge);
+  border-radius: 13px;
+  background: #0b1925;
+  box-shadow: 0 18px 45px #0009;
+}
+
+.n7-live-home .n7-home-menu button {
+  width: 100%;
+  justify-content: flex-start;
+  gap: 11px;
+  border: 0;
+  padding: 0 10px;
+  color: var(--n7-home-text);
+  background: transparent;
+}
+
+.n7-home-menu svg { color: var(--n7-home-cyan); }
+.n7-home-menu-divider { border-top: 1px solid var(--n7-home-edge); margin-top: 5px; padding-top: 5px; }
+
+.n7-live-home .n7-guide-main {
+  position: absolute;
+  inset: clamp(18px, 3dvh, 32px) 0 0;
+  padding: 0;
+}
+
+.n7-live-home .n7-guide-figure-slot { position: relative; }
+.n7-live-home .n7-guide-details { position: relative; margin: 55px 12px 12px 0; }
+
+.n7-live-home #n7-guide-call {
+  position: absolute;
+  z-index: 4;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.n7-live-home #n7-guide-call > button {
+  display: block;
+  width: clamp(64px, 9dvh, 84px);
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
+  pointer-events: auto;
+}
+
+.n7-guide-view.n7-live-home #n7-guide-voice {
+  position: absolute;
+  left: 50%;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 5;
+  width: min(520px, calc(100% - 2 * var(--n7-home-gutter)));
+}
+
+.n7-guide-view.n7-live-home #n7-guide-voice > .n7-home-voice {
+  width: 100%;
+  max-height: 40dvh;
+  padding: 0 !important;
+  overflow: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent !important;
+  scrollbar-width: thin;
+}
+
+.n7-home-dock {
+  text-align: center;
+}
+
+.n7-home-dock-row {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 420px) 42px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  min-height: 50px;
+}
+
+.n7-home-voice-state {
+  grid-column: 2;
+  display: grid;
+  gap: 4px;
+  color: var(--n7-home-text);
+  text-shadow: 0 1px 9px #000;
+  font-size: 12px;
+}
+
+.n7-mira-state { color: #b9e7f0; font: 500 11px ui-monospace,monospace; letter-spacing: .36em; text-transform: uppercase; }
+.n7-home-call-hint { color: #9ab5c0; font: 10px ui-monospace,monospace; letter-spacing: .08em; text-transform: uppercase; }
+.n7-mira-status-dots { display: flex; justify-content: center; gap: 7px; padding: 2px 0; }
+.n7-mira-status-dots i { width: 4px; height: 4px; border-radius: 50%; background: #7ddaf0; opacity: .66; }
+
+.n7-home-meter {
+  display: block;
+  width: 100%;
+  overflow: visible;
+  color: var(--n7-home-dim);
+}
+
+.n7-mira-bar {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scaleY(calc(.13 + 1.22 * var(--n7-status-energy, 0)));
+}
+
+.n7-home-dock[data-phase="listening"] .n7-mira-bar { transform: scaleY(.42); }
+.n7-home-dock[data-phase="listening"] .n7-home-meter,
+.n7-home-dock[data-phase="speaking"] .n7-home-meter { color: var(--n7-home-cyan); }
+.n7-home-dock[data-phase="thinking"] .n7-home-meter { color: var(--n7-home-gold); }
+
+.n7-live-home .n7-home-caption-button {
+  grid-column: 3;
+  width: 42px;
+  padding: 0;
+  border-color: #7fe6f533;
+  background: #08162391;
+  color: #c5edf5;
+}
+
+.n7-live-home .n7-home-caption-button[aria-pressed="true"] {
+  border-color: #7fe6f58c;
+  background: #123347;
+  color: var(--n7-home-cyan);
+  box-shadow: inset 0 0 13px #7fe6f520;
+}
+.n7-live-home .n7-home-audio-unlock { min-height: 32px; padding: 0 7px; margin: 3px 0 0; border: 0; color: var(--n7-home-dim); }
+
+.n7-home-captions {
+  max-height: 7em;
+  overflow: auto;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--n7-home-edge);
+  border-radius: 7px;
+  background: #050e17ed;
+  color: var(--n7-home-text);
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.n7-live-home #n7-guide-voice .n7-home-voice-detail { margin: 5px 4px 1px; color: var(--n7-home-dim); }
+.n7-live-home #n7-guide-voice .n7-voice-preview { display: none; }
+
+.n7-guide-view.n7-live-home .n7-guide-controls {
+  position: absolute;
+  top: max(96px, calc(env(safe-area-inset-top) + 80px));
+  right: var(--n7-home-gutter);
+  z-index: 8;
+  width: min(340px, calc(100vw - 36px));
+  max-height: min(70dvh, 545px);
+  overflow: auto;
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--n7-home-edge);
+  border-radius: 13px;
+  background: #0b1925;
+  box-shadow: 0 18px 45px #0009;
+}
+
+.n7-guide-view.n7-live-home .n7-guide-controls[hidden] { display: none; }
+.n7-live-home .n7-guide-cluster, .n7-live-home .n7-guide-group { flex-wrap: wrap; }
+.n7-live-home .n7-guide-group { padding-left: 0; }
+.n7-home-settings-title { display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
+.n7-home-tuning { display: grid; gap: 9px; padding-bottom: 10px; border-bottom: 1px solid var(--n7-home-edge); }
+.n7-home-tuning label { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 8px; font-size: 12px; }
+.n7-home-tuning label span[aria-hidden] { color: var(--n7-home-cyan); font-variant-numeric: tabular-nums; }
+.n7-home-tuning input { grid-column: 1 / -1; width: 100%; margin: 0; accent-color: var(--n7-home-cyan); }
+.n7-home-tuning input:focus-visible { outline: 2px solid var(--n7-home-gold); outline-offset: 3px; }
+.n7-live-home .n7-home-tuning button { justify-self: end; min-height: 34px; }
+
+.n7-ambient-field picture img {
+  opacity: var(--n7-fog-opacity, 1);
+  filter: brightness(var(--n7-field-brightness, 1));
+}
+
+.n7-mira-field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.n7-mira-field[data-rendered="true"] { opacity: .9; }
+
+/* Light across the full-screen backdrop, beneath the existing figure. */
+.n7-ambient-field::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, #040811b8, transparent 22%),
+    radial-gradient(ellipse at 50% 45%, transparent 46%, #03071150);
+}
+
+.n7-ambient-field[data-effects="on"]::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 48%, #249ab747, transparent 62%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 100ms linear;
+}
+
+.n7-live-home[data-activity="listening"] .n7-ambient-field::before { opacity: .4; }
+.n7-live-home[data-activity="thinking"] .n7-ambient-field::before { opacity: .22; }
+.n7-live-home[data-activity="speaking"] .n7-ambient-field::before { opacity: calc(.28 + .65 * var(--n7-voice-energy, 0)); }
+
+@media (max-width: 700px) {
+  .n7-guide-view.n7-live-home {
+    --n7-pill-bottom: max(16px, env(safe-area-inset-bottom));
+    --n7-status-bottom: calc(var(--n7-pill-bottom) + 46px);
+  }
+
+  .n7-home-actions {
+    position: fixed;
+    inset: auto var(--n7-home-gutter) var(--n7-pill-bottom);
+    width: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas: "appearance menu";
+  }
+
+  .n7-mira-overview { width: min(245px, 66vw); }
+  .n7-mira-overview time { margin-top: 10px; }
+  .n7-mira-overview time span { font-size: 26px; }
+
+  .n7-live-home .n7-home-actions button.n7-home-pill { min-height: 34px; letter-spacing: .12em; }
+
+  .n7-home-menu { top: auto; right: 0; bottom: calc(100% + 8px); }
+
+  .n7-live-home .n7-guide-main {
+    inset: max(82px, calc(env(safe-area-inset-top) + 69px)) 0 calc(var(--n7-status-bottom) + 76px);
+  }
+
+  .n7-guide-view.n7-live-home #n7-guide-voice {
+    bottom: var(--n7-status-bottom);
+  }
+
+  .n7-guide-view.n7-live-home .n7-guide-controls {
+    top: auto;
+    right: auto;
+    left: var(--n7-home-gutter);
+    bottom: var(--n7-status-bottom);
+  }
+}

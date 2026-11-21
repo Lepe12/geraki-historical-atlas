@@ -1,35 +1,89 @@
 "use client";
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, type CSSProperties } from "react";
 import { N7_BACKDROP_REFERENCE } from "./N7BackdropReference";
+import N7MiraField from "./N7MiraField";
+import type {GuideMood} from "./N7GuideScene";
 
 type Highlight={x:number;y:number;phase:number;sprite:HTMLCanvasElement};
 
-export type N7BackdropHandle={wave:(x:number,y:number,radius:number,fade:number)=>void;clear:()=>void};
-const N7Backdrop=forwardRef<N7BackdropHandle,{effects:boolean;reduced:boolean}>(function N7Backdrop({effects,reduced},ref) {
+export type N7BackdropHandle={wave:(x:number,y:number,radius:number,fade:number)=>void;clear:()=>void;setVoiceLevel:(level:number)=>void};
+export type N7BackdropTuning={fog:number;brightness:number;motion:number};
+type BackdropProps={effects:boolean;reduced:boolean;ambience?:{wide:string;portrait:string};tuning?:N7BackdropTuning;activity?:GuideMood};
+
+// MIRA CoreMatter's harmonic orbit paths projected behind the N7 figure.
+// Adapted from MIRA-HUD (MIT). See N7-MIRA-HUD-LICENSE.txt.
+const ORBIT_TILTS=[-.95,.65,-.35,1.12,.24,-1.34];
+function paintOrbits(ctx:CanvasRenderingContext2D,w:number,h:number,time:number,energy:number,brightness:number){
+  const radius=Math.min(w*.405,h*.37),cx=w*.5,cy=h*.48;
+  ctx.save();
+  ctx.globalCompositeOperation="screen";
+  for(const [i,tilt] of ORBIT_TILTS.entries()){
+    const phase=i*1.29;
+    const az=tilt+.12*Math.sin(time*.09+phase);
+    const cos=Math.cos(az),sin=Math.sin(az);
+    const oval=.64+(i%3)*.13;
+    const warm=i%3===1;
+    const gradient=ctx.createLinearGradient(cx-radius,cy-radius,cx+radius,cy+radius);
+    gradient.addColorStop(0,warm?"#dd8d43":"#4bbfdf");
+    gradient.addColorStop(.44,warm?"#ffe1ae":"#bcf6ff");
+    gradient.addColorStop(1,warm?"#9d5f39":"#2b7fb3");
+    ctx.strokeStyle=gradient;
+    ctx.shadowColor=warm?"#f7af64":"#59dfff";
+    ctx.shadowBlur=4+energy*8;
+    ctx.globalAlpha=Math.min(.82,(.29+(i%2)*.17+energy*.24)*brightness);
+    ctx.lineWidth=.65+(i%2)*.28+energy*.4;
+    ctx.beginPath();
+    for(let step=0;step<=96;step++){
+      const a=(step%96)/96*Math.PI*2;
+      const rr=radius*(.91+i*.037)*(1+.10*Math.sin(3*a+phase+time*.12)+.043*Math.sin(5*a-phase-time*.2));
+      const x=Math.cos(a)*rr,y=Math.sin(a)*rr*oval;
+      const px=cx+x*cos-y*sin,py=cy+(x*sin+y*cos)*1.12;
+      if(step===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+    }
+    ctx.closePath();ctx.stroke();
+  }
+  ctx.restore();
+}
+
+const N7Backdrop=forwardRef<N7BackdropHandle,BackdropProps>(function N7Backdrop({effects,reduced,ambience,tuning,activity="idle"},ref) {
+  const source=ambience?.wide??N7_BACKDROP_REFERENCE;
+  const portrait=ambience?.portrait;
   const hostRef=useRef<HTMLDivElement>(null);
   const imageRef=useRef<HTMLImageElement>(null);
   const layerRef=useRef<HTMLDivElement>(null);
-  const flags=useRef({effects,reduced});
+  const flags=useRef({effects,reduced,tuning});
+  const voiceLevel=useRef(0);
   const restart=useRef<()=>void>(()=>{});
   const waveRef=useRef<(x:number,y:number,radius:number,fade:number)=>void>(()=>{});
-  useImperativeHandle(ref,()=>({wave:(x,y,r,f)=>waveRef.current(x,y,r,f),clear:()=>waveRef.current(0,0,-1,0)}),[]);
-  useEffect(()=>{flags.current={effects,reduced};restart.current();},[effects,reduced]);
+  useImperativeHandle(ref,()=>({
+    wave:(x,y,r,f)=>waveRef.current(x,y,r,f),
+    clear:()=>waveRef.current(0,0,-1,0),
+    setVoiceLevel:level=>{voiceLevel.current=Math.max(0,level);},
+  }),[]);
+  useEffect(()=>{flags.current={effects,reduced,tuning};restart.current();},[effects,reduced,tuning]);
 
   useEffect(()=>{
     const host=hostRef.current,image=imageRef.current,layer=layerRef.current;
     if(!host||!image||!layer) return;
-    let disposed=false,loaded=false;
+    let disposed=false,loadedSource="",lastEnergy="";
     const highlights:Highlight[]=[];
     let centers:{x:number;y:number}[]=[];
     const start=()=>{
-      layer.style.display=flags.current.effects&&!flags.current.reduced?"block":"none";
+      const animate=flags.current.effects&&!flags.current.reduced;
+      layer.style.display=animate?"block":"none";
+      if(!animate){host.style.removeProperty("--n7-voice-energy");lastEnergy="";}
     };
     restart.current=start;
     let layout=()=>{};
     const observer=new ResizeObserver(()=>layout());observer.observe(host);
     const load=()=>{
-      if(disposed||loaded) return;
-      loaded=true;
+      const currentSource=image.currentSrc;
+      if(disposed||!image.naturalWidth||!currentSource||loadedSource===currentSource) return;
+      loadedSource=currentSource;
+      for(const point of highlights)point.sprite.remove();
+      highlights.length=0;
+      const smoke=layer.querySelector<HTMLElement>("[data-smoke-drift]");
+      if(smoke)smoke.style.backgroundImage=`url("${currentSource}")`;
       const w=418,h=Math.round(w*image.naturalHeight/image.naturalWidth);
       const sample=document.createElement("canvas");sample.width=w;sample.height=h;
       const sctx=sample.getContext("2d",{willReadFrequently:true});
@@ -61,7 +115,7 @@ const N7Backdrop=forwardRef<N7BackdropHandle,{effects:boolean;reduced:boolean}>(
         if(highlights.length===12) break;
       }
       for(const point of highlights){
-        Object.assign(point.sprite.style,{position:"absolute",mixBlendMode:"screen",animation:"n7-ridge-light 9.6s ease-in-out infinite",animationDelay:`${-point.phase}s`});
+        Object.assign(point.sprite.style,{position:"absolute",mixBlendMode:"screen",animation:"n7-ridge-light 9.6s ease-in-out infinite",animationDelay:`${-point.phase}s`,animationPlayState:"var(--n7-field-animation, running)"});
         layer.append(point.sprite);
       }
       layout=()=>{
@@ -98,38 +152,62 @@ const N7Backdrop=forwardRef<N7BackdropHandle,{effects:boolean;reduced:boolean}>(
     const strands=layer.querySelector<HTMLCanvasElement>("[data-strands]");
     const sctx2=strands?.getContext("2d")||null;
     const ribbons=Array.from({length:7},(_,i)=>({y:.12+i*.12+((i*37)%11)/100,amp:.04+((i*53)%7)/120,len:.55+((i*29)%5)/10,phase:i*1.7,speed:.018+((i*13)%5)/400,tilt:((i%3)-1)*.10,alpha:.10+((i*17)%5)/40,lines:2+(i%3)}));
-    let strandRaf=0,lastStrand=0;
+    let strandRaf=0,lastStrand=0,strandTime=performance.now()/1000;
     const drawStrands=(now:number)=>{
       strandRaf=requestAnimationFrame(drawStrands);
       if(!strands||!sctx2||disposed)return;
-      if(!flags.current.effects||flags.current.reduced||now-lastStrand<33)return;lastStrand=now;
+      const {effects,reduced,tuning}=flags.current;
+      if(!effects||reduced||now-lastStrand<33)return;
+      const motion=(tuning?.motion??100)/100;
+      strandTime+=Math.min(lastStrand?now-lastStrand:0,80)*motion/1000;
+      lastStrand=now;
+      const level=tuning?voiceLevel.current:0;
+      const energy=level.toFixed(3);
+      if(tuning&&energy!==lastEnergy){host.style.setProperty("--n7-voice-energy",energy);lastEnergy=energy;}
       const w=Math.max(1,Math.round(host.clientWidth/2)),h=Math.max(1,Math.round(host.clientHeight/2));
       if(strands.width!==w||strands.height!==h){strands.width=w;strands.height=h;}
-      sctx2.clearRect(0,0,w,h);const t=now/1000;
+      sctx2.clearRect(0,0,w,h);const t=tuning?strandTime:now/1000;
       for(const r of ribbons){
         const start=((t*r.speed+r.phase*.13)%1.6)-.55,x0=start*w,x1=(start+r.len)*w;
-        const g=sctx2.createLinearGradient(x0,0,x1,0);g.addColorStop(0,"rgba(170,232,248,0)");g.addColorStop(.5,`rgba(196,240,252,${r.alpha})`);g.addColorStop(1,"rgba(170,232,248,0)");
+        const alpha=Math.min(.65,r.alpha*(1+level*2.4)*(tuning?.brightness??100)/100);
+        const amplitude=r.amp*(1+level*.32*motion);
+        const g=sctx2.createLinearGradient(x0,0,x1,0);g.addColorStop(0,"rgba(170,232,248,0)");g.addColorStop(.5,`rgba(196,240,252,${alpha})`);g.addColorStop(1,"rgba(170,232,248,0)");
         sctx2.strokeStyle=g;
         for(let l=0;l<r.lines;l++){
           sctx2.lineWidth=l?.6:1;sctx2.beginPath();
-          for(let s=0;s<=40;s++){const f=s/40,x=x0+(x1-x0)*f,yy=(r.y+r.tilt*(f-.5)+r.amp*Math.sin(f*5.2+t*.35+r.phase)+.012*Math.sin(f*13+t*.6+r.phase))*h+l*2.2;s?sctx2.lineTo(x,yy):sctx2.moveTo(x,yy);}
+          for(let s=0;s<=40;s++){const f=s/40,x=x0+(x1-x0)*f,yy=(r.y+r.tilt*(f-.5)+amplitude*Math.sin(f*5.2+t*.35+r.phase)+.012*Math.sin(f*13+t*.6+r.phase))*h+l*2.2;s?sctx2.lineTo(x,yy):sctx2.moveTo(x,yy);}
           sctx2.stroke();
         }
       }
+      if(tuning)paintOrbits(sctx2,w,h,t,level,tuning.brightness/100);
     };
     strandRaf=requestAnimationFrame(drawStrands);
     image.addEventListener("load",load);
     if(image.complete&&image.naturalWidth) load();
     return()=>{disposed=true;cancelAnimationFrame(strandRaf);observer.disconnect();for(const point of highlights)point.sprite.remove();image.removeEventListener("load",load);restart.current=()=>{};waveRef.current=()=>{};};
-  },[]);
+  },[source,portrait]);
 
-  return <div ref={hostRef} aria-label="N7 Step 6 living backdrop" data-effects={effects&&!reduced?"on":"off"}
-    style={{position:"absolute",inset:0,zIndex:0,pointerEvents:"none",overflow:"hidden"}}>
-    <img ref={imageRef} src={N7_BACKDROP_REFERENCE} alt="Cinematic mountain landscape" style={{position:"absolute",width:"100%",height:"100%",objectFit:"cover"}} />
+  const appearance=tuning&&{
+    "--n7-fog-opacity":.35+.65*Math.min(1,tuning.fog/100),
+    "--n7-smoke-opacity":.32*tuning.fog/100,
+    "--n7-field-brightness":tuning.brightness/100,
+    "--n7-smoke-duration":`${4800/Math.max(1,tuning.motion)}s`,
+    "--n7-field-animation":tuning.motion===0?"paused":"running",
+  };
+  return <div ref={hostRef} className={ambience?"n7-ambient-field":undefined} aria-hidden={ambience?true:undefined}
+    aria-label={ambience?undefined:"N7 Step 6 living backdrop"} data-effects={effects&&!reduced?"on":"off"}
+    style={{position:"absolute",inset:0,zIndex:0,pointerEvents:"none",overflow:"hidden",...appearance} as CSSProperties}>
+    <picture>
+      {portrait&&<source media="(max-width: 720px) and (orientation: portrait)" srcSet={portrait}/>}
+      <img ref={imageRef} src={source} alt={ambience?"":"Cinematic mountain landscape"} style={{position:"absolute",width:"100%",height:"100%",objectFit:"cover"}} />
+    </picture>
+    {ambience&&tuning&&effects&&!reduced&&<N7MiraField tuning={tuning} activity={activity} voiceLevel={voiceLevel}/>}
     <style>{`@keyframes n7-ridge-light {0%,100% {opacity:.08} 50% {opacity:.78}}@keyframes n7-smoke-drift {0% {transform:scale(1.10) translate(-1.8%,.8%)} 100% {transform:scale(1.14) translate(1.8%,-1.2%)}}`}</style>
     <div ref={layerRef} data-ridge-layer="" aria-label="Existing ridge illumination" style={{position:"absolute",inset:0}}>
       {/* Slow smoke drift: a soft, faint copy of the same raster moving very slowly. */}
-      <div aria-hidden="true" data-smoke-drift="" style={{position:"absolute",inset:0,backgroundImage:`url(${N7_BACKDROP_REFERENCE})`,backgroundSize:"cover",backgroundPosition:"center",opacity:.32,mixBlendMode:"screen",filter:"blur(6px)",animation:"n7-smoke-drift 48s ease-in-out infinite alternate"}}/>
+      <div aria-hidden="true" data-smoke-drift="" style={{position:"absolute",inset:0,backgroundSize:"cover",backgroundPosition:"center",
+        opacity:"var(--n7-smoke-opacity, .32)",mixBlendMode:"screen",filter:tuning?"blur(6px) brightness(var(--n7-field-brightness, 1))":"blur(6px)",
+        animation:"n7-smoke-drift var(--n7-smoke-duration, 48s) ease-in-out infinite alternate",animationPlayState:"var(--n7-field-animation, running)"}}/>
       <canvas data-strands="" aria-hidden="true" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/>
     </div>
   </div>;
