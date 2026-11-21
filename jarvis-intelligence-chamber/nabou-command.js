@@ -132,8 +132,10 @@
  const sIn=$('n7Search');if(sIn){sIn.placeholder='Βρες ορμητήριο, πειρατή ή χρονιά';sIn.setAttribute('aria-label','Αναζήτηση ορμητηρίου, πειρατή ή χρονιάς');}
  top?.querySelector('.n7-search kbd')?.remove();
  const mapMode=()=>M3()?.enabled?'3d':ui.old?'jansson':'today';
+ const toast=t=>{let e=$('nbcToast');if(!e){e=h('div',{id:'nbcToast',class:'nbc-toast',role:'status'});document.body.append(e);}e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,7000);};
  const setMode=async m=>{const is3=!!M3()?.enabled;
-  if(m==='3d'){if(!is3)$('map3dToggle')?.click();return;}
+  if(m==='3d'){if(!is3){if(M3()&&M3().supported===false){toast('Αυτός ο browser δεν υποστηρίζει το ανάγλυφο 3D (WebGL).');return;}$('map3dToggle')?.click();
+    setTimeout(()=>{if(!M3()?.enabled)toast(/githack|localhost|127\.0\.0\.1/.test(location.host)?'Το ανάγλυφο 3D δεν ανοίγει στη σελίδα δοκιμής (preview)· στο κανονικό site ανοίγει.':'Το ανάγλυφο 3D δεν μπόρεσε να ανοίξει. Δοκίμασε ανανέωση της σελίδας.');syncMode();},9000);}return;}
   if(is3)$('map3dToggle')?.click();setOld(m==='jansson');syncMode();};
  const mapsw=h('div',{class:'nbc-mapsw',role:'group','aria-label':'Ποιος χάρτης φαίνεται'},
   h('button',{type:'button',dataset:{mode:'today'},onclick:()=>setMode('today')},'Σημερινός χάρτης'),
@@ -415,9 +417,8 @@
   const stage=$('chartStage');if(!stage)return;const v=view2d(),r=stage.getBoundingClientRect(),vr=view.getBoundingClientRect();
   const sx=vr.left+cx*v.s+v.x,sy=vr.top+cy*v.s+v.y;stage.dispatchEvent(new WheelEvent('wheel',{deltaY:-Math.log(want/v.s)/0.0015,clientX:sx,clientY:sy,bubbles:true,cancelable:true}));
   const lon=cx/C.k+C.lon0;const lat=Math.atan(Math.sinh((C.my1-cy/C.k)*Math.PI/180))*180/Math.PI;
-  if(cine){setTimeout(()=>{const v2=view2d(),tx=64+aw/2,ty=96+ah/2,ddx=tx-(cx*v2.s+v2.x),ddy=ty-(cy*v2.s+v2.y);
-    for(const [dd,pos,neg] of [[ddx,'ArrowLeft','ArrowRight'],[ddy,'ArrowUp','ArrowDown']])for(let i=0;i<Math.min(80,Math.round(Math.abs(dd)/60));i++)stage.dispatchEvent(new KeyboardEvent('keydown',{key:dd>0?pos:neg,bubbles:true,cancelable:true}));
-    setTimeout(stnDeclutter,200);},420);return;}
+  if(cine){setTimeout(()=>{const v2=view2d(),tx=64+aw/2,ty=96+ah/2,ccx=cx+(view.clientWidth/2-tx)/v2.s,ccy=cy+(view.clientHeight/2-ty)/v2.s;
+    pan2d(ccx/C.k+C.lon0,Math.atan(Math.sinh((C.my1-ccy/C.k)*Math.PI/180))*180/Math.PI);setTimeout(stnDeclutter,400);},420);return;}
   requestAnimationFrame(()=>{pan2d(lon,lat);setTimeout(stnDeclutter,120);});}
  // station names: drop the ones that would overlap (start and end first, then in route order)
  function stnDeclutter(){const all=[...rsvg.querySelectorAll('.nbc-sea:not([style*="none"]) .nbc-stn')];const keep=[];
@@ -628,12 +629,18 @@
    d+='C'+f(p1.x+(p2.x-p0.x)/6)+' '+f(p1.y+(p2.y-p0.y)/6)+' '+f(p2.x-(p3.x-p1.x)/6)+' '+f(p2.y-(p3.y-p1.y)/6)+' '+f(p2.x)+' '+f(p2.y);}return d;}
  const lanePts=ln=>rdpPts(ln.map(([la,lo])=>project(lo,la)),.45);
  function svgEl(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.append(e);return e;}
+ const arrowsLater=[];
+ // small chevrons along a lane, pointing the way the ships sailed; sized on screen, spaced along the path
+ function placeArrows(){for(const [ln,ar] of arrowsLater){ar.replaceChildren();let T=0;try{T=ln.getTotalLength();}catch(e){}if(!T)continue;const step=16;
+   for(let t=step*.6;t<T-step*.4;t+=step){const a=ln.getPointAtLength(t),b=ln.getPointAtLength(Math.min(T,t+.6));const ang=Math.atan2(b.y-a.y,b.x-a.x)*180/Math.PI;
+    const c=svgEl('path',{d:'M-3.2 -2.6L0.8 0L-3.2 2.6',class:'chev'},ar);c.style.transform=`translate(${a.x.toFixed(2)}px,${a.y.toFixed(2)}px) rotate(${ang.toFixed(1)}deg) scale(var(--nbc-inv,1))`;}}}
  function buildBV(){
   const defs=rsvg.querySelector('defs')||svgEl('defs',{},rsvg);
   for(const r of BV.routes){const g=svgEl('g',{class:'nbc-sea','data-bvr':r.id});g.style.setProperty('--c',r.color);
    const lanes=[...r.lines.map(ln=>({ln,kind:'main'})),...(r.ext||[]).map(e=>({ln:e.pts,kind:e.kind||'extension',name:e.name,pages:e.pages}))];
    for(const L of lanes){const d=curveD(lanePts(L.ln)),k=L.kind==='main'?'':' '+L.kind;
-    svgEl('path',{d,class:'cas'+k},g);svgEl('path',{d,class:'ln'+k},g);if(L.kind==='main')svgEl('path',{d,class:'core'},g);
+    svgEl('path',{d,class:'glow'+k},g);const ln=svgEl('path',{d,class:'ln'+k},g);
+    if(L.kind!=='variant'){const ar=svgEl('g',{class:'arw'+k},g);arrowsLater.push([ln,ar]);}
     const hit=svgEl('path',{d,class:'hit'},g);if(L.name)svgEl('title',{},hit).textContent=L.name+' · σελ. '+L.pages;}
    // stations named by the thesis
    const sg=svgEl('g',{class:'nbc-stns'},g);
@@ -646,14 +653,20 @@
    svgEl('title',{},g).textContent=r.name+' · Μπελαβίλας 1992, σελ. '+r.pages;
    // the name runs along the middle third of the main lane, always left-to-right
    {const P=lanePts(r.lines[0]);let L=[0];for(let i=1;i<P.length;i++)L.push(L[i-1]+Math.hypot(P[i].x-P[i-1].x,P[i].y-P[i-1].y));const T=L[L.length-1];
-    let best=null;for(let i=0;i<P.length;i++){let j=i;while(j<P.length-1&&L[j]-L[i]<T*.22)j++;if(L[j]-L[i]<T*.18)break;
-     const ch=Math.hypot(P[j].x-P[i].x,P[j].y-P[i].y),q=ch/(L[j]-L[i]);if(!best||q>best.q)best={q,a:P[i],b:P[j]};}
+    // the name sits in the middle of the longest stretch between two stations, along the chord of that stretch
+    const at=v=>{let k=0;while(k<L.length-1&&L[k]<v)k++;return P[k];};
+    const SL=(r.stations||[]).map(st=>{const q=project(st.lon,st.lat);let bi=0,bd=1e9;P.forEach((p,i)=>{const d=Math.hypot(p.x-q.x,p.y-q.y);if(d<bd){bd=d;bi=i;}});return bd<6?{v:L[bi],big:st.role==='start'||st.role==='end'}:null;}).filter(Boolean);
+    const cuts=[{v:0,big:true},...SL,{v:T,big:true}].sort((x,y)=>x.v-y.v);let g0=0,g1=T,gs=-1;
+    // stretches next to the start or end (which carry the larger «αφετηρία / προορισμός» labels) count for less
+    for(let i=0;i<cuts.length-1;i++){const len=cuts[i+1].v-cuts[i].v,sc=len*(cuts[i].big||cuts[i+1].big?.55:1);if(sc>gs){gs=sc;g0=cuts[i].v;g1=cuts[i+1].v;}}
+    const c=(g0+g1)/2,hw=Math.min((g1-g0)*.42,T*.2),best={a:at(c-hw),b:at(c+hw)};
     let A=best?best.a:P[0],B=best?best.b:P[P.length-1];if(B.x<A.x)[A,B]=[B,A];
-    const id='nbcLane-'+r.id;svgEl('path',{id,d:`M${A.x.toFixed(2)} ${A.y.toFixed(2)}L${B.x.toFixed(2)} ${B.y.toFixed(2)}`,fill:'none',stroke:'none'},defs);
-    const lab=svgEl('text',{class:'nbc-sea-label',dy:'-0.55em'},g),tp=svgEl('textPath',{href:'#'+id,startOffset:'50%','text-anchor':'middle'},lab);tp.textContent=r.short||r.name;}
+    const mx=(A.x+B.x)/2,my=(A.y+B.y)/2,ang=Math.atan2(B.y-A.y,B.x-A.x)*180/Math.PI;
+    const lab=svgEl('text',{class:'nbc-sea-label','text-anchor':'middle',x:'0',y:'0',dy:'-0.95em'},g);lab.textContent=r.short||r.name;
+    lab.style.transform=`translate(${mx.toFixed(2)}px,${my.toFixed(2)}px) rotate(${ang.toFixed(1)}deg)`;}
    g.addEventListener('click',ev=>{ev.stopPropagation();pickSeaRoute(r.id);});rsvg.append(g);bvLines.set(r.id,g);}
   for(const pt of BV.points){const e=bvPin(pt,false),q=project(pt.lon,pt.lat);e.style.left=q.x+'px';e.style.top=q.y+'px';layer.append(e);bvPins.set(pt.id,e);}
-  mountBV3d();marks();}
+  requestAnimationFrame(placeArrows);mountBV3d();marks();}
  // «only the routes» in 3D: hide the chart's own 3D furniture (lane banners, ink lines, the decorative ship line)
  // while the sea lanes are shown alone; restored exactly as it was when the mode ends.
  let quietSet=null;function quiet3d(on){const sc=M3()?.enabled&&M3().scene;if(!sc)return;
