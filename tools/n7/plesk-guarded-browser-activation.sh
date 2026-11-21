@@ -27,8 +27,8 @@ command -v git >/dev/null || { echo 'N7_GIT_MISSING' >&2; exit 2; }
 repo=''
 for candidate in "$GIT_PARENT"/*; do
   [ -d "$candidate" ] || continue
-  remotes="$(git --git-dir="$candidate" config --get-regexp '^remote\\..*\\.url$' 2>/dev/null || true)"
-  if printf '%s\\n' "$remotes" | grep -Eiq 'github\\.com[/:]Lepe12/independent-ai-bot(\\.git)?/?([[:space:]]|$)'; then
+  remotes="$(git --git-dir="$candidate" config --get-regexp '^remote\..*\.url$' 2>/dev/null || true)"
+  if printf '%s\n' "$remotes" | grep -Eiq 'github\.com[/:]Lepe12/independent-ai-bot(\.git)?/?([[:space:]]|$)'; then
     if [ -n "$repo" ]; then echo 'N7_AMBIGUOUS_GIT_MIRROR' >&2; exit 2; fi
     repo="$candidate"
   fi
