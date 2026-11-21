@@ -1,4 +1,5 @@
 // Verify the actual chart, not only the decorative welcome image. No production writes.
+// The icon-rail shell this test checks is kept behind ?classic=1 since the cinematic redesign (nabou-command.browser.test.cjs covers the new shell).
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('node:http'),path=require('node:path');
 (async()=>{
@@ -11,7 +12,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
  page.on('pageerror',e=>errors.push(e.message));
  const snapshot={schema:'pct-command-center-live-v1',run_id:'100',mission:{target:'Έλεγχος χάρτη',status:'COMPLETED'},agents:[{id:'greek',status:'COMPLETED'}],discoveries:[{title:'Δοκιμαστική ιστορική πηγή',url:'https://example.org/source'}],claims:[],blockers:[],events:[],safety:{automatic_verified:false}};
  await page.route('**/*',r=>{const u=r.request().url();if(!u.startsWith('https://'))return r.continue();if(u.includes('raw.githubusercontent.com'))return r.fulfill({json:snapshot});if(u.includes('/status/'))return r.fulfill({json:{snapshot,events:[]}});return r.abort();});await page.routeWebSocket(/.*/,()=>{});
- await page.goto('http://127.0.0.1:'+server.address().port+'/jarvis-intelligence-chamber/');
+ await page.goto('http://127.0.0.1:'+server.address().port+'/jarvis-intelligence-chamber/?classic=1');
  await page.waitForFunction(()=>document.body.dataset.currentResearchRun==='100');
  // N7 layout: the landing page is the framed map itself; no welcome card or poster is rendered.
  assert.equal(await page.locator('body').getAttribute('data-atlas-landing'),'true');
