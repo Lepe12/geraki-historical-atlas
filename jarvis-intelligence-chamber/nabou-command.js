@@ -118,12 +118,56 @@
  periodChip.addEventListener('click',()=>rangeInputs()[0]?.focus());
  const seg=h('div',{class:'nbc-seg',role:'group','aria-label':'Βιβλίο'},...[['All','Όλα'],['Book I','I'],['Book II','II'],['Book III','III']].map(([v,l])=>
   h('button',{type:'button',dataset:{book:v},'aria-pressed':String(v==='All'),title:v==='All'?'Όλα τα βιβλία':bookLabel(v),onclick:()=>{ui.book=v;refresh();}},l)));
- const t3d=h('button',{type:'button',class:'nbc-tool',id:'nbc3d','aria-pressed':'false',title:'Τρισδιάστατος χάρτης με ανάγλυφο',onclick:()=>$('map3dToggle')?.click()},ico(I.cube),h('b',{text:'3D'}));
+ const t3d=h('button',{type:'button',class:'nbc-tool','aria-pressed':'false',title:'Τρισδιάστατος χάρτης με ανάγλυφο',onclick:()=>$('map3dToggle')?.click()},ico(I.cube),h('b',{text:'3D'}));
  const tFull=h('button',{type:'button',class:'nbc-tool',title:'Πλήρης οθόνη','aria-label':'Πλήρης οθόνη',onclick:()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}catch{}}},ico(I.full));
  const tOld=h('button',{type:'button',class:'nbc-tool',id:'nbcOld','aria-pressed':'false',title:'Ιστορικός χάρτης: Jansson 1650 (David Rumsey Map Collection)',onclick:()=>setOld(!ui.old)},
   ico('<path d="M4 5l5-2 6 2 5-2v16l-5 2-6-2-5 2z"/><path d="M9 3v16M15 5v16"/>'),h('b',{text:'1650'}));
- if(actions)actions.before(h('div',{class:'nbc-topctl'},h('span',{class:'nbc-lbl',text:'Βιβλίο'}),seg,periodChip,tOld,t3d,tFull));
- const sync3d=()=>{const on=!!M3()?.enabled;t3d.setAttribute('aria-pressed',String(on));t3d.querySelector('b').textContent=on?'2D':'3D';t3d.title=on?'Επιστροφή στον επίπεδο χάρτη':'Τρισδιάστατος χάρτης με ανάγλυφο';body.classList.toggle('nbc-3d',on);};
+ /* Cinematic shell (owner-approved mockup, 20 Nov 2026): compass mark, one search, one map switch that names what it shows. */
+ const CINE=!/[?&]classic=1/.test(location.search);if(CINE)body.classList.add('nbc-cine');
+ const logo=top?.querySelector('.n7-logo');
+ if(logo){logo.querySelector('.n7-wings')?.remove();logo.querySelector('.n7-logo-text')?.remove();
+  const m=document.createElementNS(NS,'svg');m.setAttribute('viewBox','0 0 40 40');m.setAttribute('class','nbc-compass');m.setAttribute('aria-hidden','true');
+  m.innerHTML='<circle cx="20" cy="20" r="18.5" fill="none" stroke="#c29a5b" stroke-width=".8"/><circle cx="20" cy="20" r="13" fill="none" stroke="#c29a5b55" stroke-width=".6"/><path d="M20 3l2.4 17L20 37l-2.4-17z" fill="#ede4d2"/><path d="M3 20l17-2.4L37 20l-17 2.4z" fill="#c29a5b"/><circle cx="20" cy="20" r="1.6" fill="#061419"/>';
+  logo.prepend(m);}
+ const sIn=$('n7Search');if(sIn){sIn.placeholder='Βρες ορμητήριο, πειρατή ή χρονιά';sIn.setAttribute('aria-label','Αναζήτηση ορμητηρίου, πειρατή ή χρονιάς');}
+ top?.querySelector('.n7-search kbd')?.remove();
+ const mapMode=()=>M3()?.enabled?'3d':ui.old?'jansson':'today';
+ const setMode=async m=>{const is3=!!M3()?.enabled;
+  if(m==='3d'){if(!is3)$('map3dToggle')?.click();return;}
+  if(is3)$('map3dToggle')?.click();setOld(m==='jansson');syncMode();};
+ const mapsw=h('div',{class:'nbc-mapsw',role:'group','aria-label':'Ποιος χάρτης φαίνεται'},
+  h('button',{type:'button',dataset:{mode:'today'},onclick:()=>setMode('today')},'Σημερινός χάρτης'),
+  h('button',{type:'button',dataset:{mode:'jansson'},title:'Χάρτης της Μεσογείου του Jansson, 1650 (David Rumsey Map Collection)',onclick:()=>setMode('jansson')},'Χάρτης του Jansson, 1650'),
+  h('button',{type:'button',id:'nbc3d',dataset:{mode:'3d'},title:'Τρισδιάστατος χάρτης με ανάγλυφο',onclick:()=>setMode(M3()?.enabled?(ui.old?'jansson':'today'):'3d')},'Ανάγλυφο 3D'));
+ function syncMode(){const m=mapMode();for(const b of mapsw.children)b.setAttribute('aria-pressed',String(b.dataset.mode===m));}
+ /* Site navigation: one row of page names (left), search and saved places (right). Map tools live on the map. */
+ const navTo=sel=>()=>nav?.querySelector(sel)?.click();
+ const tabBtn=(t,id,fn,label)=>h('button',{type:'button',class:'nbc-navtab',id,'aria-label':label||t,onclick:fn},t);
+ const idx=tabBtn('Ευρετήριο','nbcIndex',()=>{if(!dock.hidden&&ui.tab!=='history'){card.hidden=true;return;}openTab('bases');},'Ευρετήριο: ορμητήρια, πρόσωπα, γεγονότα, ρότες, πηγές');
+ const siteNav=h('nav',{class:'nbc-sitenav','aria-label':'Σελίδες του Άτλαντα'},
+  tabBtn('Χάρτης','nbcNavMap',()=>{navTo('[data-atlas-nav="map"]')();if(card)card.hidden=true;}),idx,
+  tabBtn('Έρευνα','nbcNavResearch',navTo('[data-atlas-nav="research"]'),'Η έρευνά μου'),
+  tabBtn('Πορεία','nbcNavActivity',()=>actions?.querySelector('[data-n7-nav="activity"]')?.click(),'Πορεία έρευνας'),
+  tabBtn('Βιβλιοθήκη','nbcNavLib',navTo('[data-atlas-nav="sources"]'),'Βιβλιοθήκη πηγών'),
+  tabBtn('Δεδομένα','nbcNavData',navTo('[data-atlas-nav="tools"]')));
+ const syncNav=()=>{const page=body.dataset.readerView||'map';const cur=!dock.hidden&&ui.tab!=='history'?'nbcIndex':page==='research'?'nbcNavResearch':page==='sources'?'nbcNavLib':page==='tools'?'nbcNavData':'nbcNavMap';
+  for(const b of siteNav.children)b.setAttribute('aria-current',b.id===cur?'page':'false');};
+ if(CINE){logo?.after(siteNav);new MutationObserver(syncNav).observe(body,{attributes:true,attributeFilter:['data-reader-view']});setInterval(syncNav,800);}
+ if(CINE&&actions){const sv=actions.querySelector('#n7SavedBtn');if(sv){sv.classList.add('nbc-word');sv.replaceChildren('Αποθηκευμένα');sv.removeAttribute('title');}
+  actions.querySelector('[data-n7-nav="activity"]')?.classList.add('nbc-hide');}
+ const sBox=top?.querySelector('.n7-search');
+ if(CINE&&actions){siteNav.append(actions);actions.querySelector('#n7SavedBtn')?.classList.add('nbc-navtab');}
+ if(sBox){const mic=h('button',{type:'button',class:'nbc-mic','aria-label':'Φωνή N7',title:'Μίλα στον N7',onclick:()=>document.querySelector('#n7Assistant .pro-voice')?.click()});
+  mic.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg>';sBox.append(mic);}
+ /* Map tools: which map, and its layers, in one group on the map. */
+ const lay=h('button',{type:'button',class:'nbc-maptool',id:'nbcLayersBtn','aria-label':'Επίπεδα και υπόμνημα του χάρτη',onclick:()=>{nav?.querySelector('[data-n7-nav="layers"]')?.click();lay.setAttribute('aria-pressed',String(shell.dataset.layers==='open'));}},'Επίπεδα');
+ if(actions){if(CINE){const clk=id=>()=>document.getElementById(id)?.click();const sep=()=>h('i',{class:'nbc-mapsep','aria-hidden':'true'});
+   const mg=h('div',{class:'nbc-mapgroup',role:'group','aria-label':'Χάρτης'},mapsw,sep(),lay,sep(),
+    h('button',{type:'button',class:'nbc-maptool',onclick:clk('resetView'),'aria-label':'Δείξε όλη τη Μεσόγειο'},'Όλη η Μεσόγειος'),sep(),
+    h('button',{type:'button',class:'nbc-maptool nbc-zoom',onclick:clk('zoomOut'),'aria-label':'Σμίκρυνση χάρτη',title:'Σμίκρυνση'},'−'),
+    h('button',{type:'button',class:'nbc-maptool nbc-zoom',onclick:clk('zoomIn'),'aria-label':'Μεγέθυνση χάρτη',title:'Μεγέθυνση'},'+'));(document.getElementById('n7MapSlot')||document.body).append(mg);const fitTl=()=>document.documentElement.style.setProperty('--nbc-mg',mg.offsetWidth+'px');new ResizeObserver(fitTl).observe(mg);fitTl();actions.before(h('div',{class:'nbc-topctl',hidden:true},seg,periodChip,tOld,t3d,tFull));}else actions.before(h('div',{class:'nbc-topctl'},h('span',{class:'nbc-lbl',text:'Βιβλίο'}),seg,periodChip,tOld,t3d,tFull));}
+ setTimeout(syncMode,0);
+ const sync3d=()=>{const on=!!M3()?.enabled;t3d.setAttribute('aria-pressed',String(on));t3d.querySelector('b').textContent=on?'2D':'3D';t3d.title=on?'Επιστροφή στον επίπεδο χάρτη':'Τρισδιάστατος χάρτης με ανάγλυφο';body.classList.toggle('nbc-3d',on);syncMode();};
  addEventListener('nabou:map3d',()=>{sync3d();if(M3()?.enabled)mount3d();});
  if(!M3()?.supported)t3d.disabled=true;
 
@@ -139,6 +183,32 @@
  if(card){card.before(dock);dbody.append(recBox,card);}
  const syncDock=()=>{dock.hidden=!!card?.hidden;if(dock.hidden&&ui.route){ui.route=null;ui.bv=null;routeHi(null);for(const l of bvLines.values())l.classList.remove('hi');marks();}};
  if(card)new MutationObserver(syncDock).observe(card,{attributes:true,attributeFilter:['hidden']});syncDock();
+ /* ── cinematic stage: big title of the selected place, a prologue when nothing is selected ── */
+ const cTitle=h('section',{class:'nbc-ctitle',id:'nbcCTitle','aria-live':'polite',hidden:true});
+ const prologue=h('section',{class:'nbc-prologue',id:'nbcPrologue',hidden:true},
+  h('h1',{text:'Η Μεσόγειος των κουρσάρων'}),
+  h('p',{text:'Εκατό ορμητήρια, οι δυνάμεις που τα κράτησαν και οι ρότες ανάμεσά τους, από το 1500 ως το 1700.'}),
+  h('div',{class:'nbc-cta'},h('button',{type:'button',class:'nbc-cbtn pri',onclick:()=>{closePrologue();openTab('bases');}},'Δες τα ορμητήρια'),
+   h('button',{type:'button',class:'nbc-cbtn',onclick:()=>closePrologue()},'Εξερεύνησε τον χάρτη')));
+ let proDone=false;try{proDone=sessionStorage.getItem('nbc.prologue')==='1';}catch(e){}
+ function closePrologue(){proDone=true;try{sessionStorage.setItem('nbc.prologue','1');}catch(e){}cineTitle();}
+ document.body.append(cTitle,prologue);
+ function cineTitle(){if(!CINE){cTitle.hidden=true;prologue.hidden=true;return;}const open=!dock.hidden;const b=open&&ui.tab==='history'&&ui.base&&baseById.get(ui.base);const r=!b&&open&&ui.tab==='history'&&ui.rec&&byId.get(ui.rec);
+  prologue.hidden=proDone||open||!!ui.base;
+  if(!b&&!r){cTitle.hidden=true;body.classList.remove('nbc-has-title');return;}
+  cTitle.replaceChildren();
+  if(b){const ents=Object.values(b.centuries).flat();const first=ents[0]||{};const tp=topoByBase.get(b.id);
+   const faiths=Object.entries(baseFaiths(b));const fa=faiths.map(([,f])=>f);const both=new Set(fa).size>1;
+   const kick=[b.port&&b.port!==b.area?b.port:'',first.siteType||''].filter(Boolean).join(', ');
+   cTitle.append(kick?h('div',{class:'k',text:kick}):'',h('h1',{text:b.area}),first.details?h('p',{text:first.details}):'',
+    h('div',{class:'facts'},
+     h('div',null,h('b',null,h('i',{class:'dot '+(both?'both':fa[0])}),both?'Χριστιανικό και μουσουλμανικό':(fa[0]==='muslim'?'Μουσουλμανικό ορμητήριο':'Χριστιανικό ορμητήριο')),faiths.map(([c])=>c+'ος').join(' και ')+' αιώνας'),
+     first.pirates?h('div',null,h('b',{text:'Πληρώματα'}),first.pirates.replace(/\//g,', ')):'',
+     tp&&tp.names.length?h('div',null,h('b',{text:'Στις πηγές'}),tp.names.map(n=>n.name).join(', ')):''));}
+  else{cTitle.append(h('div',{class:'k',text:TYPE[r.type]||'Τόπος'}),h('h1',{text:greek(r)||r.place}),r.historicalContext?h('p',{text:String(r.historicalContext).split(/(?<=\.)\s/)[0]}):'');}
+  cTitle.hidden=false;body.classList.add('nbc-has-title');}
+ new MutationObserver(()=>cineTitle()).observe(dock,{attributes:true,attributeFilter:['hidden']});
+ setTimeout(cineTitle,0);
  function openTab(id,{show=true}={}){ui.tab=id;if(ui.route&&!(id==='routes'&&!String(ui.route).startsWith('bv:'))&&!(id==='history'&&ui.bv&&String(ui.route)==='bv:'+ui.bv)){ui.route=null;routeHi(null);for(const l of bvLines.values())l.classList.remove('hi');}if(card&&show)card.hidden=false;paint();
   for(const b of tabs.children)b.setAttribute('aria-selected',String(b.dataset.tab===id));try{marks();}catch(e){}
   for(const b of nav?.querySelectorAll('[data-nbc-panel]')||[])b.setAttribute('aria-current',b.dataset.nbcPanel===id&&!card?.hidden?'true':'false');}
@@ -164,7 +234,9 @@
   else if(ui.tab==='sources'){kicker='Ιστορικές πηγές';nodes=sourcesView();}
   if(!DATA.places.length&&!['history','bases'].includes(ui.tab))nodes=[empty('Φόρτωση εγγραφών GERAKI…')];
   if(ui.tab==='bases'&&!BASES.bases.length)nodes=[empty('Φόρτωση ορμητηρίων…')];
+  if(body.classList.contains('nbc-cine')&&ui.tab==='history'&&ui.base&&!ui.power&&!ui.bv)kicker='Χρονικό';
   $('nbcKicker').textContent=kicker;recBox.replaceChildren(...nodes);recBox.hidden=!nodes.length;
+  try{cineTitle();}catch(e){}
   dbody.scrollTop=same?keep:0;
  }
  function recordView(p){
@@ -204,7 +276,7 @@
    h('div',{class:'nbc-actions'},h('a',{class:'nbc-btn',href:BASES.source?.map,target:'_blank',rel:'noopener noreferrer'},'Χάρτης ArcGIS ↗'),h('a',{class:'nbc-btn',href:BASES.source?.repository,target:'_blank',rel:'noopener noreferrer'},'Διατριβή ↗')),
    h('p',{class:'nbc-miss',text:BASES.coordinateNote||''})));
   const evs=EVENTS.events.filter(e=>e.area===b.area);
-  if(evs.length)out.push(sect('Πειρατές & γεγονότα · '+b.area,...evs.sort((a,c)=>(a.years[0]||9999)-(c.years[0]||9999)).map(eventItem)));
+  if(evs.length){const cs=sect('Χρονικό',...evs.sort((a,c)=>(a.years[0]||9999)-(c.years[0]||9999)).map(eventItem));cs.classList.add('nbc-chron');out.splice(1,0,cs);}
   const near=DATA.places.filter(p=>Number.isFinite(p.lat)&&Math.hypot((p.lon-b.lon)*Math.cos(b.lat*Math.PI/180),p.lat-b.lat)<.12);
   if(near.length)out.push(sect('Εγγραφές GERAKI εδώ',placeList(near)));
   out.push(h('div',{class:'nbc-actions'},h('button',{type:'button',class:'nbc-btn primary',onclick:()=>focusAt(b.lon,b.lat)},ico(I.focus),'Εστίαση στον χάρτη'),
@@ -237,7 +309,13 @@
   if(!all.length)out.push(empty('Κανένα ορμητήριο με αυτά τα φίλτρα.'));
   out.push(h('p',{class:'nbc-miss',text:'Πηγή: '+(BASES.source?.thesis||'')}));return out;}
  const baseList=l=>h('ul',{class:'nbc-list'},...l.map(b=>item(b.port||b.area,[b.port!==b.area?b.area:'',Object.entries(baseFaiths(b)).map(([c,fa])=>c+'ος '+(fa==='christian'?'χρ.':'μουσ.')).join(' · ')].filter(Boolean).join(' · '),()=>selectBase(b.id),null,ui.base===b.id,flagSvg(b,18))));
- function selectBase(id,{focus=true}={}){const b=baseById.get(id);if(!b)return;ui.power=null;ui.bv=null;ui.evBin=null;ui.base=id;ui.rec=null;ui.pro=null;openTab('history');marks();if(focus)focusAt(b.lon,b.lat);}
+ function selectBase(id,{focus=true}={}){const b=baseById.get(id);if(!b)return;ui.power=null;ui.bv=null;ui.evBin=null;ui.base=id;ui.rec=null;ui.pro=null;openTab('history');marks();
+  if(body.classList.contains('nbc-cine')&&!M3()?.enabled)cineFocus(b.lon,b.lat);else if(focus)focusAt(b.lon,b.lat);}
+ // Cinematic framing: come in close and put the place between the title (left) and the chronicle (right).
+ function cineFocus(lon,lat){const stage=$('chartStage');if(!stage)return;const pt=project(lon,lat);let v=view2d();const vr=view.getBoundingClientRect(),want=3.2;
+  if(v.s<want*.85)stage.dispatchEvent(new WheelEvent('wheel',{deltaY:-Math.log(want/v.s)/0.0015,clientX:vr.left+pt.x*v.s+v.x,clientY:vr.top+pt.y*v.s+v.y,bubbles:true,cancelable:true}));
+  setTimeout(()=>{v=view2d();const tx=Math.max(view.clientWidth*.5,(view.clientWidth-420)*.66),ty=view.clientHeight*.4,dx=tx-(pt.x*v.s+v.x),dy=ty-(pt.y*v.s+v.y);
+   for(const [d,pos,neg] of [[dx,'ArrowLeft','ArrowRight'],[dy,'ArrowUp','ArrowDown']])for(let i=0;i<Math.min(80,Math.round(Math.abs(d)/60));i++)stage.dispatchEvent(new KeyboardEvent('keydown',{key:d>0?pos:neg,bubbles:true,cancelable:true}));},420);}
  function focusAt(lon,lat){if(M3()?.enabled)M3().camera({lon,lat,tilt:48,rot:0,dist:2.4});else pan2d(lon,lat);}
  /* ───── powers of the period: their period banners at their seats (historical context, well established) ─────
     The banners are the chart's own gonfalons (window.NABOU_EMBLEMS: Burgundy cross, Lion of St Mark, lilies,
@@ -452,16 +530,19 @@
    if(s){e.style.setProperty('--rule',RULERS[s[2]][1]);e.dataset.rule=RULERS[s[2]][0];}else{e.style.removeProperty('--rule');delete e.dataset.rule;}}}
 
  function setOld(v){ui.old=!!v;try{localStorage.setItem('nbc.old',v?'1':'0');}catch(e){}if(v)loadOld();
-  body.classList.toggle('nbc-old-on',ui.old);$('nbcOld')?.setAttribute('aria-pressed',String(ui.old));if(oldPanel)oldPanel.hidden=!ui.old;}
+  body.classList.toggle('nbc-old-on',ui.old);$('nbcOld')?.setAttribute('aria-pressed',String(ui.old));if(oldPanel)oldPanel.hidden=!ui.old;try{syncMode();}catch(e){}}
  let oldPanel=null;
  function buildOldPanel(){if(oldPanel||!OLD)return;const slot=$('n7MapSlot');if(!slot)return;
   let op=0.7;try{op=+(localStorage.getItem('nbc.oldOp')||0.7);}catch(e){}osvg.style.setProperty('--op',op);
   const rng=h('input',{type:'range',min:'0',max:'100',value:String(Math.round(op*100)),'aria-label':'Διαφάνεια ιστορικού χάρτη'});
   rng.addEventListener('input',()=>{osvg.style.setProperty('--op',rng.value/100);try{localStorage.setItem('nbc.oldOp',String(rng.value/100));}catch(e){}});
+  if(CINE){// credit as a map attribution line (bottom-right); the opacity control lives in «Επίπεδα»
+   oldPanel=h('p',{class:'nbc-attrib',hidden:!ui.old},h('a',{href:OLD.item,target:'_blank',rel:'noopener',title:OLD.credit,text:'Χάρτης: Jansson, 1650 · David Rumsey Map Collection'}),' · ',h('a',{href:OLD.licenseUrl,target:'_blank',rel:'noopener',text:'CC BY-NC-SA'}));
+   slot.append(oldPanel);return;}
   oldPanel=h('aside',{class:'nbc-oldpanel',hidden:!ui.old},
    h('div',{class:'nbc-old-h'},h('b',{text:OLD.short}),h('button',{type:'button',class:'nbc-x','aria-label':'Κλείσιμο ιστορικού χάρτη',onclick:()=>setOld(false)},'✕')),
    h('label',{class:'nbc-old-r'},h('span',{text:'σήμερα'}),rng,h('span',{text:'1650'})),
-   h('p',{class:'nbc-old-c'},h('a',{href:OLD.item,target:'_blank',rel:'noopener',text:OLD.credit}),' · ',h('a',{href:OLD.licenseUrl,target:'_blank',rel:'noopener',text:OLD.license})),
+   h('p',{class:'nbc-old-c'},h('a',{href:OLD.item,target:'_blank',rel:'noopener',title:OLD.credit,text:CINE?'Jansson, 1650 · David Rumsey Map Collection':OLD.credit}),' · ',h('a',{href:OLD.licenseUrl,target:'_blank',rel:'noopener',text:CINE?'CC BY-NC-SA':OLD.license})),
    h('p',{class:'nbc-old-n',text:'Γεωαναφορά NABOU με '+OLD.gcps.length+' σημεία ελέγχου· ενδιάμεσα μένει η παραμόρφωση του 1650. Μόνο στον 2Δ χάρτη.'}));
   slot.append(oldPanel);}
  try{if(localStorage.getItem('nbc.old')==='1')setTimeout(()=>setOld(true),50);}catch(e){}
@@ -647,9 +728,12 @@
  /* ───── layers: NABOU section in the existing «Επίπεδα» panel ───── */
  function buildLayers(){const host=$('proMapTools')||$('n7LayersBody');if(!host||$('nbcLayers'))return;
   const sw=(label,get,set,extra)=>{const i=h('input',{type:'checkbox'});i.checked=get();i.addEventListener('change',()=>{set(i.checked);marks();});return h('label',{class:'pro-check nbc-check'},i,h('span',{text:label}),extra||null);};
-  const box=h('fieldset',{class:'nbc-layers',id:'nbcLayers'},h('legend',{text:'Εγγραφές GERAKI'}),
+  const box=h('fieldset',{class:'nbc-layers',id:'nbcLayers'},h('legend',{text:'Εγγραφές GERAKI'}),h('p',{class:'nbc-lg',text:'Βιβλίο'}),seg,
    sw('Οικισμοί',()=>ui.layers.towns,v=>ui.layers.towns=v),sw('Τοπωνύμια (νησιά, θάλασσες)',()=>ui.layers.labels,v=>ui.layers.labels=v),sw('Διαδρομές (2D)',()=>ui.layers.routes,v=>ui.layers.routes=v),
-   h('p',{class:'nbc-lg',text:'Ιστορικός χάρτης'}),sw('Jansson 1650 (David Rumsey)',()=>!!ui.old,v=>setOld(v)),
+   h('p',{class:'nbc-lg',text:'Ιστορικός χάρτης'}),sw('Jansson 1650 (David Rumsey)',()=>!!ui.old,v=>setOld(v)),(()=>{let op=0.7;try{op=+(localStorage.getItem('nbc.oldOp')||0.7);}catch(e){}
+    const r=h('input',{type:'range',min:'0',max:'100',value:String(Math.round(op*100)),'aria-label':'Πόσο φαίνεται ο χάρτης του Jansson'});
+    r.addEventListener('input',()=>{osvg.style.setProperty('--op',r.value/100);try{localStorage.setItem('nbc.oldOp',String(r.value/100));}catch(e){}});
+    return h('label',{class:'nbc-opac'},h('span',{text:'Πόσο φαίνεται'}),r);})(),
    h('p',{class:'nbc-lg',text:'Δυνάμεις της εποχής'}),sw('Λάβαρα στις έδρες τους',()=>ui.layers.powers,v=>ui.layers.powers=v),
    h('p',{class:'nbc-lg',text:'Μπελαβίλας 1992 (ΕΜΠ)'}),h('button',{type:'button',class:'nbc-btn nbc-routes-btn',onclick:()=>setRoutesOnly(true)},'Δείξε τις ναυτικές ρότες (μόνες τους)'),sw('Καταφύγια, παζάρια, βίγλες',()=>ui.layers.bvpoints,v=>ui.layers.bvpoints=v),
    h('p',{class:'nbc-lg',text:'Πειρατικά ορμητήρια (διατριβή Μ. Γουργουρίνη)'}),
@@ -695,7 +779,7 @@
   let n=0;const t=setInterval(()=>{if(wrapAtlas()||++n>100)clearInterval(t);},100);
   body.dataset.nbcRecords=String(d.places.length);
  }).catch(()=>{body.dataset.nbcRecords='unavailable';paint();});
- buildPowers();sync3d();openTab('bases',{show:false});
+ buildPowers();sync3d();openTab('bases',{show:false});if(body.classList.contains('nbc-cine')&&card)card.hidden=true;
  // Research lanes («Ερευνητές»: Βρετανία, Ολλανδία…) are research-source families, not states: in the atlas
  // they stay off unless the user turns them on in «Επίπεδα»; research activity no longer switches them on.
  let lanesByUser=false;document.addEventListener('change',e=>{if(e.target.closest?.('#proMapTools')&&/Ερευνητές/.test(e.target.closest('label')?.textContent||''))lanesByUser=e.target.checked;},true);
