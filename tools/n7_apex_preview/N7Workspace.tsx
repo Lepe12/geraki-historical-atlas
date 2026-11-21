@@ -102,6 +102,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   const guest=!authenticated&&N7_GUEST_CHAT;
   const home=N7_GUIDE&&!N7_GUEST_CHAT;
   const wasAuthenticated=useRef(false);
+  const conversationListRequest=useRef(0);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [conversationId, setConversationId] = useState("");
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -130,12 +131,12 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   useEffect(()=>{
     // One welcome per login (this browser tab session). Where the browser blocks automatic audio, the
     // visible «Έναρξη N7» button starts it with the visitor's click.
-    if(!authenticated||guest||!guideOpen||!voiceHost||wasGreeted()||!voice.supported.output)return;
+    if(compactGuide||!authenticated||guest||!guideOpen||!voiceHost||wasGreeted()||!voice.supported.output)return;
     let locked=true;
     try{const AudioCtor=window.AudioContext;if(AudioCtor){const probe=new AudioCtor();locked=probe.state!=="running";void probe.close();}}catch{locked=true;}
     if(locked){setGreetGate(true);return;}
     markGreeted();voiceRef.current.speak(GREETING,true);
-  },[authenticated,guest,guideOpen,voiceHost,voice.supported.output]);
+  },[compactGuide,authenticated,guest,guideOpen,voiceHost,voice.supported.output]);
   const startGreeting=()=>{markGreeted();setGreetGate(false);voiceRef.current.speak(GREETING,true);};
   const [taskPrompt, setTaskPrompt] = useState("");
   const [kind, setKind] = useState("analysis");
@@ -214,30 +215,37 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
     return()=>{disposed=true;window.clearInterval(timer);};
   },[pendingJobs]);
   const [error, setError] = useState("");
+  const refreshConversations=useCallback(async ()=>{
+    const request=++conversationListRequest.current;
+    const result=await n7("/api/conversations");
+    if(request!==conversationListRequest.current||!wasAuthenticated.current)return;
+    const list=Array.isArray(result.conversations)?result.conversations as Conversation[]:[];
+    setConversations(list);
+    return list;
+  },[]);
 
   const check = useCallback(async () => {
     try {
       const s = await n7("/api/status");
       setOnline(true);
-      if(wasAuthenticated.current&&s.authenticated!==true){try{window.sessionStorage.removeItem(GREETED_KEY);}catch{/* ignore */}voiceRef.current.suspend();setMessages([]);setConversations([]);setTasks([]);setPendingJobs([]);setConversationId("");}
+      if(wasAuthenticated.current&&s.authenticated!==true){try{window.sessionStorage.removeItem(GREETED_KEY);}catch{/* ignore */}conversationListRequest.current++;voiceRef.current.suspend();setMessages([]);setConversations([]);setTasks([]);setPendingJobs([]);setConversationId("");}
       wasAuthenticated.current=s.authenticated===true;setAuthenticated(s.authenticated === true);
       if (s.authenticated === true) {
-        const [c, t] = await Promise.all([n7("/api/conversations"), n7("/api/tasks")]);
-        const list = Array.isArray(c.conversations) ? c.conversations as Conversation[] : [];
-        setConversations(list);
+        const [list, t] = await Promise.all([refreshConversations(), n7("/api/tasks")]);
+        if(!wasAuthenticated.current)return;
         setTasks(Array.isArray(t.tasks) ? t.tasks as Task[] : []);
-        adopt.current(list);
+        if(list)adopt.current(list);
       }
     } catch (e) {
       setOnline(false);
       setError(e instanceof Error ? e.message : "N7 connection error");
     }
-  }, []);
+  }, [refreshConversations]);
   useEffect(() => { void check(); }, [check]);
   useEffect(()=>{const refresh=()=>void check();window.addEventListener("focus",refresh);return()=>window.removeEventListener("focus",refresh);},[check]);
   async function login(event:React.FormEvent<HTMLFormElement>){
     event.preventDefault();const form=event.currentTarget,input=form.elements.namedItem("password") as HTMLInputElement;
-    setLoginBusy(true);setError("");try{await n7("/api/login",{password:input.value});input.value="";await check();}catch(e){input.value="";setError(e instanceof Error?e.message:String(e));}finally{setLoginBusy(false);}
+    setLoginBusy(true);setError("");try{await n7("/api/login",{password:input.value});input.value="";if(compactGuide)setVoiceOpen(false);await check();}catch(e){input.value="";setError(e instanceof Error?e.message:String(e));}finally{setLoginBusy(false);}
   }
 
   useEffect(() => {
@@ -279,8 +287,6 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
     const id = String(d.id || "");
     if (!id) throw Error("N7 returned no conversation ID");
     activeConversation.current=id;heard.current[id]=0;setConversationId(id); setMessages([]);
-    const list = await n7("/api/conversations");
-    setConversations(Array.isArray(list.conversations) ? list.conversations as Conversation[] : []);
     return id;
   }
   async function send(spoken?:string) {
@@ -334,11 +340,13 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
       }else if (conv?.messages){if(activeConversation.current===id){setMessages(conv.messages);readAnswerRef.current(id,conv.messages);}}
       else {const reply=await n7("/api/conversations/"+idPath(id));const messages=(reply.conversation as {messages?:Msg[]})?.messages||[];if(activeConversation.current===id){setMessages(messages);readAnswerRef.current(id,messages);}}
       setMessage(current=>current.trim()===prompt?"":current);
-      const list = await n7("/api/conversations");
-      setConversations(Array.isArray(list.conversations) ? list.conversations as Conversation[] : []);
       // Text arrival is not audio playback; never invent a speaking event.
     } catch (e) { const error=e instanceof Error?e.message:String(e);setError(error);voiceRef.current.failConversation(error); }
-    finally { sending.current=false;setBusy(false); }
+    finally {
+      sending.current=false;setBusy(false);
+      // The conversation picker must never delay the next turn or cancel its audio.
+      if(wasAuthenticated.current)void refreshConversations().catch(()=>{});
+    }
   }
   autoSend.current=text=>{if(pendingJobs.some(j=>j.conversationId===conversationId)||sending.current||busy){voiceRef.current.failConversation("Το N7 απαντά ακόμη. Περίμενε πριν ξεκινήσεις ξανά.");return;}void send(text);};
   async function submitTask() {
@@ -380,7 +388,7 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
     {!authenticated&&!guest?<>{loginForm}<button type="button" style={buttonStyle} onClick={()=>void check()}>Επανέλεγχος σύνδεσης</button></>:<>
       <div style={{display:"flex",gap:7,flexWrap:"wrap",alignItems:"center"}}>
         {!voice.conversation&&<button type="button" style={buttonStyle} onClick={voice.toggle} aria-pressed={voice.enabled} disabled={!voice.supported.output}>Φωνή {voice.enabled?"ενεργή":"ανενεργή"}</button>}
-        <button type="button" style={{...buttonStyle,background:voice.conversation?"#713c25":"#12516a"}} onClick={voice.conversation?voice.suspend:voice.startConversation} disabled={!voice.conversation&&(busy||pendingJobs.some(j=>j.conversationId===conversationId)||!voice.supported.input||!voice.supported.output)}>{voice.conversation?"Τέλος συζήτησης":"Έναρξη συζήτησης"}</button>
+        <button type="button" style={{...buttonStyle,background:voice.conversation?"#713c25":"#12516a"}} onClick={voice.conversation?voice.suspend:()=>voice.startConversation()} disabled={!voice.conversation&&(busy||pendingJobs.some(j=>j.conversationId===conversationId)||!voice.supported.input||!voice.supported.output)}>{voice.conversation?"Τέλος συζήτησης":"Έναρξη συζήτησης"}</button>
         {!voice.conversation&&<button type="button" style={buttonStyle} onClick={voice.listen} disabled={busy||pendingJobs.some(j=>j.conversationId===conversationId)||!voice.supported.input}>Υπαγόρευση</button>}
         {!voice.conversation&&<button type="button" style={buttonStyle} onClick={()=>{voice.suspend();}}>Διακοπή ήχου</button>}
         {!voice.conversation&&<button type="button" style={buttonStyle} onClick={()=>voice.speak("Γεια σου. Είμαι το N7. Η φωνή είναι έτοιμη.",true)} disabled={!voice.supported.output}>Δοκιμή φωνής</button>}
@@ -471,10 +479,10 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
   const toggleConversation=()=>{
     if(voice.conversation)voice.suspend();
     else if(needsLogin)setVoiceOpen(open=>home?!open:true);
-    else{
-      if(compactGuide&&greetGate){markGreeted();setGreetGate(false);}
-      voice.startConversation();
-    }
+    else if(compactGuide&&!wasGreeted()){
+      markGreeted();
+      voice.startConversation(GREETING);
+    }else voice.startConversation();
   };
   const liveCaptions=voice.phase==="listening"&&message.trim()?message.trim():lastAnswer;
   const callLabel=needsLogin?"Σύνδεση":voice.conversation?"Λήξη κλήσης":"Έναρξη κλήσης";
@@ -498,7 +506,6 @@ export default function N7Workspace({ onActivity, onTrace, openSignal=0, guideOp
           {!needsLogin&&<div id="n7-home-captions" hidden={!captionsOpen} className="n7-home-captions" aria-live="polite">
             {liveCaptions?richText(liveCaptions):"Δεν υπάρχει ακόμα απομαγνητοφώνηση."}
           </div>}
-          {greetGate&&<button type="button" data-n7-start="" className="n7-home-audio-unlock" onClick={startGreeting}>Ενεργοποίηση ήχου</button>}
           {!needsLogin&&!voice.phase&&!waitingForAnswer&&voice.status&&<p className="n7-home-voice-detail" role="status">{voice.status}</p>}
         </div>:<>
         {greetGate&&<div className="n7-voice-preview" role="status" aria-label="Καλωσόρισμα N7" style={{textAlign:"center",padding:"4px 0 8px"}}>
