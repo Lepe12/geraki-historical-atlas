@@ -1,0 +1,788 @@
+/* NABOU_COMMAND_V1 — command interface for the NABOU atlas (Neocom rail, top-bar filters, tabbed right
+   dock, data-driven timeline) layered over the existing chart. It never edits the locked renderers
+   (chamber.js, nautical-chart.js, gpu-field.js, map-3d*.js): the 3D chart is driven only through
+   window.NABOU_MAP3D, the reference places through window.NABOU_PRO_ATLAS, the period through the
+   existing timeline inputs. GERAKI records (../data.json) are shown at their STORED coordinates; nothing is
+   geocoded, added or inferred, and missing fields stay unavailable. Inactive inside the N7 embed. */
+(() => {
+ 'use strict';
+ if(window.N7_EMBED||document.documentElement.classList.contains('n7-embed'))return;
+ const $=id=>document.getElementById(id),body=document.body,shell=$('n7Shell'),C=window.NABOU_CHART;
+ const plane=$('chartPlane'),view=$('chartView');
+ if(!shell||!C||!plane||$('nbcDock'))return;
+ body.classList.add('nbc-on');
+ const NS='http://www.w3.org/2000/svg';
+ function h(tag,attrs,...kids){const e=document.createElement(tag);
+  if(attrs)for(const [k,v] of Object.entries(attrs)){if(v==null||v===false)continue;
+   if(k==='class')e.className=v;else if(k==='text')e.textContent=v;else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);
+   else if(k==='dataset')Object.assign(e.dataset,v);else e.setAttribute(k,v===true?'':v);}
+  for(const c of kids.flat()){if(c==null||c===false)continue;e.append(c instanceof Node?c:document.createTextNode(String(c)));}return e;}
+ const ico=(d,cls='')=>{const s=document.createElementNS(NS,'svg');s.setAttribute('viewBox','0 0 24 24');s.setAttribute('aria-hidden','true');s.setAttribute('class','n7-ico nbc-ico '+cls);s.innerHTML=d;return s;};
+ const I={
+  history:'<path d="M4 19.5V5a2 2 0 0 1 2-2h12v15H6a2 2 0 0 0-2 2z"/><path d="M8 7h6M8 11h6"/>',
+  towns:'<path d="M3 21V11l4-3 4 3v10M11 21V7l5-4 5 4v14M3 21h18"/><path d="M14 10h4M14 14h4"/>',
+  monuments:'<path d="M5 21V9h14v12M3 21h18M5 9V5h3v2h3V5h2v2h3V5h3v4"/><path d="M10 21v-5h4v5"/>',
+  people:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c.8-3.6 3.2-5.5 6-5.5s5.2 1.9 6 5.5"/><circle cx="17" cy="9" r="2.4"/><path d="M16 14.6c2.6.2 4.3 2 5 5"/>',
+  sources:'<path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 12h7M9 16h7"/>',
+  routes:'<circle cx="6" cy="18" r="2.2"/><circle cx="18" cy="6" r="2.2"/><path d="M8 17c6-1 3-8 8-10" stroke-dasharray="2.5 2.5"/>',
+  layers:'<path d="M12 3l9 4.5-9 4.5-9-4.5z"/><path d="M3 12l9 4.5 9-4.5"/><path d="M3 16.5l9 4.5 9-4.5"/>',
+  time:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/>',
+  cube:'<path d="M12 3 20 7.5v9L12 21 4 16.5v-9z"/><path d="M4 7.5 12 12l8-4.5M12 12v9"/>',
+  full:'<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+  focus:'<circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>',
+  close:'<path d="M6 6l12 12M18 6 6 18"/>',
+  bases:'<path d="M6 21V3"/><path d="M6 4h11l-2.5 4L17 12H6"/>'};
+ const fold=s=>String(s??'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLocaleLowerCase('el').replace(/ς/g,'σ').trim();
+ const txt=v=>Array.isArray(v)?v.join(', '):String(v??'').trim();
+ const yearsIn=s=>[...String(s||'').matchAll(/\b(1[5-6]\d\d)\b/g)].map(m=>+m[1]);
+ const people=s=>String(s||'').split(';').map(x=>x.trim()).filter(Boolean);
+ const greek=p=>String(p?.historicalNames||'').split('/').map(x=>x.trim()).find(x=>/[Ͱ-Ͽ]/.test(x))||'';
+ const nameOf=p=>greek(p)||p.place;
+ const TYPE={City:'Πόλη',Port:'Λιμάνι',Island:'Νησί',Fortress:'Οχυρό',Region:'Περιοχή',Village:'Χωριό','Sea / Strait':'Θάλασσα / πορθμός'};
+ const STATUS={VERIFIED:['Επαληθευμένο σημείο','ok'],APPROXIMATE:['Σημείο κατά προσέγγιση','warn'],'NEEDS RESEARCH':['Χρειάζεται έρευνα','risk']};
+ const RTYPE={'DEPICTED TRAVEL':'Αποτυπωμένο ταξίδι','STRONG RECONSTRUCTION':'Ισχυρή ανασύνθεση','INTELLIGENCE / NETWORK':'Δίκτυο πληροφοριών (μη φυσική)','PLANNED — NOT EXECUTED':'Σχεδιασμένο — δεν εκτελέστηκε'};
+ const NONPHYS=new Set(['INTELLIGENCE / NETWORK','PLANNED — NOT EXECUTED']);
+ const RCOLOR={'DEPICTED TRAVEL':'#f1dfb4','STRONG RECONSTRUCTION':'#d8c08a','INTELLIGENCE / NETWORK':'#7fd6e6','PLANNED — NOT EXECUTED':'#c99f6a'};
+ const LABEL_ONLY=new Set(['sea-label','region-label','island-label']);
+ const ICON={village:'atlas-village.svg','coastal-village':'atlas-coastal-village.svg',town:'atlas-town.svg',city:'atlas-city.svg',capital:'atlas-city.svg',port:'atlas-port.svg',fortress:'atlas-fortress.svg'};
+ const bookLabel=b=>String(b).replace(/^Book /,'Βιβλίο ');
+ const atlas=()=>window.NABOU_PRO_ATLAS,M3=()=>window.NABOU_MAP3D,reader=()=>window.N7_READER;
+
+ let DATA={places:[],routes:[]},byId=new Map(),linked=new Map(),proToRec=new Map();
+ let TOPO={bases:[],extra:[]},topoByBase=new Map(),BASES={bases:[]},baseById=new Map(),EVENTS={events:[]},THESIS={};
+ /* ───── pirate bases (M. Gourgourini, thesis 2024 · ArcGIS layers): flag symbols of the thesis legend ─────
+    red flag = Christian base, green = Muslim; grey pole = 16th c., black = 17th; a base whose faith changes
+    between the centuries shows both colours (16th c. half at the pole). */
+ const FAITH={christian:['Χριστιανικό','#c8322d'],muslim:['Μουσουλμανικό','#2f8f4e']};
+ const CENT={'16':'16ος αι.','17':'17ος αι.'};
+ const baseFaiths=b=>{const f={};for(const [c,l] of Object.entries(b.centuries))f[c]=l[0]?.faith;return f;};
+ // A cloth flag on a turned pole (thesis code: red Christian, green Muslim; grey pole 16th c., black 17th c.).
+ let flagN=0;
+ function flagArt(left,right,c16,c17,size){const pole=c16&&c17?'#2b2b2b':c16?'#9b9b9b':'#151515',g='nbcfg'+(++flagN);
+  const s=document.createElementNS(NS,'svg');s.setAttribute('viewBox','0 0 26 30');s.setAttribute('width',size);s.setAttribute('height',Math.round(size*30/26));s.setAttribute('aria-hidden','true');s.setAttribute('class','nbc-flag');
+  const cloth='M5.4 4.6C9 1.6 12 7.2 15.6 4.8S21.6 2 25.4 4.4L22.4 9.6 25.4 14.8C21.6 12.4 19 17.4 15.6 15S9 12.6 5.4 15.4Z';
+  s.innerHTML=`<defs><linearGradient id="${g}" x1="5" x2="25.5" y1="0" y2="0" gradientUnits="userSpaceOnUse">`
+   +`<stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset=".2" stop-color="#fff" stop-opacity=".05"/><stop offset=".38" stop-color="#000" stop-opacity=".32"/>`
+   +`<stop offset=".55" stop-color="#fff" stop-opacity=".2"/><stop offset=".74" stop-color="#000" stop-opacity=".3"/><stop offset=".9" stop-color="#fff" stop-opacity=".12"/><stop offset="1" stop-color="#000" stop-opacity=".2"/></linearGradient></defs>`
+   +`<path d="${cloth}" fill="${right}"/>`
+   +`<path d="M5.4 4.6C9 1.6 12 7.2 15.6 4.8V15C12 12.6 9 12.6 5.4 15.4Z" fill="${left}"/>`
+   +`<path d="${cloth}" fill="url(#${g})"/>`
+   +`<path d="${cloth}" fill="none" stroke="#1a120a" stroke-width=".7" stroke-linejoin="round" opacity=".8"/>`
+   +`<rect x="3.1" y="3" width="2.4" height="26" rx="1.1" fill="${pole}"/>${c16&&c17?'<rect x="3.1" y="3" width="2.4" height="10" rx="1.1" fill="#9b9b9b"/>':''}`
+   +`<rect x="3.6" y="3.4" width=".7" height="25" rx=".35" fill="#fff" opacity=".3"/>`
+   +`<circle cx="4.3" cy="2.4" r="1.8" fill="#c9a24e" stroke="#4a3216" stroke-width=".6"/><circle cx="3.7" cy="1.8" r=".55" fill="#fff4cc" opacity=".85"/>`;return s;}
+ function flagSvg(b,size=26){const f=baseFaiths(b),c16=f['16'],c17=f['17'];return flagArt(FAITH[c16||c17][1],FAITH[c17||c16][1],c16,c17,size);}
+ const oldNames=b=>(topoByBase.get(b.id)?.names||[]).map(n=>n.name).join(' ');
+ const baseName=b=>b.port&&b.port!==b.area?b.port+' · '+b.area:b.area;
+ function baseVisible(b){const {from,to}=period(),f=baseFaiths(b);
+  return Object.entries(f).some(([c,fa])=>(c==='16'?from<=1599:to>=1600)&&ui.layers[fa]!==false&&(ui.century==='all'||ui.century===c)&&(ui.faith==='all'||ui.faith===fa));}
+
+ const ui={tab:'history',rec:null,pro:null,base:null,faith:'all',century:'all',book:'All',typeFilter:'all',q:{towns:'',people:'',sources:'',bases:''},personOpen:null,
+  layers:{towns:true,labels:true,routes:false,christian:true,muslim:true,powers:true,bvroutes:false,bvpoints:true},status:{VERIFIED:true,APPROXIMATE:true,'NEEDS RESEARCH':true},rtypes:new Map()};
+
+ /* ───── period: the existing timeline inputs are the single source of truth ───── */
+ const rangeInputs=()=>[...document.querySelectorAll('#n7TimelineRange input[type=range]')];
+ function period(){const r=rangeInputs().map(i=>+i.value);return r.length===2?{from:Math.min(...r),to:Math.max(...r)}:{from:1500,to:1700};}
+ function setPeriod(from,to){const [a,b]=rangeInputs();if(!a||!b)return;
+  // Same order as a user drag, so professional-atlas.js keeps from <= to and updates the label.
+  b.value=String(Math.max(+a.value,to));b.dispatchEvent(new Event('input',{bubbles:true}));
+  a.value=String(from);a.dispatchEvent(new Event('input',{bubbles:true}));
+  b.value=String(to);b.dispatchEvent(new Event('input',{bubbles:true}));}
+ const bookHit=x=>ui.book==='All'||(x.books||[]).includes(ui.book);
+ function yearHit(x){const {from,to}=period();if(from<=1500&&to>=1700)return true;const ys=yearsIn(x.period);return !ys.length||ys.some(y=>y>=from&&y<=to)||(Math.min(...ys)<=from&&Math.max(...ys)>=to);}
+ const visible=x=>bookHit(x)&&yearHit(x);
+ const filterLine=()=>{const {from,to}=period(),p=[];if(ui.book!=='All')p.push(bookLabel(ui.book));p.push(from+'–'+to);return p.join(' · ');};
+
+ /* ───── Neocom (left rail) ───── */
+ const nav=shell.querySelector('.n7-nav'),spacer=nav?.querySelector('.n7-nav-spacer');
+ const PANELS=[['bases','Πειρατικά ορμητήρια',I.bases],['history','Ιστορία τόπου',I.history],['towns','Οικισμοί',I.towns],['monuments','Μνημεία & οχυρά',I.monuments],['people','Πρόσωπα',I.people],['routes','Διαδρομές',I.routes],['sources','Ιστορικές πηγές',I.sources]];
+ if(nav){
+  for(const b of nav.querySelectorAll(':scope>button,:scope>a')){const l=b.querySelector('span')?.textContent?.trim();if(l)b.dataset.tip=l;}
+  const lib=nav.querySelector('[data-atlas-nav="sources"]');if(lib){lib.querySelector('span').textContent='Βιβλιοθήκη';lib.dataset.tip='Βιβλιοθήκη πηγών';}
+  const sep=h('i',{class:'nbc-nc-sep','aria-hidden':'true'});nav.insertBefore(sep,spacer);
+  for(const [id,label,d] of PANELS){const b=h('button',{type:'button',class:'nbc-nc',dataset:{nbcPanel:id,tip:label},'aria-label':label},ico(d),h('span',{text:label}));nav.insertBefore(b,spacer);}
+  nav.insertBefore(h('i',{class:'nbc-nc-sep','aria-hidden':'true'}),spacer);
+  for(const what of ['layers','timeline']){const b=nav.querySelector(`[data-n7-nav="${what}"]`);if(b){b.hidden=false;b.dataset.tip=what==='layers'?'Στρώματα & φίλτρα':'Χρονολόγιο';nav.insertBefore(b,spacer);}}
+  nav.addEventListener('click',e=>{const b=e.target.closest('[data-nbc-panel]');if(!b)return;
+   if(body.dataset.readerView&&body.dataset.readerView!=='map')reader()?.show('map',{focus:false});openTab(b.dataset.nbcPanel);});
+  // Thin rail by default (labels on demand, remembered); the existing collapse button toggles it.
+  let wantOpen=false;try{wantOpen=localStorage.getItem('nbc.nav')==='open';}catch{}
+  const col=nav.querySelector('[data-n7-nav="collapse"]');
+  if(!wantOpen&&col&&shell.dataset.nav!=='collapsed')col.click();
+  col?.addEventListener('click',()=>{try{localStorage.setItem('nbc.nav',shell.dataset.nav==='collapsed'?'closed':'open');}catch{}});
+ }
+
+ /* ───── top bar: book filter, period, 3D, fullscreen ───── */
+ const top=shell.querySelector('.n7-top'),actions=top?.querySelector('.n7-top-actions');
+ const periodChip=h('button',{type:'button',class:'nbc-chip',id:'nbcPeriod',title:'Ενεργή περίοδος · πάτα για το χρονολόγιο'},ico(I.time),h('span',{id:'nbcPeriodText',text:'1500–1700'}));
+ periodChip.addEventListener('click',()=>rangeInputs()[0]?.focus());
+ const seg=h('div',{class:'nbc-seg',role:'group','aria-label':'Βιβλίο'},...[['All','Όλα'],['Book I','I'],['Book II','II'],['Book III','III']].map(([v,l])=>
+  h('button',{type:'button',dataset:{book:v},'aria-pressed':String(v==='All'),title:v==='All'?'Όλα τα βιβλία':bookLabel(v),onclick:()=>{ui.book=v;refresh();}},l)));
+ const t3d=h('button',{type:'button',class:'nbc-tool','aria-pressed':'false',title:'Τρισδιάστατος χάρτης με ανάγλυφο',onclick:()=>$('map3dToggle')?.click()},ico(I.cube),h('b',{text:'3D'}));
+ const tFull=h('button',{type:'button',class:'nbc-tool',title:'Πλήρης οθόνη','aria-label':'Πλήρης οθόνη',onclick:()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}catch{}}},ico(I.full));
+ const tOld=h('button',{type:'button',class:'nbc-tool',id:'nbcOld','aria-pressed':'false',title:'Ιστορικός χάρτης: Jansson 1650 (David Rumsey Map Collection)',onclick:()=>setOld(!ui.old)},
+  ico('<path d="M4 5l5-2 6 2 5-2v16l-5 2-6-2-5 2z"/><path d="M9 3v16M15 5v16"/>'),h('b',{text:'1650'}));
+ /* Cinematic shell (owner-approved mockup, 20 Nov 2026): compass mark, one search, one map switch that names what it shows. */
+ const CINE=!/[?&]classic=1/.test(location.search);if(CINE)body.classList.add('nbc-cine');
+ const logo=top?.querySelector('.n7-logo');
+ if(logo){logo.querySelector('.n7-wings')?.remove();logo.querySelector('.n7-logo-text')?.remove();
+  const m=document.createElementNS(NS,'svg');m.setAttribute('viewBox','0 0 40 40');m.setAttribute('class','nbc-compass');m.setAttribute('aria-hidden','true');
+  m.innerHTML='<circle cx="20" cy="20" r="18.5" fill="none" stroke="#c29a5b" stroke-width=".8"/><circle cx="20" cy="20" r="13" fill="none" stroke="#c29a5b55" stroke-width=".6"/><path d="M20 3l2.4 17L20 37l-2.4-17z" fill="#ede4d2"/><path d="M3 20l17-2.4L37 20l-17 2.4z" fill="#c29a5b"/><circle cx="20" cy="20" r="1.6" fill="#061419"/>';
+  logo.prepend(m);}
+ const sIn=$('n7Search');if(sIn){sIn.placeholder='Βρες ορμητήριο, πειρατή ή χρονιά';sIn.setAttribute('aria-label','Αναζήτηση ορμητηρίου, πειρατή ή χρονιάς');}
+ top?.querySelector('.n7-search kbd')?.remove();
+ const mapMode=()=>M3()?.enabled?'3d':ui.old?'jansson':'today';
+ const setMode=async m=>{const is3=!!M3()?.enabled;
+  if(m==='3d'){if(!is3)$('map3dToggle')?.click();return;}
+  if(is3)$('map3dToggle')?.click();setOld(m==='jansson');syncMode();};
+ const mapsw=h('div',{class:'nbc-mapsw',role:'group','aria-label':'Ποιος χάρτης φαίνεται'},
+  h('button',{type:'button',dataset:{mode:'today'},onclick:()=>setMode('today')},'Σημερινός χάρτης'),
+  h('button',{type:'button',dataset:{mode:'jansson'},title:'Χάρτης της Μεσογείου του Jansson, 1650 (David Rumsey Map Collection)',onclick:()=>setMode('jansson')},'Χάρτης του Jansson, 1650'),
+  h('button',{type:'button',id:'nbc3d',dataset:{mode:'3d'},title:'Τρισδιάστατος χάρτης με ανάγλυφο',onclick:()=>setMode(M3()?.enabled?(ui.old?'jansson':'today'):'3d')},'Ανάγλυφο 3D'));
+ function syncMode(){const m=mapMode();for(const b of mapsw.children)b.setAttribute('aria-pressed',String(b.dataset.mode===m));}
+ /* Site navigation: one row of page names (left), search and saved places (right). Map tools live on the map. */
+ const navTo=sel=>()=>nav?.querySelector(sel)?.click();
+ const tabBtn=(t,id,fn,label)=>h('button',{type:'button',class:'nbc-navtab',id,'aria-label':label||t,onclick:fn},t);
+ const idx=tabBtn('Ευρετήριο','nbcIndex',()=>{if(!dock.hidden&&ui.tab!=='history'){card.hidden=true;return;}openTab('bases');},'Ευρετήριο: ορμητήρια, πρόσωπα, γεγονότα, ρότες, πηγές');
+ const siteNav=h('nav',{class:'nbc-sitenav','aria-label':'Σελίδες του Άτλαντα'},
+  tabBtn('Χάρτης','nbcNavMap',()=>{navTo('[data-atlas-nav="map"]')();if(card)card.hidden=true;}),idx,
+  tabBtn('Έρευνα','nbcNavResearch',navTo('[data-atlas-nav="research"]'),'Η έρευνά μου'),
+  tabBtn('Πορεία','nbcNavActivity',()=>actions?.querySelector('[data-n7-nav="activity"]')?.click(),'Πορεία έρευνας'),
+  tabBtn('Βιβλιοθήκη','nbcNavLib',navTo('[data-atlas-nav="sources"]'),'Βιβλιοθήκη πηγών'),
+  tabBtn('Δεδομένα','nbcNavData',navTo('[data-atlas-nav="tools"]')));
+ const syncNav=()=>{const page=body.dataset.readerView||'map';const cur=!dock.hidden&&ui.tab!=='history'?'nbcIndex':page==='research'?'nbcNavResearch':page==='sources'?'nbcNavLib':page==='tools'?'nbcNavData':'nbcNavMap';
+  for(const b of siteNav.children)b.setAttribute('aria-current',b.id===cur?'page':'false');};
+ if(CINE){logo?.after(siteNav);new MutationObserver(syncNav).observe(body,{attributes:true,attributeFilter:['data-reader-view']});setInterval(syncNav,800);}
+ if(CINE&&actions){const sv=actions.querySelector('#n7SavedBtn');if(sv){sv.classList.add('nbc-word');sv.replaceChildren('Αποθηκευμένα');sv.removeAttribute('title');}
+  actions.querySelector('[data-n7-nav="activity"]')?.classList.add('nbc-hide');}
+ const sBox=top?.querySelector('.n7-search');
+ if(CINE&&actions){siteNav.append(actions);actions.querySelector('#n7SavedBtn')?.classList.add('nbc-navtab');}
+ if(sBox){const mic=h('button',{type:'button',class:'nbc-mic','aria-label':'Φωνή N7',title:'Μίλα στον N7',onclick:()=>document.querySelector('#n7Assistant .pro-voice')?.click()});
+  mic.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg>';sBox.append(mic);}
+ /* Map tools: which map, and its layers, in one group on the map. */
+ const lay=h('button',{type:'button',class:'nbc-maptool',id:'nbcLayersBtn','aria-label':'Επίπεδα και υπόμνημα του χάρτη',onclick:()=>{nav?.querySelector('[data-n7-nav="layers"]')?.click();lay.setAttribute('aria-pressed',String(shell.dataset.layers==='open'));}},'Επίπεδα');
+ if(actions){if(CINE){const clk=id=>()=>document.getElementById(id)?.click();const sep=()=>h('i',{class:'nbc-mapsep','aria-hidden':'true'});
+   const mg=h('div',{class:'nbc-mapgroup',role:'group','aria-label':'Χάρτης'},mapsw,sep(),lay,sep(),
+    h('button',{type:'button',class:'nbc-maptool',onclick:clk('resetView'),'aria-label':'Δείξε όλη τη Μεσόγειο'},'Όλη η Μεσόγειος'),sep(),
+    h('button',{type:'button',class:'nbc-maptool nbc-zoom',onclick:clk('zoomOut'),'aria-label':'Σμίκρυνση χάρτη',title:'Σμίκρυνση'},'−'),
+    h('button',{type:'button',class:'nbc-maptool nbc-zoom',onclick:clk('zoomIn'),'aria-label':'Μεγέθυνση χάρτη',title:'Μεγέθυνση'},'+'));(document.getElementById('n7MapSlot')||document.body).append(mg);const fitTl=()=>document.documentElement.style.setProperty('--nbc-mg',mg.offsetWidth+'px');new ResizeObserver(fitTl).observe(mg);fitTl();actions.before(h('div',{class:'nbc-topctl',hidden:true},seg,periodChip,tOld,t3d,tFull));}else actions.before(h('div',{class:'nbc-topctl'},h('span',{class:'nbc-lbl',text:'Βιβλίο'}),seg,periodChip,tOld,t3d,tFull));}
+ setTimeout(syncMode,0);
+ const sync3d=()=>{const on=!!M3()?.enabled;t3d.setAttribute('aria-pressed',String(on));t3d.querySelector('b').textContent=on?'2D':'3D';t3d.title=on?'Επιστροφή στον επίπεδο χάρτη':'Τρισδιάστατος χάρτης με ανάγλυφο';body.classList.toggle('nbc-3d',on);syncMode();};
+ addEventListener('nabou:map3d',()=>{sync3d();if(M3()?.enabled)mount3d();});
+ if(!M3()?.supported)t3d.disabled=true;
+
+ /* ───── right dock (tabs) — the existing place card lives in the «Ιστορία» tab ───── */
+ const card=$('proPlaceInfo');
+ const dock=h('aside',{id:'nbcDock',class:'n7-place nbc-dock','aria-label':'Πληροφορίες άτλαντα'});
+ const tabs=h('div',{class:'nbc-tabs',role:'tablist','aria-label':'Ενότητες'});
+ const dhead=h('div',{class:'nbc-dhead'},h('div',{class:'nbc-kicker',id:'nbcKicker'}),h('button',{type:'button',class:'nbc-x','aria-label':'Κλείσιμο πάνελ',onclick:()=>{card.hidden=true;}},ico(I.close)));
+ const dbody=h('div',{class:'nbc-dbody',id:'nbcBody',role:'tabpanel','aria-live':'polite'});
+ const recBox=h('section',{class:'nbc-rec',id:'nbcRecord'});
+ for(const [id,label,d] of PANELS)tabs.append(h('button',{type:'button',class:'nbc-tab',role:'tab','aria-selected':'false',dataset:{tab:id},title:label,'aria-label':label,onclick:()=>openTab(id)},ico(d),h('span',{text:label.split(' ')[0]})));
+ dock.append(tabs,dhead,dbody);
+ if(card){card.before(dock);dbody.append(recBox,card);}
+ const syncDock=()=>{dock.hidden=!!card?.hidden;if(dock.hidden&&ui.route){ui.route=null;ui.bv=null;routeHi(null);for(const l of bvLines.values())l.classList.remove('hi');marks();}};
+ if(card)new MutationObserver(syncDock).observe(card,{attributes:true,attributeFilter:['hidden']});syncDock();
+ /* ── cinematic stage: big title of the selected place, a prologue when nothing is selected ── */
+ const cTitle=h('section',{class:'nbc-ctitle',id:'nbcCTitle','aria-live':'polite',hidden:true});
+ const prologue=h('section',{class:'nbc-prologue',id:'nbcPrologue',hidden:true},
+  h('h1',{text:'Η Μεσόγειος των κουρσάρων'}),
+  h('p',{text:'Εκατό ορμητήρια, οι δυνάμεις που τα κράτησαν και οι ρότες ανάμεσά τους, από το 1500 ως το 1700.'}),
+  h('div',{class:'nbc-cta'},h('button',{type:'button',class:'nbc-cbtn pri',onclick:()=>{closePrologue();openTab('bases');}},'Δες τα ορμητήρια'),
+   h('button',{type:'button',class:'nbc-cbtn',onclick:()=>closePrologue()},'Εξερεύνησε τον χάρτη')));
+ let proDone=false;try{proDone=sessionStorage.getItem('nbc.prologue')==='1';}catch(e){}
+ function closePrologue(){proDone=true;try{sessionStorage.setItem('nbc.prologue','1');}catch(e){}cineTitle();}
+ document.body.append(cTitle,prologue);
+ function cineTitle(){if(!CINE){cTitle.hidden=true;prologue.hidden=true;return;}const open=!dock.hidden;const b=open&&ui.tab==='history'&&ui.base&&baseById.get(ui.base);const r=!b&&open&&ui.tab==='history'&&ui.rec&&byId.get(ui.rec);
+  prologue.hidden=proDone||open||!!ui.base;
+  if(!b&&!r){cTitle.hidden=true;body.classList.remove('nbc-has-title');return;}
+  cTitle.replaceChildren();
+  if(b){const ents=Object.values(b.centuries).flat();const first=ents[0]||{};const tp=topoByBase.get(b.id);
+   const faiths=Object.entries(baseFaiths(b));const fa=faiths.map(([,f])=>f);const both=new Set(fa).size>1;
+   const kick=[b.port&&b.port!==b.area?b.port:'',first.siteType||''].filter(Boolean).join(', ');
+   cTitle.append(kick?h('div',{class:'k',text:kick}):'',h('h1',{text:b.area}),first.details?h('p',{text:first.details}):'',
+    h('div',{class:'facts'},
+     h('div',null,h('b',null,h('i',{class:'dot '+(both?'both':fa[0])}),both?'Χριστιανικό και μουσουλμανικό':(fa[0]==='muslim'?'Μουσουλμανικό ορμητήριο':'Χριστιανικό ορμητήριο')),faiths.map(([c])=>c+'ος').join(' και ')+' αιώνας'),
+     first.pirates?h('div',null,h('b',{text:'Πληρώματα'}),first.pirates.replace(/\//g,', ')):'',
+     tp&&tp.names.length?h('div',null,h('b',{text:'Στις πηγές'}),tp.names.map(n=>n.name).join(', ')):''));}
+  else{cTitle.append(h('div',{class:'k',text:TYPE[r.type]||'Τόπος'}),h('h1',{text:greek(r)||r.place}),r.historicalContext?h('p',{text:String(r.historicalContext).split(/(?<=\.)\s/)[0]}):'');}
+  cTitle.hidden=false;body.classList.add('nbc-has-title');}
+ new MutationObserver(()=>cineTitle()).observe(dock,{attributes:true,attributeFilter:['hidden']});
+ setTimeout(cineTitle,0);
+ function openTab(id,{show=true}={}){ui.tab=id;if(ui.route&&!(id==='routes'&&!String(ui.route).startsWith('bv:'))&&!(id==='history'&&ui.bv&&String(ui.route)==='bv:'+ui.bv)){ui.route=null;routeHi(null);for(const l of bvLines.values())l.classList.remove('hi');}if(card&&show)card.hidden=false;paint();
+  for(const b of tabs.children)b.setAttribute('aria-selected',String(b.dataset.tab===id));try{marks();}catch(e){}
+  for(const b of nav?.querySelectorAll('[data-nbc-panel]')||[])b.setAttribute('aria-current',b.dataset.nbcPanel===id&&!card?.hidden?'true':'false');}
+ if(card)new MutationObserver(()=>{for(const b of nav?.querySelectorAll('[data-nbc-panel]')||[])b.setAttribute('aria-current',b.dataset.nbcPanel===ui.tab&&!card.hidden?'true':'false');}).observe(card,{attributes:true,attributeFilter:['hidden']});
+
+ const empty=t=>h('p',{class:'nbc-empty',text:t});
+ const sect=(t,...k)=>h('section',{class:'nbc-sect'},h('h4',{text:t}),...k);
+ function dl(rows){const d=h('dl',{class:'nbc-dl'});let n=0;for(const [k,v] of rows){const isN=v instanceof Node,t=isN?v:txt(v);if(!isN&&!t)continue;d.append(h('dt',{text:k}),h('dd',null,t));n++;}return n?d:null;}
+ const chip=(t,c='')=>h('span',{class:'nbc-pill '+c,text:t});
+ const stChip=s=>{const [l,c]=STATUS[s]||[s||'—',''];return h('span',{class:'nbc-pill '+c},h('i',{class:'nbc-dot '+c}),l);};
+
+ function paint(){
+  const keep=dbody.scrollTop,same=paint.last===ui.tab;paint.last=ui.tab;
+  const showCard=ui.tab==='history'&&!ui.base&&!ui.power&&!ui.bv&&(ui.pro||!ui.rec);
+  card?.classList.toggle('nbc-off',!showCard);
+  let kicker='',nodes=[];
+  if(ui.tab==='history'){kicker='Ιστορία τόπου';const bvi=ui.bv&&BVById.get(ui.bv);if(bvi&&!ui.base&&!ui.rec&&!ui.pro&&!ui.power){nodes=bvView(bvi);kicker='Μπελαβίλας 1992';}const pw=ui.power&&POWERS.find(x=>x.id===ui.power);if(nodes.length){}else if(pw&&!ui.base&&!ui.rec&&!ui.pro){nodes=powerView(pw);}else{ui.power=null;}const bs=!nodes.length&&ui.base&&baseById.get(ui.base);const r=ui.rec&&byId.get(ui.rec);if(!nodes.length)nodes=bs?baseView(bs):r?recordView(r):[];}
+  else if(ui.tab==='bases'){if(ui.evBin!=null){kicker='Γεγονότα πειρατείας · '+ui.evBin+'–'+(ui.evBin+4);nodes=evBinView(ui.evBin);}else{kicker='Πειρατικά ορμητήρια · '+filterLine();nodes=basesView();}}
+  else if(ui.tab==='towns'){kicker='Οικισμοί · '+filterLine();nodes=townsView();}
+  else if(ui.tab==='monuments'){kicker='Μνημεία & οχυρά';nodes=monumentsView();}
+  else if(ui.tab==='people'){kicker='Πρόσωπα';nodes=peopleView();}
+  else if(ui.tab==='routes'){kicker='Διαδρομές · '+filterLine();nodes=routesView();}
+  else if(ui.tab==='sources'){kicker='Ιστορικές πηγές';nodes=sourcesView();}
+  if(!DATA.places.length&&!['history','bases'].includes(ui.tab))nodes=[empty('Φόρτωση εγγραφών GERAKI…')];
+  if(ui.tab==='bases'&&!BASES.bases.length)nodes=[empty('Φόρτωση ορμητηρίων…')];
+  if(body.classList.contains('nbc-cine')&&ui.tab==='history'&&ui.base&&!ui.power&&!ui.bv)kicker='Χρονικό';
+  $('nbcKicker').textContent=kicker;recBox.replaceChildren(...nodes);recBox.hidden=!nodes.length;
+  try{cineTitle();}catch(e){}
+  dbody.scrollTop=same?keep:0;
+ }
+ function recordView(p){
+  const g=greek(p),out=[];
+  out.push(h('div',{class:'nbc-card'},h('div',{class:'nbc-type',text:(TYPE[p.type]||p.type||'Τόπος')+' · εγγραφή GERAKI'}),
+   h('h3',{class:'nbc-name',text:g||p.place}),
+   h('p',{class:'nbc-alt',text:[g?p.place:p.historicalNames,p.modernName?'σήμερα '+p.modernName:''].filter(Boolean).join(' · ')}),
+   h('div',{class:'nbc-pills'},stChip(p.coordinateStatus),...(p.books||[]).map(b=>chip(bookLabel(b),'cy')))));
+  const lead=p.historicalContext;if(lead)out.push(h('p',{class:'nbc-lead',text:lead}));
+  // Names and roles from the author's novels (characters, trilogyRole) are not historical data: not shown.
+  const d=dl([['Περίοδος',p.period],['Εξουσία',p.authority],['Κατάσταση',p.historicalStatus]]);if(d)out.push(sect('Ιστορικά στοιχεία',d));
+  if(p.sources)out.push(sect('Πηγές',h('blockquote',{class:'nbc-quote',text:p.sources})));
+  const geo=dl([['Σημείο',STATUS[p.coordinateStatus]?.[0]||p.coordinateStatus],['Συντεταγμένες',Number.isFinite(p.lat)?p.lat.toFixed(4)+'° Β · '+p.lon.toFixed(4)+'° Α':''],['Σημείωση',p.notes]]);if(geo)out.push(sect('Γεωγραφία',geo));
+  const rr=DATA.routes.filter(r=>[...(r.from||[]),...(r.to||[])].some(x=>x.id===p.id));if(rr.length)out.push(sect('Διαδρομές',routeList(rr)));
+  const miss=[['historicalContext','ιστορικό πλαίσιο'],['sources','πηγές'],['authority','εξουσία']].filter(([k])=>!txt(p[k])).map(([,l])=>l);
+  if(miss.length)out.push(h('p',{class:'nbc-miss',text:'Δεν έχουν καταχωριστεί: '+miss.join(', ')+'.'}));
+  out.push(h('div',{class:'nbc-actions'},h('button',{type:'button',class:'nbc-btn primary',onclick:()=>focusRec(p.id)},ico(I.focus),'Εστίαση στον χάρτη'),
+   h('a',{class:'nbc-btn',href:n7Href(p),target:'_blank',rel:'noopener noreferrer'},h('b',{text:'N7'}),'Ρώτησε τον N7')));
+  if(linked.get(p.id))out.push(h('p',{class:'nbc-miss',text:'Πιο κάτω: η κάρτα του τόπου με τα ευρήματα της έρευνας N7.'}));
+  return out;
+ }
+ function baseView(b){const out=[];
+  out.push(h('div',{class:'nbc-card'},h('div',{class:'nbc-type'},flagSvg(b,16),' Πειρατικό ορμητήριο'),h('h3',{class:'nbc-name',text:b.port||b.area}),
+   h('p',{class:'nbc-alt',text:b.port&&b.port!==b.area?b.area:''}),
+   h('div',{class:'nbc-pills'},...Object.entries(baseFaiths(b)).map(([c,fa])=>h('span',{class:'nbc-pill',style:'border-color:'+FAITH[fa][1]+'99;color:#f0e6d4;background:'+FAITH[fa][1]+'33'},CENT[c]+' · '+FAITH[fa][0])),stChip(b.coordinateStatus))));
+  {const t=topoByBase.get(b.id);if(t&&t.names.length){const msc=t.names.filter(n=>n.src==='msc'),cl=t.names.filter(n=>n.src==='claude'),CONF={high:'υψηλή',medium:'μέτρια',low:'χαμηλή'};
+   out.push(sect('Ονόματα στις πηγές',
+    msc.length?h('div',{class:'nbc-names-row'},h('span',{class:'nbc-pill ok',text:'Επιβεβαιωμένα'}),h('b',{text:msc.map(n=>n.name).join(' · ')}),t.modern?h('small',{text:' → σήμερα '+t.modern}):null):null,
+    cl.length?h('div',{class:'nbc-names-row'},h('span',{class:'nbc-pill warn',text:'Claude · προς έλεγχο'}),h('span',{text:cl.map(n=>n.name+(n.level==='area'?' (νησί/περιοχή)':'')).join(' · ')}),h('small',{text:' · βεβαιότητα: '+[...new Set(cl.map(n=>CONF[n.conf]||n.conf))].join('/')})):null,
+    h('p',{class:'nbc-miss',style:'margin:6px 0 0',text:(msc.length?'Επιβεβαιωμένα: μεταπτυχιακή Μ. Γουργουρίνη (2026), Παράρτημα Α. ':'')+(cl.length?'Προτάσεις του Claude με τη μέθοδο της εργασίας· δεν είναι τεκμηρίωση.':'')})));}}
+  {const rs=ruleSect(b);if(rs)out.push(rs);}
+  {const cs=(BV.cites||[]).filter(c=>c.area===b.area);if(cs.length)out.push(sect('Και στον Μπελαβίλα (1992)',...cs.map(c=>h('div',{class:'nbc-ev th context'},h('div',{class:'nbc-ev-h'},h('b',{class:'nbc-ev-y',text:'σελ. '+c.pages}),h('span',{text:'Πειρατικό καταφύγιο / ενέδρα'})),h('p',{text:c.text}),h('small',{class:'nbc-ev-src',text:BV.source?.cite||''})))));}
+  for(const [c,list] of Object.entries(b.centuries))for(const e of list){
+   const d=dl([['Πειρατές',e.pirates],['Είδος θέσης',e.siteType],['Λεπτομέρειες',e.details]]);
+   out.push(sect(CENT[c]+' · '+FAITH[e.faith][0]+' ορμητήριο',d||empty('Χωρίς επιπλέον στοιχεία στη βάση.'),e.link?h('a',{class:'nbc-btn',style:'margin-top:8px',href:e.link,target:'_blank',rel:'noopener noreferrer'},'Άρθρο στο piratecartography.com ↗'):null));}
+  out.push(sect('Πηγή',h('p',{class:'nbc-miss',style:'margin:0',text:BASES.source?.thesis||''}),
+   h('div',{class:'nbc-actions'},h('a',{class:'nbc-btn',href:BASES.source?.map,target:'_blank',rel:'noopener noreferrer'},'Χάρτης ArcGIS ↗'),h('a',{class:'nbc-btn',href:BASES.source?.repository,target:'_blank',rel:'noopener noreferrer'},'Διατριβή ↗')),
+   h('p',{class:'nbc-miss',text:BASES.coordinateNote||''})));
+  const evs=EVENTS.events.filter(e=>e.area===b.area);
+  if(evs.length){const cs=sect('Χρονικό',...evs.sort((a,c)=>(a.years[0]||9999)-(c.years[0]||9999)).map(eventItem));cs.classList.add('nbc-chron');out.splice(1,0,cs);}
+  const near=DATA.places.filter(p=>Number.isFinite(p.lat)&&Math.hypot((p.lon-b.lon)*Math.cos(b.lat*Math.PI/180),p.lat-b.lat)<.12);
+  if(near.length)out.push(sect('Εγγραφές GERAKI εδώ',placeList(near)));
+  out.push(h('div',{class:'nbc-actions'},h('button',{type:'button',class:'nbc-btn primary',onclick:()=>focusAt(b.lon,b.lat)},ico(I.focus),'Εστίαση στον χάρτη'),
+   h('a',{class:'nbc-btn',href:baseN7(b),target:'_blank',rel:'noopener noreferrer'},h('b',{text:'N7'}),'Ρώτησε τον N7')));
+  return out;}
+ const KIND={raid:'Επιδρομή / επίθεση',control:'Αλλαγή κυριαρχίας',context:'Πλαίσιο'};
+ function eventItem(e){const th=!!e.page;
+  const src=th?h('a',{href:THESIS.repository,target:'_blank',rel:'noopener noreferrer',class:'nbc-ev-src',text:'Διατριβή, σελ. '+e.page+(e.cites?.length?' · '+e.cites.join('; '):'')+' ↗'})
+   :e.source?h('a',{href:e.source,target:'_blank',rel:'noopener noreferrer',class:'nbc-ev-src',text:'piratecartography.com · '+e.area+' ↗'}):h('small',{class:'nbc-ev-src',text:'Πρόχειρη σελίδα του site (αδημοσίευτη)'});
+  const yrs=e.years.length>4?e.years.slice(0,3).join(', ')+' … '+e.years[e.years.length-1]:e.years.join(', ');
+  return h('div',{class:'nbc-ev'+(th?' th '+e.kind:'')},h('div',{class:'nbc-ev-h'},h('b',{class:'nbc-ev-y',text:e.years.length?yrs:'χωρίς έτος'}),h('span',{text:e.person||KIND[e.kind]||''})),h('p',{text:e.text}),src);}
+ function evBinView(y){const list=EVENTS.events.filter(e=>e.years.some(v=>v>=y&&v<=y+4));const g=new Map();for(const e of list)(g.get(e.area)||g.set(e.area,[]).get(e.area)).push(e);
+  const out=[h('div',{class:'nbc-actions'},h('button',{type:'button',class:'nbc-btn',onclick:()=>{ui.evBin=null;paint();buildTimeline();}},'← Όλα τα ορμητήρια'))];
+  for(const [a,l] of [...g].sort((p,q)=>p[0].localeCompare(q[0],'el'))){const b=BASES.bases.find(b=>b.area===a);
+   out.push(sect(a,b?h('button',{type:'button',class:'nbc-link',text:'Άνοιγμα ορμητηρίου',onclick:()=>{ui.evBin=null;selectBase(b.id);buildTimeline();}}):null,...l.map(eventItem)));}
+  if(!list.length)out.push(empty('Κανένα χρονολογημένο γεγονός σε αυτά τα χρόνια.'));return out;}
+ function baseN7(b){const cs=Object.keys(b.centuries);const from=cs.includes('16')?1500:1600,to=cs.includes('17')?1700:1599;
+  return 'https://bot.piratecartography.com/#atlas='+encodeURIComponent(JSON.stringify({schema:'n7-atlas-handoff/v1',place:baseName(b).slice(0,100),from,to,sources:[]}));}
+ function basesView(){const q=fold(ui.q.bases);
+  const all=BASES.bases.filter(baseVisible).filter(b=>!q||fold(b.area+' '+b.port+' '+oldNames(b)+' '+Object.values(b.centuries).flat().map(e=>e.pirates||'').join(' ')).includes(q));
+  const f=(key,v,l)=>h('button',{type:'button',class:'nbc-filter','aria-pressed':String(ui[key]===v),onclick:()=>{ui[key]=v;marks();paint();}},l);
+  const groups=new Map();for(const b of all.sort((a,c)=>a.area.localeCompare(c.area,'el')||a.port.localeCompare(c.port,'el')))(groups.get(b.area)||groups.set(b.area,[]).get(b.area)).push(b);
+  const out=[search('bases','Αναζήτηση ορμητηρίου ή πειρατών…'),
+   h('div',{class:'nbc-filters'},f('faith','all','Όλα'),f('faith','christian','Χριστιανικά'),f('faith','muslim','Μουσουλμανικά')),
+   h('div',{class:'nbc-filters'},f('century','all','16ος & 17ος'),f('century','16','16ος αι.'),f('century','17','17ος αι.')),
+   h('p',{class:'nbc-note',text:all.length+' από '+BASES.bases.length+' ορμητήρια · '+(BASES.symbology||'')})];
+  const {from,to}=period();if(!(from<=1500&&to>=1700)){const ev=EVENTS.events.filter(e=>e.years.some(y=>y>=from&&y<=to));
+   out.push(sect('Γεγονότα '+(from===to?from:from+'–'+to),...(ev.length?ev.map(e=>{const d=eventItem(e);d.prepend(h('button',{type:'button',class:'nbc-ev-go',text:e.area+' →',onclick:()=>{const b=BASES.bases.find(x=>x.area===e.area);if(b)selectBase(b.id);else{const r=(atlas()?.places||[]).find(p=>fold(p.name)===fold(e.area));if(r)atlas().select(r.id);}}}));return d;}):[empty('Κανένα χρονολογημένο γεγονός στην περίοδο.')])));}
+  for(const [a,l] of groups)out.push(l.length>1||l[0].port!==a?sect(a,baseList(l)):baseList(l));
+  if(!all.length)out.push(empty('Κανένα ορμητήριο με αυτά τα φίλτρα.'));
+  out.push(h('p',{class:'nbc-miss',text:'Πηγή: '+(BASES.source?.thesis||'')}));return out;}
+ const baseList=l=>h('ul',{class:'nbc-list'},...l.map(b=>item(b.port||b.area,[b.port!==b.area?b.area:'',Object.entries(baseFaiths(b)).map(([c,fa])=>c+'ος '+(fa==='christian'?'χρ.':'μουσ.')).join(' · ')].filter(Boolean).join(' · '),()=>selectBase(b.id),null,ui.base===b.id,flagSvg(b,18))));
+ function selectBase(id,{focus=true}={}){const b=baseById.get(id);if(!b)return;ui.power=null;ui.bv=null;ui.evBin=null;ui.base=id;ui.rec=null;ui.pro=null;openTab('history');marks();
+  if(body.classList.contains('nbc-cine')&&!M3()?.enabled)cineFocus(b.lon,b.lat);else if(focus)focusAt(b.lon,b.lat);}
+ // Cinematic framing: come in close and put the place between the title (left) and the chronicle (right).
+ function cineFocus(lon,lat){const stage=$('chartStage');if(!stage)return;const pt=project(lon,lat);let v=view2d();const vr=view.getBoundingClientRect(),want=3.2;
+  if(v.s<want*.85)stage.dispatchEvent(new WheelEvent('wheel',{deltaY:-Math.log(want/v.s)/0.0015,clientX:vr.left+pt.x*v.s+v.x,clientY:vr.top+pt.y*v.s+v.y,bubbles:true,cancelable:true}));
+  setTimeout(()=>{v=view2d();const tx=Math.max(view.clientWidth*.5,(view.clientWidth-420)*.66),ty=view.clientHeight*.4,dx=tx-(pt.x*v.s+v.x),dy=ty-(pt.y*v.s+v.y);
+   for(const [d,pos,neg] of [[dx,'ArrowLeft','ArrowRight'],[dy,'ArrowUp','ArrowDown']])for(let i=0;i<Math.min(80,Math.round(Math.abs(d)/60));i++)stage.dispatchEvent(new KeyboardEvent('keydown',{key:d>0?pos:neg,bubbles:true,cancelable:true}));},420);}
+ function focusAt(lon,lat){if(M3()?.enabled)M3().camera({lon,lat,tilt:48,rot:0,dist:2.4});else pan2d(lon,lat);}
+ /* ───── powers of the period: their period banners at their seats (historical context, well established) ─────
+    The banners are the chart's own gonfalons (window.NABOU_EMBLEMS: Burgundy cross, Lion of St Mark, lilies,
+    Ottoman tughra, Algiers, papal keys); Malta, St Stephen and Genoa are recoloured from the St George banner.
+    A seat shows only for the years given; no borders are drawn. */
+ const POWERS=[
+  {id:'venice',name:'Δημοκρατία της Βενετίας',emblem:'venetian',seats:[['Βενετία',45.4408,12.3155,1500,1700]],note:'Κυριαρχεί σε Επτάνησα, Κρήτη (έως 1669), Κύπρο (έως 1571) και σε νησιά του Αιγαίου.'},
+  {id:'ottoman',name:'Οθωμανική Αυτοκρατορία',emblem:'ottoman',seats:[['Κωνσταντινούπολη',41.0082,28.9784,1500,1700]],note:'Η μεγάλη δύναμη της Ανατολικής Μεσογείου· ο καπουδάν πασάς διοικεί τον στόλο και το Αιγαίο.'},
+  {id:'spain',name:'Ισπανική Μοναρχία (Αψβούργοι)',emblem:'spanish_simancas',seats:[['Νάπολη · αντιβασιλεία',40.8518,14.2681,1503,1700],['Παλέρμο · αντιβασιλεία της Σικελίας',38.1157,13.3615,1500,1700]],note:'Η Νάπολη και η Σικελία κυβερνώνται από Ισπανούς αντιβασιλείς· βάσεις του ισπανικού στόλου και κουρσάρων.'},
+  {id:'malta',name:'Τάγμα του Αγίου Ιωάννη (Ιππότες)',emblem:'@malta',seats:[['Ρόδος',36.4466,28.2276,1500,1522],['Μάλτα',35.8989,14.5146,1530,1700]],note:'Μετά την άλωση της Ρόδου (1522) το Τάγμα εγκαθίσταται στη Μάλτα (1530)· οι γαλέρες του κουρσεύουν τη μουσουλμανική ναυτιλία.'},
+  {id:'ststephen',name:'Τοσκάνη · Ιππότες του Αγίου Στεφάνου',emblem:'@ststephen',seats:[['Λιβόρνο',43.5485,10.3106,1562,1700]],note:'Το Τάγμα του Αγίου Στεφάνου (1561/1562) κουρσεύει από το Λιβόρνο· «Λιβορνέζοι» στις πηγές.'},
+  {id:'barbary',name:'Μπαρμπαρέσκες αντιβασιλείες (υπό την Υψηλή Πύλη)',emblem:'north_african',seats:[['Αλγέρι',36.7538,3.0588,1516,1700],['Τρίπολη',32.8872,13.1913,1551,1700],['Τύνιδα',36.8065,10.1815,1574,1700]],note:'Αλγέρι, Τρίπολη και Τύνιδα: ορμητήρια των κουρσάρων της Μπαρμπαριάς.'},
+  {id:'papal',name:'Παπικό Κράτος',emblem:'italian_states',seats:[['Ρώμη',41.9028,12.4964,1500,1700]],note:'Συμμετέχει στις χριστιανικές συμμαχίες (Ιερός Σύνδεσμος, 1571).'},
+  {id:'genoa',name:'Δημοκρατία της Γένοβας',emblem:'@genoa',seats:[['Γένοβα',44.4056,8.9463,1500,1700],['Χίος · Μαόνα',38.3710,26.1358,1500,1566]],note:'Η Χίος μένει γενουατική (Μαόνα) έως το 1566.'},
+  {id:'france',name:'Βασίλειο της Γαλλίας',emblem:'french',seats:[['Μασσαλία',43.2965,5.3698,1500,1700]],note:'Σύμμαχος των Οθωμανών από το 1536· Γάλλοι κουρσάροι στο Αιγαίο τον 17ο αι.'}];
+ const PSRC='Ιστορικό πλαίσιο, γενικά αποδεκτό (όχι τεκμηρίωση της έρευνας). Οι έδρες και τα έτη είναι ενδεικτικά.';
+ function powerSvg(p){const E=window.NABOU_EMBLEMS;let svg=E?.get?.(p.emblem.startsWith('@')?'british':p.emblem)?.svg||'';
+  if(p.emblem==='@genoa')return svg;                              // St George: red cross on white
+  if(p.emblem==='@malta')return svg.replace('fill="#f4efe2"','fill="#a3342a"').replace('stroke="#a3342a" stroke-width="6"','stroke="#f4efe2" stroke-width="6"');
+  if(p.emblem==='@ststephen')return svg.replace(/<path d="M20 8V58M4 28.5H36" stroke="#a3342a" stroke-width="6"\/>/,'<path d="M20 8V58M4 28.5H36" stroke="#c9a24e" stroke-width="8"/><path d="M20 8V58M4 28.5H36" stroke="#a3342a" stroke-width="5"/>');
+  return svg;}
+ const pPins=new Map(),pPins3d=new Map();
+ function powerPin(p,seat,three){const [nm,lat,lon,from,to]=seat;
+  const e=h('button',{type:'button',class:(three?'nbc-pin3d':'nbc-pin')+' nbc-power',dataset:{power:p.id,from,to},'aria-label':p.name+' · '+nm+' · '+from+'–'+to,title:p.name+' · '+nm+' ('+from+'–'+to+')',
+   onclick:ev=>{ev.stopPropagation();ui.power=p.id;ui.bv=null;ui.base=null;ui.rec=null;ui.pro=null;openTab('history');}});
+  // Two powers on one seat (Tripoli: Knights, then the regency) stand side by side, not on top of each other.
+  e.dataset.seat=lat+','+lon;
+  const art=h('span',{class:'nbc-power-art'});art.innerHTML=powerSvg(p);e.dataset.t0=e.title;e.append(art,h('span',{class:'nbc-power-name'},h('span',{text:nm.split(' · ')[0]}),h('b',{class:'nbc-power-count'})));return e;}
+ function buildPowers(){const E=window.NABOU_EMBLEMS;Promise.resolve(E?.ready).catch(()=>{}).then(()=>{
+  for(const p of POWERS)for(const [i,seat] of p.seats.entries()){const e=powerPin(p,seat,false),pt=project(seat[2],seat[1]);e.style.left=pt.x+'px';e.style.top=pt.y+'px';layer.append(e);pPins.set(p.id+i,e);}
+  mountPowers3d();buildLegend();marks();});}
+ function mountPowers3d(){if(pPins3d.size||!M3()?.enabled||!pPins.size)return;for(const p of POWERS)for(const [i,seat] of p.seats.entries()){const e=powerPin(p,seat,true);pPins3d.set(p.id+i,e);M3().addObject(e,{lon:seat[2],lat:seat[1],z:.05});}marks();}
+ function powerView(p){const {from,to}=period();const art=h('span',{class:'nbc-power-big'});art.innerHTML=powerSvg(p);
+  return [h('div',{class:'nbc-card nbc-power-card'},art,h('div',null,h('div',{class:'nbc-type',text:'Δύναμη της εποχής'}),h('h3',{class:'nbc-name',style:'font-size:24px',text:p.name}))),
+   h('p',{class:'nbc-lead',text:p.note}),
+   sect('Έδρες στον χάρτη',h('ul',{class:'nbc-list'},...p.seats.map(([nm,lat,lon,a,b])=>item(nm,a+'–'+b+(b<from||a>to?' · εκτός περιόδου':''),()=>focusAt(lon,lat),null,false)))),
+   h('p',{class:'nbc-miss',text:PSRC})];}
+ function n7Href(p){let {from,to}=period();if(from<=1500&&to>=1700){const ys=yearsIn(p.period);if(ys.length){from=Math.min(...ys);to=Math.max(...ys);}}
+  return 'https://bot.piratecartography.com/#atlas='+encodeURIComponent(JSON.stringify({schema:'n7-atlas-handoff/v1',place:String(nameOf(p)).slice(0,100),from,to,sources:[]}));}
+ function item(main,sub,onclick,aside,cur,icon){return h('li',null,h('button',{type:'button',class:'nbc-item'+(cur?' cur':''),onclick},icon||null,h('span',{class:'nbc-im'},h('b',{text:main}),sub?h('small',{text:sub}):null),aside||null));}
+ const townIcon=p=>{const s=String(p.atlasSymbol||'').toLowerCase();return ICON[s]?h('img',{class:'nbc-thumb',src:'../icons/'+ICON[s],alt:''}):h('span',{class:'nbc-thumb nbc-thumb-l',text:'Aa'});};
+ const placeList=l=>h('ul',{class:'nbc-list'},...l.map(p=>item(nameOf(p)+(greek(p)?' · '+p.place:''),[TYPE[p.type]||p.type,p.period].filter(Boolean).join(' · '),()=>selectRec(p.id),h('i',{class:'nbc-dot '+(STATUS[p.coordinateStatus]?.[1]||''),title:STATUS[p.coordinateStatus]?.[0]||''}),ui.rec===p.id,townIcon(p))));
+ const routeList=l=>h('ul',{class:'nbc-list'},...l.map(r=>item(r.name,[r.period].filter(Boolean).join(' · '),()=>selectRoute(r),h('i',{class:'nbc-sw'+(NONPHYS.has(r.type)?' dash':''),style:'--c:'+RCOLOR[r.type]}),false)));
+ function search(key,ph){const i=h('input',{class:'nbc-input',type:'search',placeholder:ph,'aria-label':ph,value:ui.q[key]});
+  i.addEventListener('input',()=>{ui.q[key]=i.value;clearTimeout(search.t);search.t=setTimeout(()=>{paint();const n=recBox.querySelector('.nbc-input');if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length);}},160);});return i;}
+ function townsView(){
+  const base=DATA.places.filter(visible),counts={};for(const p of base)counts[p.type]=(counts[p.type]||0)+1;
+  if(ui.typeFilter!=='all'&&!counts[ui.typeFilter])ui.typeFilter='all';const q=fold(ui.q.towns);
+  const list=base.filter(p=>(ui.typeFilter==='all'||p.type===ui.typeFilter)&&(!q||fold([p.place,p.historicalNames,p.modernName].join(' ')).includes(q))).sort((a,b)=>nameOf(a).localeCompare(nameOf(b),'el'));
+  const f=(v,l,n)=>h('button',{type:'button',class:'nbc-filter','aria-pressed':String(ui.typeFilter===v),onclick:()=>{ui.typeFilter=v;paint();}},l,h('small',{text:n}));
+  return [search('towns','Φιλτράρισμα οικισμών…'),h('div',{class:'nbc-filters'},f('all','Όλοι',base.length),...Object.keys(counts).sort((a,b)=>counts[b]-counts[a]).map(t=>f(t,TYPE[t]||t,counts[t]))),
+   list.length?placeList(list):empty('Καμία εγγραφή με αυτά τα κριτήρια.')];
+ }
+ function related(r){const key=fold(String(r.modernName||r.place).split(/[(,]/)[0]);if(key.length<3)return [];
+  return DATA.places.filter(x=>x.id!==r.id&&String(x.modernName||'').split(',').slice(1).some(part=>fold(part).replace(/\s*\(.*$/,'')===key));}
+ function monumentsView(){const forts=DATA.places.filter(p=>p.type==='Fortress'),within=DATA.places.map(p=>[p,related(p)]).filter(([,l])=>l.length);
+  const out=[h('p',{class:'nbc-note',text:'Τα δεδομένα GERAKI δεν έχουν ξεχωριστή κατηγορία μνημείων. Εμφανίζονται οι εγγραφές τύπου «Οχυρό» και τα σημεία μέσα σε μεγαλύτερο τόπο· δεν προστίθεται κανένα σημείο.'})];
+  out.push(sect('Οχυρά',forts.length?placeList(forts):empty('Δεν υπάρχουν ακόμη επαληθευμένα σημεία.')));
+  for(const [p,l] of within)out.push(sect('Μέσα σε: '+nameOf(p),placeList(l)));return out;}
+ // People: pirates and corsairs as recorded in the documented sources (piratecartography.com harbour pages).
+ // Characters from the author's novels are deliberately left out.
+ function peopleView(){
+  const m=new Map();for(const e of EVENTS.events){const n=e.person||e.who;if(!n||!e.area)continue;if(!m.has(n))m.set(n,{n,ev:[]});m.get(n).ev.push(e);}
+  const q=fold(ui.q.people),list=[...m.values()].filter(x=>!q||fold(x.n).includes(q)).sort((a,b)=>b.ev.length-a.ev.length||a.n.localeCompare(b.n,'el'));
+  const out=[search('people','Αναζήτηση πειρατή ή κουρσάρου…'),h('p',{class:'nbc-note',text:list.length+' πειρατές και κουρσάροι, όπως καταγράφονται στις σελίδες λιμανιών του piratecartography.com. Ονόματα από μυθιστορήματα δεν περιλαμβάνονται.'})];
+  for(const x of list){const yrs=[...new Set(x.ev.flatMap(e=>e.years||[]))].sort();const areas=[...new Set(x.ev.map(e=>e.area))];
+   const d=h('details',{class:'nbc-person',open:ui.personOpen===x.n},h('summary',null,h('span',{class:'nbc-av',text:x.n.replace(/[^\p{L}\s]/gu,'').split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'·'}),
+    h('span',{class:'nbc-im'},h('b',{text:x.n}),h('small',{text:[areas.join(', '),yrs.length?yrs.join(', '):''].filter(Boolean).join(' · ')}))),
+    ...x.ev.map(e=>{const b=BASES.bases.find(b=>b.area===e.area);return h('div',{class:'nbc-ev'},h('div',{class:'nbc-ev-h'},h('b',{class:'nbc-ev-y',text:(e.years||[]).join(', ')||'—'}),
+      b?h('button',{type:'button',class:'nbc-link',text:e.area,onclick:()=>selectBase(b.id)}):h('span',{text:e.area})),h('p',{text:e.text}),e.source?h('a',{class:'nbc-ev-src',href:e.source,target:'_blank',rel:'noopener',text:'piratecartography.com'}):null);}));
+   d.addEventListener('toggle',()=>{if(d.open)ui.personOpen=x.n;});out.push(d);}
+  if(!list.length)out.push(empty('Δεν βρέθηκαν πρόσωπα.'));
+  if(ui.personOpen)requestAnimationFrame(()=>recBox.querySelector('.nbc-person[open]')?.scrollIntoView({block:'nearest'}));return out;}
+ function seaRoutesSect(){if(!BV.routes.length)return null;
+  const on=!!ui.routesOnly;
+  return sect('Ναυτικές ρότες του Αιγαίου · Μπελαβίλας 1992',
+   h('p',{class:'nbc-note',style:'margin:0 0 8px',text:on?'Ο χάρτης δείχνει μόνο τις ρότες. Διάλεξε μία για να τη δεις μόνη της.':'Οι ρότες δεν μένουν μόνιμα στον χάρτη: ανοίγουν εδώ, μόνες τους, χωρίς σημαίες και άλλα σημάδια.'}),
+   h('div',{class:'nbc-actions',style:'margin:0 0 8px'},on?h('button',{type:'button',class:'nbc-btn',onclick:()=>setRoutesOnly(false)},'✕ Κλείσιμο ροτών'):h('button',{type:'button',class:'nbc-btn primary',onclick:()=>setRoutesOnly(true)},'Δείξε μόνο τις ρότες'),
+    on&&ui.routePick?h('button',{type:'button',class:'nbc-btn',onclick:()=>{ui.routePick=null;for(const l of bvLines.values())l.classList.remove('hi');marks();paint();}},'Όλες οι ρότες'):null),
+   h('ul',{class:'nbc-list'},...BV.routes.map(r=>h('li',null,h('button',{type:'button',class:'nbc-item'+(ui.routePick===r.id?' on':''),onclick:()=>pickSeaRoute(r.id)},h('i',{class:'nbc-sw',style:'--c:'+r.color}),
+    h('span',{class:'nbc-im'},h('b',{text:r.short||r.name}),h('small',{text:routeEnds(r)+' · σελ. '+r.pages})))))),
+   ...(ui.routePick?[seaRouteDetail(BVById.get(ui.routePick))]:[]));}
+ function routeEnds(r){const st=r.stations||[];const a=st.filter(x=>x.role==='start').map(x=>x.name),z=st.filter(x=>x.role==='end').map(x=>x.name);return (a.join(' / ')||'')+(z.length?' → '+z.join(' / '):'');}
+ function seaRouteDetail(r){if(!r)return null;
+  return h('div',{class:'nbc-route-detail'},h('h5',{text:r.short||r.name}),h('p',{text:r.note}),
+   h('ol',{class:'nbc-stations'},...(r.stations||[]).map(st=>h('li',{class:st.role||''},h('button',{type:'button',class:'nbc-link',text:st.name,onclick:()=>{if(M3()?.enabled)M3().camera({lon:st.lon,lat:st.lat,tilt:40,dist:2.2});else pan2d(st.lon,st.lat);}}),
+    h('small',{text:(st.role==='start'?' αρχή · ':st.role==='end'?' τέλος · ':' ')+'σελ. '+st.pages+(st.note?' · '+st.note:'')})))),
+   (r.ext||[]).length?h('p',{class:'nbc-note',text:'Διακεκομμένα: '+r.ext.map(e=>e.name+' (σελ. '+e.pages+')').join('· ')}):null,
+   h('p',{class:'nbc-miss',text:'Ν. Μπελαβίλας, διατριβή ΕΜΠ 1992, σελ. '+r.pages+'. Οι θέσεις και η χάραξη είναι κατά προσέγγιση.'}));}
+ function pickSeaRoute(id){const r=BVById.get(id);if(!r)return;ui.routePick=id;if(!ui.routesOnly)setRoutesOnly(true,{frame:false});
+  for(const [k,l] of bvLines)l.classList.toggle('hi',k===id);marks();paint();frameLines([...r.lines,...(r.ext||[]).map(e=>e.pts)]);}
+ function frameLines(lines){const pts=lines.flat();if(!pts.length)return;let a=1e9,b=-1e9,c=1e9,d=-1e9;for(const [la,lo] of pts){const q=project(lo,la);a=Math.min(a,q.x);b=Math.max(b,q.x);c=Math.min(c,q.y);d=Math.max(d,q.y);}
+  const cx=(a+b)/2,cy=(c+d)/2,want=Math.min(view.clientWidth/((b-a)*1.25+1),view.clientHeight/((d-c)*1.25+1),9);
+  if(M3()?.enabled){const ll=[(c+d)/2,(a+b)/2];M3().camera({lon:cx/C.k+C.lon0,lat:pts.reduce((s,p)=>s+p[0],0)/pts.length,tilt:30,dist:2.6});return;}
+  const stage=$('chartStage');if(!stage)return;const v=view2d(),r=stage.getBoundingClientRect(),vr=view.getBoundingClientRect();
+  const sx=vr.left+cx*v.s+v.x,sy=vr.top+cy*v.s+v.y;stage.dispatchEvent(new WheelEvent('wheel',{deltaY:-Math.log(want/v.s)/0.0015,clientX:sx,clientY:sy,bubbles:true,cancelable:true}));
+  const lon=cx/C.k+C.lon0;const lat=Math.atan(Math.sinh((C.my1-cy/C.k)*Math.PI/180))*180/Math.PI;requestAnimationFrame(()=>{pan2d(lon,lat);setTimeout(stnDeclutter,120);});}
+ // station names: drop the ones that would overlap (start and end first, then in route order)
+ function stnDeclutter(){const all=[...rsvg.querySelectorAll('.nbc-sea:not([style*="none"]) .nbc-stn')];const keep=[];
+  for(const k of all){const t=k.querySelector('.nm');if(t)t.style.visibility='';}
+  const ord=[...all.filter(k=>k.matches('.start,.end')),...all.filter(k=>!k.matches('.start,.end'))];
+  for(const k of ord){const t=k.querySelector('.nm');if(!t||getComputedStyle(k).display==='none')continue;const r=t.getBoundingClientRect();if(!r.width)continue;
+   if(keep.some(q=>r.left<q.right+2&&r.right>q.left-2&&r.top<q.bottom+1&&r.bottom>q.top-1))t.style.visibility='hidden';else keep.push(r);}}
+ function setRoutesOnly(v,{frame=true}={}){ui.routesOnly=!!v;if(!v){ui.routePick=null;for(const l of bvLines.values())l.classList.remove('hi');}
+  routeChip.hidden=!v;marks();if(ui.tab==='routes')paint();if(v&&frame)frameLines(BV.routes.flatMap(r=>r.lines));if(v&&ui.tab!=='routes')openTab('routes');}
+ function routesView(){const base=DATA.routes.filter(visible).sort((a,b)=>(a.sequence??99)-(b.sequence??99)),g=new Map();for(const r of base)(g.get(r.type)||g.set(r.type,[]).get(r.type)).push(r);
+  const out=[seaRoutesSect()].filter(Boolean);for(const [t,l] of g)out.push(sect(RTYPE[t]||t,routeList(l)));if(!base.length)out.push(empty('Καμία διαδρομή στην επιλεγμένη περίοδο.'));
+  out.push(h('p',{class:'nbc-note',text:'Οι γραμμές είναι σχηματικές· τα δίκτυα πληροφοριών και τα σχέδια που δεν εκτελέστηκαν φαίνονται διακεκομμένα και δεν είναι ταξίδια.'}));return out;}
+ function sourcesView(){const q=fold(ui.q.sources);
+  const items=[...DATA.places.filter(p=>p.sources).map(p=>({t:nameOf(p),x:p,text:p.sources,place:true})),...DATA.routes.filter(r=>r.evidence).map(r=>({t:r.name,x:r,text:r.evidence}))].filter(i=>!q||fold(i.t+' '+i.text).includes(q));
+  const out=[search('sources','Αναζήτηση στις πηγές…'),h('p',{class:'nbc-note',text:items.length+' τεκμηριωμένες εγγραφές. Τα ευρήματα της έρευνας N7 για τον επιλεγμένο τόπο είναι στην «Ιστορία τόπου».'})];
+  for(const i of items)out.push(h('div',{class:'nbc-src'},h('button',{type:'button',text:i.t,onclick:()=>i.place?selectRec(i.x.id):selectRoute(i.x)}),h('p',{text:i.text})));
+  out.push(sect('Προέλευση δεδομένων',dl([['Πηγή',DATA.generatedFrom],['Ημερομηνία',DATA.generatedAt],['Κανόνας',DATA.policy?.routeGeometry]])));return out;}
+
+ /* ───── selection & camera (existing APIs only) ───── */
+ function selectRec(id,{focus=true}={}){const p=byId.get(id);if(!p)return;ui.power=null;ui.bv=null;ui.base=null;ui.rec=id;const pro=linked.get(id);ui.pro=pro||null;
+  if(pro)atlas()?.select(pro,{focus:false});
+  openTab('history');marks();if(focus)focusRec(id);}
+ function selectRoute(r){ui.route=r.id;ui.tab='routes';openTab('routes');routeHi(r.id);marks();
+  const pts=routePts(r);if(pts.length&&M3()?.enabled){const mid=pts[Math.floor(pts.length/2)];M3().camera({lon:mid[1],lat:mid[0]});}
+  else if(pts.length){const mid=pts[Math.floor(pts.length/2)];pan2d(mid[1],mid[0]);}}
+ function focusRec(id){const p=byId.get(id);if(!p||!Number.isFinite(p.lat))return;
+  if(M3()?.enabled)M3().camera({lon:p.lon,lat:p.lat,tilt:48,rot:0,dist:2.4});else pan2d(p.lon,p.lat);}
+ function view2d(){const m=/translate\(([-\d.]+)px,\s*([-\d.]+)px\)\s*scale\(([-\d.]+)\)/.exec(plane.style.transform||'');return m?{x:+m[1],y:+m[2],s:+m[3]}:{x:0,y:0,s:1};}
+ const merc=lat=>Math.log(Math.tan(Math.PI/4+lat*Math.PI/360))*180/Math.PI;
+ const project=(lon,lat)=>({x:(lon-C.lon0)*C.k,y:(C.my1-merc(lat))*C.k});
+ // Same method as professional-atlas.js select(): the chart's own arrow-key panning.
+ function pan2d(lon,lat){const v=view2d(),pt=project(lon,lat),dx=view.clientWidth/2-(pt.x*v.s+v.x),dy=view.clientHeight/2-(pt.y*v.s+v.y),stage=$('chartStage');if(!stage)return;
+  for(const [d,pos,neg] of [[dx,'ArrowLeft','ArrowRight'],[dy,'ArrowUp','ArrowDown']])for(let i=0;i<Math.min(60,Math.round(Math.abs(d)/60));i++)stage.dispatchEvent(new KeyboardEvent('keydown',{key:d>0?pos:neg,bubbles:true,cancelable:true}));}
+ // A reference place picked on the map shows its card; a GERAKI record at the same spot is shown with it.
+ document.addEventListener('click',e=>{const m=e.target.closest?.('.pro-place-marker,.pro-3d-place');if(!m?.dataset.place)return;
+  ui.base=null;ui.pro=m.dataset.place;ui.rec=proToRec.get(ui.pro)||null;openTab('history');marks();},true);
+
+ /* ───── GERAKI records on the chart: 2D overlay + 3D pins ───── */
+ const layer=h('div',{class:'nbc-geo',id:'nbcGeo'});layer.style.width=C.W+'px';layer.style.height=C.H+'px';
+ const rsvg=document.createElementNS(NS,'svg');rsvg.setAttribute('class','nbc-routes');rsvg.setAttribute('viewBox','0 0 '+C.W+' '+C.H);rsvg.setAttribute('width',C.W);rsvg.setAttribute('height',C.H);
+ // Detailed coastline (Natural Earth 1:10m) laid over the chart once zoomed in, so coasts stay sharp instead of
+ // magnifying the overview chart's coarse outline and raster relief. Loaded on first zoom.
+ const csvg=document.createElementNS(NS,'svg');csvg.setAttribute('class','nbc-coast');csvg.setAttribute('viewBox','0 0 '+C.W+' '+C.H);csvg.setAttribute('width',C.W);csvg.setAttribute('height',C.H);csvg.setAttribute('aria-hidden','true');
+ let coastState=0;function loadCoast(){if(coastState)return;coastState=1;fetch('./data/coast-detail.json',{cache:'force-cache'}).then(r=>r.ok?r.json():null).then(d=>{if(!d)return;
+  const [lo0,la0,lo1,la1]=d.bbox,a=project(lo0,la1),b=project(lo1,la0);
+  csvg.innerHTML=`<defs><clipPath id="nbcCoastClip"><rect x="${a.x}" y="${a.y}" width="${b.x-a.x}" height="${b.y-a.y}"/></clipPath>`
+   +`<pattern id="nbcSeaHatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)"><path d="M0 3h6" stroke="#ffffff" stroke-opacity=".035" stroke-width=".6"/></pattern></defs>`
+   +`<g clip-path="url(#nbcCoastClip)"><rect class="sea" x="${a.x}" y="${a.y}" width="${b.x-a.x}" height="${b.y-a.y}"/><rect x="${a.x}" y="${a.y}" width="${b.x-a.x}" height="${b.y-a.y}" fill="url(#nbcSeaHatch)"/>`
+   +`<path class="shoal" d="${d.d}"/><path class="land" d="${d.d}"/><path class="coast" d="${d.d}"/></g>`;coastState=2;syncScale();}).catch(()=>{coastState=0;});}
+ // Historical map overlay (Jansson 1650, georeferenced by NABOU): above the chart and the sharp coasts, below routes and pins.
+ const osvg=document.createElementNS(NS,'svg');osvg.setAttribute('class','nbc-oldmap');osvg.setAttribute('viewBox','0 0 '+C.W+' '+C.H);osvg.setAttribute('width',C.W);osvg.setAttribute('height',C.H);osvg.setAttribute('aria-hidden','true');
+ let OLD=null,oldState=0;
+ function loadOld(){if(oldState)return;oldState=1;fetch('./data/historical-maps.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(d=>{OLD=d?.maps?.[0]||null;if(!OLD){oldState=0;return;}
+   osvg.innerHTML=`<rect class="dim" x="-2000" y="-2000" width="${C.W+4000}" height="${C.H+4000}"/>`+OLD.images.map((im,i)=>`<image class="${im.minScale?'det':'base'}" href="${im.href}" x="${im.x}" y="${im.y}" width="${im.w}" height="${im.h}" preserveAspectRatio="none" decoding="async"/>`).join('');
+   oldState=2;buildOldPanel();syncScale();}).catch(()=>{oldState=0;});}
+ layer.append(csvg,osvg,rsvg);plane.append(layer);
+ const syncScale=()=>{const sc=view2d().s;layer.style.setProperty('--nbc-inv',String(1/sc));layer.classList.toggle('far',sc<1.3);
+  osvg.classList.toggle('zoomed',sc>=2);osvg.classList.toggle('off3d',!!M3()?.enabled);
+  const det=sc>=2.2&&!M3()?.enabled;if(det)loadCoast();layer.classList.toggle('detail',det&&coastState===2);body.classList.toggle('nbc-detail',det&&coastState===2);};
+ new MutationObserver(syncScale).observe(plane,{attributes:true,attributeFilter:['style']});syncScale();
+ const routePts=r=>{const a=byId.get(r.from?.[0]?.id),b=byId.get(r.to?.[0]?.id);if(!a||!b)return [];
+  return [Array.isArray(r.displayStart)?r.displayStart:[a.lat,a.lon],...(r.waypoints||[]).filter(Array.isArray),Array.isArray(r.displayEnd)?r.displayEnd:[b.lat,b.lon]];};
+ const pins=new Map(),pins3d=new Map(),lines=new Map();
+ function pinEl(p,three){const sym=String(p.atlasSymbol||'').toLowerCase(),lab=LABEL_ONLY.has(sym);
+  const b=h('button',{type:'button',class:(three?'nbc-pin3d ':'nbc-pin ')+(lab?'lab':'town')+(['capital','city'].includes(sym)?' major':''),dataset:{rec:p.id,status:p.coordinateStatus||''},'aria-label':nameOf(p)+' · '+(STATUS[p.coordinateStatus]?.[0]||''),
+   title:nameOf(p)+(p.coordinateStatus==='APPROXIMATE'?' · σημείο κατά προσέγγιση':p.coordinateStatus==='NEEDS RESEARCH'?' · χρειάζεται έρευνα':''),onclick:e=>{e.stopPropagation();selectRec(p.id,{focus:false});}},
+   lab?null:h('img',{src:'../icons/'+(ICON[sym]||'atlas-town.svg'),alt:''}),h('span',{text:nameOf(p)}));return b;}
+ function buildMap(){
+  for(const p of DATA.places){if(!Number.isFinite(p.lat)||!Number.isFinite(p.lon)||linked.get(p.id))continue;const b=pinEl(p,false),pt=project(p.lon,p.lat);b.style.left=pt.x+'px';b.style.top=pt.y+'px';layer.append(b);pins.set(p.id,b);}
+  for(const r of DATA.routes){const pts=routePts(r);if(pts.length<2||r.atlasHidden)continue;const pl=document.createElementNS(NS,'polyline');
+   pl.setAttribute('points',pts.map(([la,lo])=>{const q=project(lo,la);return q.x.toFixed(1)+','+q.y.toFixed(1);}).join(' '));
+   pl.setAttribute('class','nbc-route'+(NONPHYS.has(r.type)?' np':''));pl.style.setProperty('--c',RCOLOR[r.type]||'#eee');pl.dataset.route=r.id;rsvg.append(pl);lines.set(r.id,pl);}
+ }
+
+ /* ───── sovereignty per base area and period (approved list, 20 Nov 2026; standard dates) ───── */
+ const RULERS={venice:['Βενετία','#d9a93c'],ottoman:['Οθωμανοί','#a679dc'],latin:['Λατινικές ηγεμονίες (Δουκάτο Αιγαίου κ.ά.)','#5d95e6'],
+  tributary:['Λατίνοι υποτελείς στην Πύλη','#8fb3e8'],genoa:['Γενουάτες (Μαόνα)','#eeeeee'],knights:['Ιππότες του Αγ. Ιωάννη','#ef8a46'],
+  spain:['Ισπανία','#ec78b6'],tuscany:['Τοσκάνη (Μέδικοι)','#6fd4b4'],mamluk:['Μαμελούκοι','#b39570'],hafsid:['Χαφσίδες (ισπανική προστασία 1535–74)','#b39570'],
+  mani:['Μάνη · αυτόνομη, ονομαστικά οθωμανική','#9fb0b6'],regency:['Οθωμανική αντιβασιλεία','#a679dc']};
+ const R_=(...a)=>a;const CYC_DUCHY=R_([1500,1536,'latin'],[1537,1565,'tributary'],[1566,1700,'ottoman']);
+ const RULE={
+  'Ζάκυνθος':R_([1500,1700,'venice']),'Κεφαλλονιά':R_([1500,1700,'venice']),'Κύθηρα':R_([1500,1700,'venice']),'Αντικύθηρα':R_([1500,1700,'venice']),'Στροφάδες':R_([1500,1700,'venice']),
+  'Λευκάδα':R_([1500,1683,'ottoman'],[1684,1700,'venice']),'Πρέβεζα':R_([1500,1683,'ottoman'],[1684,1700,'venice']),
+  'Αιτωλοακαρνανία':R_([1500,1700,'ottoman']),'Έξω Λούρος':R_([1500,1700,'ottoman']),'Οξειά':R_([1500,1700,'ottoman']),'Δρυονήσι':R_([1500,1700,'ottoman']),
+  'Αυλώνα':R_([1500,1700,'ottoman']),'Αυλώνα, Αλβανία':R_([1500,1700,'ottoman']),'Δυρράχιο':R_([1500,1500,'venice'],[1501,1700,'ottoman']),
+  'Μονεμβάσια':R_([1500,1539,'venice'],[1540,1689,'ottoman'],[1690,1700,'venice']),'Αργολίδα':R_([1500,1539,'venice'],[1540,1685,'ottoman'],[1686,1700,'venice']),
+  'Μεσσηνία':R_([1500,1684,'ottoman'],[1685,1700,'venice']),'Σαπιέντζα':R_([1500,1684,'ottoman'],[1685,1700,'venice']),
+  'Μάνη':R_([1500,1684,'mani'],[1685,1700,'venice']),
+  'Ύδρα':R_([1500,1684,'ottoman'],[1685,1700,'venice']),'Δοκός':R_([1500,1684,'ottoman'],[1685,1700,'venice']),'Ελαφόνησος':R_([1500,1684,'ottoman'],[1685,1700,'venice']),
+  'Σκυλλί':R_([1500,1684,'ottoman'],[1685,1700,'venice']),'Βενέτικο':R_([1500,1684,'ottoman'],[1685,1700,'venice']),'Σχίζα':R_([1500,1684,'ottoman'],[1685,1700,'venice']),
+  'Σούνιο Αττικής':R_([1500,1700,'ottoman']),'Μακρόνησος':R_([1500,1700,'ottoman']),'Πεταλάς':R_([1500,1700,'ottoman']),
+  'Κρήτη':R_([1500,1668,'venice'],[1669,1700,'ottoman']),'Γαύδος':R_([1500,1668,'venice'],[1669,1700,'ottoman']),
+  'Ρόδος':R_([1500,1522,'knights'],[1523,1700,'ottoman']),'Κάρπαθος':R_([1500,1537,'venice'],[1538,1700,'ottoman']),'Πάτμος':R_([1500,1522,'knights'],[1523,1700,'ottoman']),
+  'Αστυπάλαια':R_([1500,1536,'latin'],[1537,1700,'ottoman']),'Αμοργός':R_([1500,1536,'latin'],[1537,1700,'ottoman']),
+  'Νάξος':CYC_DUCHY,'Πάρος':CYC_DUCHY,'Αντίπαρος':CYC_DUCHY,'Μήλος':CYC_DUCHY,'Κίμωλος':CYC_DUCHY,'Ίος':CYC_DUCHY,'Σύρος':CYC_DUCHY,'Ανάφη':CYC_DUCHY,'Φολέγανδρος':CYC_DUCHY,
+  'Κάτω Κουφονήσι':CYC_DUCHY,'Πάνω Κουφονήσι':CYC_DUCHY,'Σκατζούρα':CYC_DUCHY,'Τσελεβίνια':CYC_DUCHY,'Προκοπάνιστος':CYC_DUCHY,'Αυγό':CYC_DUCHY,'Περιστέρα':CYC_DUCHY,'Τηγάνι':CYC_DUCHY,
+  'Σίφνος':CYC_DUCHY,'Κύθνος':CYC_DUCHY,'Κέα (Τζιά)':CYC_DUCHY,'Σέριφος':CYC_DUCHY,
+  'Μύκονος':R_([1500,1536,'venice'],[1537,1700,'ottoman']),'Δήλος':R_([1500,1536,'venice'],[1537,1700,'ottoman']),'Ρηνεία':R_([1500,1536,'venice'],[1537,1700,'ottoman']),
+  'Στενό Χίου':R_([1500,1565,'genoa'],[1566,1700,'ottoman']),'Οινούσσες':R_([1500,1565,'genoa'],[1566,1700,'ottoman']),
+  'Σάμος':R_([1500,1700,'ottoman']),'Ικαρία':R_([1500,1700,'ottoman']),'Φούρνοι':R_([1500,1700,'ottoman']),'Μυτιλήνη':R_([1500,1700,'ottoman']),'Θάσος':R_([1500,1700,'ottoman']),
+  'Εύβοια':R_([1500,1700,'ottoman']),'Μοσχονήσια':R_([1500,1700,'ottoman']),
+  'Σκιάθος':R_([1500,1537,'venice'],[1538,1700,'ottoman']),'Σκύρος':R_([1500,1537,'venice'],[1538,1700,'ottoman']),
+  'Παράλια Μικράς Ασίας':R_([1500,1700,'ottoman']),'Αττάλεια, Παράλια Μικράς Ασίας':R_([1500,1700,'ottoman']),'Κονάκ, Παράλια Μικράς Ασίας':R_([1500,1700,'ottoman']),
+  'Σεφεριχισάρ, Παράλια Μικράς Ασίας':R_([1500,1700,'ottoman']),'Φώκαια, Παράλια Μικράς Ασίας':R_([1500,1700,'ottoman']),
+  'Μάλτα':R_([1500,1529,'spain'],[1530,1700,'knights']),'Σικελία':R_([1500,1700,'spain']),'Καμπανία, Ιταλία':R_([1500,1502,'spain'],[1503,1700,'spain']),
+  'Απουλία, Ιταλία':R_([1500,1508,'venice'],[1509,1700,'spain']),'Λιβόρνο, Ιταλία':R_([1500,1700,'tuscany']),
+  'Λιβύη':R_([1500,1509,'hafsid'],[1510,1529,'spain'],[1530,1550,'knights'],[1551,1700,'regency']),'Τυνησία':R_([1500,1573,'hafsid'],[1574,1700,'regency']),
+  'Αίγυπτος':R_([1500,1516,'mamluk'],[1517,1700,'ottoman'])};
+ RULE['Καμπανία, Ιταλία']=R_([1500,1700,'spain']);
+ const ruleOf=b=>RULE[b.area]||null;
+ function rulerAt(b,from,to){const r=ruleOf(b);if(!r)return null;const mid=(from+to)/2;return (r.find(s=>s[0]<=mid&&mid<=s[1])||r.find(s=>s[1]>=from&&s[0]<=to)||null);}
+ function ruleSect(b){const r=ruleOf(b);if(!r)return null;const {from,to}=period();
+  return sect('Κυριαρχία',...r.map(([a,z,k])=>h('div',{class:'nbc-rule'+(z>=from&&a<=to?' in':''),style:'--rc:'+RULERS[k][1]},h('b',{text:a+'–'+z}),h('span',{text:RULERS[k][0]}))),
+   h('p',{class:'nbc-miss',style:'margin:6px 0 0',text:'Γενικό ιστορικό πλαίσιο με τις καθιερωμένες χρονολογίες· όχι τεκμηρίωση της έρευνας.'}));}
+ function applyRule(){const {from,to}=period();for(const m of [bpins,bpins3d])for(const [id,e] of m){const b=baseById.get(id);const s=b&&rulerAt(b,from,to);
+   if(s){e.style.setProperty('--rule',RULERS[s[2]][1]);e.dataset.rule=RULERS[s[2]][0];}else{e.style.removeProperty('--rule');delete e.dataset.rule;}}}
+
+ function setOld(v){ui.old=!!v;try{localStorage.setItem('nbc.old',v?'1':'0');}catch(e){}if(v)loadOld();
+  body.classList.toggle('nbc-old-on',ui.old);$('nbcOld')?.setAttribute('aria-pressed',String(ui.old));if(oldPanel)oldPanel.hidden=!ui.old;try{syncMode();}catch(e){}}
+ let oldPanel=null;
+ function buildOldPanel(){if(oldPanel||!OLD)return;const slot=$('n7MapSlot');if(!slot)return;
+  let op=0.7;try{op=+(localStorage.getItem('nbc.oldOp')||0.7);}catch(e){}osvg.style.setProperty('--op',op);
+  const rng=h('input',{type:'range',min:'0',max:'100',value:String(Math.round(op*100)),'aria-label':'Διαφάνεια ιστορικού χάρτη'});
+  rng.addEventListener('input',()=>{osvg.style.setProperty('--op',rng.value/100);try{localStorage.setItem('nbc.oldOp',String(rng.value/100));}catch(e){}});
+  if(CINE){// credit as a map attribution line (bottom-right); the opacity control lives in «Επίπεδα»
+   oldPanel=h('p',{class:'nbc-attrib',hidden:!ui.old},h('a',{href:OLD.item,target:'_blank',rel:'noopener',title:OLD.credit,text:'Χάρτης: Jansson, 1650 · David Rumsey Map Collection'}),' · ',h('a',{href:OLD.licenseUrl,target:'_blank',rel:'noopener',text:'CC BY-NC-SA'}));
+   slot.append(oldPanel);return;}
+  oldPanel=h('aside',{class:'nbc-oldpanel',hidden:!ui.old},
+   h('div',{class:'nbc-old-h'},h('b',{text:OLD.short}),h('button',{type:'button',class:'nbc-x','aria-label':'Κλείσιμο ιστορικού χάρτη',onclick:()=>setOld(false)},'✕')),
+   h('label',{class:'nbc-old-r'},h('span',{text:'σήμερα'}),rng,h('span',{text:'1650'})),
+   h('p',{class:'nbc-old-c'},h('a',{href:OLD.item,target:'_blank',rel:'noopener',title:OLD.credit,text:CINE?'Jansson, 1650 · David Rumsey Map Collection':OLD.credit}),' · ',h('a',{href:OLD.licenseUrl,target:'_blank',rel:'noopener',text:CINE?'CC BY-NC-SA':OLD.license})),
+   h('p',{class:'nbc-old-n',text:'Γεωαναφορά NABOU με '+OLD.gcps.length+' σημεία ελέγχου· ενδιάμεσα μένει η παραμόρφωση του 1650. Μόνο στον 2Δ χάρτη.'}));
+  slot.append(oldPanel);}
+ try{if(localStorage.getItem('nbc.old')==='1')setTimeout(()=>setOld(true),50);}catch(e){}
+ const routeChip=h('button',{type:'button',class:'nbc-only-chip',hidden:true,onclick:()=>setRoutesOnly(false)},h('b',{text:'Ναυτικές ρότες'}),' · μόνο οι ρότες ',h('span',{text:'✕'}));
+ $('n7MapSlot')?.append(routeChip);
+ /* ───── map legend: what the flags, numbers, banners and colour bars mean ───── */
+ function buildLegend(){const slot=$('n7MapSlot');if(!slot||$('nbcLegend'))return;
+  const row=(art,txt)=>h('div',{class:'nbc-lg-row'},h('span',{class:'nbc-lg-art'},art),h('p',null,...txt));
+  const F=(l,r,a,b)=>flagArt(l,r,a,b,28),R='#c8322d',G='#2f8f4e';
+  const badge=(t,c1,c2)=>h('i',{class:'nbc-lg-badge',style:'--nbc-f1:'+c1+';--nbc-f2:'+c2,text:t});
+  const banner=h('span',{class:'nbc-lg-ban'});const vp=POWERS.find(p=>p.id==='venice');if(vp)banner.innerHTML=powerSvg(vp);
+  const bars=h('span',{class:'nbc-rule-lg'},...['venice','ottoman','latin','tributary','genoa','knights','spain','tuscany'].map(k=>h('span',null,h('i',{style:'background:'+RULERS[k][1]}),RULERS[k][0].split(' (')[0])));
+  const panel=h('div',{class:'nbc-legend-body'},
+   h('h4',{text:'Πειρατικά ορμητήρια (διατριβή)'}),
+   row(F(R,R,'christian'),[h('b',{text:'Κόκκινη σημαία'}),' χριστιανικό ορμητήριο']),
+   row(F(G,G,'muslim'),[h('b',{text:'Πράσινη σημαία'}),' μουσουλμανικό ορμητήριο']),
+   row(h('span',null,F(R,R,'x',null),F(R,R,null,'x')),[h('b',{text:'Κοντάρι'}),': γκρι = 16ος αι., μαύρο = 17ος αι.']),
+   row(F(R,G,'christian','muslim'),['Δύο χρώματα και δίχρωμο κοντάρι: άλλαξε από τον 16ο στον 17ο αι.']),
+   row(badge('+3',R,R),[h('b',{text:'Αριθμός'}),': τόσα ακόμη ορμητήρια κρύβονται εκεί, γιατί είναι πολύ κοντά. Μεγέθυνε ή πέρνα το ποντίκι από πάνω.']),
+   row(badge('+5',R,G),['Μισό κόκκινο, μισό πράσινο: η ομάδα έχει και τα δύο.']),
+   h('h4',{text:'Ρότες & πειρατεία (Μπελαβίλας 1992)'}),
+   row(h('span',{class:'nbc-lg-route'}),[h('b',{text:'Χρωματιστή γραμμή'}),': ναυτική ρότα του Αιγαίου. Οι ρότες δεν μένουν μόνιμα: ανοίγουν από «Διαδρομές» → «Δείξε μόνο τις ρότες» και φαίνονται μόνες τους, με το όνομά τους.']),
+   row(bvIcon('refuge',22),[h('b',{text:'Άγκυρα'}),': πειρατικό καταφύγιο ή ενέδρα.']),
+   row(bvIcon('market',22),[h('b',{text:'Ζυγαριά'}),': πειρατικό παζάρι, όπου πουλιόταν η λεία.']),
+   row(bvIcon('vigla',22),[h('b',{text:'Βίγλα'}),': παρατηρητήριο με φωτιά τη νύχτα και καπνό τη μέρα.']),
+   h('h4',{text:'Δυνάμεις της εποχής'}),
+   row(banner,[h('b',{text:'Λάβαρο'}),': έδρα μιας δύναμης (π.χ. Βενετία, Νάπολη). Εμφανίζεται μόνο για τα χρόνια που ισχύει. «Νάπολη +2» = άλλα 2 σημεία κοντά.']),
+   h('h4',{text:'Ποιος κυβερνούσε'}),
+   h('p',{class:'nbc-lg-p',text:'Η γραμμή κάτω από κάθε σημαία δείχνει ποιος κυβερνούσε την περιοχή στην περίοδο του χρονολογίου.'}),bars,
+   h('p',{class:'nbc-lg-p dim',text:'Ορμητήρια: Μ. Γουργουρίνη, διατριβή (piratecartography.com). Ρότες, καταφύγια, παζάρια, βίγλες: Ν. Μπελαβίλας, διατριβή ΕΜΠ 1992 (θέσεις κατά προσέγγιση). Δυνάμεις και κυριαρχία: γενικό ιστορικό πλαίσιο.'}));
+  let open=true;try{open=localStorage.getItem('nbc.legend')!=='0';}catch(e){}
+  const btn=h('button',{type:'button',class:'nbc-legend-btn','aria-expanded':String(open),onclick:()=>{open=!open;box.dataset.open=open;btn.setAttribute('aria-expanded',String(open));try{localStorage.setItem('nbc.legend',open?'1':'0');}catch(e){}}},h('b',{text:'i'}),'Υπόμνημα');
+  const box=h('aside',{class:'nbc-legend',id:'nbcLegend','aria-label':'Υπόμνημα χάρτη',dataset:{open:String(open)}},btn,panel);slot.append(box);}
+
+ /* ───── Belavilas 1992: sea routes, pirate refuges, markets, lookouts (data/belavilas.json) ───── */
+ let BV={routes:[],cites:[],points:[]},BVById=new Map();const bvLines=new Map(),bvPins=new Map(),bvPins3d=new Map();let bv3d=[],bvLab3d=[],bvStn3d=[];
+ const BVKIND={refuge:['Πειρατικό καταφύγιο','#c8322d'],market:['Πειρατικό παζάρι','#e0a64a'],vigla:['Βίγλα (παρατηρητήριο)','#7fd3e6']};
+ function bvIcon(kind,size=20){const s=document.createElementNS(NS,'svg');s.setAttribute('viewBox','0 0 20 20');s.setAttribute('width',size);s.setAttribute('height',size);s.setAttribute('aria-hidden','true');s.setAttribute('class','nbc-bvi');
+  const c=BVKIND[kind][1];
+  s.innerHTML=`<circle cx="10" cy="10" r="8.6" fill="#120d08" stroke="${c}" stroke-width="1.6"/>`+(kind==='refuge'
+   ?`<path d="M10 4.6v9.6M7.4 6.6h5.2M5.2 11.2c.6 2.4 2.6 3.6 4.8 3.6s4.2-1.2 4.8-3.6" fill="none" stroke="${c}" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="4.4" r="1.1" fill="${c}"/>`
+   :kind==='market'?`<path d="M10 4.5v10M5.5 7h9M5.5 7 4 11h3zM14.5 7 13 11h3z" fill="none" stroke="${c}" stroke-width="1.3" stroke-linejoin="round"/><path d="M4 11a1.5 1 0 0 0 3 0M13 11a1.5 1 0 0 0 3 0" fill="${c}"/><path d="M7.5 14.8h5" stroke="${c}" stroke-width="1.4"/>`
+   :`<path d="M6.6 16h6.8l-1-7.2H7.6z" fill="${c}"/><path d="M7 8.8h6V7.4h-1.1v.8h-1.1v-.8H9.2v.8H8.1v-.8H7z" fill="${c}"/><path d="M9.2 11h1.6v2.4H9.2z" fill="#120d08"/><path d="M10 2.6c1.9 1.5 2.1 2.9 1 4.2-.4-.9-1-1.1-1.6-.7.4-1.2.3-2.3.6-3.5z" fill="#ffb347"/>`);return s;}
+ function bvPin(pt,three){const e=h('button',{type:'button',class:(three?'nbc-pin3d':'nbc-pin')+' nbc-bv k-'+pt.kind,dataset:{bv:pt.id},'aria-label':pt.name+' · '+BVKIND[pt.kind][0],title:pt.name+' · '+BVKIND[pt.kind][0]+' (Μπελαβίλας 1992)',
+   onclick:ev=>{ev.stopPropagation();selectBV(pt.id);}},bvIcon(pt.kind,three?18:20),h('span',{text:pt.name}));return e;}
+ function selectBV(id){const x=BVById.get(id);if(!x)return;ui.bv=id;ui.route=x.lines?'bv:'+id:null;ui.base=null;ui.rec=null;ui.pro=null;ui.power=null;openTab('history');marks();
+  for(const [k,l] of bvLines)l.classList.toggle('hi',k===id);}
+ function bvView(x){const isR=!!x.lines;const kind=isR?'Ναυτική ρότα':BVKIND[x.kind][0];
+  const head=h('div',{class:'nbc-card'},h('div',{class:'nbc-type'},isR?h('i',{class:'nbc-sw',style:'--c:'+x.color}):bvIcon(x.kind,16),' '+kind),h('h3',{class:'nbc-name',text:x.name}),
+   h('div',{class:'nbc-pills'},h('span',{class:'nbc-pill',text:'σελ. '+x.pages}),h('span',{class:'nbc-pill',text:'1420–1815'}),stChip('APPROXIMATE')));
+  const out=[head,sect('Τι γράφει η διατριβή',h('p',{style:'margin:0',text:isR?x.note:x.text}),x.spot?h('p',{class:'nbc-miss',text:x.spot}):null),
+   sect('Πηγή',h('p',{class:'nbc-miss',style:'margin:0',text:BV.source.cite+', σελ. '+x.pages+'.'}),h('p',{class:'nbc-miss',text:BV.note}))];
+  if(!isR){out.push(h('div',{class:'nbc-actions'},h('button',{type:'button',class:'nbc-btn primary',onclick:()=>focusAt(x.lon,x.lat)},ico(I.focus),'Εστίαση στον χάρτη')));
+   const near=BASES.bases.filter(b=>Math.hypot((b.lon-x.lon)*Math.cos(x.lat*Math.PI/180),b.lat-x.lat)<.25);if(near.length)out.push(sect('Ορμητήρια της διατριβής σου εδώ',...near.map(b=>h('button',{type:'button',class:'nbc-item',onclick:()=>selectBase(b.id)},flagSvg(b,16),h('span',{text:' '+baseName(b)})))));}
+  return out;}
+ function buildBV(){
+  for(const r of BV.routes){const g=document.createElementNS(NS,'g');g.setAttribute('class','nbc-sea');g.dataset.bvr=r.id;g.style.setProperty('--c',r.color);
+   for(const ln of r.lines){const pts=ln.map(([la,lo])=>{const q=project(lo,la);return q.x.toFixed(1)+','+q.y.toFixed(1);}).join(' ');
+    for(const cls of ['cas','ln','hit']){const pl=document.createElementNS(NS,'polyline');pl.setAttribute('points',pts);pl.setAttribute('class',cls);g.append(pl);}}
+   for(const e of r.ext||[]){const pts=e.pts.map(([la,lo])=>{const q=project(lo,la);return q.x.toFixed(1)+','+q.y.toFixed(1);}).join(' ');
+    for(const cls of ['cas ext','ln ext','hit']){const pl=document.createElementNS(NS,'polyline');pl.setAttribute('points',pts);pl.setAttribute('class',cls);
+     if(cls==='hit'){const tt=document.createElementNS(NS,'title');tt.textContent=e.name+' · σελ. '+e.pages;pl.append(tt);}g.append(pl);}}
+   // stations named by the thesis: dot + name; start and end marked
+   const sg=document.createElementNS(NS,'g');sg.setAttribute('class','nbc-stns');
+   for(const st of r.stations||[]){const q=project(st.lon,st.lat),k=document.createElementNS(NS,'g');k.setAttribute('class','nbc-stn'+(st.role?' '+st.role:''));
+    k.setAttribute('transform',`translate(${q.x.toFixed(1)} ${q.y.toFixed(1)})`);
+    const c=document.createElementNS(NS,'circle');c.setAttribute('r','1');k.append(c);
+    const tx=document.createElementNS(NS,'text');tx.setAttribute('class','nm');tx.textContent=(st.role==='start'?'Αρχή · ':st.role==='end'?'Τέλος · ':'')+st.name;k.append(tx);
+    const tt=document.createElementNS(NS,'title');tt.textContent=st.name+' · σελ. '+st.pages+(st.note?' · '+st.note:'');k.append(tt);sg.append(k);}
+   g.append(sg);
+   const t=document.createElementNS(NS,'title');t.textContent=r.name+' · Μπελαβίλας 1992, σελ. '+r.pages;g.append(t);
+   // clear name on the line: placed on the longest straight stretch of the main line, along its direction
+   {const ln=r.lines[0].map(([la,lo])=>project(lo,la));let bi=0,bl=0;for(let i=0;i<ln.length-1;i++){const L=Math.hypot(ln[i+1].x-ln[i].x,ln[i+1].y-ln[i].y);if(L>bl){bl=L;bi=i;}}
+    const A=ln[bi],B=ln[bi+1];let ang=Math.atan2(B.y-A.y,B.x-A.x)*180/Math.PI;if(ang>90)ang-=180;if(ang<-90)ang+=180;
+    const lab=document.createElementNS(NS,'text');lab.setAttribute('class','nbc-sea-label');lab.setAttribute('x',((A.x+B.x)/2).toFixed(1));lab.setAttribute('y',((A.y+B.y)/2).toFixed(1));
+    lab.setAttribute('transform',`rotate(${ang.toFixed(1)} ${((A.x+B.x)/2).toFixed(1)} ${((A.y+B.y)/2).toFixed(1)})`);lab.setAttribute('dy','-4');lab.setAttribute('text-anchor','middle');lab.textContent=r.short||r.name;g.append(lab);}
+   g.addEventListener('click',ev=>{ev.stopPropagation();pickSeaRoute(r.id);});rsvg.append(g);bvLines.set(r.id,g);}
+  for(const pt of BV.points){const e=bvPin(pt,false),q=project(pt.lon,pt.lat);e.style.left=q.x+'px';e.style.top=q.y+'px';layer.append(e);bvPins.set(pt.id,e);}
+  mountBV3d();marks();}
+ function mountBV3d(){const m=M3();if(bvPins3d.size||!m?.enabled||!m.ready||!BV.points.length)return;
+  for(const pt of BV.points){const e=bvPin(pt,true);bvPins3d.set(pt.id,e);m.addObject(e,{lon:pt.lon,lat:pt.lat,z:.03});}
+  try{const T=m.THREE;for(const r of BV.routes)for(const ln of r.lines){const ps=ln.map(([la,lo])=>{const o=new T.Object3D(),hd=m.addObject(o,{lon:lo,lat:la,z:.02});const v=o.position.clone();hd.remove();return v;});
+    const geo=new T.BufferGeometry().setFromPoints(ps),mat=new T.LineBasicMaterial({color:r.color,transparent:true,opacity:.95});
+    const line=new T.Line(geo,mat);line.computeLineDistances();line.userData.bvr=r.id;m.scene.add(line);bv3d.push(line);}
+   for(const r of BV.routes)for(const e of r.ext||[]){const ps=e.pts.map(([la,lo])=>{const o=new T.Object3D(),hd=m.addObject(o,{lon:lo,lat:la,z:.02});const v=o.position.clone();hd.remove();return v;});
+    const line=new T.Line(new T.BufferGeometry().setFromPoints(ps),new T.LineDashedMaterial({color:r.color,dashSize:.03,gapSize:.02,transparent:true,opacity:.8}));line.computeLineDistances();line.userData.bvr=r.id;m.scene.add(line);bv3d.push(line);}
+   for(const r of BV.routes)for(const st of r.stations||[]){const lab=h('div',{class:'nbc-stn3d'+(st.role?' '+st.role:''),style:'--c:'+r.color,dataset:{bvr:r.id},title:st.name+' · σελ. '+st.pages},h('i'),h('span',{text:(st.role==='start'?'Αρχή · ':st.role==='end'?'Τέλος · ':'')+st.name}));
+    bvStn3d.push(lab);m.addObject(lab,{lon:st.lon,lat:st.lat,z:.03});}
+   for(const r of BV.routes){const ln=r.lines[0];const k=Math.floor(ln.length/2);const lab=h('div',{class:'nbc-sea3d',style:'--c:'+r.color,text:r.short||r.name,title:r.name});bvLab3d.push(lab);
+    lab.addEventListener('click',ev=>{ev.stopPropagation();pickSeaRoute(r.id);});m.addObject(lab,{lon:ln[k][1],lat:ln[k][0],z:.03});}}catch(e){console.warn('nabou: 3D routes',e);}
+  marks();}
+ const bpins=new Map(),bpins3d=new Map();
+ function basePin(b,three){const e=h('button',{type:'button',class:(three?'nbc-pin3d':'nbc-pin')+' nbc-base major',dataset:{base:b.id},'aria-label':baseName(b)+' · πειρατικό ορμητήριο',title:baseName(b)+' · '+Object.entries(baseFaiths(b)).map(([c,fa])=>CENT[c]+' '+FAITH[fa][0].toLowerCase()).join(', '),
+   onclick:ev=>{ev.stopPropagation();selectBase(b.id,{focus:false});}},flagSvg(b,three?22:24),h('span',{text:b.port||b.area}));return e;}
+ function buildBases(){for(const b of BASES.bases){const e=basePin(b,false),pt=project(b.lon,b.lat);e.style.left=pt.x+'px';e.style.top=pt.y+'px';layer.append(e);bpins.set(b.id,e);}mountBases3d();marks();}
+ function mountBases3d(){if(bpins3d.size||!M3()?.enabled||!BASES.bases.length)return;for(const b of BASES.bases){const e=basePin(b,true);bpins3d.set(b.id,e);M3().addObject(e,{lon:b.lon,lat:b.lat,z:.03});}marks();}
+ function mount3d(){mountBases3d();mountPowers3d();mountBV3d();if(pins3d.size||!M3()?.enabled||!DATA.places.length)return;
+  for(const p of DATA.places){if(!Number.isFinite(p.lat)||linked.get(p.id))continue;const b=pinEl(p,true);pins3d.set(p.id,b);M3().addObject(b,{lon:p.lon,lat:p.lat,z:.03});}
+  marks();}
+ function routeHi(id){for(const [k,l] of lines)l.classList.toggle('hi',k===id);}
+ function marks(){try{applyRule();}catch(e){}
+  for(const e of [...bvPins.values(),...bvPins3d.values()]){e.hidden=!ui.layers.bvpoints;e.toggleAttribute('data-sel',ui.bv===e.dataset.bv);}
+  {const on=!!ui.routesOnly;for(const [k,g] of bvLines)g.style.display=on&&(!ui.routePick||ui.routePick===k)?'':'none';for(const l of bv3d)l.visible=on&&(!ui.routePick||ui.routePick===l.userData.bvr);for(const l of bvLab3d)l.hidden=!on;for(const l of bvStn3d)l.hidden=!on||!(ui.routePick?ui.routePick===l.dataset.bvr:l.classList.contains('start')||l.classList.contains('end'));body.classList.toggle('nbc-route-picked',on&&!!ui.routePick);body.classList.toggle('nbc-routes-only',on);}
+  for(const [id,b] of [...pins,...pins3d]){const p=byId.get(id),on=visible(p)&&ui.status[p.coordinateStatus||'NEEDS RESEARCH']!==false&&(LABEL_ONLY.has(String(p.atlasSymbol).toLowerCase())?ui.layers.labels:ui.layers.towns);b.hidden=!on;b.toggleAttribute('data-sel',ui.rec===id);}
+  {const {from,to}=period();for(const e of [...pPins.values(),...pPins3d.values()])e.hidden=!ui.layers.powers||+e.dataset.to<from||+e.dataset.from>to;}
+  for(const [id,e] of [...bpins,...bpins3d]){const b=baseById.get(id);e.hidden=!baseVisible(b);e.toggleAttribute('data-sel',ui.base===id);}
+  for(const [id,l] of lines){const r=DATA.routes.find(x=>x.id===id);l.style.display=(ui.layers.routes||(ui.tab==='routes'&&!dock.hidden)||ui.route===id)&&visible(r)&&ui.rtypes.get(r.type)!==false?'':'none';}
+  body.classList.toggle('nbc-route-focus',!!ui.route);
+  if(typeof queueDeclutter==='function')queueDeclutter();
+ }
+
+ /* ───── decluttering: nearby pins fold into the nearest shown marker («+n»), in 2D and 3D ─────
+    Screen-space only (element boxes); no position changes. Larger towns and reference places stay. */
+ const R=44;let clT=0;
+ function declutter(){
+  const three=!!M3()?.enabled,box=view.getBoundingClientRect();
+  for(const e of document.querySelectorAll('[data-nbc-more]'))e.removeAttribute('data-nbc-more'),e.removeAttribute('data-nbc-names'),e.removeAttribute('data-nbc-flag');
+  for(const e of document.querySelectorAll('[data-nbc-fold]'))e.removeAttribute('data-nbc-fold');
+  const refs=[...document.querySelectorAll(three?'.pro-3d-place,.nbc-pin3d.nbc-power':'.pro-place-marker,.nbc-pin.nbc-power')].filter(e=>!e.hidden&&e.offsetParent);
+  const mine=[...(three?bpins3d:bpins).values(),...(three?bvPins3d:bvPins).values(),...(three?pins3d:pins).values()].filter(e=>!e.hidden&&e.offsetParent);
+  const rank=e=>e.hasAttribute('data-sel')?0:e.classList.contains('nbc-base')?1:e.classList.contains('nbc-bv')?2:e.classList.contains('major')?2:e.classList.contains('lab')?4:3;
+  mine.sort((a,b)=>rank(a)-rank(b));
+  const pt=e=>{const r=e.getBoundingClientRect();return {x:r.left+r.width/2,y:e.classList.contains('lab')?r.top+r.height/2:r.bottom-6,ok:r.width>0&&r.right>box.left&&r.left<box.right&&r.bottom>box.top&&r.top<box.bottom};};
+  // Banners lead: places and bases next to a seat fold into its banner, which shows the count in its
+  // name plate (never as a badge over the art). The seat's own place marker folds without counting.
+  // Two powers on one seat in the shown period (Tripoli 1551) stand side by side with one name plate.
+  const bySeat=new Map();for(const e of refs)if(e.classList.contains('nbc-power')){e.classList.remove('nbc-pair');e.style.removeProperty('--dx');const k=e.dataset.seat;bySeat.set(k,[...(bySeat.get(k)||[]),e]);}
+  for(const g of bySeat.values())if(g.length>1)g.forEach((e,i)=>{e.style.setProperty('--dx',(i-(g.length-1)/2)*30+'px');if(i<g.length-1)e.classList.add('nbc-pair');});
+  const pw=refs.filter(e=>e.classList.contains('nbc-power')),heads=pw.map(e=>({e,...pt(e),n:[],members:[]}));
+  for(const e of refs){if(pw.includes(e))continue;const q=pt(e);const h0=heads.find(hd=>hd.e.classList.contains('nbc-power')&&Math.hypot(hd.x-q.x,hd.y-q.y)<R*1.4);
+   if(h0){e.setAttribute('data-nbc-fold','');if(Math.hypot(h0.x-q.x,h0.y-q.y)>14)h0.n.push(e.querySelector('span,b,strong')?.textContent||e.textContent.trim());}else heads.push({e,...q,n:[],members:[]});}
+  for(const e of document.querySelectorAll('.nbc-power-count'))e.textContent='';for(const e of pw)if(e.dataset.t0)e.title=e.dataset.t0;
+  for(const e of mine){const q=pt(e);if(!q.ok)continue;if(e.hasAttribute('data-sel')){heads.push({e,...q,n:[],members:[]});continue;}
+   const h0=heads.find(hd=>Math.hypot(hd.x-q.x,hd.y-q.y)<(hd.e.classList.contains('nbc-power')?R*1.4:R));
+   if(h0){h0.n.push(e.querySelector('span')?.textContent||'');h0.members.push(e);e.setAttribute('data-nbc-fold','');}else heads.push({e,...q,n:[],members:[]});}
+  for(const hd of heads)if(hd.n.length&&hd.e.classList.contains('nbc-power')){const c=hd.e.querySelector('.nbc-power-count');if(c)c.textContent='+'+hd.n.length;
+   hd.e.title=hd.e.dataset.t0+' · κοντά: '+hd.n.join(', ');}
+  for(const hd of heads)if(hd.n.length&&!hd.e.classList.contains('nbc-power')){
+   // A group holding pirate bases shows a small flag with the count (thesis colours, by majority faith).
+   const fs=[hd.e,...hd.members].map(e=>e.dataset.base&&baseById.get(e.dataset.base)).filter(Boolean).flatMap(b=>Object.values(baseFaiths(b)));
+   if(fs.length){const c=fs.filter(f=>f==='christian').length,m=fs.length-c;hd.e.setAttribute('data-nbc-flag','');
+    hd.e.style.setProperty('--nbc-f1',FAITH[c>=m?'christian':'muslim'][1]);hd.e.style.setProperty('--nbc-f2',FAITH[c&&m?(c>=m?'muslim':'christian'):(c>=m?'christian':'muslim')][1]);}
+   else hd.e.removeAttribute('data-nbc-flag');
+   hd.e.setAttribute('data-nbc-more','+'+hd.n.length);hd.e.setAttribute('data-nbc-names','Κοντά: '+hd.n.join(', ')+' · μεγέθυνε για να φανούν');}
+ }
+ const queueDeclutter=()=>{cancelAnimationFrame(clT);clT=requestAnimationFrame(declutter);};
+ new MutationObserver(()=>{queueDeclutter();if(ui.routesOnly){clearTimeout(stnDeclutter.t);stnDeclutter.t=setTimeout(stnDeclutter,90);}}).observe(plane,{attributes:true,attributeFilter:['style']});
+ addEventListener('resize',queueDeclutter);
+ // The 3D camera moves without DOM events we can observe; while 3D is on, re-check a few times a second.
+ // The 3D camera and late layout (landing page, docked map) give no event we can observe: re-check
+ // often while 3D is on, and every second in 2D (cheap: one box read per pin).
+ let clTick=0;setInterval(()=>{if(document.hidden)return;if(M3()?.enabled||++clTick%3===0)declutter();},350);
+
+ /* ───── timeline: year marks from the records, on the existing range ───── */
+ const track=shell.querySelector('.n7-timeline-track');const marksEl=h('div',{class:'nbc-tl',id:'nbcTimeline','aria-label':'Έτη με εγγραφές'});
+ const allBtn=h('button',{type:'button',class:'nbc-tl-all',text:'Όλη η περίοδος',onclick:()=>setPeriod(1500,1700)});
+ const rangeHost=$('n7TimelineRange');if(rangeHost)rangeHost.append(marksEl);if(track)track.querySelector('.n7-timeline-head')?.append(allBtn);
+ function buildTimeline(){if(!track)return;const cnt=new Map();
+  for(const x of [...DATA.places,...DATA.routes])if(bookHit(x)&&!x.atlasHidden)for(const y of new Set(yearsIn(x.period)))cnt.set(y,(cnt.get(y)||0)+1);
+  const max=Math.max(1,...cnt.values()),{from,to}=period();
+  // Dated piracy events in 5-year bins (many entries list several years); a bin sets that period.
+  const evB=new Map();for(const e of EVENTS.events)for(const y of new Set(e.years.map(y=>y-y%5)))evB.set(y,(evB.get(y)||0)+1);
+  const evMax=Math.max(1,...evB.values());
+  const evMarks=[...evB].sort((a,b)=>a[0]-b[0]).map(([y,n])=>{const on=ui.evBin===y;return h('button',{type:'button',class:'nbc-yr nbc-yr-ev'+(on?' on':''),style:'left:'+((y+2-1500)/2)+'%;--s:'+(6+Math.round(7*n/evMax))+'px',
+    title:y+'–'+(y+4)+' · '+n+' γεγονότα πειρατείας','aria-label':y+' έως '+(y+4)+': '+n+' γεγονότα πειρατείας','aria-pressed':String(on),
+    onclick:()=>{ui.evBin=ui.evBin===y?null:y;ui.base=null;openTab('bases');buildTimeline();}},h('i'),h('span',{text:y+'–'+(y+4)+' · '+n+' γεγονότα'}));});
+  // GERAKI year bars came from the novels' records; the timeline now shows only dated piracy events.
+  marksEl.replaceChildren(...evMarks);
+  allBtn.hidden=from<=1500&&to>=1700;
+ }
+
+ /* ───── timeline: press or drag anywhere on the bar moves only the nearest end ───── */
+ function rangeDrag(){const r=$('n7TimelineRange');if(!r||r.dataset.nbcDrag)return;r.dataset.nbcDrag='1';const [a,b]=[...r.querySelectorAll('input[type=range]')];if(!a||!b)return;
+  const yr=x=>{const q=r.getBoundingClientRect(),lo=+a.min,hi=+a.max;return Math.round(lo+Math.min(1,Math.max(0,(x-q.left)/q.width))*(hi-lo));};
+  const put=(inp,v)=>{if(+inp.value===v)return;inp.value=String(v);inp.dispatchEvent(new Event('input',{bubbles:true}));inp.dispatchEvent(new Event('change',{bubbles:true}));};
+  let act=null;
+  r.addEventListener('pointerdown',e=>{if(e.button||e.target.closest?.('button,a,.nbc-yr'))return;const v=yr(e.clientX),da=Math.abs(v-+a.value),db=Math.abs(v-+b.value);
+   act=da<db?a:db<da?b:(v<+a.value?a:b);e.preventDefault();r.setPointerCapture(e.pointerId);act.focus({preventScroll:true});
+   put(act,act===a?Math.min(v,+b.value):Math.max(v,+a.value));},true);
+  r.addEventListener('pointermove',e=>{if(!act)return;const v=yr(e.clientX);put(act,act===a?Math.min(v,+b.value):Math.max(v,+a.value));});
+  const end=e=>{if(act){act=null;try{r.releasePointerCapture(e.pointerId);}catch(x){}}};r.addEventListener('pointerup',end);r.addEventListener('pointercancel',end);}
+
+ /* ───── layers: NABOU section in the existing «Επίπεδα» panel ───── */
+ function buildLayers(){const host=$('proMapTools')||$('n7LayersBody');if(!host||$('nbcLayers'))return;
+  const sw=(label,get,set,extra)=>{const i=h('input',{type:'checkbox'});i.checked=get();i.addEventListener('change',()=>{set(i.checked);marks();});return h('label',{class:'pro-check nbc-check'},i,h('span',{text:label}),extra||null);};
+  const box=h('fieldset',{class:'nbc-layers',id:'nbcLayers'},h('legend',{text:'Εγγραφές GERAKI'}),h('p',{class:'nbc-lg',text:'Βιβλίο'}),seg,
+   sw('Οικισμοί',()=>ui.layers.towns,v=>ui.layers.towns=v),sw('Τοπωνύμια (νησιά, θάλασσες)',()=>ui.layers.labels,v=>ui.layers.labels=v),sw('Διαδρομές (2D)',()=>ui.layers.routes,v=>ui.layers.routes=v),
+   h('p',{class:'nbc-lg',text:'Ιστορικός χάρτης'}),sw('Jansson 1650 (David Rumsey)',()=>!!ui.old,v=>setOld(v)),(()=>{let op=0.7;try{op=+(localStorage.getItem('nbc.oldOp')||0.7);}catch(e){}
+    const r=h('input',{type:'range',min:'0',max:'100',value:String(Math.round(op*100)),'aria-label':'Πόσο φαίνεται ο χάρτης του Jansson'});
+    r.addEventListener('input',()=>{osvg.style.setProperty('--op',r.value/100);try{localStorage.setItem('nbc.oldOp',String(r.value/100));}catch(e){}});
+    return h('label',{class:'nbc-opac'},h('span',{text:'Πόσο φαίνεται'}),r);})(),
+   h('p',{class:'nbc-lg',text:'Δυνάμεις της εποχής'}),sw('Λάβαρα στις έδρες τους',()=>ui.layers.powers,v=>ui.layers.powers=v),
+   h('p',{class:'nbc-lg',text:'Μπελαβίλας 1992 (ΕΜΠ)'}),h('button',{type:'button',class:'nbc-btn nbc-routes-btn',onclick:()=>setRoutesOnly(true)},'Δείξε τις ναυτικές ρότες (μόνες τους)'),sw('Καταφύγια, παζάρια, βίγλες',()=>ui.layers.bvpoints,v=>ui.layers.bvpoints=v),
+   h('p',{class:'nbc-lg',text:'Πειρατικά ορμητήρια (διατριβή Μ. Γουργουρίνη)'}),
+   h('p',{class:'nbc-lg',text:'Κυριαρχία (χρώμα κάτω από τη σημαία)'}),h('div',{class:'nbc-rule-lg'},...['venice','ottoman','latin','tributary','genoa','knights','spain','tuscany'].map(k=>h('span',null,h('i',{style:'background:'+RULERS[k][1]}),RULERS[k][0].split(' (')[0]))),sw('Χριστιανικά',()=>ui.layers.christian,v=>ui.layers.christian=v,h('i',{class:'nbc-dot',style:'background:#c8322d'})),sw('Μουσουλμανικά',()=>ui.layers.muslim,v=>ui.layers.muslim=v,h('i',{class:'nbc-dot',style:'background:#2f8f4e'})),
+   h('p',{class:'nbc-lg',text:'Κατάσταση σημείου (GERAKI)'}),...Object.entries(STATUS).map(([k,[l,c]])=>sw(l,()=>ui.status[k],v=>ui.status[k]=v,h('i',{class:'nbc-dot '+c}))),
+   h('p',{class:'nbc-lg',text:'Τύποι διαδρομών'}),...[...ui.rtypes.keys()].map(t=>sw(RTYPE[t]||t,()=>ui.rtypes.get(t),v=>ui.rtypes.set(t,v),h('i',{class:'nbc-sw'+(NONPHYS.has(t)?' dash':''),style:'--c:'+RCOLOR[t]}))));
+  host.append(box);}
+
+ /* ───── search: GERAKI records join the existing top-field place list ───── */
+ function wrapAtlas(){const a=atlas();if(!a||a.__nbc)return !!a;
+  const search0=a.search,select0=a.select;
+  a.search=v=>{const base=search0(v)||[],q=fold(v);if(!q)return base;const have=new Set(base.map(x=>x.id));
+   const extra=DATA.places.filter(p=>!linked.get(p.id)&&fold([p.place,p.historicalNames,p.modernName].join(' ')).includes(q)).slice(0,6).map(p=>({id:p.id,name:nameOf(p)+' · GERAKI'}));
+   const bx=BASES.bases.filter(b=>fold(b.area+' '+b.port+' '+oldNames(b)).includes(q)).slice(0,6).map(b=>{const hit=(topoByBase.get(b.id)?.names||[]).find(n=>fold(n.name).includes(q));
+    return {id:b.id,name:(hit&&!fold(b.area+' '+b.port).includes(q)?hit.name+' → ':'')+baseName(b)+' · ορμητήριο'};});
+   return [...bx,...base,...extra.filter(x=>!have.has(x.id))];};
+  // Reference-place ids keep the original path (also used by the N7 map link); GERAKI ids open the record.
+  a.select=(id,opt)=>{if(byId.has(id))return selectRec(id);if(baseById.has(id))return selectBase(id);const r=select0(id,opt);if(a.selected===id){ui.base=null;ui.pro=id;ui.rec=proToRec.get(id)||null;openTab('history');marks();}return r;};
+  Object.defineProperty(a,'__nbc',{value:true});return true;}
+
+ function refresh(){for(const b of seg.children)b.setAttribute('aria-pressed',String(b.dataset.book===ui.book));
+  const {from,to}=period();$('nbcPeriodText').textContent=from===to?String(from):from+'–'+to;periodChip.classList.toggle('on',!(from<=1500&&to>=1700));
+  buildTimeline();marks();if(!dock.hidden)paint();}
+ document.addEventListener('input',e=>{if(e.target.closest?.('#n7TimelineRange'))requestAnimationFrame(refresh);});
+
+ // Dated events: the thesis (ch. 2, with page) and the site's harbour pages.
+ Promise.all(['./data/thesis-events.json','./data/pirate-events.json'].map(u=>fetch(u,{cache:'no-cache'}).then(r=>r.ok?r.json():null).catch(()=>null))).then(([t,site])=>{
+  if(t)THESIS=t;EVENTS={events:[...(t?.events||[]),...(site?.events||[])]};buildTimeline();if(!dock.hidden)paint();body.dataset.nbcEvents=String(EVENTS.events.length);});
+ fetch('./data/toponyms.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(d=>{if(!d)return;TOPO=d;topoByBase=new Map(d.bases.map(e=>[e.base,e]));for(const [id,e] of [...bpins,...bpins3d]){const t=topoByBase.get(id);if(t)e.title=e.title+' · '+t.names.map(n=>n.name).slice(0,4).join(', ');}body.dataset.nbcTopo=String(d.bases.length);}).catch(()=>{});
+ fetch('./data/belavilas.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(d=>{if(!d)return;BV=d;BVById=new Map([...d.routes,...d.points].map(x=>[x.id,x]));buildBV();body.dataset.nbcBv=String(d.points.length);}).catch(()=>{});
+ fetch('./data/pirate-bases.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.json();}).then(d=>{
+  BASES=d;baseById=new Map(d.bases.map(b=>[b.id,b]));buildBases();body.dataset.nbcBases=String(d.bases.length);if(!dock.hidden)paint();
+  let n=0;const t=setInterval(()=>{if(wrapAtlas()||++n>100)clearInterval(t);},100);
+ }).catch(()=>{body.dataset.nbcBases='unavailable';});
+ fetch('../data.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.json();}).then(d=>{
+  DATA=d;byId=new Map(d.places.map(p=>[p.id,p]));
+  for(const t of new Set(d.routes.map(r=>r.type)))ui.rtypes.set(t,true);
+  // A GERAKI record within ~25 km of a reference place is the same place (the reference marker stays the only pin).
+  const refs=atlas()?.places||[];
+  for(const p of d.places){const r=refs.find(x=>Math.hypot(x.lon-p.lon,(x.lat-p.lat))<.25);if(r){linked.set(p.id,r.id);if(!proToRec.has(r.id))proToRec.set(r.id,p.id);}}
+  if(atlas()?.selected&&!ui.rec){ui.pro=atlas().selected;ui.rec=proToRec.get(ui.pro)||null;}
+  buildMap();buildLayers();rangeDrag();refresh();mount3d();
+  let n=0;const t=setInterval(()=>{if(wrapAtlas()||++n>100)clearInterval(t);},100);
+  body.dataset.nbcRecords=String(d.places.length);
+ }).catch(()=>{body.dataset.nbcRecords='unavailable';paint();});
+ buildPowers();sync3d();openTab('bases',{show:false});if(body.classList.contains('nbc-cine')&&card)card.hidden=true;
+ // Research lanes («Ερευνητές»: Βρετανία, Ολλανδία…) are research-source families, not states: in the atlas
+ // they stay off unless the user turns them on in «Επίπεδα»; research activity no longer switches them on.
+ let lanesByUser=false;document.addEventListener('change',e=>{if(e.target.closest?.('#proMapTools')&&/Ερευνητές/.test(e.target.closest('label')?.textContent||''))lanesByUser=e.target.checked;},true);
+ new MutationObserver(()=>{if(body.dataset.proLanes==='true'&&!lanesByUser&&body.dataset.readerView!=='research'){body.dataset.proLanes='false';const i=[...document.querySelectorAll('#proMapTools label')].find(l=>/Ερευνητές/.test(l.textContent))?.querySelector('input');if(i)i.checked=false;}}).observe(body,{attributes:true,attributeFilter:['data-pro-lanes']});
+ window.NABOU_COMMAND={selectRecord:selectRec,selectBase,openTab,get state(){return {tab:ui.tab,rec:ui.rec,pro:ui.pro,book:ui.book,...period()};}};
+})();
