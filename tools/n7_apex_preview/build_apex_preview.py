@@ -158,7 +158,7 @@ def main():
     shutil.copy2(overlay/"N7HumanoidView.tsx",out/"components/N7HumanoidView.tsx")
     shutil.copy2(overlay/"N7Backdrop.tsx",out/"components/N7Backdrop.tsx")
     shutil.copy2(overlay/"N7HeadSurface.ts",out/"components/N7HeadSurface.ts")
-    for name in ("N7GuideScene.tsx","N7GuideView.tsx","N7GuideFx.ts","useN7Voice.ts","N7FemaleVoice.ts","N7VoiceSignal.ts","N7AgentSpeech.ts","N7Navigation.ts"):
+    for name in ("N7GuideScene.tsx","N7GuideView.tsx","N7GuideHome.css","N7GuideFx.ts","N7MiraField.tsx","N7MiraFieldShader.ts","N7MiraHud.tsx","useN7Voice.ts","N7FemaleVoice.ts","N7VoiceSignal.ts","N7AgentSpeech.ts","N7Navigation.ts"):
         shutil.copy2(overlay/name,out/"components"/name)
     (out/"components/N7BackdropReference.ts").write_text(f'export const N7_BACKDROP_REFERENCE = "{base_path}/n7-mountain-backdrop.webp";\n')
     shutil.copy2(overlay/"N7HumanoidReference.ts",out/"components/N7HumanoidReference.ts")
@@ -198,6 +198,16 @@ def main():
     if humanoid_sha != "bdba288c56230908e1c6abd1a199e5a895159730faf27c672916b03d51a5c7e5":
         raise RuntimeError(f"wrong N7 humanoid asset sha256: {humanoid_sha}")
     (out/"public/n7-humanoid-idle-v3.webp").write_bytes(humanoid_bytes)
+    if guide and not isolated:
+        shutil.copy2(overlay/"N7-MIRA-HUD-LICENSE.txt",out/"public/n7-mira-hud-license.txt")
+        for name,expected_hash in (
+            ("n7-ambient-v1.webp","0f9efa0d98463dee4fe2e55cde2f204c4f3648e50f09749694c411cb2504087a"),
+            ("n7-ambient-portrait-v1.webp","606c8b4df62aabd467959e4aeff4662bb0eaebf4f3f9e8b4925c74901d522c4f"),
+        ):
+            ambient_bytes=(overlay/"assets"/name).read_bytes()
+            if hashlib.sha256(ambient_bytes).hexdigest()!=expected_hash:
+                raise RuntimeError("wrong N7 ambient asset "+name)
+            (out/"public"/name).write_bytes(ambient_bytes)
     if guide:
         face_bytes=(overlay/"assets/n7-humanoid-face-v4.webp").read_bytes()
         if hashlib.sha256(face_bytes).hexdigest()!="1abf41530c4253962a46fe426c107eb2f776f54ad5c2c5e594b8765bd569ea68":

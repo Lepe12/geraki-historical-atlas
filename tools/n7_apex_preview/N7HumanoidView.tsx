@@ -6,6 +6,7 @@ import { createHeadSurface } from "./N7HeadSurface";
 import N7Backdrop from "./N7Backdrop";
 import N7GuideView from "./N7GuideView";
 import { N7_GUIDE } from "./N7BuildFlags";
+import type {N7Target} from "./N7Navigation";
 
 type ViewMode = "assembly" | "particle" | "original" | "compare";
 type Mood = "idle" | "listening" | "thinking" | "speaking";
@@ -1008,6 +1009,6 @@ function LegacyHumanoidView({open,onClose,activity}:{open:boolean;onClose:()=>vo
   </section>;
 }
 
-export default function N7HumanoidView(props:{open:boolean;onClose:()=>void;onBackToWorkspace?:()=>void;activity?:N7Activity;onWorkspace?:()=>void;onNavigate?:(target:"chat"|"nabou")=>void}){
+export default function N7HumanoidView(props:{open:boolean;onClose:()=>void;onBackToWorkspace?:()=>void;activity?:N7Activity;onWorkspace?:()=>void;onNavigate?:(target:N7Target)=>void}){
   const {onNavigate,onBackToWorkspace,...legacy}=props;return N7_GUIDE?<N7GuideView {...legacy} onNavigate={onNavigate} onBackToWorkspace={onBackToWorkspace}/>:<LegacyHumanoidView {...legacy}/>;
 }

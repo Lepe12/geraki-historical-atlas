@@ -1,17 +1,30 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import {BookOpen, ClipboardList, Map, MessageSquare, PanelTop, X} from "lucide-react";
 import N7GuideScene,{type GuideFrameInfo,type GuideMode,type GuideMood} from "./N7GuideScene";
-import N7Backdrop,{type N7BackdropHandle} from "./N7Backdrop";
+import N7Backdrop,{type N7BackdropHandle,type N7BackdropTuning} from "./N7Backdrop";
 import { N7_HUMANOID_REFERENCE } from "./N7HumanoidReference";
 import { CORE, createAssemblySound, createFx } from "./N7GuideFx";
+import type {N7Target} from "./N7Navigation";
+import {N7MiraOverview} from "./N7MiraHud";
+import "./N7GuideHome.css";
 
 // Second face option: the owner-supplied H01 head composed onto the same body.
 // It is a different source raster for the same scene, rig, moods and voice.
 type Face="n7"|"h01";
-const H01_FIGURE=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/"))+"/n7-humanoid-h01-v2.webp";
+const ASSET_ROOT=N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/"));
+const H01_FIGURE=ASSET_ROOT+"/n7-humanoid-h01-v2.webp";
+const AMBIENT_BACKGROUND={wide:ASSET_ROOT+"/n7-ambient-v1.webp",portrait:ASSET_ROOT+"/n7-ambient-portrait-v1.webp"};
+const DEFAULT_TUNING:N7BackdropTuning={fog:100,brightness:100,motion:100};
+const TUNING_KEY="n7-backdrop-tuning-v1";
+const TUNING_CONTROLS=[
+  {key:"fog",label:"Ομίχλη",min:0,max:160},
+  {key:"brightness",label:"Φωτεινότητα",min:50,max:150},
+  {key:"motion",label:"Κίνηση",min:0,max:150},
+] as const;
 const H01_SCALE=2.5;
 
-export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigate,onBackToWorkspace}:{open:boolean;onClose:()=>void;onBackToWorkspace?:()=>void;activity?:GuideMood|null;onWorkspace?:()=>void;onNavigate?:(target:"chat"|"nabou")=>void}){
+export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigate,onBackToWorkspace}:{open:boolean;onClose:()=>void;onBackToWorkspace?:()=>void;activity?:GuideMood|null;onWorkspace?:()=>void;onNavigate?:(target:N7Target)=>void}){
   const [reduced,setReduced]=useState(false),[effects,setEffects]=useState(true),[breathing,setBreathing]=useState(true),[gestures,setGestures]=useState(true);
   const [mode,setMode]=useState<GuideMode>("assembly"),[mood,setMood]=useState<GuideMood>("idle");
   const [replay,setReplay]=useState(0),[done,setDone]=useState(false),[manualMotion,setManualMotion]=useState(false),[details,setDetails]=useState(false);
@@ -25,21 +38,51 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
     const unlock=()=>{if(soundOn.current)s.unlock();};window.addEventListener("pointerdown",unlock,true);window.addEventListener("keydown",unlock,true);
     return()=>{window.removeEventListener("pointerdown",unlock,true);window.removeEventListener("keydown",unlock,true);s.dispose();sfx.current=null;};
   },[open]);
-  const home=!!onNavigate; // N7_APEX_HOME_V1: the authenticated home screen
-  const [faceChoice,setFace]=useState<Face>("n7");
+  const [diagnosticsView,setDiagnosticsView]=useState(false);
+  const home=!!onNavigate&&!diagnosticsView;
+  const [tuning,setTuning]=useState(DEFAULT_TUNING);
   useEffect(()=>{
-    try{const asked=new URLSearchParams(window.location.search).get("face"),saved=window.localStorage.getItem("n7-face");const next=asked||saved;if(next==="h01"||next==="n7")setFace(next);}catch{}
-  },[]);
+    if(!home)return;
+    try{
+      const stored=JSON.parse(window.localStorage.getItem(TUNING_KEY)??"null");
+      const next={...DEFAULT_TUNING};
+      for(const {key,min,max} of TUNING_CONTROLS){
+        const value=stored?.[key];
+        if(Number.isFinite(value))next[key]=Math.round(Math.min(max,Math.max(min,value))/5)*5;
+      }
+      setTuning(next);
+    }catch{}
+  },[home]);
+  const saveTuning=(next:N7BackdropTuning)=>{
+    setTuning(next);
+    try{window.localStorage.setItem(TUNING_KEY,JSON.stringify(next));}catch{}
+  };
+  const [faceChoice,setFace]=useState<Face>("n7");
   const chooseFace=(next:Face)=>{setFace(next);try{window.localStorage.setItem("n7-face",next);}catch{}};
   const figureUrl=faceChoice==="h01"?H01_FIGURE:N7_HUMANOID_REFERENCE;
   const dialogRef=useRef<HTMLElement>(null);
-  // Keep the technical controls available via ?controls=1.
+  const menuButton=useRef<HTMLButtonElement>(null);
+  const appearanceButton=useRef<HTMLButtonElement>(null);
+  const appearanceCloseButton=useRef<HTMLButtonElement>(null);
+  const voiceStatusHost=useRef<HTMLDivElement>(null);
+  const lastStatusEnergy=useRef(0);
+  const [menuOpen,setMenuOpen]=useState(false),[appearanceOpen,setAppearanceOpen]=useState(false);
+  // The existing full diagnostic layout remains available via ?controls=1.
   useEffect(()=>{
-    if(!home||!open)return;const el=dialogRef.current;if(!el)return;
-    let controls=false;try{controls=new URLSearchParams(window.location.search).get("controls")==="1";}catch{/* ignore */}
-    if(!controls)el.classList.add("n7-minimal");
-    return()=>el.classList.remove("n7-minimal");
-  },[home,open]);
+    setMenuOpen(false);
+    setAppearanceOpen(false);
+    const params=new URLSearchParams(window.location.search);
+    const diagnostics=params.get("controls")==="1";
+    setDiagnosticsView(diagnostics);
+    let saved:string|null=null;
+    try{saved=window.localStorage.getItem("n7-face");}catch{}
+    const next=params.get("face")||saved;
+    setFace(next==="h01"?"h01":"n7");
+  },[open]);
+  useEffect(()=>{
+    if(open&&appearanceOpen)appearanceCloseButton.current?.focus();
+  },[open,appearanceOpen]);
+  const closeAppearance=()=>{setAppearanceOpen(false);setDetails(false);appearanceButton.current?.focus();};
   const figureRef=useRef<HTMLDivElement>(null),waveRef=useRef<HTMLDivElement>(null),backdrop=useRef<N7BackdropHandle>(null),ignitionRef=useRef<HTMLDivElement>(null);
   const lastStats=useRef(0),settings=useRef({details:false,effects:true,reduced:false}),wasOpen=useRef(false),automatic=useRef(false);
   const face=useRef({x:0,y:0,max:1});
@@ -70,6 +113,12 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
   const complete=useCallback(()=>setDone(true),[]);
   const frame=useCallback((info:GuideFrameInfo)=>{
     const ring=waveRef.current,point=face.current,s=settings.current;
+    backdrop.current?.setVoiceLevel(info.voiceLevel);
+    const energy=Math.round(Math.max(0,info.voiceLevel)*1000)/1000;
+    if(voiceStatusHost.current&&energy!==lastStatusEnergy.current){
+      voiceStatusHost.current.style.setProperty("--n7-status-energy",String(energy));
+      lastStatusEnergy.current=energy;
+    }
     if(ring){
       if(info.shock>=0&&s.effects&&!s.reduced){
         const radius=12+point.max*info.shock,fade=Math.sin(Math.PI*info.shock)*.55;
@@ -97,14 +146,19 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
   const realMood=automatic.current&&activity?activity:null;
   if(!open)return null;
   return <section ref={dialogRef} onKeyDown={event=>{
-    if(event.key==="Escape"){event.stopPropagation();onClose();}
+    if(event.key==="Escape"){
+      event.stopPropagation();
+      if(menuOpen){setMenuOpen(false);menuButton.current?.focus();}
+      else if(appearanceOpen)closeAppearance();
+      else onClose();
+    }
     if(event.key==="Tab"){
       const controls=Array.from(event.currentTarget.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled),a[href]')).filter(el=>el.offsetParent!==null);
       const first=controls[0],last=controls.at(-1);
       if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
       else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
     }
-  }} role="dialog" aria-modal="true" aria-label="N7 Humanoid preview" className="n7-guide-view">
+  }} role="dialog" aria-modal="true" aria-label="N7 Humanoid preview" className={"n7-guide-view"+(home?" n7-live-home":"")} data-activity={activity||"idle"}>
     <style>{`
       .n7-guide-view{position:fixed;inset:0;height:100dvh;max-height:100dvh;z-index:120;background:#000;color:#e6f7fb;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column;overflow:hidden}
       .n7-guide-view button{padding:5px 7px;border:1px solid rgba(140,225,245,.18);border-radius:5px;color:#bfe9f3;background:rgba(4,14,22,.35);cursor:pointer;font:500 10px/1.2 ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase}
@@ -130,36 +184,65 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
       #n7-guide-voice p{font-size:12px;line-height:1.5;margin:6px 0;color:#a9cfd9}
       /* N7_APEX_HOME_V1: the two navigation buttons must fit a phone beside the existing ones. */
       @media(max-width:480px){.n7-guide-header{padding:10px 10px;gap:6px}.n7-guide-brand{letter-spacing:.12em;font-size:12px}.n7-guide-header>div{gap:4px!important}.n7-guide-header button{padding:5px 6px}}
-      .n7-home-navigation,.n7-home-back{display:none}
-      .n7-guide-view.n7-minimal .n7-guide-header,.n7-guide-view.n7-minimal .n7-guide-controls{display:none}
-      .n7-guide-view.n7-minimal .n7-home-navigation{display:flex;flex:none;z-index:5;justify-content:center;padding:4px 12px calc(14px + env(safe-area-inset-bottom))}
-      .n7-guide-view.n7-minimal .n7-home-back{display:block;position:absolute;top:12px;right:12px;z-index:6}
-      .n7-home-navigation a{color:#cdf9ff;padding:8px 12px;font-size:13px;text-underline-offset:3px}
-      .n7-guide-view.n7-minimal .n7-voice-preview{display:none}
-      .n7-guide-view.n7-minimal #n7-guide-voice>div{width:min(680px,calc(100% - 24px));text-align:center}
-      .n7-guide-view.n7-minimal #n7-guide-voice button[data-n7-conversation-toggle]{text-transform:none;letter-spacing:normal;font-size:14px}
       .n7-guide-details{padding:14px;background:rgba(2,9,14,.88);border:1px solid rgba(120,220,240,.16);border-radius:12px;overflow:auto;font-size:12px;line-height:1.6;min-height:0}
       @media(max-width:700px), (max-width:1000px) and (max-height:500px){.n7-guide-main[data-details=true]{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) 115px}.n7-guide-controls{align-self:stretch;margin:0;max-width:none;border-radius:0;border-width:1px 0 0;padding:6px 8px;gap:4px 10px;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;min-height:42px}#n7-guide-voice>div{width:100%;border-radius:0;border-width:1px 0 0}.n7-guide-controls>*{flex-shrink:0}.n7-guide-cluster{flex-wrap:nowrap}.n7-guide-group{padding-left:10px}.n7-guide-view button{padding:6px 8px;font-size:11px}}
     `}</style>
-    <N7Backdrop ref={backdrop} effects={effects} reduced={reduced}/>
+    <N7Backdrop ref={backdrop} effects={effects} reduced={reduced} ambience={home?AMBIENT_BACKGROUND:undefined} tuning={home?tuning:undefined} activity={activity||"idle"}/>
     <div ref={waveRef} aria-label="N7 completion shockwave" data-progress="-1" style={{display:"none",position:"fixed",pointerEvents:"none",border:"2px solid #ffe0a6",boxShadow:"0 0 12px #63ddff88",borderRadius:"50%",zIndex:3}}/>
-    <header className="n7-guide-header"><strong className="n7-guide-brand">N7 <i>·</i> HUMANOID</strong><div style={{display:"flex",gap:8}}>{onWorkspace&&<button type="button" onClick={onWorkspace}>Συνομιλία</button>}{onNavigate&&<button type="button" data-nav="chat" onClick={()=>onNavigate("chat")}>Chat</button>}{onNavigate&&<button type="button" data-nav="nabou" onClick={()=>onNavigate("nabou")}>NABOU</button>}<button type="button" data-exit="" onClick={onClose}>Exit</button></div></header>
+    {home&&onNavigate?<header className="n7-home-header">
+      <N7MiraOverview/>
+      <div className="n7-home-actions">
+        <div className="n7-home-menu-anchor">
+          <button ref={menuButton} className="n7-home-pill n7-home-menu-button" type="button"
+            aria-expanded={menuOpen} aria-controls="n7-home-menu" onClick={()=>{
+              if(appearanceOpen){setAppearanceOpen(false);setDetails(false);}
+              setMenuOpen(value=>!value);
+            }}>
+            Μενού
+          </button>
+          {menuOpen&&<nav id="n7-home-menu" className="n7-home-menu" aria-label="Πλοήγηση N7">
+            <button type="button" data-nav="nabou" onClick={()=>onNavigate("nabou")}><Map size={17} aria-hidden="true"/>Χάρτης NABOU</button>
+            <button type="button" data-nav="library" onClick={()=>onNavigate("library")}><BookOpen size={17} aria-hidden="true"/>Βιβλιοθήκη</button>
+            <button type="button" data-nav="agents" onClick={()=>onNavigate("agents")}><ClipboardList size={17} aria-hidden="true"/>Agents και εργασίες</button>
+            <button type="button" data-nav="chat" onClick={()=>onNavigate("chat")}><MessageSquare size={17} aria-hidden="true"/>Γραπτή συνομιλία</button>
+            {onBackToWorkspace&&<div className="n7-home-menu-divider">
+              <button type="button" onClick={onBackToWorkspace}><PanelTop size={17} aria-hidden="true"/>Πίνακας εργασίας</button>
+            </div>}
+          </nav>}
+        </div>
+        <button ref={appearanceButton} type="button" className="n7-home-pill n7-home-appearance-button" aria-expanded={appearanceOpen}
+          aria-controls="n7-appearance" onClick={()=>{
+            if(appearanceOpen)closeAppearance();
+            else{setMenuOpen(false);setAppearanceOpen(true);}
+          }}>Εμφάνιση</button>
+      </div>
+    </header>:<header className="n7-guide-header"><strong className="n7-guide-brand">N7 <i>·</i> HUMANOID</strong><div style={{display:"flex",gap:8}}>{onWorkspace&&<button type="button" onClick={onWorkspace}>Συνομιλία</button>}{onNavigate&&<button type="button" data-nav="chat" onClick={()=>onNavigate("chat")}>Chat</button>}{onNavigate&&<button type="button" data-nav="nabou" onClick={()=>onNavigate("nabou")}>NABOU</button>}<button type="button" data-exit="" onClick={onClose}>Exit</button></div></header>}
     <div className="n7-guide-main" data-details={details}>
-      <div className="n7-guide-figure-slot"><div ref={figureRef} className="n7-guide-figure" aria-label={mode==="assembly"?"N7 guide particle-river assembly":undefined}>
+      <div className="n7-guide-figure-slot">
+        <div ref={figureRef} className="n7-guide-figure" aria-label={mode==="assembly"?"N7 guide particle-river assembly":undefined}>
         {(mode==="original"||mode==="compare")&&<img src={figureUrl} alt="Approved N7 idle reference" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"contain",opacity:mode==="compare"?.38:1,zIndex:mode==="compare"?1:undefined}}/>}
         <N7GuideScene key={faceChoice} source={faceChoice==="h01"?H01_FIGURE:undefined} scale={faceChoice==="h01"?H01_SCALE:undefined} mode={mode} mood={mood} effects={effects} reduced={reduced} breathing={breathing} gestures={gestures} replay={replay} manualMotion={manualMotion} diagnostics={details} onComplete={complete} onFrame={frame}/>
         <canvas ref={fxRef} aria-hidden="true" data-fx="assembly-burst" style={{position:"absolute",inset:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:2,mixBlendMode:"screen"}}/>
         <span ref={ignitionRef} aria-label="N7 face ignition" data-active="false" style={{position:"absolute",pointerEvents:"none"}}/>
+        {home&&<div id="n7-guide-call" style={{left:`${CORE.x/3.2}%`,top:`${CORE.y/4.8}%`}}/>}
         {mode==="assembly"&&!done&&<span aria-label="N7 visible assembly source" style={{position:"absolute",left:`${CORE.x/3.2}%`,top:`${CORE.y/4.8}%`,width:1,height:1,pointerEvents:"none"}}/>}
       </div></div>
       {details&&<aside className="n7-guide-details" aria-label="Technical details"><strong>Guide diagnostics</strong><p>Three.js · one humanoid scene<br/>sRGB · tone mapping OFF<br/>Sample 320×480 · assembly 6s<br/>Shockwave 2.5s · breathing 7.2s<br/>Reduced motion: {reduced?"ON":"OFF"}</p><p>Particles {stats?.particles??"loading"}<br/>Render {stats?.renderMs.toFixed(2)??"—"} ms<br/>Frame {stats?.frameMs.toFixed(2)??"—"} ms</p><label style={{display:"block"}}><input type="checkbox" checked={breathing} onChange={e=>setBreathing(e.target.checked)}/> Breathing</label><label style={{display:"block"}}><input type="checkbox" checked={gestures} onChange={e=>setGestures(e.target.checked)}/> Head gestures</label><p>Listening and Speaking buttons are visual previews. Live Listening follows microphone start; live Speaking follows audio playback.</p><p>Assembly is silent: no owner-supplied audio file. Camera tracking is optional and not enabled.</p>{mode==="compare"&&<p>REFERENCE 38% + PARTICLE RECONSTRUCTION</p>}</aside>}
     </div>
-    <div id="n7-guide-voice" style={{position:"relative",zIndex:5,flex:"none"}}/>
-    {home&&<>
-      <button type="button" className="n7-home-back" onClick={onBackToWorkspace??onClose}>Πίσω στο Workspace</button>
-      <nav className="n7-home-navigation" aria-label="Πλοήγηση N7"><a href="/?view=chat">Γραπτή συνομιλία</a></nav>
-    </>}
-    <footer className="n7-guide-controls">
+    <div ref={home?voiceStatusHost:undefined} id="n7-guide-voice" style={home?undefined:{position:"relative",zIndex:5,flex:"none"}}/>
+    <footer id={home?"n7-appearance":undefined} className="n7-guide-controls" hidden={home&&!appearanceOpen}>
+      {home&&<div className="n7-home-settings-title">
+        <strong>Εμφάνιση Humanoid</strong>
+        <button ref={appearanceCloseButton} type="button" aria-label="Κλείσιμο ρυθμίσεων εμφάνισης" onClick={closeAppearance}><X size={16} aria-hidden="true"/></button>
+      </div>}
+      {home&&<div className="n7-home-tuning" role="group" aria-label="Ρυθμίσεις φόντου">
+        {TUNING_CONTROLS.map(({key,label,min,max})=><label key={key}>
+          <span>{label}</span><span aria-hidden="true">{tuning[key]}%</span>
+          <input type="range" min={min} max={max} step={5} value={tuning[key]} aria-valuetext={`${tuning[key]}%`}
+            onChange={event=>saveTuning({...tuning,[key]:event.currentTarget.valueAsNumber})}/>
+        </label>)}
+        <button type="button" onClick={()=>saveTuning(DEFAULT_TUNING)}>Επαναφορά</button>
+      </div>}
       <div className="n7-guide-cluster">
       <span role="status" aria-label="N7 mood status" className="n7-guide-status">{mode==="assembly"?`ASSEMBLY · ${done?"COMPLETE":"BUILDING"}`:`MOOD · ${(realMood||mood).toUpperCase()}${realMood?" · LIVE N7 REQUEST":mood!=="idle"?" · PREVIEW":""}`}</span>
       <span className="n7-guide-group"><small aria-hidden="true">ΔΙΑΘΕΣΗ</small>
@@ -179,7 +262,7 @@ export default function N7GuideView({open,onClose,activity,onWorkspace,onNavigat
         <button type="button" aria-pressed={effects} onClick={changeEffects}>Effects {effects?"On":"Off"}</button>
         <button type="button" aria-pressed={sound} onClick={()=>setSound(v=>!v)}>Sound {sound?"On":"Off"}</button>
         <button type="button" aria-expanded={details} onClick={()=>setDetails(v=>!v)}>Technical details</button>
-        <a href={N7_HUMANOID_REFERENCE.slice(0,N7_HUMANOID_REFERENCE.lastIndexOf("/"))+"/avatar-3d/"} target="_blank" rel="noopener noreferrer">Πραγματικό 3D</a>
+        <a href={ASSET_ROOT+"/avatar-3d/"} target="_blank" rel="noopener noreferrer">Πραγματικό 3D</a>
         <button type="button" className="n7-guide-assembly" disabled={!effects} onClick={replayAssembly}>{mode==="assembly"?"Replay Assembly":"Assembly"}</button>
         {/* Skip keeps its slot when it does not apply, so the dock and the figure never jump. */}
         {mode==="assembly"||!done?<button type="button" onClick={skip}>Skip</button>:<button type="button" disabled aria-hidden="true" tabIndex={-1} style={{visibility:"hidden"}}>Skip</button>}
