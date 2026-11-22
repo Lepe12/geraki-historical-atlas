@@ -185,7 +185,7 @@ async function readGroqStream(response,onDelta){
  return {text,reason};
 }
 function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publicSearch,fetcher=fetch,
-  researchDeadlineMs=8500,articleDeadlineMs=8500,modelDeadlineMs=25000,archiveSearch=null,agents=null}){
+  researchDeadlineMs=8500,articleDeadlineMs=8500,modelDeadlineMs=25000,archiveSearch=null,agents=null,chatAgent=null}){
  const library=createLibrary(DATA_DIR,{ocr:async images=>{
   if(!API_KEY||!MODEL)throw Error('vision_model_unavailable');
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),55000);
@@ -263,6 +263,14 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
     return;
    }
   }
+  // N7_CHAT_AGENT_V1: the model itself may search the web and read public pages before answering
+  // (events, travel, current facts). Any fault falls back to the unchanged path below.
+  let agentNotes='';
+  if(chatAgent&&!attachments.length&&!item.projectId){
+   try{agentNotes=await chatAgent.run(history,{apiKey:API_KEY,model:MODEL,base:BASE,fetcher,emit,publicSearch,isCancelled:()=>cancelled});}
+   catch(e){console.warn('N7_CHAT_AGENT_FAILED '+String(e.message||e).slice(0,80));agentNotes='';}
+   if(agentNotes)console.log('N7_CHAT_AGENT used_tools=1');
+  }
   emit('status',{stage:'research',message:'Ελέγχω πηγές και προετοιμάζω την ιστορική έρευνα…'});
   let evidence=null,messages,libraryHits=[],archiveWarning='';
   try{
@@ -287,7 +295,7 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
    let researchTimer;
    try{
     evidence=await Promise.race([
-      privateScope&&!wantsExternal?Promise.resolve({searched:false,items:[],reason:'private_library_scope'}):publicSearch.researchMessages([{role:'user',content:queryInstruction.replace(/Συνημμένο κείμενο:[\s\S]*/u,'').slice(0,1500)}]),
+      agentNotes?Promise.resolve({searched:false,items:[],reason:'agent_tools'}):privateScope&&!wantsExternal?Promise.resolve({searched:false,items:[],reason:'private_library_scope'}):publicSearch.researchMessages([{role:'user',content:queryInstruction.replace(/Συνημμένο κείμενο:[\s\S]*/u,'').slice(0,1500)}]),
       new Promise(resolve=>{researchTimer=setTimeout(()=>resolve(researchTimeout),researchDeadlineMs);})
     ]);
    }finally{clearTimeout(researchTimer);}
@@ -336,7 +344,7 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
    const webBudget=Math.max(0,12900-projectContext.length-recalled.length-libraryContext.length-archiveWarning.slice(0,300).length);
    const fullWeb=publicSearch.contextForResearch(evidence);
    const webContext=fullWeb.slice(0,webBudget)+(fullWeb.length>webBudget?'\n[Web context bounded; do not claim to have read omitted results.]':'');
-   const context=archiveWarning.slice(0,300)+'\n'+projectContext+recalled+libraryContext+'\n\n'+webContext;
+   const context=archiveWarning.slice(0,300)+'\n'+projectContext+recalled+libraryContext+'\n\n'+webContext+(agentNotes?'\n\n'+agentNotes:'');
    emit('status',{stage:'context',message:'Πηγές στο μοντέλο: '+libraryHits.length+' αποσπάσματα. Μνήμη έργου: '+(projectContext?'επιλεγμένες εγκεκριμένες καταχωρίσεις':'χωρίς συνδεδεμένο έργο')+'.'+(recalled?' Ανακτήθηκαν παλαιότερα μηνύματα.':'')+(omitted?' '+omitted+' επιπλέον αποσπάσματα έμειναν εκτός ορίου.':'')});
    if(context&&messages[0]?.role==='system')messages[0].content+='\n\n'+context;
   }catch(e){emit('error',{error:'Η προετοιμασία της έρευνας απέτυχε: '+String(e.message||e).slice(0,160)});res.off?.('close',disconnected);if(!res.writableEnded)res.end();return;}

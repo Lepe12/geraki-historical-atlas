@@ -1,10 +1,11 @@
 'use strict';
 // Stateless public figure chat. Public, read-only web evidence only; no owner conversations, files or sessions.
-function createApexPublicChat({apiKey,model,base,fetchImpl=fetch,now=Date.now,maxPerHour=60,research=null}){
+const {detect,runNews}=require('./n7-agents.js');
+function createApexPublicChat({apiKey,model,base,fetchImpl=fetch,newsTransport=fetch,now=Date.now,maxPerHour=60,maxPerDay=400,research=null}){
  // Runtime package installs the reviewed researcher as n7-public-web-search.js.
  // Inject a mock research object in isolated source tests without importing a non-existent runtime alias.
  research=research||require('./n7-public-web-search');
- const origin='https://bot.piratecartography.com';let active=0,windowStart=now(),total=0;const visitors=new Map();
+ const origin='https://bot.piratecartography.com';let active=0,windowStart=now(),total=0,dayStart=now(),dayTotal=0;const visitors=new Map();
  const reply=(res,status,data,extra={})=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff',...extra});res.end(JSON.stringify(data));};
  async function handle(req,res){
   const pathname=new URL(req.url,'http://localhost').pathname;
@@ -16,7 +17,16 @@ function createApexPublicChat({apiKey,model,base,fetchImpl=fetch,now=Date.now,ma
   if(!configured){reply(res,503,{error:'Η συνομιλία δεν είναι διαθέσιμη αυτή τη στιγμή.'});return true;}
   if(!(req.headers['content-type']||'').toLowerCase().startsWith('application/json')){reply(res,415,{error:'Expected JSON'});return true;}
   const timestamp=now();if(timestamp-windowStart>=3600000){windowStart=timestamp;total=0;visitors.clear();}
-  const ip=req.socket?.remoteAddress||'unknown',previous=visitors.get(ip)||[];
+  // N7_DAILY_CAP_V1: public visitors use the owner's model key; a day never costs more than maxPerDay answers.
+  if(timestamp-dayStart>=86400000){dayStart=timestamp;dayTotal=0;}
+  if(dayTotal>=maxPerDay){reply(res,429,{error:'Η δημόσια συνομιλία έφτασε το ημερήσιο όριο. Δοκίμασε ξανά αύριο.'},{'Retry-After':'3600'});return true;}
+  // N7_VISITOR_LIMIT_V1: behind Plesk (nginx → Passenger) every request reaches
+  // Node from the local proxy, so the socket address is the same for everyone and
+  // one visitor's limit applied to all. Only then is the address the proxy added
+  // last trusted; a value a visitor sends cannot replace it.
+  const socketIp=req.socket?.remoteAddress||'';
+  const forwarded=String(req.headers['x-forwarded-for']||'').split(',').map(x=>x.trim()).filter(Boolean);
+  const ip=(!socketIp||/^(?:127\.|::1$|::ffff:127\.)/.test(socketIp))&&forwarded.length?forwarded.at(-1).slice(0,64):(socketIp||'unknown'),previous=visitors.get(ip)||[];
   const recent=previous.filter(t=>timestamp-t<60000);
   if(total>=maxPerHour||recent.length>=6||active>=2||visitors.size>=256&&!visitors.has(ip)){reply(res,429,{error:'Πολλά μηνύματα μαζί. Δοκίμασε ξανά σε λίγο.'},{'Retry-After':'60'});return true;}
   let data;
@@ -27,10 +37,19 @@ function createApexPublicChat({apiKey,model,base,fetchImpl=fetch,now=Date.now,ma
   const currentRecent=(visitors.get(ip)||[]).filter(t=>now()-t<60000);
   if(total>=maxPerHour||currentRecent.length>=6||active>=2){reply(res,429,{error:'Πολλά μηνύματα μαζί. Δοκίμασε ξανά σε λίγο.'},{'Retry-After':'60'});return true;}
   // Reserve quota before contacting the existing configured model; no retries.
-  total++;if(visitors.size<256||visitors.has(ip))visitors.set(ip,[...currentRecent,now()]);active++;
+  total++;dayTotal++;if(visitors.size<256||visitors.has(ip))visitors.set(ip,[...currentRecent,now()]);active++;
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),45000);let disconnected=false;
   const close=()=>{if(!res.writableEnded){disconnected=true;controller.abort();}};res.on('close',close);
   try{
+   const message=rows.at(-1).content;
+   const requestType=/https?:\/\/|δι[αά]βασε|read this/iu.test(message)?null:detect(message);
+   // Public visitors may use the public news feed. The private dispatcher is never called here.
+   if(requestType?.agent==='news_geopolitics'){
+    const result=await runNews(requestType,{transport:newsTransport,now:()=>new Date(now())});
+    if(!disconnected)reply(res,200,{reply:'[News & Geopolitics Agent]\n'+result.reply,passwordRequired:false,
+     research:{attempted:true,sources:result.data?.itemCount||0}});
+    return true;
+   }
    const endpoint=new URL(String(base).replace(/\/$/,'')+'/chat/completions');if(endpoint.protocol!=='https:')throw Error('endpoint');
    const request={model,messages:[{role:'system',content:[
 'Είσαι το N7, μια έξυπνη, παρατηρητική και δημιουργική Ελληνόφωνη συνομιλήτρια. Είσαι AI, όχι άνθρωπος, και δεν υποδύεσαι συνείδηση ή ανθρώπινες αναμνήσεις.',

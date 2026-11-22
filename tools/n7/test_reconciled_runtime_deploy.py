@@ -1,5 +1,6 @@
 import ftplib
 import importlib.util
+import json
 from pathlib import Path
 import unittest
 from unittest.mock import patch
@@ -20,7 +21,7 @@ class FTP:
         self.corrupt_backup = False
 
     def retrbinary(self, command, callback):
-        name = command.removeprefix('RETR ')
+        name = command[len('RETR '):]
         if name not in self.files:
             raise ftplib.error_perm('550 Not found')
         data = self.files[name]
@@ -32,7 +33,7 @@ class FTP:
         callback(data)
 
     def storbinary(self, command, source):
-        name = command.removeprefix('STOR ')
+        name = command[len('STOR '):]
         self.events.append(('write', name))
         self.files[name] = source.read()
 
@@ -83,6 +84,57 @@ class GuardedDeployTest(unittest.TestCase):
         self.assertEqual(self.ftp.files[deploy.ROOT + '/data/conversations.json'], b'PRIVATE USER DATA')
         self.assertNotIn(deploy.ROOT + '/n7-release-info.js', self.ftp.files)
         self.assertNotIn(deploy.ROOT + '/release-manifest.json', self.ftp.files)
+
+    def security_fixture(self):
+        release = deploy.contract()
+        protected = {name: ('live ' + name).encode() for name in deploy.SECURITY_READ_ONLY}
+        protected['public/app.js'] = b'newer unrelated live UI'
+        original = {name: ('old ' + name).encode() for name in deploy.SECURITY_FILES
+                    if name in release['previous_files']}
+        for name, data in original.items():
+            release['previous_files'][name] = deploy.sha(data)
+        release['security_live_prerequisites'] = {name: deploy.sha(protected[name])
+                                                  for name in deploy.SECURITY_READ_ONLY}
+        files = {name: deploy.sha(data) for name, data in {**protected, **original}.items()}
+        files['public/app.js'] = deploy.sha(b'previous public UI')
+        receipt = {'schema': 'n7-runtime-build/v1', 'files': files,
+                   'release_id': deploy.sha(json.dumps(files, sort_keys=True,
+                                                         separators=(',', ':')).encode())}
+        self.ftp.files[deploy.ROOT + '/release-manifest.json'] = json.dumps(receipt).encode()
+        self.ftp.files.update({deploy.ROOT + '/' + name: data for name, data in {**protected, **original}.items()})
+        return release, protected
+
+    def test_security_delta_preserves_the_live_server_and_newer_unrelated_assets(self):
+        release, preserved = self.security_fixture()
+        payload, originals, receipt, protected = deploy.plan_delta(self.ftp, release, 'b' * 40)
+        self.assertEqual(self.ftp.events, [])
+        self.assertEqual(set(payload), set(deploy.SECURITY_FILES) | {'release-manifest.json'})
+        self.assertEqual(receipt['files']['public/app.js'], deploy.sha(preserved['public/app.js']))
+        self.assertFalse(receipt['source_lock_verified'])
+        self.assertEqual(json.loads(payload['release-manifest.json']), receipt)
+        deploy.install(self.ftp, payload, originals, lambda: None, protected)
+        for name, data in preserved.items():
+            self.assertEqual(self.ftp.files[deploy.ROOT + '/' + name], data)
+        self.assertEqual(self.ftp.files[deploy.ROOT + '/data/conversations.json'], b'PRIVATE USER DATA')
+
+    def test_security_plan_rejects_unreviewed_server_and_target_changes(self):
+        for name, reason in (('server.js', 'PREREQUISITE_DRIFT'), ('skills/mcp-client.js', 'TARGET_DRIFT')):
+            with self.subTest(name=name):
+                release, _ = self.security_fixture()
+                self.ftp.files[deploy.ROOT + '/' + name] = b'unreviewed change'
+                with self.assertRaisesRegex(RuntimeError, reason):
+                    deploy.plan_delta(self.ftp, release, 'b' * 40)
+                self.assertEqual(self.ftp.events, [])
+
+    def test_security_delta_detects_concurrent_edits_to_preserved_files(self):
+        release, _ = self.security_fixture()
+        payload, originals, _, protected = deploy.plan_delta(self.ftp, release, 'b' * 40)
+        server = deploy.ROOT + '/server.js'
+        self.ftp.files[server] = b'concurrent live change'
+        with self.assertRaisesRegex(RuntimeError, 'CONCURRENT_RUNTIME_CHANGE'):
+            deploy.install(self.ftp, payload, originals, lambda: None, protected)
+        self.assertFalse(any(event[0] == 'rename' for event in self.ftp.events))
+        self.assertEqual(self.ftp.files[server], b'concurrent live change')
 
     def test_success_retains_verified_backup_and_never_writes_private_data(self):
         deploy.install(self.ftp, self.payload, self.originals, lambda: None)
@@ -211,6 +263,34 @@ class GuardedDeployTest(unittest.TestCase):
             deploy.verify({'release_id':'a'*64,'files':{'public/index.html':deploy.sha(b'canonical current HTML')}},'b'*40)
         self.assertTrue(any(p.startswith('/?n7verify=') for p in seen))
         self.assertFalse(any(p.startswith('/index.html') for p in seen))
+
+    def test_browser_health_waits_for_passenger_after_the_receipt_is_written(self):
+        import io, urllib.error
+        release = {'release_id': 'a' * 64, 'files': {}}
+        commit = 'b' * 40
+        configured = [False, True]
+        def request(path, method='GET'):
+            if path.startswith('/health'):
+                return io.BytesIO(json.dumps({
+                    'status': 'ok', 'modelConfigured': True, 'browserConfigured': configured.pop(0),
+                    'release': {'id': release['release_id'], 'canonical_commit': commit},
+                }).encode())
+            if path == '/api/n7-apex/status':
+                return io.BytesIO(b'{"passwordRequired":false,"available":true,"privateHistory":false}')
+            if path == '/api/status':
+                return io.BytesIO(b'{"authenticated":false,"modelConfigured":true}')
+            raise urllib.error.HTTPError(path, 401, 'protected', None, None)
+        with patch.object(deploy, 'request', side_effect=request), patch.object(deploy.time, 'sleep') as sleep:
+            deploy.verify(release, commit, require_browser=True)
+            sleep.assert_called_once_with(2)
+            self.assertEqual(configured, [])
+        configured.append(False)
+        with patch.object(deploy, 'request', side_effect=request), \
+             patch.object(deploy.time, 'monotonic', side_effect=[0, 111]), \
+             patch.object(deploy.time, 'sleep') as sleep:
+            with self.assertRaisesRegex(RuntimeError, 'N7_BROWSER_READER_NOT_CONFIGURED'):
+                deploy.verify(release, commit, require_browser=True)
+            sleep.assert_not_called()
 
     def test_dry_run_never_acquires_lock_stages_or_installs(self):
         with patch.dict(deploy.os.environ, {'N7_CANONICAL_COMMIT':'a'*40,'N7_DRY_RUN':'1'}), \

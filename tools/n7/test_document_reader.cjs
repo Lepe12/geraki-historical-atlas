@@ -21,6 +21,10 @@ test('revalidates redirect DNS before making second request',async()=>{
  const {Readable}=require('node:stream'),{EventEmitter}=require('node:events');let requests=0;
  const request=(_u,_opt,cb)=>{requests++;const e=new EventEmitter();e.end=()=>{const r=Readable.from([]);r.statusCode=302;r.headers={location:'https://127.0.0.1/private'};cb(r);e.emit('close')};return e;};
  await assert.rejects(reader.fetchPublic('https://example.org',{lookup:async()=>[{address:'8.8.8.8',family:4}],request}),/private_address/);assert.equal(requests,1);
+ const lookedUp=[];
+ const lookup=async host=>{lookedUp.push(host);return [{address:'8.8.8.8',family:4}];};
+ await assert.rejects(reader.fetchPublic('https://example.org',{lookup,request,followRedirects:false}),/redirect_blocked/);
+ assert.deepEqual(lookedUp,['example.org']);assert.equal(requests,2);
 });
 test('robots supports agent groups and longest allow rule',()=>{
  const r='User-agent: *\nDisallow: /private\nAllow: /private/open$';assert.equal(reader.robotsAllowed(r,'/private/secret'),false);assert.equal(reader.robotsAllowed(r,'/private/open'),true);

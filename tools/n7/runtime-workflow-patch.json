@@ -90,5 +90,9 @@
   {
     "old": "const n7StreamChat=require('./n7-stream-attachments').makeHandler({\n API_KEY,MODEL,BASE,DATA_DIR,",
     "new": "const n7StreamChat=require('./n7-stream-attachments').makeHandler({\n agents:require('./n7-agents.js'),\n API_KEY,MODEL,BASE,DATA_DIR,"
+  },
+  {
+    "old": " promptMessages:history=>promptMessages(history),\n",
+    "new": " // N7_CHAT_AGENT_V1: the chat model may search the web and read public pages before answering.\n chatAgent:require('./n7-chat-agent.js'),\n promptMessages:history=>promptMessages(history),\n"
   }
 ]

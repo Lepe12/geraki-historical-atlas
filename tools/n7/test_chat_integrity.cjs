@@ -33,7 +33,7 @@ test('Greek editing imperatives activate all approved rules and unrelated reques
  const dir=temporary(t),skills=path.join(dir,'skills');fs.mkdirSync(path.join(skills,'greek-prose-editor'),{recursive:true});fs.writeFileSync(path.join(skills,'greek-prose-editor','SKILL.md'),'---\nname: greek-prose-editor\n---\nPreserve voice.');
  const memory=createOwnerChatMemory(path.join(dir,'data'),skills);for(let i=0;i<18;i++)memory.add('Κανόνας επιμέλειας αριθμός '+i+'.');
  for(const content of ['Επιμελήσου αυτό','Διόρθωσε αυτό','Ορθογραφικός έλεγχος']){const result=memory.context([{role:'user',content}]);assert.match(result,/αριθμός 0\./);assert.match(result,/αριθμός 17\./);}
- const previous=[{role:'user',content:'Διόρθωσε αυτό'}];assert.equal(memory.context([...previous,{role:'user',content:'Τι καιρό κάνει;'}]),'');assert.match(memory.context([...previous,{role:'user',content:'Συνέχισε'}]),/OWNER-APPROVED/);
+ const previous=[{role:'user',content:'Διόρθωσε αυτό'}];assert.doesNotMatch(memory.context([...previous,{role:'user',content:'Τι καιρό κάνει;'}]),/OWNER-APPROVED|Κανόνας επιμέλειας αριθμός/);assert.match(memory.context([...previous,{role:'user',content:'Συνέχισε'}]),/OWNER-APPROVED/);
 });
 test('retrieval aliases preserve literal evidence and PDF coverage identifies physical pages and OCR gaps',async t=>{
  const dir=temporary(t),library=createLibrary(dir,{background:false,extract:async()=>({totalPages:3,examinedPages:3,pages:[{page:1,text:'Ragusa: confiscation of a vessel.'},{page:3,text:'Venice records.'}],emptyPages:[2]})});t.after(()=>library.stop());

@@ -113,6 +113,29 @@
           if(typeof entry==="string")ul.append(el("li",entry));
         section.append(ul);
       }
+      const replay=answer.citation_replay?.proposals;
+      if(Array.isArray(replay)&&replay.length){
+        section.append(el("h4","Επανέλεγχος αποθηκευμένων παραπομπών"));
+        section.append(el("p","Οι καταγραφές παρακάτω προέρχονται από τις αρχικές προτάσεις. Ο έλεγχος αφορά την αντιστοίχιση του αποσπάσματος και της θέσης στην πηγή."));
+        const labels={
+          PRIVATE_REVIEW_SOURCE_CONTEXT_CHANGED:"Άλλαξε ή λείπει το τεκμήριο στο οποίο παρέπεμπε η πρόταση.",
+          PRIVATE_REVIEW_SOURCE_EXCERPT_NOT_AVAILABLE:"Το απόσπασμα της αρχικής πρότασης δεν βρέθηκε στο υλικό που ανακτήθηκε.",
+          PRIVATE_REVIEW_REVALIDATION_REJECTED:"Η πρόταση δεν πέρασε τους ελέγχους τεκμηρίωσης.",
+          PRIVATE_REVIEW_QUOTE_OFFSET_OR_ID_MISMATCH:"Η ακριβής θέση του αποσπάσματος ή η ταυτότητα του ισχυρισμού δεν συμφωνεί.",
+          PRIVATE_REVIEW_ORIGINAL_CITATION_CHANGED:"Δεν αναπαράχθηκε η αποθηκευμένη αναφορά στην πηγή ή τη σελίδα."
+        };
+        for(const row of replay){
+          const item=el("details"),accepted=row.status==="REPLAYED";
+          item.append(el("summary","Πρόταση "+row.proposal+" · "+(accepted?"Η παραπομπή αναπαράχθηκε":"Η παραπομπή απορρίφθηκε")));
+          if(row.statement)item.append(el("p",row.statement));
+          const loc=row.printed_page?"έντυπη σ. "+row.printed_page:row.scan_pages?.length?"σαρωμένη σελίδα "+row.scan_pages.join(", "):"χωρίς θέση σελίδας";
+          item.append(el("p",[row.source_title||"Πηγή χωρίς τίτλο",row.source_creator,loc].filter(Boolean).join(" · ")));
+          if(row.saved_quote)item.append(el("blockquote",row.saved_quote));
+          for(const reason of row.reasons||[])item.append(el("p",(labels[reason.code]||reason.code)+
+            (reason.fields?.length?" ("+reason.fields.join(", ")+")":"")));
+          section.append(item);
+        }
+      }
       if(Array.isArray(answer.source_candidates)&&answer.source_candidates.length){
         section.append(el("h4","Αυτούσια αποσπάσματα για έλεγχο πηγής και σελίδας"));
         section.append(el("p","Οι εγγραφές είναι προτεινόμενες παραπομπές σε αποκτημένο κείμενο, όχι ιστορικά επαληθευμένα γεγονότα. Ο έλεγχος της πρωτότυπης σελίδας και της ανεξαρτησίας των πηγών εκκρεμεί."));

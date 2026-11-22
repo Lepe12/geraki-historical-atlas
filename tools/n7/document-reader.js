@@ -14,7 +14,7 @@ async function resolvePublic(host,lookup=dns.lookup){
  if(!addresses.length||addresses.some(a=>!publicIP(a.address)))throw Error('private_address');
  return addresses.find(a=>a.family===4)||addresses[0];
 }
-async function fetchPublic(value,{timeout=6500,maxBytes=5*1024*1024,lookup=dns.lookup,request=https.request}={}){
+async function fetchPublic(value,{timeout=6500,maxBytes=5*1024*1024,lookup=dns.lookup,request=https.request,followRedirects=true}={}){
  const deadline=Date.now()+timeout;
  for(let hop=0;hop<4;hop++){
   const u=validateURL(value),remaining=deadline-Date.now();if(remaining<=0)throw Error('timeout');
@@ -22,7 +22,12 @@ async function fetchPublic(value,{timeout=6500,maxBytes=5*1024*1024,lookup=dns.l
   const response=await new Promise((resolve,reject)=>{
    const req=request(u,{method:'GET',agent:false,lookup:(_h,opt,cb)=>cb(null,opt?.all?[addr]:addr.address,addr.family),headers:{'User-Agent':'N7PublicResearch/1.0 (https://piratecartography.com)','Accept':'text/html,application/pdf,text/plain;q=0.8','Accept-Encoding':'identity'}},res=>{
     const status=res.statusCode||0;
-    if(status>=300&&status<400){res.resume();resolve({status,location:res.headers.location});return;}
+    if(status>=300&&status<400){
+     res.resume();
+     if(!followRedirects||!res.headers.location)reject(Error('redirect_blocked'));
+     else resolve({status,location:res.headers.location});
+     return;
+    }
     if(status!==200){res.resume();reject(Error('http_'+status));return;}
     if(Number(res.headers['content-length']||0)>maxBytes){res.destroy();reject(Error('too_large'));return;}
     const chunks=[];let count=0;

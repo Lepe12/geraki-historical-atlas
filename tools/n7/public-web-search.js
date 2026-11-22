@@ -18,6 +18,7 @@ const ALLOWED=new Set([GOOGLE_SEARCH_HOST,DDG_SEARCH_HOST,DDG_LITE_HOST,NEWS_HOS
 const MAX_REMOTE=350000;
 const TIMEOUT=6500;
 const MAX_QUERY=170;
+console.info('N7_TAVILY_CONFIGURED '+Boolean(process.env.TAVILY_API_KEY?.trim()));
 function compact(v,max=200){
   return String(v||'').replace(/[\u0000-\u001f]/g,' ').replace(/\s+/g,' ').trim().slice(0,max);
 }
@@ -251,6 +252,37 @@ function crossrefParse(raw){
       provider:'Crossref',recordType:'bibliography',excerpt:compact([authors,Array.isArray(p['container-title'])?p['container-title'][0]:''].filter(Boolean).join(' — '),280)};
   }).filter(Boolean);
 }
+// N7_TAVILY_SEARCH_V1: server-side only. Never return or log the API credential.
+async function tavilySearch(query,{transport=fetch,key=process.env.TAVILY_API_KEY}={}){
+  if(!key || !String(key).trim())return [];
+  const ctl=new AbortController(),timer=setTimeout(()=>ctl.abort(),8000);
+  try{
+    const response=await transport('https://api.tavily.com/search',{
+      method:'POST',redirect:'error',signal:ctl.signal,
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+String(key).trim()},
+      body:JSON.stringify({query:compact(query,170),search_depth:'basic',max_results:6,include_answer:false,include_raw_content:false})
+    });
+    if(!response.ok)throw Error('TAVILY_HTTP_'+response.status);
+    const size=Number(response.headers?.get?.('content-length')||0);
+    if(size>250000)throw Error('TAVILY_RESPONSE_TOO_LARGE');
+    const raw=await response.text();
+    if(Buffer.byteLength(raw,'utf8')>250000)throw Error('TAVILY_RESPONSE_TOO_LARGE');
+    const data=JSON.parse(raw);
+    const items=(Array.isArray(data.results)?data.results:[]).slice(0,6).map(x=>{
+      const url=safeLink(x.url),title=compact(x.title,180);
+      if(!url||!title)return null;
+      return {title,url,source:new URL(url).hostname,provider:'Tavily Web Search',
+        published:compact(x.published_date,12),excerpt:compact(x.content,450),
+        recordType:'search_result'};
+    }).filter(Boolean);
+    console.info('N7_TAVILY_SEARCH results='+items.length);
+    return items;
+  }catch(error){
+    const reason=/^TAVILY_HTTP_\d{3}$/.test(error.message)?error.message:error.name==='AbortError'?'timeout':'request_failed';
+    console.warn('N7_TAVILY_SEARCH failed='+reason);
+    throw error;
+  }finally{clearTimeout(timer);}
+}
 async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
   const request=classify(messages,now);
   if(!request)return {searched:false,items:[],reason:'not_needed'};
@@ -277,13 +309,19 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
   const europeanaJob=request.kind==='historical'
     ?(request.historicalLanza?identities.searchLanza(n7Europeana.searchEuropeana,{transport}):n7Europeana.searchEuropeana(request.userText,{transport}))
     :Promise.resolve({configured:false,queried:false,items:[],reason:'not_historical'});
-  const [results,europeana]=await Promise.all([
+  const tavilyJob=(!request.generic && process.env.TAVILY_API_KEY)
+    ?Promise.allSettled([tavilySearch(request.query,{transport})]).then(items=>items[0])
+    :Promise.resolve(null);
+  const [results,europeana,tavilyResult]=await Promise.all([
     Promise.allSettled(targets.map(async x=>{
       const raw=await boundedFetch(x.url,{transport});
       return x.web?googleWebParse(raw):x.ddg?duckDuckGoParse(raw):x.rss?parseRss(raw,x.name,now.getTime(),request.kind==='news'?75:10000):x.books?googleBooksParse(raw):x.crossref?crossrefParse(raw):wikiParse(raw);
     })),
-    europeanaJob
+    europeanaJob,
+    tavilyJob
   ]);
+  const booksOk=targets.some((x,i)=>x.books&&results[i]?.status==='fulfilled');
+  if(tavilyResult)results.unshift(tavilyResult);
   // Retry bounded, distinct historical queries when the first search is irrelevant.
   // Do not mistake HTTP success for useful evidence.
   if(request.kind==='historical'){
@@ -294,7 +332,6 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
     const initialRelevant=initial.filter(x=>historicalMatch(x,request));
     if(initialRelevant.length<2 || /creveuil|crevell|crevelier|κρεβε/iu.test(request.userText)){
       // If Google Books rejects quota-limited requests (e.g. HTTP 429), do not repeat them.
-      const booksOk=targets.some((x,i)=>x.books&&results[i]?.status==='fulfilled');
       for(const alternative of historicalRetryQueries(request).slice(0,4)){
         const qq=encodeURIComponent(alternative);
         const retryTargets=[
@@ -355,7 +392,7 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
       found:(europeana.items||[]).length,reason:europeana.reason,rejectedDifferentPeople:europeana.rejectedDifferentPeople||0,queryVariants:europeana.queryVariants||1},
     availableProviders:successful+(europeana.reason==='ok'?1:0),
     failedProviders:results.length-successful+(europeana.queried&&europeana.reason!=='ok'?1:0),
-    relevantResults:items.length,queryRetried:results.length>targets.length};
+    relevantResults:items.length,queryRetried:results.length>targets.length+(tavilyResult?1:0)};
 }
 // N7_FULL_SOURCE_READING_V1: content excerpts only from a bounded trusted publisher allowlist.
 const ARTICLE_HOSTS=new Set([
@@ -551,5 +588,5 @@ function sourceFooter(research){
     items.map((x,i)=>'[S'+(i+1)+'] '+x.title+' — '+x.source+
       (x.published?' ('+x.published+')':'')+(x.articleRead?' [αναγνώστηκε περιεχόμενο'+(x.pdfPages?' · PDF σ. '+x.pdfPages.map(p=>p.page).join(', '):'')+(x.partial?' · μερική ανάγνωση':'')+']':' [μόνο μεταδεδομένα'+(x.readStatus?' · '+x.readStatus:'')+']')+'\n'+x.url).join('\n');
 }
-module.exports={classify,parseRss,wikiParse,googleWebParse,duckDuckGoParse,googleBooksParse,crossrefParse,boundedFetch,researchMessages,contextForResearch,sourceFooter,safeLink,extractVisibleArticle,publisherArticle,enrichPublisherArticles,cleanHistoryForTopic};
+module.exports={tavilySearch,classify,parseRss,wikiParse,googleWebParse,duckDuckGoParse,googleBooksParse,crossrefParse,boundedFetch,researchMessages,contextForResearch,sourceFooter,safeLink,extractVisibleArticle,publisherArticle,enrichPublisherArticles,cleanHistoryForTopic};
 

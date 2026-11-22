@@ -125,6 +125,16 @@
   {id:'piracy',label:'Γενική αναφορά πειρατείας',re:/πειρατ|κουρσαρ|κουρσ|pirat|corsair|corsar|privateer/u}
  ];
  function classify(text){const f=fold(text);return CATEGORIES.filter(c=>c.re.test(f)).map(c=>c.id);}
+ function splitWeatherNews(text){
+  const weather=/(?<!\p{L})(?:καιρο|θερμοκρασι|βροχ|βρεξ|weather|forecast)/u;
+  const news=/(?<!\p{L})(?:ειδησ|γεωπολιτικ|νεα για|news|headlines|geopolit)/u;
+  for(const separator of text.matchAll(/\s+(?:και|and)\s+/giu)){
+   const parts=[text.slice(0,separator.index),text.slice(separator.index+separator[0].length)];
+   const kinds=parts.map(part=>({weather:weather.test(fold(part)),news:news.test(fold(part))}));
+   if(kinds.every(k=>k.weather!==k.news)&&kinds[0].weather!==kinds[1].weather)return parts;
+  }
+  return null;
+ }
  function route(input){
   const text=String(input||'').trim();
   if(!text||text.length>6000)return {intent:'invalid',agent:null,local:true,error:'Η εντολή πρέπει να έχει 1–6.000 χαρακτήρες.'};
@@ -143,6 +153,7 @@
   if(asksForOpinion&&!explicitAction)return pick('chat');
   if(/βιβλιοθηκ|στισ πηγεσ μασ|στα βιβλια μασ/u.test(f))return pick('library.search',{terms:libraryTerms(text)});
   if(/github|pull request|repository|κωδικα|commit/u.test(f)||/(?<![a-z])(pr|repo|ci)(?![a-z])/.test(f))return pick('coding');
+  if(splitWeatherNews(text))return pick('chat');
   if(W('καιρο|θερμοκρασι|βροχ|weather|forecast'))return pick('weather',{location:place?place.name:weatherPlace(text)});
   if(W('ειδησε|news'))return pick('web.news');
   if(/διαδικτυ|στο web|στον ιστο|google|online|δημοσιευσ|επιστημονικ/u.test(f))return pick('web.search');
@@ -165,7 +176,7 @@
  const SPEECH_MONTHS=['Ιανουαρίου','Φεβρουαρίου','Μαρτίου','Απριλίου','Μαΐου','Ιουνίου','Ιουλίου','Αυγούστου','Σεπτεμβρίου','Οκτωβρίου','Νοεμβρίου','Δεκεμβρίου'];
  const SPEECH_DAYS={'Δευ':'Δευτέρα','Τρί':'Τρίτη','Τετ':'Τετάρτη','Πέμ':'Πέμπτη','Παρ':'Παρασκευή','Σάβ':'Σάββατο','Κυρ':'Κυριακή'};
  const SPEECH_WIND={'Β':'βόρεια','ΒΑ':'βορειοανατολικά','Α':'ανατολικά','ΝΑ':'νοτιοανατολικά','Ν':'νότια','ΝΔ':'νοτιοδυτικά','Δ':'δυτικά','ΒΔ':'βορειοδυτικά'};
- const SPEECH_SECTION={'ΓΕΓΟΝΟΤΑ ΜΕ ΔΙΑΣΤΑΥΡΩΣΗ':'Γεγονότα που διασταυρώθηκαν από περισσότερα μέσα.','ΑΝΑΦΟΡΕΣ ΧΩΡΙΣ ΔΙΑΣΤΑΥΡΩΣΗ':'Αναφορές που δεν έχουν διασταυρωθεί.','ΙΣΧΥΡΙΣΜΟΙ, ΔΗΛΩΣΕΙΣ':'Ισχυρισμοί και δηλώσεις.','ΑΝΑΛΥΣΕΙΣ ΚΑΙ ΣΧΟΛΙΑ':'Αναλύσεις και σχόλια, δηλαδή γνώμες.'};
+ const SPEECH_SECTION={'ΣΧΕΤΙΚΟΙ ΤΙΤΛΟΙ ΑΠΟ ΠΕΡΙΣΣΟΤΕΡΑ ΜΕΣΑ':'Σχετικοί τίτλοι από περισσότερα μέσα.','ΛΟΙΠΟΙ ΤΙΤΛΟΙ ΕΙΔΗΣΕΩΝ':'Λοιποί τίτλοι ειδήσεων.','ΓΕΓΟΝΟΤΑ ΜΕ ΔΙΑΣΤΑΥΡΩΣΗ':'Γεγονότα που διασταυρώθηκαν από περισσότερα μέσα.','ΑΝΑΦΟΡΕΣ ΧΩΡΙΣ ΔΙΑΣΤΑΥΡΩΣΗ':'Αναφορές που δεν έχουν διασταυρωθεί.','ΙΣΧΥΡΙΣΜΟΙ, ΔΗΛΩΣΕΙΣ':'Ισχυρισμοί και δηλώσεις.','ΑΝΑΛΥΣΕΙΣ ΚΑΙ ΣΧΟΛΙΑ':'Αναλύσεις και σχόλια, δηλαδή γνώμες.'};
  const MAX_SPOKEN_CHARACTERS=700;
  function spokenGreek(line){
   return String(line)
@@ -184,7 +195,7 @@
   if(!agent)return input;
   const lines=input.slice(agent[0].length).split('\n').map(l=>l.trim()).filter(Boolean),out=[];
   for(const line of lines){
-   if(/^(?:[^:\n]{1,90}: )?https:\/\/\S+$/.test(line)||/^(?:Πηγή|Σημείωση):/.test(line)||/^Ενημέρωση:/.test(line))continue;
+   if(/^(?:[^:\n]{1,90}: )?https:\/\/\S+$/.test(line)||/^(?:Πηγή|Σημείωση|Ενημέρωση):/.test(line)||/^\[(Weather|News & Geopolitics) Agent\]$/.test(line))continue;
    const header=Object.keys(SPEECH_SECTION).find(k=>line.startsWith(k));
    if(header){out.push(SPEECH_SECTION[header]);continue;}
    const headline=line.match(/^\[S\d+\]\s+(.+?)\s+—\s+\d{2}\/\d{2}\/\d{4}\s+—\s+(.+)$/);
@@ -196,6 +207,6 @@
   if(cut)return spoken+(sources?' Η πλήρης απάντηση με τις πηγές είναι γραμμένη στη συνομιλία.':' Η πλήρης απάντηση είναι γραμμένη στη συνομιλία.');
   return spoken+(sources?' Οι πηγές είναι γραμμένες στη συνομιλία.':'');
  }
- const api={classify,CATEGORIES,fold,PLACES,REGIONS,AGENTS,route,findPlace,linkPlaces,matchRecord,years,libraryTerms,speakAgent,spokenGreek};
+ const api={classify,CATEGORIES,fold,PLACES,REGIONS,AGENTS,route,splitWeatherNews,findPlace,linkPlaces,matchRecord,years,libraryTerms,speakAgent,spokenGreek};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.N7CommandRouter=api;
 })(typeof window==='undefined'?globalThis:window);

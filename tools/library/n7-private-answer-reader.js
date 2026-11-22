@@ -5,6 +5,29 @@ const path=require("node:path");
 const crypto=require("node:crypto");
 const {open}=require("./n7_private_aead");
 const ID=/^[0-9]{8,20}$/;
+const shortText=(value,limit)=>typeof value==="string"?value.slice(0,limit):"";
+
+function readReplay(dir,runId,key){
+  const file=path.join(dir,"citation-replay.json.enc");
+  if(!fs.existsSync(file))return null;
+  try{
+    if(fs.statSync(file).size>1_000_100)return null;
+    const data=JSON.parse(open(fs.readFileSync(file),key,"research:"+runId+":citation_replay:manifest").toString("utf8"));
+    if(data.schema!=="n7-private-citation-replay-v1"||data.run_id!==runId||data.historically_verified!==false||
+       !Array.isArray(data.proposal_decisions)||data.proposal_decisions.length>100)return null;
+    return {status:shortText(data.status,100),proposals:data.proposal_decisions.filter(row=>
+      row&&Number.isInteger(row.proposal)&&["REPLAYED","REJECTED"].includes(row.status)).map(row=>({
+        proposal:row.proposal,status:row.status,claim_id:shortText(row.claim_id,80),
+        statement:shortText(row.statement,650),saved_quote:shortText(row.saved_quote,1800),
+        source_title:shortText(row.source_title,250),source_creator:shortText(row.source_creator,250),
+        printed_page:shortText(String(row.printed_page??""),30),
+        scan_pages:Array.isArray(row.scan_indexes)?row.scan_indexes.filter(n=>Number.isInteger(n)&&n>=0&&n<100000).slice(0,6).map(n=>n+1):[],
+        reasons:(Array.isArray(row.reasons)?row.reasons:[]).slice(0,10).filter(reason=>
+          /^[A-Z0-9_]{1,90}$/.test(reason?.reason||"")).map(reason=>({code:reason.reason,
+          fields:(Array.isArray(reason.binding_fields)?reason.binding_fields:[]).filter(field=>/^[a-z_]{1,40}$/.test(field)).slice(0,10)}))
+      }))};
+  }catch{return null;}
+}
 
 function readOwnerAnswer(dataDir,runId,keyFile=path.join(__dirname,".n7-library-bridge-key")){
   if(typeof runId!=="string"||!ID.test(runId))throw Error("INVALID_PRIVATE_RESEARCH_RUN");
@@ -22,9 +45,10 @@ function readOwnerAnswer(dataDir,runId,keyFile=path.join(__dirname,".n7-library-
   if(check!==index.sealed_sha256)throw Error("PRIVATE_ANSWER_CIPHERTEXT_CHANGED");
   const key=fs.readFileSync(keyFile);
   if(key.length!==32)throw Error("PRIVATE_RESEARCH_KEY_MISSING");
-  let value;
+  let value,citationReplay;
   try{
     value=JSON.parse(open(ciphertext,key,"research:"+runId+":answer").toString("utf8"));
+    citationReplay=readReplay(dir,runId,key);
   }finally{key.fill(0);}
   if(!value||typeof value!=="object"||Array.isArray(value)||
      typeof value.status!=="string"||value.historically_verified===true||
@@ -69,10 +93,6 @@ function readOwnerAnswer(dataDir,runId,keyFile=path.join(__dirname,".n7-library-
         proposed_statement:typeof claim.statement==="string"?claim.statement.slice(0,600):"",
         exact_acquired_quote:claim.quote.slice(0,1100),
         source_title:String(source.title||"Πηγή χωρίς τίτλο").slice(0,250),
-        source_creator:typeof source.source_bibliography?.creator==="string"?
-          source.source_bibliography.creator.slice(0,250):"",
-        reported_archival_reference:typeof source.reported_archival_reference?.display==="string"?
-          source.reported_archival_reference.display.slice(0,500):"",
         page_locator:page,source_lines:lines,
         source_text_sha256:/^[a-f0-9]{64}$/.test(source.source_text_sha256||"")?
           source.source_text_sha256:null,
@@ -90,7 +110,7 @@ function readOwnerAnswer(dataDir,runId,keyFile=path.join(__dirname,".n7-library-
     claims_examined:Array.isArray(value.claims)?value.claims.length:0,
     selected_passages:Number.isFinite(coverage.selected_passages)?coverage.selected_passages:0,
     model_language:greekParagraphs.length?"el":"source_original",
-    paragraphs,references,source_candidates,
+    paragraphs,references,source_candidates,citation_replay:citationReplay,
     limitations:["Only acquired excerpts were analysed. This is not source authentication or human historical verification.",
       "Exact original-page inspection and independence assessment remain necessary."]
   };
