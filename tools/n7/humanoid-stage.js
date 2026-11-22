@@ -201,11 +201,11 @@ async function call(path,payload){
  let d={};try{d=await r.json();}catch{}
  if(!r.ok)throw Error(d.error||('HTTP '+r.status));return d;
 }
-async function chat(text){
+async function chat(text,{voice=false}={}){
  if(typeof window.N7VoiceChat?.send!=='function')throw Error('Η συνομιλία N7 δεν είναι διαθέσιμη σε αυτή τη σελίδα.');
  if(!active)await create();
  S.conversationId=active;save();
- const out=await window.N7VoiceChat.send(active,text);
+ const out=await window.N7VoiceChat.send(active,text,{voice}); // N7_VOICE_CONVERSATION_V1: spoken turns get a short spoken reply
  if(out.queued){presence('thinking','Σε ουρά επεξεργασίας');say('Η εντολή μπήκε σε ουρά του μοντέλου. Η απάντηση θα εμφανιστεί στη συνομιλία όταν ολοκληρωθεί.',{speak:false});return 'queued';}
  presence('done');
  say(out.text||'');return out.cancelled?'cancelled':'done';
@@ -426,7 +426,7 @@ async function run(text,{voice=false}={}){
   else if(r.intent==='library.search')status=await library(r);
   else if(r.intent==='weather')status=await weather(r);
   else if(r.intent==='coding')status=await coding(r);
-  else status=await chat(text);
+  else status=await chat(text,{voice});
   log(r.intent,text,status);
  }catch(e){fail(e);}
  finally{running=false;send.disabled=false;if(voice)lastVoice=true;if(voiceSession&&!utter&&!listening)scheduleListening(450);}

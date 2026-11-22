@@ -185,7 +185,7 @@ async function readGroqStream(response,onDelta){
  return {text,reason};
 }
 function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publicSearch,fetcher=fetch,
-  researchDeadlineMs=8500,articleDeadlineMs=8500,modelDeadlineMs=25000,archiveSearch=null,agents=null,chatAgent=null}){
+  researchDeadlineMs=8500,articleDeadlineMs=8500,modelDeadlineMs=25000,archiveSearch=null,agents=null,chatAgent=null,voiceModel=process.env.N7_VOICE_MODEL||(BASE==='https://api.groq.com/openai/v1'?'openai/gpt-oss-120b':'')}){
  const library=createLibrary(DATA_DIR,{ocr:async images=>{
   if(!API_KEY||!MODEL)throw Error('vision_model_unavailable');
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),55000);
@@ -218,6 +218,8 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
   try{await Promise.all(attachments.filter(a=>a.type==='application/pdf').map(async a=>{a.pdfEvidence=await documentReader.pdfText(a.buffer);a.text=pdfPrompt(a.pdfEvidence);}));}catch(e){return writeError(res,400,'Δεν αναγνώστηκε το PDF: '+String(e.message).slice(0,80));}
   for(const attachment of attachments.filter(a=>a.type==='application/pdf'||a.type==='text/plain'||a.type==='text/markdown')){try{attachment.libraryId=(await library.ingest(attachment.buffer,attachment.name)).id;}catch(e){attachment.libraryWarning=String(e.message).slice(0,120);}}
   const content=input.message.trim();
+  // N7_VOICE_CONVERSATION_V1: the Humanoid marks spoken turns; they get a short, natural spoken reply.
+  const voice=input.voice===true&&!attachments.length;
   // Write once before invoking model; stored images are private, never served publicly.
   let metadata;
   try{metadata=privateStore(DATA_DIR,id,attachments);}catch(e){return writeError(res,400,e.message);}
@@ -295,7 +297,7 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
    let researchTimer;
    try{
     evidence=await Promise.race([
-      agentNotes?Promise.resolve({searched:false,items:[],reason:'agent_tools'}):privateScope&&!wantsExternal?Promise.resolve({searched:false,items:[],reason:'private_library_scope'}):publicSearch.researchMessages([{role:'user',content:queryInstruction.replace(/Συνημμένο κείμενο:[\s\S]*/u,'').slice(0,1500)}]),
+      agentNotes?Promise.resolve({searched:false,items:[],reason:'agent_tools'}):voice?Promise.resolve({searched:false,items:[],reason:'voice_conversation'}):privateScope&&!wantsExternal?Promise.resolve({searched:false,items:[],reason:'private_library_scope'}):publicSearch.researchMessages([{role:'user',content:queryInstruction.replace(/Συνημμένο κείμενο:[\s\S]*/u,'').slice(0,1500)}]),
       new Promise(resolve=>{researchTimer=setTimeout(()=>resolve(researchTimeout),researchDeadlineMs);})
     ]);
    }finally{clearTimeout(researchTimer);}
@@ -354,7 +356,14 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
   emit('status',{stage:'model',message:'Οι πηγές ελέγχθηκαν. Το N7 συντάσσει την απάντηση…'});
   try{
    let continuationFailure='';
-   const answerGuide={
+   const answerGuide=voice?{
+     role:'system',
+     content:'N7 VOICE CONVERSATION: the owner is talking to you out loud through the Humanoid and will HEAR your reply. '+
+       'Answer like a person in a live conversation, in natural spoken Greek: usually 1 to 3 short sentences, at most about 60 words, '+
+       'unless the owner explicitly asks for detail. Put the answer first. No lists, headings, markdown, emojis, links, reference marks or source footers. '+
+       'If research notes or sources are in the context, summarise what matters in a sentence and say the details can follow if wanted. '+
+       'Warm and natural, a little humour when it fits; never robotic disclaimers. When it helps, end with one short question or offer.'
+   }:{
      role:'system',
      content:'N7 RESPONSE COMPLETION: Answer the actual request concisely but completely. '+
        'For a long historical question, start with sources read/not read and the bibliography '+
@@ -362,6 +371,8 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
        'Do not produce a year-by-year list longer than 12 key entries. '+
        'If only the title/snippet is available, never claim to have read the full article.'
    };
+   // Spoken turns use their own model (separate free-tier quota on Groq); any failure before the first word falls back to MODEL.
+   let model=voice&&voiceModel?voiceModel:MODEL;
    for(let pass=0;pass<2;pass++){
     // Follow-up is focused on the missing final sections, not a replay of the
     // entire long answer or model context (which caused timeouts).
@@ -374,10 +385,12 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
     ]:[...messages,answerGuide];
     if(cancelled)throw Error('Η απάντηση διακόπηκε από τον χρήστη');
     const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),modelDeadlineMs);activeController=controller;
-    const request={model:MODEL,messages:ask,temperature:0.25,stream:true,
-      max_completion_tokens:2400};
-    if(BASE==='https://api.groq.com/openai/v1'&&MODEL==='qwen/qwen3.8-27b'){
-      request.reasoning_effort='none';request.max_completion_tokens=2400;
+    const request={model,messages:ask,temperature:voice?0.6:0.25,stream:true,
+      max_completion_tokens:voice?400:2400};
+    if(BASE==='https://api.groq.com/openai/v1'&&model==='qwen/qwen3.8-27b'){
+      request.reasoning_effort='none';
+    }else if(/^openai\/gpt-oss-/.test(model)){
+      request.reasoning_effort='low';
     }
     let completion;
     try{
@@ -387,12 +400,13 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
       });
       completion=await readGroqStream(response,part=>{final+=part;emit('delta',{text:part})});
     }catch(err){
+      if(!final&&model!==MODEL&&!cancelled){console.warn('N7_VOICE_MODEL_FALLBACK '+String(err.message||err).slice(0,80));model=MODEL;pass--;continue;}
       if(!final)throw err;
       continuationFailure=cancelled?'διακοπή από τον χρήστη':err.name==='AbortError'?'το χρονικό όριο':'πρόβλημα σύνδεσης με το μοντέλο';
       emit('status',{stage:'partial',message:'Η συνέχεια διακόπηκε· διατηρώ την ήδη παραχθείσα απάντηση.'});
       break;
     }finally{clearTimeout(timeout);}
-    if(completion.reason!=='length'){done=true;break;}
+    if(completion.reason!=='length'||voice){done=true;break;}
     emit('status',{stage:'continuation',message:'Η απάντηση συνεχίζεται…'});
    }
    if(!done&&continuationFailure) {
@@ -402,9 +416,10 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
    }
    if(!final)throw Error('Το μοντέλο δεν έστειλε κείμενο');
    const provenance=library.audit(final,libraryHits,evidence?.items||[]);
-   const libraryFooter=library.footer(libraryHits,provenance);
+   // Spoken replies carry no source footers: they would be read aloud.
+   const libraryFooter=voice?'':library.footer(libraryHits,provenance);
    if(libraryFooter){final+=libraryFooter;emit('delta',{text:libraryFooter});}
-   const footer=publicSearch.sourceFooter(evidence);
+   const footer=voice?'':publicSearch.sourceFooter(evidence);
    if(footer){final+=footer;emit('delta',{text:footer});}
    const readFiles=attachments.length?attachments:history.slice(-24).filter(m=>m.role==='user').flatMap(m=>(m.attachments||[]).map(meta=>loadStored(DATA_DIR,id,meta)).filter(Boolean)).slice(-4);
    const coverage=readFiles.filter(a=>a.pdfEvidence).map(a=>{const e=a.pdfEvidence;return a.name+': κείμενο από φυσικές σελίδες '+(e.pages.map(p=>p.page).join(', ')||'καμία')+' από '+e.totalPages+'.'+(e.emptyPages?.length?' Χωρίς αναγνώσιμο κείμενο: '+e.emptyPages.join(', ')+' — χρειάζεται OCR.':'')+(e.partial?' Μερική εξαγωγή· δεν διαβάστηκε ολόκληρο το PDF.':'');}).join('\n');

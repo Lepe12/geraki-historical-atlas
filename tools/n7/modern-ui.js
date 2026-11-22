@@ -123,7 +123,7 @@
   const result=await originalApi(url.replace(/\/chat$/,''));if(result.conversation?.messages?.some(m=>m.attachments?.length))documentChats.add(result.conversation.id);return {...result,streamedText:text,exchangeId,completed:done,cancelled:controller.signal.aborted};
  }
  // Same authenticated transport and project context as typed chat; pending drafts/files stay untouched.
- window.N7VoiceChat={send:async(conversationId,message)=>{
+ window.N7VoiceChat={send:async(conversationId,message,{voice=false}={})=>{
   if(active!==conversationId||busy||$('send').disabled)throw Error('Το N7 απαντά ήδη ή η συνομιλία άλλαξε.');
   busy=true;$('send').disabled=true;
   try{
@@ -131,7 +131,7 @@
    if(active!==conversationId)throw Error('Η συνομιλία άλλαξε.');
    render([...before.conversation.messages,{role:'user',content:message}]);
    const url='/api/conversations/'+conversationId+'/chat';
-   const result=streamAvailable?await streamDocuments(url,{message},[]):await originalApi(url,{method:'POST',body:JSON.stringify({message})});
+   const result=streamAvailable?await streamDocuments(url,voice?{message,voice:true}:{message},[]):await originalApi(url,{method:'POST',body:JSON.stringify({message})});
    if(result.pending&&result.job_id){watchQueuedAnswer(result.job_id,conversationId);return {queued:true};}
    if(active===conversationId&&result.conversation){render(result.conversation.messages);$('currenttitle').textContent=result.conversation.title;await list();}
    if(result.cancelled)return {text:result.streamedText||'Η απάντηση διακόπηκε.',cancelled:true,exchangeId:result.exchangeId};
