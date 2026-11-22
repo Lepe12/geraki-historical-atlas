@@ -1,0 +1,32 @@
+# Pages CMS (https://app.pagescms.org): browser editor for the NABOU menu and pages.
+# Saving commits to this branch; atlas-pages.yml then republishes the atlas.
+media:
+  input: jarvis-intelligence-chamber/content/media
+  output: ./content/media
+
+content:
+  - name: nabou-site
+    label: NABOU — Μενού και σελίδες
+    type: file
+    path: jarvis-intelligence-chamber/content/site.json
+    format: json
+    fields:
+      - name: menu
+        label: Μενού (σελίδες και links)
+        description: Με κείμενο ανοίγει σελίδα· με link ανοίγει τη διεύθυνση.
+        type: object
+        list: true
+        fields:
+          - name: label
+            label: Όνομα στο μενού
+            type: string
+            required: true
+          - name: content
+            label: Κείμενο σελίδας
+            type: rich-text
+          - name: url
+            label: Link (προαιρετικό, αντί για κείμενο)
+            type: string
+          - name: hidden
+            label: Κρυφό
+            type: boolean
