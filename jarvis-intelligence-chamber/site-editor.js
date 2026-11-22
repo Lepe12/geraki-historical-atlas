@@ -7,9 +7,9 @@
   if (!S || !shell) return;
   const REPO = 'Lepe12/geraki-historical-atlas';
   const DIR = 'jarvis-intelligence-chamber/';
-  // Preview on raw.githack.com saves to the branch being previewed; the real site saves to main.
+  // ?branch=… wins; a raw.githack.com preview of a branch saves to that branch; the real site saves to main.
   const m = location.host === 'raw.githack.com' && location.pathname.match(/^\/Lepe12\/geraki-historical-atlas\/([^/]+)\//i);
-  const BRANCH = m ? decodeURIComponent(m[1]) : 'main';
+  const BRANCH = new URLSearchParams(location.search).get('branch') || (m && !/^[0-9a-f]{40}$/.test(m[1]) ? decodeURIComponent(m[1]) : 'main');
   const TOKEN_KEY = 'nabou.githubToken';
   let dirty = false;
 
