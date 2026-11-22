@@ -1,0 +1,245 @@
+name: N7 live GET audit
+on:
+  push:
+    branches: [audit/n7-live-readonly-20261116]
+    paths: [.github/workflows/n7-live-readonly-audit.yml]
+  pull_request:
+    paths: [.github/workflows/n7-live-readonly-audit.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: GET-only status checks
+        shell: bash
+        run: |
+          set +e
+          echo "AUDIT_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          for url in https://bot.piratecartography.com/ https://bot.piratecartography.com/n7-apex/ https://bot.piratecartography.com/api/status https://bot.piratecartography.com/api/agents https://pct-live.piratecartography.com/health https://n7-agent.piratecartography.com/health; do
+            host="${url#https://}"; host="${host%%/*}"
+            echo "CHECK $url DNS=$(getent ahostsv4 "$host" | head -1 | awk '{print $1}')"
+            curl -sS -L --max-redirs 2 --connect-timeout 8 --max-time 18 -o /dev/null -w 'HTTP=%{http_code} IP=%{remote_ip} BYTES=%{size_download} CONTENT_TYPE=%{content_type}\n' "$url"
+          done
+          echo "Unauthenticated GET only; this does not test shared chat memory, run deployment, or authenticate."
+      - name: Inspect anonymous runtime and UI links (read only)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import urllib.request, json, re, html
+          from urllib.parse import urljoin
+          base='https://bot.piratecartography.com'
+          def get(path):
+              try:
+                  req=urllib.request.Request(base+path,headers={'User-Agent':'N7-live-audit/1.0'})
+                  with urllib.request.urlopen(req,timeout=12) as r:
+                      return r.status,r.headers.get('Content-Type',''),r.read(450000).decode('utf-8','replace')
+              except Exception as e:
+                  return None,'',type(e).__name__+': '+str(e)[:90]
+          for path in ['/','/n7-apex/','/api/status','/api/conversations','/api/tasks']:
+              status,ctype,data=get(path)
+              print('PAGE',path,'status=',status,'type=',ctype,'bytes=',len(data))
+              if 'application/json' in ctype and path=='/api/status':
+                  try:
+                      obj=json.loads(data)
+                      print('STATUS_FIELDS',[(k, obj.get(k)) for k in ['authenticated','online','status'] if k in obj])
+                  except Exception: pass
+              if path in ['/','/n7-apex/'] and 'text/html' in ctype:
+                  scripts=re.findall(r'<script\\b[^>]*\\bsrc=["\\\']([^"\\\']+)',data,re.I)
+                  print('SCRIPTS',path,[x[:150] for x in scripts[:12]])
+                  print('UI_MARKERS',path,{k:(k.lower() in data.lower()) for k in ['n7-apex','humanoid','app.js','_next','voice']})
+          PY
+      - name: Identify HTML interception on JSON endpoints
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import urllib.request,re,hashlib
+          paths=['/','/n7-apex/','/api/status']
+          for p in paths:
+              url='https://bot.piratecartography.com'+p
+              try:
+                  with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'N7-diagnostic/1.0','Accept':'application/json' if p.startswith('/api/') else 'text/html'}),timeout=15) as r:
+                      b=r.read(50000).decode('utf-8','replace')
+                      title=re.search(r'<title[^>]*>(.*?)</title>',b,re.I|re.S)
+                      tags=re.findall(r'<h[1-3][^>]*>(.*?)</h[1-3]>',b,re.I|re.S)[:3]
+                      text=re.sub(r'\\s+',' ',re.sub('<[^>]+>',' ',b))
+                      print('TARGET',p,'code',r.status,'final_path',r.url.split('.com',1)[-1][:120])
+                      print('CONTENT_TYPE',r.headers.get('Content-Type'),'SERVER',r.headers.get('Server'),'HASH',hashlib.sha256(b.encode()).hexdigest()[:16])
+                      print('TITLE',title.group(1)[:140] if title else 'none','HEADINGS',[re.sub('<[^>]+>','',x)[:100] for x in tags])
+                      print('CONTENT_PREFIX',text[:230])
+              except Exception as e:
+                  print('ERROR',p,type(e).__name__,str(e)[:140])
+          PY
+
+  existing_ftps:
+    runs-on: ubuntu-24.04
+    environment: nabou-production
+    timeout-minutes: 5
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+    steps:
+      - name: Authenticate using existing environment and inspect N7 target read-only
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import ftplib,os,socket,ssl
+          keys=('PCT_FTPS_HOST','PCT_FTPS_USER','PCT_FTPS_PASSWORD')
+          print('ENVIRONMENT=nabou-production')
+          print('CREDENTIAL_BINDINGS='+('present' if all(os.getenv(k) for k in keys) else 'missing'))
+          if not all(os.getenv(k) for k in keys):raise SystemExit(2)
+          h=os.environ['PCT_FTPS_HOST']
+          tls=os.getenv('PCT_FTPS_TLS_SERVER_NAME','').strip() or 'linux3087.grserver.gr'
+          port=int(os.getenv('PCT_FTPS_PORT','21'))
+          try:
+              first={row[4][0] for row in socket.getaddrinfo(h,port,type=socket.SOCK_STREAM)}
+              second={row[4][0] for row in socket.getaddrinfo(tls,port,type=socket.SOCK_STREAM)}
+              if not first.intersection(second):
+                  print('TLS_HOST_MATCH=false');raise SystemExit(3)
+              print('TLS_HOST_MATCH=true')
+              ftp=ftplib.FTP_TLS(timeout=25,context=ssl.create_default_context())
+              ftp.connect(h,port)
+              ftp.host=tls
+              ftp.login(os.environ['PCT_FTPS_USER'],os.environ['PCT_FTPS_PASSWORD'])
+              ftp.prot_p()
+              print('EXISTING_FTPS_AUTH=PASS')
+              for tag,dest in (('NABOU','/piratecartography-gateway/server/command-center-live'),('N7','/bot.piratecartography.com/n7-app')):
+                  try:
+                      ftp.cwd(dest)
+                      print(tag+'_TARGET_ACCESS=PASS')
+                      names={x.rsplit('/',1)[-1] for x in ftp.nlst()}
+                      print(tag+'_EXPECTED_ROOT_FILE='+str(('server.js' if tag=='N7' else 'app.js') in names).lower())
+                  except ftplib.all_errors as e:
+                      print(tag+'_TARGET_ACCESS=FAIL_'+type(e).__name__)
+              ftp.quit()
+          except (ftplib.all_errors,OSError,ValueError) as e:
+              print('EXISTING_FTPS_CONNECT_ERROR='+type(e).__name__)
+              raise SystemExit(4)
+          PY
+
+  cross_repo_access:
+    runs-on: ubuntu-24.04
+    environment: nabou-production
+    timeout-minutes: 3
+    permissions:
+      contents: read
+    steps:
+      - name: Verify existing authorization to read private N7 canonical repository
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          N7_PAT_PRESENT: ${{ secrets.N7_REPO_TOKEN != '' }}
+          GH_APP_ID_PRESENT: ${{ secrets.GH_APP_ID != '' }}
+          GH_APP_KEY_PRESENT: ${{ secrets.GH_APP_PRIVATE_KEY != '' }}
+        run: |
+          if gh api repos/Lepe12/independent-ai-bot -q .full_name >/dev/null 2>&1; then
+            echo "CANONICAL_PRIVATE_REPO_READ=YES"
+          else
+            echo "CANONICAL_PRIVATE_REPO_READ=NO"
+          fi
+          echo "EXISTING_N7_TOKEN=$N7_PAT_PRESENT"
+          echo "EXISTING_GH_APP_ID=$GH_APP_ID_PRESENT"
+          echo "EXISTING_GH_APP_KEY=$GH_APP_KEY_PRESENT"
+
+  n7_code_inventory:
+    runs-on: ubuntu-24.04
+    environment: nabou-production
+    timeout-minutes: 5
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+    steps:
+      - name: Compare live N7 runtime binaries against canonical release checksums (read-only)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import ftplib,hashlib,ssl
+          import os
+          host=os.environ['PCT_FTPS_HOST']
+          ftp=ftplib.FTP_TLS(timeout=30,context=ssl.create_default_context())
+          ftp.connect(host,21)
+          ftp.host='linux3087.grserver.gr'
+          ftp.login(os.environ['PCT_FTPS_USER'],os.environ['PCT_FTPS_PASSWORD'])
+          ftp.prot_p()
+          ftp.cwd('/bot.piratecartography.com/n7-app')
+          expected={
+            'server.js':'e4ac4fe64303961e8de73fabdfd6ade93ab32aee6d760fe02d30825f5339e86f',
+            'agent.js':'bcb534390f0c1df9d8b6c50b62a9286d697575b9852768dd625c2463a02c71b2',
+            'browser.js':'e1135490f8c977cb866aebc665a65f375a0ffa972255140d17902399f20d6f9e',
+            'skills/registry.js':'9563d7ebacaae3bf45421a13ee70d0a48b10eac6e6ef7e66424923db026d51a2'
+          }
+          for name,digest in expected.items():
+            parts=[]
+            try:
+              ftp.retrbinary('RETR '+name,parts.append)
+              actual=hashlib.sha256(b''.join(parts)).hexdigest()
+              print('LIVE_N7_'+name.replace('/','_').replace('.','_')+'=CANONICAL' if actual==digest else
+                    'LIVE_N7_'+name.replace('/','_').replace('.','_')+'=DIFFERENT '+actual[:16])
+            except ftplib.error_perm:
+              print('LIVE_N7_'+name.replace('/','_').replace('.','_')+'=NOT_READABLE')
+          ftp.quit()
+          PY
+
+
+  n7_full_release_verify:
+    runs-on: ubuntu-24.04
+    environment: nabou-production
+    timeout-minutes: 12
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+    steps:
+      - name: Read-only hash check of all reviewed N7 runtime files
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import ftplib,hashlib,json,os,ssl,urllib.request
+          url='https://raw.githubusercontent.com/Lepe12/geraki-historical-atlas/41de84c4aedff877cc5f5b3607343c6b9f630ca4/n7-secure-relay/expected-hashes.json'
+          with urllib.request.urlopen(url,timeout=30) as response:
+              manifest=json.load(response)
+          assert manifest['schema']=='n7-live-hash-audit-v1'
+          expected=manifest['files']
+          ftp=ftplib.FTP_TLS(timeout=40,context=ssl.create_default_context())
+          ftp.connect(os.environ['PCT_FTPS_HOST'],21)
+          ftp.host='linux3087.grserver.gr'
+          ftp.login(os.environ['PCT_FTPS_USER'],os.environ['PCT_FTPS_PASSWORD'])
+          ftp.prot_p()
+          ftp.cwd('/bot.piratecartography.com/n7-app')
+          matches=0
+          problems=[]
+          for name,sha in expected.items():
+              pieces=[]
+              try:
+                  ftp.retrbinary('RETR '+name,pieces.append)
+                  if hashlib.sha256(b''.join(pieces)).hexdigest()==sha:
+                      matches+=1
+                  else:
+                      problems.append((name,'HASH_MISMATCH'))
+              except ftplib.all_errors as error:
+                  problems.append((name,type(error).__name__))
+          ftp.quit()
+          print('N7_LIVE_RELEASE_MATCHING_FILES='+str(matches),flush=True)
+          print('N7_LIVE_RELEASE_EXPECTED_FILES='+str(len(expected)),flush=True)
+          for name,kind in problems[:15]:
+              print('N7_LIVE_RELEASE_PROBLEM '+name+' '+kind,flush=True)
+          health_url='https://bot.piratecartography.com/health'
+          with urllib.request.urlopen(health_url,timeout=20) as response:
+              health=json.load(response)
+          print('N7_LIVE_HEALTH_OK='+str(health.get('status')=='ok').lower(),flush=True)
+          print('N7_LIVE_MODEL_CONFIGURED='+str(health.get('modelConfigured') is True).lower(),flush=True)
+          print('N7_LIVE_BROWSER_CONFIGURED='+str(health.get('browserConfigured') is True).lower(),flush=True)
+          print('N7_LIVE_RELEASE_ID_MATCH='+
+            str(health.get('release',{}).get('id')==manifest['release_id']).lower(),flush=True)
+          print('N7_LIVE_RELEASE_COMMIT_MATCH='+
+            str(health.get('release',{}).get('canonical_commit')==manifest['source_commit']).lower(),flush=True)
+          if matches!=len(expected) or problems or health.get('status')!='ok' or health.get('modelConfigured') is not True:
+              raise SystemExit('N7_FULL_RELEASE_MISMATCH')
+          print('N7_FULL_RELEASE_VERIFIED=true',flush=True)
+          PY
