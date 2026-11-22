@@ -57,7 +57,7 @@
       S.render();
       if (S.editing) {
         const sc = document.createElement('script');
-        sc.src = './site-editor.js?v=1';
+        sc.src = './site-editor.js?v=2';
         document.body.append(sc);
       }
     })
