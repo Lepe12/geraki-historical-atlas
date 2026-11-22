@@ -1,0 +1,22 @@
+name: N7 voice Niki public asset discovery
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/n7-niki-source-probe.yml'
+      - 'tools/n7_apex_preview/probe_niki_public_asset.py'
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7_apex_preview/probe_niki_public_asset.py
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python tools/n7_apex_preview/probe_niki_public_asset.py
