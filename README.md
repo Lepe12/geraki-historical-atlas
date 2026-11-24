@@ -40,3 +40,7 @@ The Atlas remains a separate publication/visualization consumer. Its data-integr
 - planned, intelligence/network and reconstructed routes must remain visually distinguishable.
 
 The research engine must not publish raw discovery material into the Atlas as established fact.
+
+## Open-source license and research materials
+
+Original software code and its accompanying software documentation in this repository are released under the [MIT License](LICENSE), to the extent the contributors hold the necessary rights. This grant does **not** relicense third-party dependencies or third-party materials. Historical source excerpts, archival reproductions, images, maps, externally sourced datasets, and research evidence may carry separate copyright, attribution, archival access, privacy, or reuse restrictions. Do not assume those materials are MIT-licensed merely because they appear in this repository; consult their original rights holders and provenance records. Contributions must respect existing third-party notices and licenses.
