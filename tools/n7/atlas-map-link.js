@@ -10,14 +10,14 @@
  const embedded=window.parent!==window;
  // An embed link is honoured only inside a frame, a window link only in an opened window.
  if(opened.embed!==embedded||(!embedded&&!window.opener))return;
- const opener=embedded?window.parent:window.opener,seen=new Set();let nonce=opened.nonce;
+ const opener=embedded?window.parent:window.opener,seen=new Set();let nonce=opened.nonce,origin=opened.origin||P.BOT;
  const M=()=>embedded&&window.NABOU_MAP?.ready?.()?window.NABOU_MAP:null;
  if(embedded)document.documentElement.classList.add('n7-embed');
  history.replaceState(null,'',location.pathname+location.search);
- const post=data=>{try{if(!opener.closed)opener.postMessage({schema:P.SCHEMA,nonce,...data},P.BOT);}catch{}};
+ const post=data=>{try{if(!opener.closed)opener.postMessage({schema:P.SCHEMA,nonce,...data},origin);}catch{}};
  const el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!=null)e.textContent=text;if(cls)e.className=cls;return e;};
  // The MapLibre atlas exposes records; this adapter gives them the shape the commands below use.
- const atlas=()=>{const m=M();if(!m)return embedded?null:window.NABOU_PRO_ATLAS;
+ const atlas=()=>{const m=M();if(!m)return embedded&&window.NABOU_MAP?null:window.NABOU_PRO_ATLAS||null;
   return {places:m.records.map(r=>({id:r.id,name:r.place})),get selected(){return m.selected();},select:id=>m.focus(id)};};
  const record=id=>M()?.records.find(r=>r.id===id)||null;
  function current(){
@@ -65,6 +65,14 @@
   const a=atlas();
   if(!a)return {ok:false,error:'NABOU_ATLAS_NOT_READY'};
   if(c.action==='home'){window.NABOU_ATLAS?.setPage?.('home');return {ok:true};}
+  if(c.action==='fly'){
+   // HERMES_NABOU_V1: a pirate base by coordinates (NABOU data/pirate-bases.json); camera only, data untouched.
+   window.NABOU_ATLAS?.setPage?.('home');const m3=window.NABOU_MAP3D;
+   if(m3?.supported){const go=()=>{const t=m3.camera()?.tilt;m3.camera(t==null?{lon:c.lon,lat:c.lat}:{lon:c.lon,lat:c.lat,tilt:t});};
+    if(m3.enabled&&m3.ready)go();else Promise.resolve(m3.set(true)).then(go,()=>{});return {ok:true,map3d:true};}
+   const near=(a.places||[]).map(p=>[Math.hypot((p.lon-c.lon)*Math.cos(c.lat*Math.PI/180),p.lat-c.lat),p]).sort((x,y)=>x[0]-y[0])[0];
+   if(near){a.select(near[1].id);return {ok:true,nearest:near[1].id};}
+   return {ok:false,error:'MAP_CAMERA_UNAVAILABLE'};}
   if(c.action==='results'){const n=renderResults(c.results);if(n.located)a.select(c.results.places.find(p=>p.place&&a.places.some(x=>x.id===p.place)).place);return {ok:true,...n};}
   const id=c.place||a.selected;
   if(!a.places.some(x=>x.id===id))return {ok:false,error:'PLACE_NOT_IN_NABOU_GAZETTEER'};
@@ -73,7 +81,7 @@
   return {ok:a.selected===id};
  }
  window.addEventListener('message',event=>{
-  if(event.origin!==P.BOT||event.source!==opener||!P.envelope(event.data,nonce))return;
+  if(event.origin!==origin||event.source!==opener||!P.envelope(event.data,nonce))return;
   const f=P.mapFocus(event.data);
   if(f){if(seen.has(f.id))return;seen.add(f.id);
    // Only a record that exists in data.json is focused; the ack reports where the camera really is.
@@ -95,6 +103,6 @@
  if(atlas())ready();else{let n=0;const t=setInterval(()=>{if(atlas()||++n>300){clearInterval(t);if(atlas())ready();else post({type:'error',message:'NABOU_ATLAS_NOT_READY'});}},100);}
  window.addEventListener('pagehide',()=>post({type:'closed'}));
  // A reloaded N7 window re-targets this same named window: re-bind without reloading the map.
- window.addEventListener('hashchange',()=>{const o=P.opening(location.hash);if(!o)return;nonce=o.nonce;seen.clear();last='';
+ window.addEventListener('hashchange',()=>{const o=P.opening(location.hash);if(!o)return;nonce=o.nonce;origin=o.origin||P.BOT;seen.clear();last='';
   history.replaceState(null,'',location.pathname+location.search);ready();});
 })();

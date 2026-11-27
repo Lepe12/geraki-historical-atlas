@@ -5,11 +5,15 @@
 (function(root){
  'use strict';
  const SCHEMA='n7-map/v1',BOT='https://bot.piratecartography.com',ATLAS='https://lepe12.github.io';
+ // HERMES_NABOU_V1: the Ερμής Humanoid (hermes.piratecartography.com) may open/embed NABOU too.
+ const HERMES='https://hermes.piratecartography.com',ORIGINS=new Set([BOT,HERMES]);
  const ATLAS_URL=ATLAS+'/geraki-historical-atlas/jarvis-intelligence-chamber/';
  // N7_SPLIT_MAP_V1: the public MapLibre atlas (data.json records), embedded below N7 in an iframe.
  const ATLAS_ROOT_URL=ATLAS+'/geraki-historical-atlas/';
  const STATUSES=new Set(['VERIFIED','APPROXIMATE','NEEDS RESEARCH']);
- const ACTIONS=new Set(['focus','sources','results','home']);
+ const ACTIONS=new Set(['focus','sources','results','home','fly']);
+ // Eastern Atlantic to Levant: any of the atlas's pirate bases, nothing outside the map.
+ const lonOK=x=>typeof x==='number'&&Number.isFinite(x)&&x>=-20&&x<=45,latOK=x=>typeof x==='number'&&Number.isFinite(x)&&x>=25&&x<=50;
  const nonceOK=x=>typeof x==='string'&&/^[a-f0-9]{32}$/.test(x);
  const idOK=x=>typeof x==='string'&&/^[a-f0-9-]{36}$/.test(x);
  const placeOK=x=>typeof x==='string'&&/^[a-z][a-z0-9-]{1,40}$/.test(x);
@@ -19,9 +23,9 @@
  function opening(hash){
   // Parsed on the NABOU side from location.hash; refuses anything but the exact N7 origin.
   try{const raw=new URLSearchParams(String(hash||'').replace(/^#/,'')).get('n7map');if(!raw||raw.length>400)return null;
-   const o=JSON.parse(raw);return o&&o.schema===SCHEMA&&o.origin===BOT&&nonceOK(o.nonce)?{nonce:o.nonce,embed:o.embed===true}:null;}catch{return null;}
+   const o=JSON.parse(raw);return o&&o.schema===SCHEMA&&ORIGINS.has(o.origin)&&nonceOK(o.nonce)?{nonce:o.nonce,embed:o.embed===true,origin:o.origin}:null;}catch{return null;}
  }
- function openUrl(nonce){if(!nonceOK(nonce))throw Error('invalid nonce');return ATLAS_URL+'#n7map='+encodeURIComponent(JSON.stringify({schema:SCHEMA,nonce,origin:BOT}));}
+ function openUrl(nonce,origin=BOT,embed=false){if(!nonceOK(nonce)||!ORIGINS.has(origin))throw Error('invalid nonce');return ATLAS_URL+'#n7map='+encodeURIComponent(JSON.stringify(embed?{schema:SCHEMA,nonce,origin,embed:true}:{schema:SCHEMA,nonce,origin}));}
  // The MapLibre atlas with relief (owner's choice for a clear close view of a place, 2026-11-13).
  function embedUrl(nonce){if(!nonceOK(nonce))throw Error('invalid nonce');return ATLAS_ROOT_URL+'#n7map='+encodeURIComponent(JSON.stringify({schema:SCHEMA,nonce,origin:BOT,embed:true}));}
  // N7 -> map: focus one existing data.json record. Nothing but a record id crosses.
@@ -60,6 +64,7 @@
  function command(data){
   if(!data||data.type!=='command'||!idOK(data.id)||!ACTIONS.has(data.action))return null;
   if(data.action==='focus'||data.action==='sources'){if(data.place!=null&&!placeOK(data.place))return null;return {id:data.id,action:data.action,place:data.place??null};}
+  if(data.action==='fly'){if(!lonOK(data.lon)||!latOK(data.lat))return null;return {id:data.id,action:'fly',lon:data.lon,lat:data.lat,label:str(data.label,120)};}
   if(data.action==='results'){const r=results(data.results);return r?{id:data.id,action:'results',results:r}:null;}
   return {id:data.id,action:data.action};
  }
@@ -73,6 +78,6 @@
    camera:c?{lng:n(c.lng),lat:n(c.lat),zoom:n(c.zoom)}:null,
    coordinateStatus:STATUSES.has(value.coordinateStatus)?value.coordinateStatus:null};
  }
- const api={SCHEMA,BOT,ATLAS,ATLAS_URL,ATLAS_ROOT_URL,nonceOK,idOK,placeOK,recordIdOK,envelope,opening,openUrl,embedUrl,mapFocus,records,command,results,state};
+ const api={SCHEMA,BOT,HERMES,ORIGINS,ATLAS,ATLAS_URL,ATLAS_ROOT_URL,nonceOK,idOK,placeOK,recordIdOK,envelope,opening,openUrl,embedUrl,mapFocus,records,command,results,state};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.N7MapProtocol=api;
 })(typeof window==='undefined'?globalThis:window);
