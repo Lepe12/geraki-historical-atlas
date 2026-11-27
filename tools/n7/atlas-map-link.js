@@ -63,16 +63,18 @@
  }
  function run(c){
   const a=atlas();
-  if(!a)return {ok:false,error:'NABOU_ATLAS_NOT_READY'};
-  if(c.action==='home'){window.NABOU_ATLAS?.setPage?.('home');return {ok:true};}
+  // The map's own reset button: it drives the 3D camera home when 3D is on (map-3d.js).
+  if(c.action==='home'){window.NABOU_ATLAS?.setPage?.('home');const r=document.getElementById('resetView');if(r)r.click();return {ok:true};}
   if(c.action==='fly'){
    // HERMES_NABOU_V1: a pirate base by coordinates (NABOU data/pirate-bases.json); camera only, data untouched.
    window.NABOU_ATLAS?.setPage?.('home');const m3=window.NABOU_MAP3D;
-   if(m3?.supported){const go=()=>{const t=m3.camera()?.tilt;m3.camera(t==null?{lon:c.lon,lat:c.lat}:{lon:c.lon,lat:c.lat,tilt:t});};
+   if(m3?.supported){// Same close, slightly tilted view as the N7 embed focus (n7-embed-map.js).
+    const go=()=>m3.camera({lon:c.lon,lat:c.lat,tilt:48,rot:0,dist:2.4});
     if(m3.enabled&&m3.ready)go();else Promise.resolve(m3.set(true)).then(go,()=>{});return {ok:true,map3d:true};}
-   const near=(a.places||[]).map(p=>[Math.hypot((p.lon-c.lon)*Math.cos(c.lat*Math.PI/180),p.lat-c.lat),p]).sort((x,y)=>x[0]-y[0])[0];
-   if(near){a.select(near[1].id);return {ok:true,nearest:near[1].id};}
+   const near=(a?.places||[]).map(p=>[Math.hypot((p.lon-c.lon)*Math.cos(c.lat*Math.PI/180),p.lat-c.lat),p]).sort((x,y)=>x[0]-y[0])[0];
+   if(near&&a){a.select(near[1].id);return {ok:true,nearest:near[1].id};}
    return {ok:false,error:'MAP_CAMERA_UNAVAILABLE'};}
+  if(!a)return {ok:false,error:'NABOU_ATLAS_NOT_READY'};
   if(c.action==='results'){const n=renderResults(c.results);if(n.located)a.select(c.results.places.find(p=>p.place&&a.places.some(x=>x.id===p.place)).place);return {ok:true,...n};}
   const id=c.place||a.selected;
   if(!a.places.some(x=>x.id===id))return {ok:false,error:'PLACE_NOT_IN_NABOU_GAZETTEER'};
